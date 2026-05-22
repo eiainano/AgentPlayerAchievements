@@ -1,0 +1,26 @@
+{
+  "name": "agpa",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Agent Player Achievements — gamified achievement system for AI coding agents",
+  "scripts": {
+    "demo": "tsx src/cli/mvp.ts demo",
+    "stats": "tsx src/cli/mvp.ts stats",
+    "progress": "tsx src/cli/mvp.ts progress",
+    "reset": "tsx src/cli/mvp.ts reset",
+    "dashboard": "tsx src/cli/dashboard.ts",
+    "mcp": "tsx src/main.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^4.1.6"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@types/node": "^22.0.0",
+    "zod": "^4.4.3"
+  }
+}

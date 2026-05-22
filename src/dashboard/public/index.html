@@ -1,5 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
-<head><meta charset="UTF-8"><title>AGPA Dashboard</title></head>
-<body><h1>AGPA Dashboard</h1><p>Frontend coming in Tasks 6-8.</p></body>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AGPA — Achievements Dashboard</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav id="top-nav">
+    <div class="nav-inner">
+      <span class="nav-brand">🎮 AGPA</span>
+      <div class="nav-links">
+        <a href="#profile" class="nav-link active" data-section="profile">Profile</a>
+        <a href="#achievements" class="nav-link" data-section="achievements">Achievements</a>
+        <a href="#sets" class="nav-link" data-section="sets">Sets</a>
+        <a href="#timeline" class="nav-link" data-section="timeline">Timeline</a>
+      </div>
+      <span class="nav-stats" id="nav-stats">0/0</span>
+    </div>
+  </nav>
+
+  <!-- Profile Hero -->
+  <section id="profile" class="section hero-section">
+    <div class="hero-inner">
+      <div class="level-ring-container">
+        <div class="level-ring" id="level-ring">
+          <span class="level-number" id="level-number">0</span>
+        </div>
+      </div>
+      <h1 class="hero-title">Agent Achievements</h1>
+      <div class="xp-bar-container">
+        <div class="xp-bar" id="xp-bar">
+          <div class="xp-bar-fill" id="xp-bar-fill"></div>
+        </div>
+        <span class="xp-label" id="xp-label">0 / 0 XP</span>
+      </div>
+      <div class="showcase" id="showcase"></div>
+      <div class="stats-row" id="stats-row"></div>
+    </div>
+  </section>
+
+  <!-- Achievement Grid -->
+  <section id="achievements" class="section">
+    <div class="section-header">
+      <h2>Achievements</h2>
+      <div class="filter-tabs" id="filter-tabs">
+        <button class="filter-tab active" data-filter="all">All</button>
+        <button class="filter-tab" data-filter="unlocked">Unlocked</button>
+        <button class="filter-tab" data-filter="locked">Locked</button>
+      </div>
+    </div>
+    <div class="category-nav" id="category-nav"></div>
+    <div class="achievement-grid" id="achievement-grid"></div>
+  </section>
+
+  <!-- Sets -->
+  <section id="sets" class="section">
+    <div class="section-header">
+      <h2>Sets</h2>
+    </div>
+    <div class="sets-grid" id="sets-grid"></div>
+  </section>
+
+  <!-- Timeline -->
+  <section id="timeline" class="section">
+    <div class="section-header">
+      <h2>Timeline</h2>
+    </div>
+    <div class="timeline" id="timeline-list"></div>
+  </section>
+
+  <!-- Toast container -->
+  <div id="toast-container"></div>
+
+  <script src="/app.js"></script>
+</body>
 </html>

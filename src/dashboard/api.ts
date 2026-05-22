@@ -1,0 +1,202 @@
+import type {
+  AchievementDefinition,
+  AchievementState,
+  RarityLevel,
+  TrackedEvent,
+  Condition,
+  EvaluationResult,
+} from '../engine/types.js';
+import { evaluateCondition } from '../engine/evaluator.js';
+import { calcTotalXp, calcLevel, calcLevelProgress } from './xp.js';
+import { buildTimeline } from './timeline.js';
+import { loadConfig } from '../config.js';
+import type { AppConfig } from '../config.js';
+
+// ── Response types ────────────────────────────────────────────────────
+
+export interface AchievementItem {
+  id: string;
+  name: string;
+  name_cn?: string;
+  description: string;
+  icon: string;
+  category: string;
+  rarity: RarityLevel;
+  hidden?: boolean;
+  set_id?: string;
+  unlocked: boolean;
+  unlocked_at?: string;
+  progress?: { current: number; target: number };
+}
+
+export interface SetAchievementMember {
+  id: string;
+  name: string;
+  icon: string;
+  rarity: RarityLevel;
+  unlocked: boolean;
+}
+
+export interface SetItem {
+  id: string;
+  name: string;
+  achievements: SetAchievementMember[];
+  completed: number;
+  total: number;
+}
+
+export interface DashboardStats {
+  total_achievements: number;
+  unlocked: number;
+  completion_pct: number;
+  total_events: number;
+  by_category: Record<string, { total: number; unlocked: number }>;
+  by_rarity: Record<string, { total: number; unlocked: number }>;
+  level: number;
+  total_xp: number;
+  xp_progress: { current: number; target: number };
+  showcase: Array<{ slot: number; achievement: AchievementItem | null }>;
+  streak: number;
+}
+
+export interface DashboardData {
+  achievements: AchievementItem[];
+  stats: DashboardStats;
+  timeline: Array<{ id: string; unlocked_at: string }>;
+  sets: SetItem[];
+  config: Pick<AppConfig, 'lang'>;
+}
+
+// ── Compute progress for a single achievement ─────────────────────────
+
+function computeProgress(
+  def: AchievementDefinition,
+  events: TrackedEvent[],
+): { current: number; target: number } | undefined {
+  if (!def.conditions || def.conditions.length === 0) return undefined;
+  const result = evaluateCondition(def.conditions[0]!, events);
+  if (result.target <= 0) return undefined;
+  return { current: Math.min(result.progress, result.target), target: result.target };
+}
+
+// ── API response builders ────────────────────────────────────────────
+
+export function buildAchievementsResponse(
+  definitions: AchievementDefinition[],
+  state: AchievementState,
+  opts: { events?: TrackedEvent[]; taskCount?: number },
+): AchievementItem[] {
+  return definitions.map(def => {
+    const unlockedAt = state.unlocked[def.id];
+    const unlocked = !!unlockedAt;
+    return {
+      id: def.id,
+      name: def.name,
+      name_cn: def.name_cn,
+      description: def.description,
+      icon: def.icon || '🏆',
+      category: def.category,
+      rarity: def.rarity,
+      hidden: def.hidden,
+      set_id: def.set_id,
+      unlocked,
+      unlocked_at: unlockedAt,
+      progress: unlocked ? undefined : computeProgress(def, opts.events || []),
+    };
+  });
+}
+
+export function buildSetsResponse(
+  definitions: AchievementDefinition[],
+  state: AchievementState,
+): SetItem[] {
+  const sets = new Map<string, AchievementDefinition[]>();
+  for (const def of definitions) {
+    if (!def.set_id) continue;
+    const list = sets.get(def.set_id) || [];
+    list.push(def);
+    sets.set(def.set_id, list);
+  }
+
+  return Array.from(sets.entries()).map(([setId, members]) => ({
+    id: setId,
+    name: setId.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+    achievements: members.map(m => ({
+      id: m.id,
+      name: m.name,
+      icon: m.icon || '🏆',
+      rarity: m.rarity,
+      unlocked: !!state.unlocked[m.id],
+    })),
+    completed: members.filter(m => state.unlocked[m.id]).length,
+    total: members.length,
+  }));
+}
+
+function calcStreak(events: TrackedEvent[]): number {
+  const days = new Set<string>();
+  for (const e of events) {
+    days.add(e.timestamp.slice(0, 10));
+  }
+  const sorted = [...days].sort().reverse();
+  if (sorted.length === 0) return 0;
+  let streak = 1;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const d1 = new Date(sorted[i]!);
+    const d2 = new Date(sorted[i + 1]!);
+    if ((d1.getTime() - d2.getTime()) / 86400000 <= 1) streak++;
+    else break;
+  }
+  return streak;
+}
+
+export function buildApiResponse(
+  definitions: AchievementDefinition[],
+  state: AchievementState,
+  events: TrackedEvent[],
+  showcaseData: Array<{ slot: number; achievement: AchievementItem | null }>,
+): DashboardData {
+  const taskCount = events.filter(e => e.event_type === 'task.complete').length;
+  const achievements = buildAchievementsResponse(definitions, state, { events, taskCount });
+
+  const unlockedDefs = definitions.filter(d => state.unlocked[d.id]);
+  const totalXp = calcTotalXp(
+    unlockedDefs.map(d => ({ rarity: d.rarity })),
+    taskCount,
+  );
+
+  const byCategory: Record<string, { total: number; unlocked: number }> = {};
+  const byRarity: Record<string, { total: number; unlocked: number }> = {};
+  for (const def of definitions) {
+    const cat = def.category || 'unknown';
+    const rar = def.rarity || 'common';
+    if (!byCategory[cat]) byCategory[cat] = { total: 0, unlocked: 0 };
+    if (!byRarity[rar]) byRarity[rar] = { total: 0, unlocked: 0 };
+    byCategory[cat]!.total++;
+    byRarity[rar]!.total++;
+    if (state.unlocked[def.id]) {
+      byCategory[cat]!.unlocked++;
+      byRarity[rar]!.unlocked++;
+    }
+  }
+
+  return {
+    achievements,
+    stats: {
+      total_achievements: definitions.length,
+      unlocked: Object.keys(state.unlocked).length,
+      completion_pct: Math.round((Object.keys(state.unlocked).length / definitions.length) * 100),
+      total_events: events.length,
+      by_category: byCategory,
+      by_rarity: byRarity,
+      level: calcLevel(totalXp),
+      total_xp: totalXp,
+      xp_progress: calcLevelProgress(totalXp),
+      showcase: showcaseData,
+      streak: calcStreak(events),
+    },
+    timeline: buildTimeline(state.unlocked),
+    sets: buildSetsResponse(definitions, state),
+    config: { lang: loadConfig().lang },
+  };
+}

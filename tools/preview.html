@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Pixel Art Preview</title>
+<style>
+body { background: #1a1a2e; display: flex; gap: 40px; flex-wrap: wrap; padding: 40px; font-family: sans-serif; color: #ccc; }
+.art { background: #16213e; padding: 20px; border-radius: 12px; text-align: center; }
+.art h3 { margin: 0 0 12px 0; color: #fff; }
+.grid { display: grid; grid-template-columns: repeat(48, 10px); grid-template-rows: repeat(48, 10px); gap: 0; }
+.pixel { width: 10px; height: 10px; }
+</style></head><body>
+
+<div class="art"><h3>🚀 Rocket (Fire)</h3>
+<div class="grid" id="g1"></div></div>
+<div class="art"><h3>🛡️ Shield (Gold)</h3>
+<div class="grid" id="g2"></div></div>
+<div class="art"><h3>⚡ Lightning (Neon)</h3>
+<div class="grid" id="g3"></div></div>
+
+<script>
+const data = [
+  {id:"g1",svg:"rocket-launch-bold.svg",colors:[{stop:0.0,c:"#7f1d1d"},{stop:0.2,c:"#b91c1c"},{stop:0.4,c:"#ea580c"},{stop:0.6,c:"#fbbf24"},{stop:0.8,c:"#fef08a"}]},
+  {id:"g2",svg:"shield-check-bold.svg",colors:[{stop:0.0,c:"#78350f"},{stop:0.2,c:"#92400e"},{stop:0.4,c:"#d97706"},{stop:0.6,c:"#fbbf24"},{stop:0.8,c:"#fef3c7"}]},
+  {id:"g3",svg:"lightning-bold.svg",colors:[{stop:0.0,c:"#4a044e"},{stop:0.2,c:"#86198f"},{stop:0.4,c:"#d946ef"},{stop:0.6,c:"#f0abfc"},{stop:0.8,c:"#fdf4ff"}]}
+];
+
+async function load() {
+  for (const entry of data) {
+    const resp = await fetch(entry.svg);
+    const svgText = await resp.text();
+    const img = new Image();
+    const blob = new Blob([svgText], {type:'image/svg+xml'});
+    const url = URL.createObjectURL(blob);
+    img.src = url;
+    await img.decode();
+
+    const c = document.createElement('canvas');
+    c.width = 48; c.height = 48;
+    const ctx = c.getContext('2d');
+    ctx.drawImage(img, 0, 0, 48, 48);
+    const pixels = ctx.getImageData(0, 0, 48, 48).data;
+
+    const grid = document.getElementById(entry.id);
+    const colors = entry.colors;
+
+    // Distance transform
+    const mask = [];
+    for (let y = 0; y < 48; y++) {
+      const row = [];
+      for (let x = 0; x < 48; x++) {
+        row.push(pixels[(y*48+x)*4+3] > 128);
+      }
+      mask.push(row);
+    }
+
+    const dist = Array.from({length:48},()=>new Float64Array(48));
+    const L = 9999;
+    for (let y=0;y<48;y++) for(let x=0;x<48;x++) dist[y][x]=mask[y][x]?L:0;
+    for (let y=0;y<48;y++) for(let x=0;x<48;x++) {if(x>0)dist[y][x]=Math.min(dist[y][x],dist[y][x-1]+1);if(y>0)dist[y][x]=Math.min(dist[y][x],dist[y-1][x]+1);}
+    for (let y=47;y>=0;y--) for(let x=47;x>=0;x--) {if(x<47)dist[y][x]=Math.min(dist[y][x],dist[y][x+1]+1);if(y<47)dist[y][x]=Math.min(dist[y][x],dist[y+1][x]+1);}
+    let md = 0;
+    for (let y=0;y<48;y++) for(let x=0;x<48;x++) if(mask[y][x]&&dist[y][x]<L&&dist[y][x]>md) md=dist[y][x];
+
+    for (let y=0;y<48;y++) {
+      for (let x=0;x<48;x++) {
+        const div = document.createElement('div');
+        div.className = 'pixel';
+        if (mask[y][x]) {
+          const t = md>1?dist[y][x]/md:0;
+          let ci = Math.floor(t*colors.length);
+          if (ci>=colors.length) ci=colors.length-1;
+          div.style.background = colors[ci].c;
+        }
+        grid.appendChild(div);
+      }
+    }
+  }
+}
+load();
+</script>
+</body></html>

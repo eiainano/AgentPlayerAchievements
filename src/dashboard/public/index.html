@@ -17,6 +17,18 @@
         <a href="#sets" class="nav-link" data-section="sets">Sets</a>
         <a href="#timeline" class="nav-link" data-section="timeline">Timeline</a>
       </div>
+      <label class="switch" title="Language">
+        <span class="switch-label">EN</span>
+        <input type="checkbox" id="lang-toggle">
+        <span class="switch-track"><span class="switch-knob"></span></span>
+        <span class="switch-label">中</span>
+      </label>
+      <label class="switch" title="Theme">
+        <span class="switch-label">☀️</span>
+        <input type="checkbox" id="theme-toggle">
+        <span class="switch-track"><span class="switch-knob"></span></span>
+        <span class="switch-label">🌙</span>
+      </label>
       <span class="nav-stats" id="nav-stats">0/0</span>
     </div>
   </nav>
@@ -37,6 +49,13 @@
         <span class="xp-label" id="xp-label">0 / 0 XP</span>
       </div>
       <div class="showcase" id="showcase"></div>
+      <div class="showcase-actions">
+        <span id="pick-banner" class="pick-banner" style="display:none">
+          <span class="pick-banner-text"></span>
+          <button class="pick-cancel-btn" onclick="cancelPick()">✕ Cancel</button>
+        </span>
+        <button id="showcase-auto" class="showcase-auto-btn" onclick="autoFillShowcase()" title="Auto-fill with rarest">⚡ Auto</button>
+      </div>
       <div class="stats-row" id="stats-row"></div>
     </div>
   </section>

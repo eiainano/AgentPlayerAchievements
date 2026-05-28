@@ -1,3 +1,67 @@
+// ── Theme ──────────────────────────────────────────────
+
+function initTheme() {
+  const saved = localStorage.getItem('agpa-theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme = saved || (prefersDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+  const toggle = document.getElementById('theme-toggle');
+  if (toggle) toggle.checked = (theme === 'dark');
+}
+
+function toggleTheme() {
+  const toggle = document.getElementById('theme-toggle');
+  if (!toggle) return;
+  const theme = toggle.checked ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('agpa-theme', theme);
+}
+
+initTheme();
+
+document.addEventListener('DOMContentLoaded', () => {
+  const themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) themeToggle.addEventListener('change', toggleTheme);
+  const langToggle = document.getElementById('lang-toggle');
+  if (langToggle) langToggle.addEventListener('change', toggleLang);
+});
+
+// ── Language ────────────────────────────────────────────
+
+let currentLang = 'en';
+
+function initLang(configLang) {
+  const saved = localStorage.getItem('agpa-lang');
+  currentLang = saved || configLang || 'en';
+  const toggle = document.getElementById('lang-toggle');
+  if (toggle) toggle.checked = (currentLang === 'zh');
+}
+
+function toggleLang() {
+  const toggle = document.getElementById('lang-toggle');
+  if (!toggle) return;
+  currentLang = toggle.checked ? 'zh' : 'en';
+  localStorage.setItem('agpa-lang', currentLang);
+  if (dashboardData) renderAll(dashboardData);
+}
+
+function displayName(item) {
+  if (currentLang === 'zh' && item.name_cn) return item.name_cn;
+  return item.name;
+}
+
+// ── Data & Render ──────────────────────────────────────
+
+let dashboardData = null;
+
+function renderAll(data) {
+  renderNav(data);
+  renderProfile(data);
+  renderAchievements(data);
+  renderSets(data);
+  renderTimeline(data);
+}
+
 (async function () {
   const res = await fetch('/api/data');
   if (!res.ok) {
@@ -5,19 +69,17 @@
     return;
   }
   const data = await res.json();
+  dashboardData = data;
+  initLang(data.config?.lang);
 
-  renderNav(data);
-  renderProfile(data);
-  renderAchievements(data);
-  renderSets(data);
-  renderTimeline(data);
+  renderAll(data);
 
   // Toast for recently unlocked
   const now = Date.now();
   data.timeline.forEach(t => {
     if (now - new Date(t.unlocked_at).getTime() < 300000) {
       const ach = data.achievements.find(a => a.id === t.id);
-      if (ach) showToast(ach.icon, ach.name, ach.rarity);
+      if (ach) showToast(ach.icon, displayName(ach), ach.rarity);
     }
   });
 })();
@@ -51,6 +113,80 @@ function renderNav(data) {
   });
 }
 
+// ── Showcase management ──────────────────────────────
+
+let pickSlot = null; // slot index currently being picked, or null
+
+async function startPick(slot) {
+  if (pickSlot === slot) { cancelPick(); return; }
+  pickSlot = slot;
+
+  // Highlight the selected showcase slot
+  const slots = document.querySelectorAll('.showcase-slot');
+  slots.forEach((el, i) => el.classList.toggle('picking', i === slot));
+
+  // Show pick mode header
+  const banner = document.getElementById('pick-banner');
+  if (banner) {
+    banner.style.display = 'flex';
+    banner.querySelector('.pick-banner-text').textContent =
+      `Pick an achievement for slot ${slot + 1}`;
+  }
+
+  // Re-render grid to show pin buttons
+  if (dashboardData) renderGrid(dashboardData);
+
+  // Scroll to achievements section
+  document.getElementById('achievements')?.scrollIntoView({ behavior: 'smooth' });
+}
+
+function cancelPick() {
+  pickSlot = null;
+  const slots = document.querySelectorAll('.showcase-slot');
+  slots.forEach(el => el.classList.remove('picking'));
+  const banner = document.getElementById('pick-banner');
+  if (banner) banner.style.display = 'none';
+  if (dashboardData) renderGrid(dashboardData);
+}
+
+async function pinToSlot(achId) {
+  if (pickSlot === null) return;
+  const res = await fetch('/api/showcase', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ slot: pickSlot, achievement_id: achId }),
+  });
+  if (!res.ok) return;
+  await refreshData();
+  pickSlot = null;
+  const banner = document.getElementById('pick-banner');
+  if (banner) banner.style.display = 'none';
+}
+
+async function clearSlot(slot) {
+  if (pickSlot !== null) { cancelPick(); return; }
+  const res = await fetch('/api/showcase', {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ slot }),
+  });
+  if (!res.ok) return;
+  await refreshData();
+}
+
+async function autoFillShowcase() {
+  const res = await fetch('/api/showcase/auto', { method: 'POST' });
+  if (!res.ok) return;
+  await refreshData();
+}
+
+async function refreshData() {
+  const res = await fetch('/api/data');
+  if (!res.ok) return;
+  dashboardData = await res.json();
+  renderAll(dashboardData);
+}
+
 // ── Profile Hero ─────────────────────────────────────
 
 function renderProfile(data) {
@@ -73,10 +209,21 @@ function renderProfile(data) {
   if (showcase) {
     showcase.innerHTML = stats.showcase.map(s => {
       if (s.achievement) {
-        return `<div class="showcase-slot filled" data-rarity="${s.achievement.rarity}" title="${s.achievement.name}">${s.achievement.icon}</div>`;
+        return `<div class="showcase-slot filled" data-rarity="${s.achievement.rarity}"
+          title="${escHtml(displayName(s.achievement))} — click to remove"
+          onclick="clearSlot(${s.slot})">${s.achievement.icon}</div>`;
       }
-      return `<div class="showcase-slot empty">+</div>`;
+      return `<div class="showcase-slot empty"
+        title="Click to pick an achievement"
+        onclick="startPick(${s.slot})">+</div>`;
     }).join('');
+
+    // Auto-fill button
+    const hasUnlocked = stats.showcase.some(s => !s.achievement) || true;
+    const autoBtn = document.getElementById('showcase-auto');
+    if (autoBtn) {
+      autoBtn.style.display = stats.unlocked > 0 ? 'inline' : 'none';
+    }
   }
 
   const row = document.getElementById('stats-row');
@@ -95,6 +242,10 @@ function renderProfile(data) {
       </div>
     `).join('');
   }
+
+  // Pick mode banner visibility
+  const banner = document.getElementById('pick-banner');
+  if (banner && pickSlot === null) banner.style.display = 'none';
 }
 
 // ── Achievement Grid ────────────────────────────────
@@ -146,19 +297,38 @@ function renderGrid(data) {
 
   if (currentCategory) items = items.filter(a => a.category === currentCategory);
 
-  grid.innerHTML = items.map(a => {
+  const inPickMode = pickSlot !== null;
+
+  grid.className = inPickMode ? 'achievement-grid picking' : 'achievement-grid';
+
+  grid.innerHTML = items.map((a, idx) => {
     const locked = !a.unlocked;
     const showIcon = locked && a.hidden ? '\u{1F512}' : a.icon;
-    const progressHtml = a.progress && a.progress.target > 0
-      ? `<div class="ach-progress"><div class="ach-progress-fill" style="width:${Math.min((a.progress.current / a.progress.target) * 100, 100)}%"></div></div>`
+    const progressPct = a.progress && a.progress.target > 0
+      ? Math.min((a.progress.current / a.progress.target) * 100, 100)
+      : 0;
+    const progressText = a.progress && a.progress.target > 0
+      ? `${a.progress.current}/${a.progress.target}`
       : '';
-    const hiddenHint = locked && a.hidden ? '<div class="ach-hidden-hint">Hidden</div>' : '';
-    const nameDisplay = locked && a.hidden ? '???' : a.name;
+    const progressHtml = a.progress && a.progress.target > 0
+      ? `<div class="ach-progress"><div class="ach-progress-fill" style="width:${progressPct}%"></div><span class="ach-progress-text">${progressText}</span></div>`
+      : '';
+    const hiddenHint = locked && a.hidden ? '<div class="ach-hidden-hint">&#128275; Hidden</div>' : '';
+    const nameDisplay = locked && a.hidden ? '???' : displayName(a);
 
-    return `<div class="ach-card ${locked ? 'locked' : ''}" data-rarity="${a.rarity}">
-      <div class="ach-icon">${showIcon}</div>
+    const pinBtn = inPickMode && !locked
+      ? `<div class="ach-pin" onclick="event.stopPropagation(); pinToSlot('${escAttr(a.id)}')" title="Pin to showcase">📌</div>`
+      : '';
+
+    const pickableClass = inPickMode && !locked ? ' pickable' : '';
+    const lockedClass = locked ? ' locked' : '';
+
+    return `<div class="ach-card${lockedClass}${pickableClass}" data-rarity="${a.rarity}" style="--delay:${idx * 30}ms">
+      <div class="ach-stripe"></div>
+      ${pinBtn}
+      <div class="ach-icon-wrap"><span class="ach-icon">${showIcon}</span></div>
       <div class="ach-name">${escHtml(nameDisplay)}</div>
-      <div class="ach-rarity" style="color:${rarityColor(a.rarity)}">${a.rarity}</div>
+      <span class="ach-rarity-badge">${a.rarity}</span>
       ${progressHtml}
       ${hiddenHint}
     </div>`;
@@ -169,6 +339,10 @@ function escHtml(s) {
   const div = document.createElement('div');
   div.textContent = s;
   return div.innerHTML;
+}
+
+function escAttr(s) {
+  return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;');
 }
 
 // ── Sets ─────────────────────────────────────────────
@@ -190,10 +364,15 @@ function renderSets(data) {
     }, 'common');
 
     const membersHtml = set.achievements.map(a =>
-      `<div class="set-member ${a.unlocked ? 'unlocked' : 'locked'}" title="${escHtml(a.name)}">${a.unlocked ? a.icon : '?'}</div>`
+      `<div class="set-member ${a.unlocked ? 'unlocked' : 'locked'}" title="${escHtml(displayName(a))}">${a.unlocked ? a.icon : '?'}</div>`
     ).join('');
 
-    return `<div class="set-card">
+    const complete = set.completed === set.total && set.total > 0;
+    const rewardHtml = complete && set.reward && set.reward.value
+      ? `<div class="set-reward" data-type="${escHtml(set.reward.type)}">${escHtml(set.reward.value)}</div>`
+      : '';
+
+    return `<div class="set-card ${complete ? 'complete' : ''}">
       <div class="set-header">
         <span style="font-size:24px;">${set.achievements.find(a => a.unlocked)?.icon || '\u{1F4E6}'}</span>
         <span class="set-name">${escHtml(set.name)}</span>
@@ -203,6 +382,7 @@ function renderSets(data) {
         <div class="set-bar-fill" style="width:${pct}%;background:${rarityColor(highestRarity)}"></div>
       </div>
       <div class="set-members">${membersHtml}</div>
+      ${rewardHtml}
     </div>`;
   }).join('');
 }
@@ -230,7 +410,7 @@ function renderTimeline(data) {
       <div class="tl-time">${timeStr}</div>
       <div class="tl-ach">
         <span class="tl-icon">${ach.icon}</span>
-        <span class="tl-name" style="color:${rarityColor(ach.rarity)}">${escHtml(ach.name)}</span>
+        <span class="tl-name" style="color:${rarityColor(ach.rarity)}">${escHtml(displayName(ach))}</span>
       </div>
     </div>`;
   }).filter(Boolean).join('');

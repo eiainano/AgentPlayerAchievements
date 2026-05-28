@@ -5,6 +5,8 @@ import type {
   TrackedEvent,
   Condition,
   EvaluationResult,
+  SetDefinition,
+  SetReward,
 } from '../engine/types.js';
 import { evaluateCondition } from '../engine/evaluator.js';
 import { calcTotalXp, calcLevel, calcLevelProgress } from './xp.js';
@@ -43,6 +45,7 @@ export interface SetItem {
   achievements: SetAchievementMember[];
   completed: number;
   total: number;
+  reward: SetReward;
 }
 
 export interface DashboardStats {
@@ -109,7 +112,9 @@ export function buildAchievementsResponse(
 export function buildSetsResponse(
   definitions: AchievementDefinition[],
   state: AchievementState,
+  setDefinitions: SetDefinition[],
 ): SetItem[] {
+  const setDefMap = new Map(setDefinitions.map(s => [s.id, s]));
   const sets = new Map<string, AchievementDefinition[]>();
   for (const def of definitions) {
     if (!def.set_id) continue;
@@ -118,19 +123,23 @@ export function buildSetsResponse(
     sets.set(def.set_id, list);
   }
 
-  return Array.from(sets.entries()).map(([setId, members]) => ({
-    id: setId,
-    name: setId.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-    achievements: members.map(m => ({
-      id: m.id,
-      name: m.name,
-      icon: m.icon || '🏆',
-      rarity: m.rarity,
-      unlocked: !!state.unlocked[m.id],
-    })),
-    completed: members.filter(m => state.unlocked[m.id]).length,
-    total: members.length,
-  }));
+  return Array.from(sets.entries()).map(([setId, members]) => {
+    const setDef = setDefMap.get(setId);
+    return {
+      id: setId,
+      name: setDef?.name || setId.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+      achievements: members.map(m => ({
+        id: m.id,
+        name: m.name,
+        icon: m.icon || '🏆',
+        rarity: m.rarity,
+        unlocked: !!state.unlocked[m.id],
+      })),
+      completed: members.filter(m => state.unlocked[m.id]).length,
+      total: members.length,
+      reward: setDef?.reward || { type: 'badge', value: '' },
+    };
+  });
 }
 
 function calcStreak(events: TrackedEvent[]): number {
@@ -155,6 +164,8 @@ export function buildApiResponse(
   state: AchievementState,
   events: TrackedEvent[],
   showcaseData: Array<{ slot: number; achievement: AchievementItem | null }>,
+  engineStats: { total_events: number; by_category: Record<string, { total: number; unlocked: number }>; by_rarity: Record<string, { total: number; unlocked: number }> },
+  setDefinitions: SetDefinition[],
 ): DashboardData {
   const taskCount = events.filter(e => e.event_type === 'task.complete').length;
   const achievements = buildAchievementsResponse(definitions, state, { events, taskCount });
@@ -165,30 +176,15 @@ export function buildApiResponse(
     taskCount,
   );
 
-  const byCategory: Record<string, { total: number; unlocked: number }> = {};
-  const byRarity: Record<string, { total: number; unlocked: number }> = {};
-  for (const def of definitions) {
-    const cat = def.category || 'unknown';
-    const rar = def.rarity || 'common';
-    if (!byCategory[cat]) byCategory[cat] = { total: 0, unlocked: 0 };
-    if (!byRarity[rar]) byRarity[rar] = { total: 0, unlocked: 0 };
-    byCategory[cat]!.total++;
-    byRarity[rar]!.total++;
-    if (state.unlocked[def.id]) {
-      byCategory[cat]!.unlocked++;
-      byRarity[rar]!.unlocked++;
-    }
-  }
-
   return {
     achievements,
     stats: {
       total_achievements: definitions.length,
       unlocked: Object.keys(state.unlocked).length,
       completion_pct: Math.round((Object.keys(state.unlocked).length / definitions.length) * 100),
-      total_events: events.length,
-      by_category: byCategory,
-      by_rarity: byRarity,
+      total_events: engineStats.total_events,
+      by_category: engineStats.by_category,
+      by_rarity: engineStats.by_rarity,
       level: calcLevel(totalXp),
       total_xp: totalXp,
       xp_progress: calcLevelProgress(totalXp),
@@ -196,7 +192,7 @@ export function buildApiResponse(
       streak: calcStreak(events),
     },
     timeline: buildTimeline(state.unlocked),
-    sets: buildSetsResponse(definitions, state),
+    sets: buildSetsResponse(definitions, state, setDefinitions),
     config: { lang: loadConfig().lang },
   };
 }

@@ -8,10 +8,14 @@
     "stats": "tsx src/cli/mvp.ts stats",
     "progress": "tsx src/cli/mvp.ts progress",
     "reset": "tsx src/cli/mvp.ts reset",
+    "init": "tsx src/cli/init.ts",
+    "doctor": "tsx src/cli/doctor.ts",
     "dashboard": "tsx src/cli/dashboard.ts",
     "mcp": "tsx src/main.ts",
+    "stats-server": "tsx src/server/stats-server.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "build": "tsc --noEmit"
   },
   "devDependencies": {
     "tsx": "^4.19.0",
@@ -21,6 +25,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@types/node": "^22.0.0",
+    "yaml": "^2.9.0",
     "zod": "^4.4.3"
   }
 }

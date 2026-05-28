@@ -52,7 +52,7 @@ describe('buildAchievementsResponse', () => {
 
 describe('buildSetsResponse', () => {
   it('returns empty array when no sets', () => {
-    const result = buildSetsResponse(defs, state);
+    const result = buildSetsResponse(defs, state, []);
     expect(Array.isArray(result)).toBe(true);
   });
 
@@ -62,7 +62,7 @@ describe('buildSetsResponse', () => {
       makeDef({ id: 's2', name: 'S2', set_id: 'set_a', conditions: [] }),
       makeDef({ id: 's3', name: 'S3', set_id: 'set_b', conditions: [] }),
     ];
-    const result = buildSetsResponse(defsWithSets, state);
+    const result = buildSetsResponse(defsWithSets, state, []);
     expect(result).toHaveLength(2);
     const setA = result.find(s => s.id === 'set_a')!;
     expect(setA.total).toBe(2);

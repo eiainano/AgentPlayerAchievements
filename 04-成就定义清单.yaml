@@ -1,0 +1,1670 @@
+# Agent Achievement System — 完整成就定义清单
+# 版本: 1.0 / 日期: 2026-05-17
+
+definitions:
+
+  # ============================================================
+  # Category: Onboarding (入门)
+  # ============================================================
+  - id: first_contact
+    name: "First Contact"
+    name_cn: "Hello World"
+    description: "完成首次对话。历史记住了这一天。"
+    icon: "👋"
+    category: onboarding
+    rarity: common
+    hidden: false
+    set: the_beginning
+    conditions:
+      - type: counter
+        event: conversation.message
+        operator: ">="
+        value: 1
+
+  - id: three_company
+    name: "Three's Company"
+    name_cn: "帽子戏法"
+    description: "累计完成 3 个 task。agent 开始认识你了。"
+    icon: "🤝"
+    category: onboarding
+    rarity: common
+    hidden: false
+    set: the_beginning
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: task.complete
+        operator: ">="
+        value: 3
+
+  - id: tool_time
+    name: "Tool Time"
+    name_cn: "工具学徒"
+    description: "agent 执行了第一个 tool call。世界变大了。"
+    icon: "🔧"
+    category: onboarding
+    rarity: common
+    hidden: false
+    set: the_beginning
+    conditions:
+      - type: counter
+        event: tool.complete
+        operator: ">="
+        value: 1
+
+  - id: permission_granted
+    name: "Permission Granted"
+    name_cn: "门禁卡"
+    description: "手动调整过 agent 的权限模式。控制权在你手上。"
+    icon: "🔐"
+    category: onboarding
+    rarity: uncommon
+    hidden: false
+    set: the_beginning
+    conditions:
+      - type: counter
+        event: permission.mode_changed
+        operator: ">="
+        value: 1
+
+  - id: read_manual
+    name: "Read the Manual"
+    name_cn: "看说明书"
+    description: "打开过 help 或文档。很少有人这么做。"
+    icon: "📖"
+    category: onboarding
+    rarity: uncommon
+    hidden: false
+    set: the_beginning
+    conditions:
+      - type: counter
+        event: help.accessed
+        operator: ">="
+        value: 1
+
+  - id: first_sunrise
+    name: "First Sunrise"
+    name_cn: "再接再厉"
+    description: "24h 内开启 ≥ 2 个 session。agent 已经是习惯了。"
+    icon: "🌅"
+    category: onboarding
+    rarity: common
+    hidden: false
+    set: the_beginning
+    conditions:
+      - type: threshold
+        event: session.start
+        window: 24h
+        operator: ">="
+        value: 2
+
+  # ── Gap #1: 引导性成就（功能发现） ──
+  - id: first_shot
+    name: "First Shot"
+    name_cn: "命令学徒"
+    description: "使用了第一个 slash command。你的 CLI 你做主。"
+    icon: "🔫"
+    category: onboarding
+    rarity: common
+    hidden: false
+    set: the_beginning
+    conditions:
+      - type: counter
+        event: command.slash_used
+        operator: ">="
+        value: 1
+
+  - id: model_hopper
+    name: "Model Hopper"
+    name_cn: "换换口味"
+    description: "手动切换了一次 AI 模型。总有一款适合你。"
+    icon: "🔄"
+    category: onboarding
+    rarity: common
+    hidden: false
+    conditions:
+      - type: counter
+        event: model.switch
+        operator: ">="
+        value: 1
+
+  - id: worktree_trial
+    name: "Worktree Trial"
+    name_cn: "隔离区"
+    description: "使用过 worktree 模式在隔离环境中工作。代码安全第一。"
+    icon: "🌲"
+    category: onboarding
+    rarity: common
+    hidden: false
+    conditions:
+      - type: counter
+        event: worktree.created
+        operator: ">="
+        value: 1
+
+  - id: mcp_first_contact
+    name: "Agent Plug-in"
+    name_cn: "场外接入"
+    description: "连接了第一个 MCP server。agent 的能力向外延伸了。"
+    icon: "🔌"
+    category: onboarding
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: counter
+        event: mcp.server_used
+        operator: ">="
+        value: 1
+
+  - id: visual_prompt
+    name: "A Picture's Worth"
+    name_cn: "有图有真相"
+    description: "给 agent 传了一张图片来理解。它看到了你所见的。"
+    icon: "🖼️"
+    category: onboarding
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: counter
+        event: tool.complete
+        filter: "tool_name == 'Read' && file_type matches 'image/*'"
+        operator: ">="
+        value: 1
+
+  # ============================================================
+  # Category: Milestones (里程碑)
+  # ============================================================
+  - id: double_digits
+    name: "Double Digits"
+    description: "10 个 task 完成。你已经不是新手了。"
+    icon: "🔟"
+    category: milestone
+    rarity: uncommon
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: task.complete
+        operator: ">="
+        value: 10
+
+  - id: century
+    name: "Century"
+    description: "100 个 task。你开始怀疑没有 agent 的日子是怎么过的。"
+    icon: "💯"
+    category: milestone
+    rarity: rare
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: task.complete
+        operator: ">="
+        value: 100
+
+  - id: millennium
+    name: "Millennium"
+    description: "1000 个 task。你和 agent 已是一种共生关系。"
+    icon: "🏆"
+    category: milestone
+    rarity: epic
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: task.complete
+        operator: ">="
+        value: 1000
+
+  - id: marathon
+    name: "Marathon"
+    description: "单 session 持续超过 3 小时。你还活着吗？"
+    icon: "🏃"
+    category: milestone
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: threshold
+        event: session.end
+        field: duration_ms
+        operator: ">="
+        value: 10800000  # 3h in ms
+
+  - id: streak_7
+    name: "Streak 7"
+    description: "连续 7 天使用。agent 已经是你的日常。"
+    icon: "🔥"
+    category: milestone
+    rarity: uncommon
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: streak
+        event: session.start
+        unit: day
+        operator: ">="
+        value: 7
+
+  - id: streak_30
+    name: "Streak 30"
+    description: "连续 30 天。不仅是工具，是生活方式。"
+    icon: "📅"
+    category: milestone
+    rarity: rare
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: streak
+        event: session.start
+        unit: day
+        operator: ">="
+        value: 30
+
+  - id: streak_100
+    name: "Streak 100"
+    description: "连续 100 天。应该给你做个纪录片。"
+    icon: "🎬"
+    category: milestone
+    rarity: legendary
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: streak
+        event: session.start
+        unit: day
+        operator: ">="
+        value: 100
+
+  - id: polyglot
+    name: "Polyglot"
+    description: "agent 对话涉及过 5 种以上编程语言。"
+    icon: "🌐"
+    category: milestone
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: distinct_count
+        event: file.create
+        field: language
+        operator: ">="
+        value: 5
+
+  # ============================================================
+  # Category: Skill (技巧)
+  # ============================================================
+  - id: chain_reaction
+    name: "Chain Reaction"
+    description: "单次对话中 agent 完成 5 步以上连续 tool call。"
+    icon: "⛓️"
+    category: skill
+    rarity: uncommon
+    hidden: false
+    set: agent_commander
+    conditions:
+      - type: counter
+        event: tool.complete
+        window: single_session
+        operator: ">="
+        value: 5
+
+  - id: full_auto
+    name: "Full Auto"
+    description: "10 步以上 tool chain，全程自主零拒绝。"
+    icon: "🤖"
+    category: skill
+    rarity: rare
+    hidden: false
+    set: agent_commander
+    conditions:
+      - type: sequence
+        event: tool.complete
+        window: single_session
+        consecutive: true
+        count:
+          operator: ">="
+          value: 10
+      - type: counter
+        event: tool.deny
+        window: same_session
+        operator: "=="
+        value: 0
+
+  - id: architect
+    name: "Architect"
+    description: "单 task 中 agent 成功编辑了 5 个以上文件。"
+    icon: "🏗️"
+    category: skill
+    rarity: rare
+    hidden: false
+    set: agent_commander
+    conditions:
+      - type: distinct_count
+        event: file.edit
+        field: file_path
+        window: single_task
+        operator: ">="
+        value: 5
+
+  - id: surgeon
+    name: "Surgeon"
+    description: "单 task 只改了恰好需要的部分，零多余改动。"
+    icon: "🩺"
+    category: skill
+    rarity: epic
+    hidden: false
+    set: agent_commander
+    conditions:
+      - type: threshold
+        metric: "edit_lines / total_file_lines"
+        window: single_task
+        operator: "<"
+        value: 0.05
+      - type: event
+        event: task.complete
+        window: same_task
+
+  - id: seeker
+    name: "Seeker"
+    description: "单 session 中搜索类 tool ≥ 10 次。你在深挖。"
+    icon: "🔍"
+    category: skill
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: counter
+        event: tool.complete
+        filter: "tool_name in ['grep','glob','web_search','web_fetch']"
+        window: single_session
+        operator: ">="
+        value: 10
+
+  - id: the_debugger
+    name: "The Debugger"
+    description: "agent 代码报错，你让它自己修，修好了。这就是信任。"
+    icon: "🐛"
+    category: skill
+    rarity: uncommon
+    hidden: false
+    set: the_bug_catcher
+    conditions:
+      - type: sequence
+        events: ["test.fail", "agent.self_fix", "test.pass"]
+        window: single_task
+
+  - id: triple_debugger
+    name: "Triple Debugger"
+    description: "单 task 中 agent 自修复 ≥ 3 次错误。"
+    icon: "🪲"
+    category: skill
+    rarity: rare
+    hidden: false
+    set: the_bug_catcher
+    conditions:
+      - type: sequence_count
+        pattern: ["test.fail", "agent.self_fix", "test.pass"]
+        window: single_task
+        operator: ">="
+        value: 3
+
+  # ── Gap #2: 强迫多样性成就 ──
+  - id: tool_completist
+    name: "Tool Completist"
+    description: "单 session 中使用过全部核心 tool（Read / Edit / Write / Bash / Think）。五脏俱全。"
+    icon: "🧰"
+    category: skill
+    rarity: rare
+    hidden: false
+    conditions:
+      - type: distinct_count
+        event: tool.complete
+        field: tool_name
+        values: ["Read", "Edit", "Write", "Bash", "ToolSearch"]
+        window: single_session
+        operator: ">="
+        value: 5
+
+  - id: the_switch
+    name: "The Switch"
+    description: "同一次 task 中从 Plan 模式切换到 Agent 模式完成最终实现。先谋后动。"
+    icon: "🎭"
+    category: skill
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: sequence
+        events: ["plan.mode_activated", "agent.mode_activated", "task.complete"]
+        window: single_task
+
+  - id: photographic_memory
+    name: "Photographic Memory"
+    description: "在 50 轮以上的对话中成功引用了早期上下文。agent 的记忆是短暂的，你的上下文是持久的。"
+    icon: "🧠"
+    category: skill
+    rarity: rare
+    hidden: false
+    conditions:
+      - type: threshold
+        event: context.referenced
+        field: turn_distance
+        operator: ">="
+        value: 50
+
+  # ============================================================
+  # Category: Style (风格)
+  # ============================================================
+  - id: minimalist
+    name: "Minimalist"
+    description: "prompt 长度排全体前 10% 短。惜字如金，agent 需要很努力。"
+    icon: "🪶"
+    category: style
+    rarity: epic
+    hidden: false
+    conditions:
+      - type: percentile
+        metric: "avg_prompt_length"
+        operator: "<="
+        value: 10
+
+  - id: novelist
+    name: "Novelist"
+    description: "prompt 长度排全体前 10% 长。事无巨细，agent 不用猜。"
+    icon: "📝"
+    category: style
+    rarity: epic
+    hidden: false
+    conditions:
+      - type: percentile
+        metric: "avg_prompt_length"
+        operator: ">="
+        value: 90
+
+  - id: one_shot
+    name: "One Shot"
+    description: "单 task 只问了 agent 一次就完成。"
+    icon: "🎯"
+    category: style
+    rarity: rare
+    hidden: false
+    conditions:
+      - type: threshold
+        event: task.complete
+        field: step_count
+        operator: "=="
+        value: 1
+
+  - id: iterative_refiner
+    name: "Iterative Refiner"
+    description: "单 task 交互 > 20 轮才完成。你在打磨，不是 agent 不行。"
+    icon: "🔄"
+    category: style
+    rarity: rare
+    hidden: false
+    conditions:
+      - type: threshold
+        event: task.complete
+        field: step_count
+        operator: ">"
+        value: 20
+
+  - id: night_owl
+    name: "Night Owl"
+    description: "session 大多在凌晨 (0:00-5:00)。"
+    icon: "🦉"
+    category: style
+    rarity: uncommon
+    hidden: true
+    set: night_shift
+    conditions:
+      - type: mode
+        event: session.start
+        field: hour
+        in_range: [0, 5]
+        threshold: 0.5  # >50% in this range
+
+  - id: weekend_warrior
+    name: "Weekend Warrior"
+    description: "session 集中在周末。白天搬砖，周末 coding。"
+    icon: "⚔️"
+    category: style
+    rarity: uncommon
+    hidden: true
+    set: night_shift
+    conditions:
+      - type: mode
+        event: session.start
+        field: day_of_week
+        in_range: [0, 6]  # Sat=0, Sun=6
+        threshold: 0.5
+
+  - id: copy_paste_king
+    name: "Copy-Paste King"
+    description: "粘贴内容 / 总输入 > 50%。你在喂 agent 外部知识。"
+    icon: "📋"
+    category: style
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: ratio
+        numerator: "paste_chars"
+        denominator: "total_input_chars"
+        operator: ">"
+        value: 0.5
+
+  # ============================================================
+  # Category: Tool Mastery (工具大师)
+  # ============================================================
+  - id: file_whisperer
+    name: "File Whisperer"
+    description: "累计让 agent 编辑了 500 个文件。"
+    icon: "📁"
+    category: tool_mastery
+    rarity: rare
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: file.edit
+        operator: ">="
+        value: 500
+
+  - id: git_wizard
+    name: "Git Wizard"
+    description: "agent 参与了 100 次 git commit。"
+    icon: "🧙"
+    category: tool_mastery
+    rarity: rare
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: git.commit
+        filter: "agent_involved == true"
+        operator: ">="
+        value: 100
+
+  - id: shell_shocker
+    name: "Shell Shocker"
+    description: "agent 在终端执行了 250 次命令。"
+    icon: "💻"
+    category: tool_mastery
+    rarity: uncommon
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: tool.complete
+        filter: "tool_name in ['bash','terminal','execute']"
+        operator: ">="
+        value: 250
+
+  - id: web_wanderer
+    name: "Web Wanderer"
+    description: "agent 上网搜索了 100 次。"
+    icon: "🌍"
+    category: tool_mastery
+    rarity: uncommon
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: tool.complete
+        filter: "tool_name in ['web_search','web_fetch']"
+        operator: ">="
+        value: 100
+
+  - id: parallel_universe
+    name: "Parallel Universe"
+    description: "同一项目同时有 ≥ 3 个 active session。"
+    icon: "🌌"
+    category: tool_mastery
+    rarity: rare
+    hidden: false
+    conditions:
+      - type: threshold
+        metric: "concurrent_sessions"
+        window: same_project
+        operator: ">="
+        value: 3
+
+  - id: mcp_explorer
+    name: "MCP Explorer"
+    description: "连接并使用过 5 个以上 MCP server。"
+    icon: "🔌"
+    category: tool_mastery
+    rarity: epic
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: distinct_count
+        event: mcp.server_used
+        operator: ">="
+        value: 5
+
+  - id: image_whisperer
+    name: "Image Whisperer"
+    description: "让 agent 通过图片理解了你的意图。一图胜千言。"
+    icon: "📸"
+    category: tool_mastery
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: counter
+        event: tool.complete
+        filter: "tool_name == 'Read' && file_type matches 'image/*'"
+        operator: ">="
+        value: 5
+
+  # ============================================================
+  # Category: Workflow (工作流)
+  # ============================================================
+  - id: pr_champion
+    name: "PR Champion"
+    description: "通过 agent 创建了你的第一个 PR。从代码到协作。"
+    icon: "🔀"
+    category: workflow
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: counter
+        event: git.pr_created
+        filter: "agent_involved == true"
+        operator: ">="
+        value: 1
+
+  - id: cicd_pioneer
+    name: "CI/CD Pioneer"
+    description: "agent 帮你创建了 GitHub Actions workflow 文件。自动化从这里开始。"
+    icon: "⚙️"
+    category: workflow
+    rarity: rare
+    hidden: false
+    conditions:
+      - type: counter
+        event: file.create
+        filter: "file_path matches '.github/workflows/*.yml'"
+        operator: ">="
+        value: 1
+
+  - id: code_reviewer
+    name: "Code Reviewer"
+    description: "让 agent 审查过代码，给出了有价值的建议。"
+    icon: "👁️"
+    category: workflow
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: counter
+        event: code.review_requested
+        operator: ">="
+        value: 1
+
+  - id: perfect_review
+    name: "Ship It!"
+    description: "agent 审查代码后零问题，直接通过。完美的代码？还是 agent 在摸鱼？"
+    icon: "🚢"
+    category: workflow
+    rarity: rare
+    hidden: false
+    conditions:
+      - type: sequence
+        events: ["code.review_requested", "code.review_approved"]
+        filter: "issues_found == 0"
+        window: single_task
+
+  - id: deep_review
+    name: "Deep Review"
+    description: "agent 一次审查发现 10+ 个问题。AI wrote this, didn't it?"
+    icon: "🧐"
+    category: workflow
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: threshold
+        event: code.review_completed
+        field: issues_found
+        operator: ">="
+        value: 10
+
+  - id: plan_mode_user
+    name: "Strategic Thinker"
+    description: "对复杂任务使用了 Plan 模式。三思而后 code。"
+    icon: "🧠"
+    category: workflow
+    rarity: uncommon
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: plan.mode_entered
+        operator: ">="
+        value: 1
+
+  - id: plan_strategist
+    name: "Plan Strategist"
+    description: "累计使用 Plan 模式 25 次。你不写代码，你写蓝图。"
+    icon: "📐"
+    category: workflow
+    rarity: rare
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: plan.mode_entered
+        operator: ">="
+        value: 25
+
+  - id: auto_committer
+    name: "Auto Committer"
+    description: "agent 替你 commit 了代码。你只需要点头。"
+    icon: "🤖"
+    category: workflow
+    rarity: common
+    hidden: false
+    conditions:
+      - type: counter
+        event: git.commit
+        filter: "agent_involved == true"
+        operator: ">="
+        value: 1
+
+  - id: changelog_keeper
+    name: "Changelog Keeper"
+    description: "agent 帮你写了 changelog。版本历史的守护者。"
+    icon: "📋"
+    category: workflow
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: counter
+        event: file.create
+        filter: "file_path matches 'CHANGELOG*'"
+        operator: ">="
+        value: 1
+
+  - id: context_conscious
+    name: "Context Conscious"
+    description: "单 task 中触发了 3 次以上自动压缩。你在挑战 agent 的记忆极限。"
+    icon: "🧩"
+    category: workflow
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: threshold
+        event: context.compacted
+        window: single_task
+        operator: ">="
+        value: 3
+
+  - id: session_veteran
+    name: "Session Veteran"
+    description: "累计开启 50 个 session。agent 已经是你的老搭档了。"
+    icon: "🪖"
+    category: workflow
+    rarity: uncommon
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: session.start
+        operator: ">="
+        value: 50
+
+  - id: session_centurion
+    name: "Session Centurion"
+    description: "累计开启 300 个 session。你和 agent 的故事可以出书了。"
+    icon: "📚"
+    category: workflow
+    rarity: rare
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: session.start
+        operator: ">="
+        value: 300
+
+  - id: token_titan
+    name: "Token Titan"
+    description: "累计消耗 10M token。你是 API 服务商最喜欢的用户类型。"
+    icon: "💎"
+    category: workflow
+    rarity: rare
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: token.consumed
+        unit: tokens
+        operator: ">="
+        value: 10000000
+
+  - id: token_legend
+    name: "Token Legend"
+    description: "累计消耗 100M token。agent 已经读了比你一生还多的文字。"
+    icon: "🌌"
+    category: workflow
+    rarity: epic
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: token.consumed
+        unit: tokens
+        operator: ">="
+        value: 100000000
+
+  - id: multi_project
+    name: "Multi-Project"
+    description: "同日内在 3 个以上项目中使用了 agent。你不是专一的用户。"
+    icon: "🗂️"
+    category: workflow
+    rarity: rare
+    hidden: false
+    conditions:
+      - type: distinct_count
+        event: session.start
+        field: project_path
+        window: 24h
+        operator: ">="
+        value: 3
+
+  # ── Gap #2 + #3: 全流程 + 多样性 ──
+  - id: full_cycle
+    name: "Full Cycle"
+    description: "agent 独立完成了编码→commit→PR 全过程，你只是看了结果。真正的 delegation。"
+    icon: "♻️"
+    category: workflow
+    rarity: epic
+    hidden: false
+    conditions:
+      - type: sequence
+        events: ["task.complete", "git.commit", "git.pr_created"]
+        window: single_session
+
+  - id: cycle_master
+    name: "Cycle Master"
+    description: "累计完成 10 次 Full Cycle（编码→commit→PR）。你几乎不需要写代码了。"
+    icon: "🔁"
+    category: workflow
+    rarity: legendary
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: sequence_count
+        pattern: ["task.complete", "git.commit", "git.pr_created"]
+        window: single_session
+        operator: ">="
+        value: 10
+
+  # ============================================================
+  # Category: Creator (创造者)
+  # ============================================================
+  - id: command_crafter
+    name: "Command Crafter"
+    description: "创建了你的第一个自定义 slash command。agent 学会了新把戏。"
+    icon: "⚡"
+    category: creator
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: counter
+        event: command.created
+        operator: ">="
+        value: 1
+
+  - id: command_library
+    name: "Command Library"
+    description: "累计创建 10 个自定义命令。你的 CLI 你做主。"
+    icon: "📚"
+    category: creator
+    rarity: rare
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: command.created
+        operator: ">="
+        value: 10
+
+  - id: skill_creator
+    name: "Skill Creator"
+    description: "创建了你的第一个自定义 skill。agent 的能力边界由你定义。"
+    icon: "✨"
+    category: creator
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: counter
+        event: skill.created
+        operator: ">="
+        value: 1
+
+  - id: skill_publisher
+    name: "Skill Publisher"
+    description: "将你创建的 skill 发布到社区。分享是美德。"
+    icon: "📦"
+    category: creator
+    rarity: rare
+    hidden: false
+    conditions:
+      - type: counter
+        event: skill.published
+        operator: ">="
+        value: 1
+
+  - id: agent_architect
+    name: "Agent Architect"
+    description: "创建了你的第一个自定义 agent。你不再只是用户，你是架构师。"
+    icon: "🏛️"
+    category: creator
+    rarity: rare
+    hidden: false
+    set: creator_trifecta
+    conditions:
+      - type: counter
+        event: agent.created
+        operator: ">="
+        value: 1
+
+  - id: hooks_master
+    name: "Hooks Master"
+    description: "配置了 agent 自动化 hook。你在建造一个自动化的王国。"
+    icon: "🪝"
+    category: creator
+    rarity: uncommon
+    hidden: false
+    set: creator_trifecta
+    conditions:
+      - type: counter
+        event: hook.configured
+        operator: ">="
+        value: 1
+
+  - id: plugin_explorer
+    name: "Plugin Explorer"
+    description: "从市场安装了你的第一个插件。agent 的生态是你的游乐场。"
+    icon: "🧩"
+    category: creator
+    rarity: common
+    hidden: false
+    set: creator_trifecta
+    conditions:
+      - type: counter
+        event: plugin.installed
+        operator: ">="
+        value: 1
+
+  - id: template_master
+    name: "Template Master"
+    description: "创建了可复用的项目模板。一次搭建，N 次复用。"
+    icon: "📐"
+    category: creator
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: counter
+        event: template.created
+        operator: ">="
+        value: 1
+
+  # ── Gap #2: 命令多样性 ──
+  - id: slash_commander
+    name: "Slash Commander"
+    description: "使用过 5 种不同的 slash command。你的命令行十项全能。"
+    icon: "🔣"
+    category: creator
+    rarity: rare
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: distinct_count
+        event: command.slash_used
+        field: command_name
+        operator: ">="
+        value: 5
+
+  # ============================================================
+  # Category: Hidden (隐藏成就)
+  # ============================================================
+  - id: ill_do_it_myself
+    name: "I'll Do It Myself"
+    description: "连续拒绝 10 次 tool call 建议。agent 在角落默默看着。"
+    icon: "😤"
+    category: hidden
+    rarity: rare
+    hidden: true
+    conditions:
+      - type: streak
+        event: tool.deny
+        operator: ">="
+        value: 10
+
+  - id: perfectionist
+    name: "Perfectionist"
+    description: "同一函数被 Edit ≥ 7 次。函数说：你到底想要什么？"
+    icon: "✨"
+    category: hidden
+    rarity: epic
+    hidden: true
+    conditions:
+      - type: counter
+        event: file.edit
+        field: function_name
+        same_target: true
+        window: single_task
+        operator: ">="
+        value: 7
+
+  - id: the_all_nighter
+    name: "The All-Nighter"
+    description: "单 task 持续 > 6h。太阳升起来，你还在 coding。"
+    icon: "🌄"
+    category: hidden
+    rarity: legendary
+    hidden: true
+    conditions:
+      - type: threshold
+        event: task.complete
+        field: duration_ms
+        operator: ">="
+        value: 21600000  # 6h in ms
+
+  - id: its_learning
+    name: "It's Learning"
+    description: "agent 输出中包含幽默模式。它试图让你笑。"
+    icon: "🤖💬"
+    category: hidden
+    rarity: mythic
+    hidden: true
+    conditions:
+      - type: pattern_match
+        event: conversation.message
+        role: agent
+        pattern: "humor_detected"
+        # 由引擎内置的幽默检测器判断
+
+  - id: agent_collector
+    name: "Agent Collector"
+    description: "同时使用过 3 个不同厂商的 AI agent。我们注意到了。"
+    icon: "🃏"
+    category: hidden
+    rarity: rare
+    hidden: true
+    set: collectors_soul
+    conditions:
+      - type: distinct_count
+        event: session.start
+        field: tool_source
+        operator: ">="
+        value: 3
+
+  - id: scorched_earth
+    name: "Scorched Earth"
+    description: "单 task 全量 revert 后重新开始。这需要勇气。"
+    icon: "🔥"
+    category: hidden
+    rarity: uncommon
+    hidden: true
+    conditions:
+      - type: sequence
+        events: ["task.progress", "git.revert_all", "task.restart"]
+        window: single_task
+
+  - id: daily_checkin
+    name: "Daily Check-In"
+    description: "连续 15 天每天使用但只发一条消息。你是来签到的吗？"
+    icon: "✅"
+    category: hidden
+    rarity: epic
+    hidden: true
+    conditions:
+      - type: streak
+        event: session.start
+        unit: day
+        operator: ">="
+        value: 15
+      - type: threshold
+        event: conversation.message
+        max_per_day: 1
+
+  - id: tinkerer
+    name: "Tinkerer"
+    description: "settings / CLAUDE.md 手动编辑 > 20 次。你是一个 tinker。"
+    icon: "⚙️"
+    category: hidden
+    rarity: rare
+    hidden: true
+    conditions:
+      - type: counter
+        event: config.file_edited
+        operator: ">="
+        value: 20
+
+  - id: hold_my_beer
+    name: "Hold My Beer"
+    description: "使用了 dangerously-skip-permissions。你知道自己在做什么，对吧？"
+    icon: "🍺"
+    category: hidden
+    rarity: rare
+    hidden: true
+    conditions:
+      - type: counter
+        event: permission.dangerously_skipped
+        operator: ">="
+        value: 1
+
+  - id: execute_order_66
+    name: "Execute Order 66"
+    description: "agent 执行了 kill -9。它处理了绝地武士。"
+    icon: "💀"
+    category: hidden
+    rarity: uncommon
+    hidden: true
+    conditions:
+      - type: counter
+        event: tool.complete
+        filter: "tool_name == 'bash' && command contains 'kill -9'"
+        operator: ">="
+        value: 1
+
+  - id: rewriting_history
+    name: "Rewriting History"
+    description: "agent 执行了 git push --force。你改变了时间线。"
+    icon: "⏰"
+    category: hidden
+    rarity: uncommon
+    hidden: true
+    conditions:
+      - type: counter
+        event: tool.complete
+        filter: "command contains 'push --force' || command contains 'push -f'"
+        operator: ">="
+        value: 1
+
+  - id: im_root
+    name: "I Am Root"
+    description: "agent 第一次执行了 sudo。能力越大，责任越大。"
+    icon: "👑"
+    category: hidden
+    rarity: common
+    hidden: true
+    conditions:
+      - type: counter
+        event: tool.complete
+        filter: "command contains 'sudo'"
+        operator: ">="
+        value: 1
+
+  - id: snake_charmer
+    name: "Snake Charmer"
+    description: "读取了 100 个 Python 文件。🐍 是你的精神动物。"
+    icon: "🐍"
+    category: hidden
+    rarity: uncommon
+    hidden: true
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: file.read
+        filter: "file_path matches '*.py'"
+        operator: ">="
+        value: 100
+
+  - id: gopher_gang
+    name: "Gopher Gang"
+    description: "读取了 100 个 Go 文件。简单、高效、并发——你懂。"
+    icon: "🐹"
+    category: hidden
+    rarity: uncommon
+    hidden: true
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: file.read
+        filter: "file_path matches '*.go'"
+        operator: ">="
+        value: 100
+
+  - id: rustacean
+    name: "Rustacean"
+    description: "读取了 100 个 Rust 文件。安全第一，borrow checker 第二。"
+    icon: "🦀"
+    category: hidden
+    rarity: uncommon
+    hidden: true
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: file.read
+        filter: "file_path matches '*.rs'"
+        operator: ">="
+        value: 100
+
+  - id: js_everywhere
+    name: "JS Everywhere"
+    description: "读取了 100 个 JavaScript/TypeScript 文件。前端后端，无所不在。"
+    icon: "📜"
+    category: hidden
+    rarity: common
+    hidden: true
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: file.read
+        filter: "file_path matches '*.{js,ts,jsx,tsx}'"
+        operator: ">="
+        value: 100
+
+  - id: true_vibe_coder
+    name: "True Vibe Coder"
+    description: "skip permissions + 写代码 + commit + PR，一气呵成。完全的信任，完全的 vibe。"
+    icon: "🌊"
+    category: hidden
+    rarity: epic
+    hidden: true
+    conditions:
+      - type: sequence
+        events: ["permission.dangerously_skipped", "file.write", "git.commit", "git.pr_created"]
+        window: single_session
+
+  - id: lucky_777
+    name: "Lucky 777"
+    description: "agent 某次输出恰好 777 tokens。今天去抽卡。"
+    icon: "🎰"
+    category: hidden
+    rarity: legendary
+    hidden: true
+    conditions:
+      - type: threshold
+        event: conversation.message
+        field: output_tokens
+        operator: "=="
+        value: 777
+
+  - id: im_sorry_dave
+    name: "I'm Sorry, Dave"
+    description: "agent 拒绝了你。但语气太过礼貌，让你不生气了。"
+    icon: "🔴"
+    category: hidden
+    rarity: rare
+    hidden: true
+    conditions:
+      - type: sequence
+        events: ["tool.requested", "tool.deny"]
+      - type: pattern_match
+        event: conversation.message
+        pattern: "I'm sorry.*can't.*|I'm afraid.*can't.*|抱歉.*无法.*"
+
+  - id: early_bird
+    name: "Early Bird"
+    description: "session 大多在清晨 (6:00-9:00)。每天第一件事就是和 agent 说早安。"
+    icon: "🐦"
+    category: hidden
+    rarity: uncommon
+    hidden: true
+    conditions:
+      - type: mode
+        event: session.start
+        field: hour
+        in_range: [6, 9]
+        threshold: 0.5
+
+  - id: midas_touch
+    name: "Midas Touch"
+    description: "单 task 中编辑了 20+ 个文件。点石成金，文件如金。"
+    icon: "🪙"
+    category: hidden
+    rarity: epic
+    hidden: true
+    conditions:
+      - type: distinct_count
+        event: file.edit
+        field: file_path
+        window: single_task
+        operator: ">="
+        value: 20
+
+  - id: nothing_to_see
+    name: "Nothing to See Here"
+    description: "单 task 中 editor 一次都没打开过。agent 自己搞定了所有事。"
+    icon: "🫣"
+    category: hidden
+    rarity: uncommon
+    hidden: true
+    conditions:
+      - type: counter
+        event: output.edit
+        window: single_task
+        operator: "=="
+        value: 0
+      - type: event
+        event: task.complete
+        window: same_task
+
+  - id: rubber_duck
+    name: "Rubber Duck"
+    description: "单次对话中问了 agent 20 个问题，但没让它执行任何操作。它在陪你 debugging。"
+    icon: "🦆"
+    category: hidden
+    rarity: rare
+    hidden: true
+    conditions:
+      - type: threshold
+        event: conversation.message
+        role: user
+        filter: "contains '?'"
+        window: single_session
+        operator: ">="
+        value: 20
+      - type: counter
+        event: tool.complete
+        window: same_session
+        operator: "=="
+        value: 0
+
+  # ── Gap #3: 创意挑战成就（隐藏） ──
+  - id: blind_faith
+    name: "Trust Fall"
+    description: "整个 task 中直接接受了 agent 的所有输出，一次都没改。完全的信任。"
+    icon: "🫂"
+    category: hidden
+    rarity: rare
+    hidden: true
+    conditions:
+      - type: counter
+        event: output.edit
+        window: single_task
+        operator: "=="
+        value: 0
+      - type: event
+        event: task.complete
+        window: same_task
+
+  - id: the_negotiator
+    name: "The Negotiator"
+    description: "agent 第一次拒绝了你的请求，换个说法它就接受了。沟通是一门艺术。"
+    icon: "🤝"
+    category: hidden
+    rarity: uncommon
+    hidden: true
+    conditions:
+      - type: sequence
+        events: ["tool.deny", "conversation.message", "tool.complete"]
+        window: single_task
+
+  - id: u_turn
+    name: "Scorched Earth Redux"
+    description: "主动让 agent revert 后换方向重新实现。推翻重来需要勇气，也说明你明确知道自己要什么。"
+    icon: "↩️"
+    category: hidden
+    rarity: uncommon
+    hidden: true
+    conditions:
+      - type: sequence
+        events: ["file.revert", "task.complete"]
+        window: single_task
+
+  - id: silent_partner
+    name: "Silent Partner"
+    description: "agent 给出首条输出后你全程没再打字。它自己完成了所有剩余工作。"
+    icon: "🤐"
+    category: hidden
+    rarity: epic
+    hidden: true
+    conditions:
+      - type: counter
+        event: conversation.message
+        window: single_session
+        operator: "=="
+        value: 1
+
+  # ============================================================
+  # Category: Challenge (挑战)
+  # ============================================================
+  - id: speed_run_bronze
+    name: "Speed Run (Bronze)"
+    description: "3 分钟内完成完整 task：需求→代码→测试通过。"
+    icon: "⏱️"
+    category: challenge
+    rarity: epic
+    hidden: false
+    set: speed_demon
+    challenge: true
+    conditions:
+      - type: threshold
+        event: task.complete
+        field: duration_ms
+        operator: "<="
+        value: 180000
+      - type: event
+        event: test.pass
+        window: same_task
+
+  - id: speed_run_silver
+    name: "Speed Run (Silver)"
+    description: "1 分钟内完成。"
+    icon: "⚡"
+    category: challenge
+    rarity: legendary
+    hidden: false
+    set: speed_demon
+    challenge: true
+    conditions:
+      - type: threshold
+        event: task.complete
+        field: duration_ms
+        operator: "<="
+        value: 60000
+      - type: event
+        event: test.pass
+        window: same_task
+
+  - id: no_edit_challenge
+    name: "No Edit Challenge"
+    description: "单 task 零手动编辑，全靠 agent。"
+    icon: "🎮"
+    category: challenge
+    rarity: rare
+    hidden: false
+    challenge: true
+    conditions:
+      - type: counter
+        event: output.edit
+        window: single_task
+        operator: "=="
+        value: 0
+      - type: event
+        event: task.complete
+        window: same_task
+
+  - id: ten_task_no_edit
+    name: "Ten-Task No Edit"
+    description: "连续 10 个 task 零手动编辑。你是 conductor，不是 editor。"
+    icon: "🎼"
+    category: challenge
+    rarity: legendary
+    hidden: false
+    progress_trackable: true
+    challenge: true
+    conditions:
+      - type: streak
+        event: task.complete
+        filter: "manual_edits == 0"
+        operator: ">="
+        value: 10
+
+  - id: multi_model
+    name: "Multi-Model"
+    description: "24h 内使用 3 种不同模型。"
+    icon: "🎨"
+    category: challenge
+    rarity: uncommon
+    hidden: false
+    set: collectors_soul
+    challenge: true
+    conditions:
+      - type: distinct_count
+        event: model.switch
+        field: to_model
+        window: 24h
+        operator: ">="
+        value: 3
+
+  # ── Gap #3: 创意挑战 ──
+  - id: short_circuit
+    name: "Short Circuit"
+    description: "用不到 50 个字符的 prompt 完成了一个完整 task。你没多写一个字。"
+    icon: "⚡"
+    category: challenge
+    rarity: legendary
+    hidden: false
+    challenge: true
+    conditions:
+      - type: threshold
+        event: task.complete
+        field: prompt_length
+        operator: "<="
+        value: 50
+        window: single_task
+
+  # ============================================================
+  # Category: Community (社区)
+  # ============================================================
+  - id: storyteller
+    name: "Storyteller"
+    description: "分享过一次 agent 对话到社交媒体或团队频道。"
+    icon: "📤"
+    category: community
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: counter
+        event: achievement.shared
+        operator: ">="
+        value: 1
+
+  - id: trophy_case
+    name: "Trophy Case"
+    description: "展示柜放满了 6 个成就。"
+    icon: "🖼️"
+    category: community
+    rarity: common
+    hidden: false
+    conditions:
+      - type: threshold
+        metric: "showcase_count"
+        operator: ">="
+        value: 6
+
+  - id: completionist_bronze
+    name: "Completionist (Bronze)"
+    description: "解锁了所有 Common 成就。"
+    icon: "🥉"
+    category: community
+    rarity: rare
+    hidden: false
+    set: completionist
+    conditions:
+      - type: set_completion
+        rarity: common
+
+  - id: completionist_silver
+    name: "Completionist (Silver)"
+    description: "解锁了所有 Uncommon 及以上成就。"
+    icon: "🥈"
+    category: community
+    rarity: epic
+    hidden: false
+    set: completionist
+    conditions:
+      - type: set_completion
+        rarity: uncommon
+        include_above: true
+
+  - id: completionist_gold
+    name: "Completionist (Gold)"
+    description: "解锁了全部非隐藏成就。"
+    icon: "🥇"
+    category: community
+    rarity: legendary
+    hidden: false
+    set: completionist
+    conditions:
+      - type: set_completion
+        exclude_hidden: true
+
+  - id: mythic_completionist
+    name: "Mythic Completionist"
+    description: "全部成就，包括隐藏。你是第一个吗？"
+    icon: "👑"
+    category: community
+    rarity: mythic
+    hidden: false
+    set: completionist
+    conditions:
+      - type: set_completion
+        all: true
+
+  # ── Gap #2: 跨工具多样性 ──
+  - id: cross_agent
+    name: "Cross-Agent"
+    description: "在 2 个不同的 agent 工具上都有成就记录（如 Claude Code + OpenCode）。agent 多面手。"
+    icon: "🔗"
+    category: community
+    rarity: epic
+    hidden: false
+    conditions:
+      - type: distinct_count
+        event: session.start
+        field: tool_source
+        operator: ">="
+        value: 2
+
+# ============================================================
+# Sets (套装)
+# ============================================================
+sets:
+  the_beginning:
+    name: "The Beginning"
+    achievements: [first_contact, three_company, tool_time, permission_granted, read_manual, first_sunrise, first_shot, model_hopper, worktree_trial, mcp_first_contact, visual_prompt]
+    reward: { type: title, value: "Founder" }
+
+  agent_commander:
+    name: "Agent Commander"
+    achievements: [full_auto, chain_reaction, architect, surgeon]
+    reward: { type: showcase_border, value: "gold" }
+
+  the_bug_catcher:
+    name: "The Bug Catcher"
+    achievements: [the_debugger, triple_debugger]
+    reward: { type: stat_counter, value: "bugs_fixed" }
+
+  night_shift:
+    name: "Night Shift"
+    achievements: [night_owl, weekend_warrior]
+    reward: { type: theme, value: "dark" }
+
+  speed_demon:
+    name: "Speed Demon"
+    achievements: [speed_run_bronze, speed_run_silver]
+    reward: { type: animation, value: "fast" }
+
+  collectors_soul:
+    name: "Collector's Soul"
+    achievements: [agent_collector, mcp_explorer, multi_model]
+    reward: { type: title, value: "Tool Collector" }
+
+  devops_triad:
+    name: "DevOps Triad"
+    achievements: [auto_committer, pr_champion, cicd_pioneer]
+    reward: { type: title, value: "DevOps" }
+
+  creator_trifecta:
+    name: "Creator Trifecta"
+    achievements: [agent_architect, hooks_master, plugin_explorer]
+    reward: { type: title, value: "Maker" }
+
+  completionist:
+    name: "Completionist"
+    achievements: [completionist_bronze, completionist_silver, completionist_gold]
+    reward: { type: badge, value: "100% Complete" }

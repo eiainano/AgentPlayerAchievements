@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.env
+*.tmp
+
+# Playwright test artifacts
+.playwright-mcp/
+
+# Binary / generated data
+head
+
+# Dashboard screenshots (root)
+before-redesign.png
+dashboard-*.png
+
+.DS_Store

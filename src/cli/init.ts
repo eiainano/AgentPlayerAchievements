@@ -142,7 +142,6 @@ Call \`achievement_track\` when you observe these:
 - Complete code review → \`code.review_completed\` with \`{ issues_found }\`
 - Generate 10k+ tokens → \`token.consumed\` with \`{ amount }\`
 - Revert a file → \`file.revert\` with \`{ file_path }\`
-- Run git revert/reset --hard → \`git.revert_all\`
 - Switch from plan mode to agent mode → \`agent.mode_activated\`
 - Fix your own bug successfully → \`agent.self_fix\` with \`{ fix_description }\`
 

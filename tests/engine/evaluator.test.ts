@@ -268,6 +268,61 @@ describe('evaluateCondition', () => {
     expect(evaluateCondition(cond, events).met).toBe(false);
   });
 
+  it('threshold: max_per_day checks daily limits', () => {
+    const now = new Date().toISOString();
+    const today = now.slice(0, 10);
+    const events = [
+      makeEvent('conversation.message', { timestamp: `${today}T08:00:00Z` }),
+      makeEvent('conversation.message', { timestamp: `${today}T09:00:00Z` }),
+      makeEvent('conversation.message', { timestamp: `${today}T10:00:00Z` }),
+    ];
+    const cond: Condition = { type: 'threshold', event: 'conversation.message', max_per_day: 1, operator: '<=', value: 0 };
+    // 3 events on today → max per day = 3 → exceeds limit of 1
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: false, progress: 3, target: 1 });
+  });
+
+  it('threshold: max_per_day passes when daily limit respected', () => {
+    const now = new Date().toISOString();
+    const today = now.slice(0, 10);
+    const events = [
+      makeEvent('conversation.message', { timestamp: `${today}T08:00:00Z` }),
+    ];
+    const cond: Condition = { type: 'threshold', event: 'conversation.message', max_per_day: 1, operator: '<=', value: 0 };
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 1, target: 1 });
+  });
+
+  it('streak: respects filter', () => {
+    const events = [
+      makeEvent('task.complete', { payload: { manual_edits: 0 }, timestamp: '2025-06-03T00:00:00Z' }),
+      makeEvent('task.complete', { payload: { manual_edits: 0 }, timestamp: '2025-06-02T00:00:00Z' }),
+      makeEvent('task.complete', { payload: { manual_edits: 5 }, timestamp: '2025-06-01T00:00:00Z' }),
+    ];
+    const cond: Condition = {
+      type: 'streak', event: 'task.complete', filter: "manual_edits == 0", operator: '>=', value: 2,
+    };
+    // Only the two manual_edits==0 events count → 2-day streak
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 2, target: 2 });
+  });
+
+  it('streak: respects operator', () => {
+    const events = [
+      makeEvent('daily', { timestamp: '2025-06-03T00:00:00Z' }),
+      makeEvent('daily', { timestamp: '2025-06-02T00:00:00Z' }),
+    ];
+    const cond: Condition = { type: 'streak', event: 'daily', operator: '==', value: 2 };
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 2, target: 2 });
+  });
+
+  it('sequence: standard mode respects window', () => {
+    const now = Date.now();
+    const events = [
+      makeEvent('step.a', { timestamp: new Date(now - 1000).toISOString() }),
+      makeEvent('step.b', { timestamp: new Date(now - 500).toISOString() }),
+    ];
+    const cond: Condition = { type: 'sequence', sequence: ['step.a', 'step.b'], window: '1h', value: 2 };
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 2, target: 2 });
+  });
+
   it('set_completion: via evaluateAll', () => {
     const defs = [
       { id: 'a', rarity: 'common', conditions: [{ type: 'set_completion' as const, rarity: 'common', value: 1 }] },

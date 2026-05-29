@@ -120,6 +120,9 @@ function buildCondition(type: ConditionType, cond: Record<string, unknown>): Con
     consecutive: cond.consecutive === true || undefined,
     count,
     same_target: cond.same_target === true || undefined,
+    all: cond.all === true || undefined,
+    exclude_hidden: cond.exclude_hidden === true || undefined,
+    max_per_day: typeof cond.max_per_day === 'number' ? cond.max_per_day as number : undefined,
   } satisfies Condition;
 }
 

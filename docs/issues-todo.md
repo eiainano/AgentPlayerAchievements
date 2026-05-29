@@ -6,10 +6,10 @@
 
 ## P0 — 逻辑 Bug（影响成就正确性）
 
-- [ ] **evalStreak 忽略 filter** — `ten_task_no_edit` 的 `filter: "manual_edits == 0"` 静默无效，streak 函数从来不读 `cond.filter`。成就变成普通 10 天连续而非"无手动编辑的连续天"。
-- [ ] **evalStreak 忽略 operator** — 第 274 行写死 `>=`，YAML 里所有 streak 的 `operator` 字段等于无操作。
-- [ ] **set_completion 不支持 `all` / `exclude_hidden`** — parser 不解构这两个字段，evaluator 也不认识。`completionist_gold`(exclude_hidden) 和 `mythic_completionist`(all) 回退到 `rarity: common`，跟 `completionist_bronze` 同条件，三个普通等级同时解锁。
-- [ ] **max_per_day 被丢** — `daily_checkin` 第二个条件 `max_per_day: 1` 不在 Condition 接口中，parser 丢弃，evaluator 永远返回 true。成就退化为纯 15 天 streak。
+- [x] **evalStreak 忽略 filter** — `ten_task_no_edit` 的 `filter: "manual_edits == 0"` 静默无效，streak 函数从来不读 `cond.filter`。成就变成普通 10 天连续而非"无手动编辑的连续天"。
+- [x] **evalStreak 忽略 operator** — 第 274 行写死 `>=`，YAML 里所有 streak 的 `operator` 字段等于无操作。
+- [x] **set_completion 不支持 `all` / `exclude_hidden`** — parser 不解构这两个字段，evaluator 也不认识。`completionist_gold`(exclude_hidden) 和 `mythic_completionist`(all) 回退到 `rarity: common`，跟 `completionist_bronze` 同条件，三个普通等级同时解锁。
+- [x] **max_per_day 被丢** — `daily_checkin` 第二个条件 `max_per_day: 1` 不在 Condition 接口中，parser 丢弃，evaluator 永远返回 true。成就退化为纯 15 天 streak。
 - [ ] **swat_team 逻辑矛盾** — `agent.spawn >= 2` + `agent.spawn <= 4` 无窗口，第 5 个 spawn 后 `<=4` 永久 false，成就永远无法解锁。需要改成窗口限制或有条件的条件组合。
 - [ ] **很多成就丢 window 默认用 24h** — `file_whisperer`(500 次)、`shell_shocker`(250 次)、`token_titan`(10M)、`token_legend`(50M)、`command_master`(100 种命令)、`web_wanderer`(100 次) 等 lifetime 成就变成 24h 内完成，几乎不可能。需要补 `window: all` 或不设时间限制。
 
@@ -17,10 +17,10 @@
 
 ## P1 — 事件覆盖缺口
 
-- [ ] **`plan.mode_activated` 无人 track** — `the_switch` 序列第一步永远匹配不上。AGENTS.md 里已有 `plan.mode_entered`（进 plan 模式），但 YAML 写的是 `plan.mode_activated`。两种修法：① 把 YAML 改成 `plan.mode_entered` ② AGENTS.md 补一个 `plan.mode_activated`。推荐①——`plan.mode_entered` 已经存在，语义一致。
+- [x] **`plan.mode_activated` 无人 track** — `the_switch` 序列第一步永远匹配不上。AGENTS.md 里已有 `plan.mode_entered`（进 plan 模式），但 YAML 写的是 `plan.mode_activated`。两种修法：① 把 YAML 改成 `plan.mode_entered` ② AGENTS.md 补一个 `plan.mode_activated`。推荐①——`plan.mode_entered` 已经存在，语义一致。
 - [ ] **`achievement.shared` 无人 track** — AGENTS.md 没有记录这个事件，hook.ts 也不 emit。`storyteller` 永远无法解锁。需要加到 AGENTS.md 或者删 `storyteller` 成就。
-- [ ] **`agent.complete` emit 了没人用** — SubagentStop hook 产生 `agent.complete` 事件，但 118 个成就里没一个引用。两个选项：① 删掉这个 emit ② 加一个成就来消费它。
-- [ ] **`git.revert_all` 在 AGENTS.md 但没成就用** — `scorched_earth` 删掉后就没消费者了。如果短期不打算加新成就，可以从 AGENTS.md 删掉这条。
+- [x] **`agent.complete` emit 了没人用** — SubagentStop hook 产生 `agent.complete` 事件，但 118 个成就里没一个引用。两个选项：① 删掉这个 emit ② 加一个成就来消费它。
+- [x] **`git.revert_all` 在 AGENTS.md 但没成就用** — `scorched_earth` 删掉后就没消费者了。如果短期不打算加新成就，可以从 AGENTS.md 删掉这条。
 
 ---
 
@@ -36,7 +36,7 @@
 
 ## P1 — Evaluator 功能缺口
 
-- [ ] **sequence（非连续模式）忽略 window** — `the_debugger`、`the_switch`、`full_cycle`、`true_vibe_coder`、`u_turn`、`the_negotiator` 在 YAML 里指定了 `window: single_task` 或 `single_session`，但标准有序 sequence 分支不读 window。事件跨多天也不会重置。
+- [x] **sequence（非连续模式）忽略 window** — `the_debugger`、`the_switch`、`full_cycle`、`true_vibe_coder`、`u_turn`、`the_negotiator` 在 YAML 里指定了 `window: single_task` 或 `single_session`，但标准有序 sequence 分支不读 window。事件跨多天也不会重置。
 - [ ] **evalThreshold metric 路径忽略 window/filter/event/role** — 当 `cond.metric` 设值时，所有过滤（事件类型、时间窗口、filter 表达式）全部跳过。`surgeon` 的 `metric: "edit_lines / total_file_lines"` + `window: single_task` — 窗口被忽略，统计的是全局事件。
 - [ ] **空 conditions 数组提前解锁** — `[].every(f)` 永远返回 true，无条件的成就每次 poll 都会解锁（但目前 YAML 里没有无条件的成就，parser 对空返回 `[]` 而不是遗漏键）。
 - [ ] **evalMode 提前返回 target 不一致** — 无事件时返回 `target: cond.value`（通常是 0），有事件时返回 `target: Math.round(threshold * 100)`。如果 YAML 同时设了 value 和 threshold，两路径返回不同 target 显示给 Dashboard。

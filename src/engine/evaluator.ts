@@ -198,6 +198,30 @@ function evalThreshold(events: TrackedEvent[], cond: Condition): EvaluationResul
     return { met: evalOp(op, val, cond.value), progress: Math.round(val * 1000) / 1000, target: cond.value };
   }
 
+  // max_per_day: check that no single day exceeds the limit
+  if (cond.max_per_day != null) {
+    const sessionWindow = isSessionWindow(cond);
+    const windowMs = sessionWindow ? 0 : parseWindow(cond.window || '24h');
+    const now = Date.now();
+    const perDay: Record<string, number> = {};
+    for (const e of events) {
+      if (cond.event && e.event_type !== cond.event) continue;
+      if (!sessionWindow && now - new Date(e.timestamp).getTime() > windowMs) continue;
+      if (cond.filter && !matchFilter(e, cond.filter)) continue;
+      if (!matchRole(e, cond.role)) continue;
+      const day = e.timestamp.slice(0, 10);
+      perDay[day] = (perDay[day] || 0) + 1;
+    }
+    let maxCount = 0;
+    let activeDays = 0;
+    for (const v of Object.values(perDay)) {
+      if (v > maxCount) maxCount = v;
+      activeDays++;
+    }
+    const op: ConditionOperator = cond.operator || '<=';
+    return { met: evalOp(op, maxCount, cond.max_per_day), progress: maxCount, target: cond.max_per_day };
+  }
+
   // Standard threshold: sum field values across matching events
   const sessionWindow = isSessionWindow(cond);
   const windowMs = sessionWindow ? 0 : parseWindow(cond.window || '24h');
@@ -258,6 +282,8 @@ function evalStreak(events: TrackedEvent[], cond: Condition): EvaluationResult {
   const days = new Set<string>();
   for (const e of events) {
     if (e.event_type !== cond.event) continue;
+    if (cond.filter && !matchFilter(e, cond.filter)) continue;
+    if (!matchRole(e, cond.role)) continue;
     days.add(e.timestamp.slice(0, 10));
   }
   const sorted = [...days].sort().reverse();
@@ -271,7 +297,8 @@ function evalStreak(events: TrackedEvent[], cond: Condition): EvaluationResult {
     else break;
   }
   const target = cond.value;
-  return { met: streak >= target, progress: streak, target };
+  const op: ConditionOperator = cond.operator || '>=';
+  return { met: evalOp(op, streak, target), progress: streak, target };
 }
 
 function evalSequence(events: TrackedEvent[], cond: Condition): EvaluationResult {
@@ -298,9 +325,13 @@ function evalSequence(events: TrackedEvent[], cond: Condition): EvaluationResult
   // Standard ordered sequence mode
   const seq = cond.sequence || [];
   if (seq.length === 0) return { met: false, progress: 0, target: 0 };
+  const seqSessionWindow = isSessionWindow(cond);
+  const seqWindowMs = seqSessionWindow ? 0 : parseWindow(cond.window || '24h');
+  const seqNow = Date.now();
   let si = 0;
   for (const e of events) {
     if (si >= seq.length) break;
+    if (!seqSessionWindow && cond.window && seqNow - new Date(e.timestamp).getTime() > seqWindowMs) continue;
     if (e.event_type === seq[si]) si++;
   }
   return { met: si >= seq.length, progress: si, target: seq.length };
@@ -338,22 +369,31 @@ const RARITY_ORDER = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'mythic
 
 function evalSetCompletion(
   cond: Condition,
-  definitions: Array<{ id: string; rarity: string }>,
+  definitions: Array<{ id: string; rarity: string; hidden?: boolean }>,
   unlocked: Record<string, string>,
   selfId: string,
 ): EvaluationResult {
-  const targetRarity = cond.rarity || 'common';
-  const startIdx = RARITY_ORDER.indexOf(targetRarity);
+  let eligible: Array<{ id: string; rarity: string; hidden?: boolean }>;
 
-  const eligible = definitions.filter(d => {
-    if (d.id === selfId) return false;
-    if (!cond.include_above) return d.rarity === targetRarity;
-    return RARITY_ORDER.indexOf(d.rarity) >= startIdx;
-  });
+  if (cond.all) {
+    // All achievements, including hidden
+    eligible = definitions.filter(d => d.id !== selfId);
+  } else if (cond.exclude_hidden) {
+    // All non-hidden achievements
+    eligible = definitions.filter(d => d.id !== selfId && !d.hidden);
+  } else {
+    const targetRarity = cond.rarity || 'common';
+    const startIdx = RARITY_ORDER.indexOf(targetRarity);
+    eligible = definitions.filter(d => {
+      if (d.id === selfId) return false;
+      if (!cond.include_above) return d.rarity === targetRarity;
+      return RARITY_ORDER.indexOf(d.rarity) >= startIdx;
+    });
+  }
 
   const total = eligible.length;
   const completed = eligible.filter(d => unlocked[d.id]).length;
-  return { met: completed >= total, progress: completed, target: total };
+  return { met: total > 0 && completed >= total, progress: completed, target: total };
 }
 
 // ── Mode ────────────────────────────────────────────────────────────
@@ -555,7 +595,7 @@ export function evaluateCondition(cond: Condition, events: TrackedEvent[]): Eval
 }
 
 export function evaluateAll(
-  definitions: Array<{ id: string; rarity?: string; conditions: Condition[] }>,
+  definitions: Array<{ id: string; rarity?: string; hidden?: boolean; conditions: Condition[] }>,
   events: TrackedEvent[],
   unlocked: Record<string, string>,
 ): string[] {
@@ -565,7 +605,7 @@ export function evaluateAll(
 
     const allMet = def.conditions.every(c => {
       if (c.type === 'set_completion') {
-        return evalSetCompletion(c, definitions as Array<{ id: string; rarity: string }>, unlocked, def.id).met;
+        return evalSetCompletion(c, definitions as Array<{ id: string; rarity: string; hidden?: boolean }>, unlocked, def.id).met;
       }
       return evaluateCondition(c, events).met;
     });

@@ -29,7 +29,6 @@ All tool calls, file operations, git commits/PRs, subagents, sessions, task comp
 | Reviewing code (done) | `code.review_completed` | `{ issues_found }` |
 | Generating significant tokens (~10k+) | `token.consumed` | `{ amount }` |
 | Reverting a file to previous version | `file.revert` | `{ file_path }` |
-| Running git revert or git reset --hard | `git.revert_all` | `{}` |
 | Switching from plan mode to agent mode | `agent.mode_activated` | `{}` |
 | Fixing your own bug successfully | `agent.self_fix` | `{ fix_description }` |
 

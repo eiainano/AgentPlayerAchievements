@@ -94,6 +94,8 @@ export interface Condition {
   // set_completion
   rarity?: string;
   include_above?: boolean;
+  all?: boolean;
+  exclude_hidden?: boolean;
   // mode
   in_range?: [number, number];
   threshold?: number;
@@ -108,6 +110,8 @@ export interface Condition {
   count?: { operator?: ConditionOperator; value: number };
   // counter
   same_target?: boolean;
+  // threshold / counter
+  max_per_day?: number;
 }
 
 export type RarityLevel = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';

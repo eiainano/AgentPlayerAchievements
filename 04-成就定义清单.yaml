@@ -432,7 +432,7 @@ definitions:
     hidden: false
     conditions:
       - type: sequence
-        events: ["plan.mode_activated", "agent.mode_activated", "task.complete"]
+        events: ["plan.mode_entered", "agent.mode_activated", "task.complete"]
         window: single_task
 
   # ============================================================

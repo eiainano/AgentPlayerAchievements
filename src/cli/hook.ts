@@ -17,7 +17,7 @@
  *   TaskCompleted      → task.complete   { task_id, duration_ms }
  *   PostCompact        → context.compacted
  *   SubagentStart      → agent.spawn     { agent_type }
- *   SubagentStop       → agent.complete  { agent_type }
+ *   SubagentStop       → (no event emitted)
  *   SessionStart       → session.start   { source }
  *   SessionEnd         → session.end     { reason }
  */
@@ -116,7 +116,6 @@ function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_type: stri
       results.push({ event_type: 'agent.spawn', payload: { ...base } });
       break;
     case 'SubagentStop':
-      results.push({ event_type: 'agent.complete', payload: { ...base } });
       break;
     case 'SessionStart':
       results.push({ event_type: 'session.start', payload: { ...base } });

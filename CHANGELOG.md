@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.2.0] — 2026-05-30
+
+### Event System Overhaul
+
+- **4 evaluator bugs fixed** — threshold → independent evalThreshold (field summation + metric expressions); sequence → consecutive mode with count sub-object; distinct_count → values whitelist; counter → same_target support
+- **4 new hook event mappings** — task.complete (TaskCompleted), context.compacted (PostCompact), tool.requested (PreToolUse), file.write (PostToolUse Write)
+- **3 new CC hooks registered** — PreToolUse, TaskCompleted, PostCompact added to init.ts; 9 hooks total (was 6)
+- **24 manual track events in AGENTS.md** — comprehensive two-category table (agent actions + user actions observable), each with specific payload hints
+- **init.ts INSTRUCTION_BLOCK rewritten** — matching AGENTS.md, injected into user's CLAUDE.md during init
+
+### Achievements
+
+- **12 new event-driven achievements** — Pipemaster, Command Baby, Cerberus (command.run); Fail Forward, Bounce Back, Phoenix (tool.failure); MCP Connoisseur, MCP Collector (mcp.tool_call); Command Master (command.run, legendary); Failure Is the Mother of Success (tool.failure, legendary); Delegator, SWAT Team (agent.spawn)
+- **3 unreachable achievements deleted** — perfect_review, photographic_memory, scorched_earth
+- **3 achievements unblocked** — the_switch, the_debugger, triple_debugger via new manual track events
+- **All 5 previously-unused hook events now serve achievements** — command.run, tool.failure, mcp.tool_call, agent.spawn all have consumer achievements
+- **109 → 118 total achievements**, all events needed by any achievement are now either auto-tracked or covered by manual instructions
+
+### Documentation & Tooling
+
+- **CLAUDE.md** — project-level instructions: build/test commands, architecture diagram, conventions, known sharp edges
+- **`docs/issues-todo.md`** — comprehensive issue tracker: 10 P0 bugs, ~20 P1 gaps, ~6 P2 data issues
+- **README.md** — updated project structure, CLI table (added hook auto + mvp), dependency list
+- **DEVLOG.md** — 2026-05-29 evaluator-fix entry + 2026-05-30 event system entries
+- **docs/PROGRESS.md** — 5→12 condition types, achievement count updated
+- **docs/design/** — 5 files now carry design-phase disclaimer headers
+
+### Housekeeping
+
+- `@types/node` → devDependencies
+- MCP engine `session_id` no longer hardcoded `demo-session`; hook.ts passes real session_id from CC stdin
+- `package.json`: version 0.1.0→0.1.1, license field added
+
+### Tech Stack Unchanged
+
+Runtime: tsx, MCP: @modelcontextprotocol/sdk, Parsing: yaml, Validation: zod, Testing: vitest (48 tests, 5 files, all passing)
+
 ## [0.1.1] — 2026-05-29
 
 ### Added

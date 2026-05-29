@@ -2,6 +2,15 @@
 
 ## [0.2.0] — 2026-05-30
 
+### System Audit & P0 Bug Fixes (10 fixed)
+
+- **evalStreak** — now reads `cond.filter` and `cond.operator` (was hardcoded `>=`)
+- **set_completion** — `all` and `exclude_hidden` fields parsed and evaluated; `completionist_gold`/`mythic_completionist` now distinct from `completionist_bronze`
+- **max_per_day** — Condition field + parser + per-day grouping in `evalThreshold`; `daily_checkin` second condition now functional
+- **sequence standard mode** — window filtering added (was silently ignoring `window:` on 7 sequence achievements)
+- **session-scoped filtering** — `scopeEvents()` added to evaluator, filters events to latest `session_id` when `single_session`/`same_session` window is set; swat_team fixed
+- **lifetime achievements** — `parseWindow` supports `all`/`lifetime` returning Infinity; 25 achievements upgraded from implicit 24h default to explicit `window: all`
+
 ### Event System Overhaul
 
 - **4 evaluator bugs fixed** — threshold → independent evalThreshold (field summation + metric expressions); sequence → consecutive mode with count sub-object; distinct_count → values whitelist; counter → same_target support
@@ -35,7 +44,7 @@
 
 ### Tech Stack Unchanged
 
-Runtime: tsx, MCP: @modelcontextprotocol/sdk, Parsing: yaml, Validation: zod, Testing: vitest (48 tests, 5 files, all passing)
+Runtime: tsx, MCP: @modelcontextprotocol/sdk, Parsing: yaml, Validation: zod, Testing: vitest (55 tests, 5 files, all passing)
 
 ## [0.1.1] — 2026-05-29
 

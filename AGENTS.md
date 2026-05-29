@@ -30,6 +30,8 @@ All tool calls, file operations, git commits/PRs, subagents, sessions, task comp
 | Generating significant tokens (~10k+) | `token.consumed` | `{ amount }` |
 | Reverting a file to previous version | `file.revert` | `{ file_path }` |
 | Running git revert or git reset --hard | `git.revert_all` | `{}` |
+| Switching from plan mode to agent mode | `agent.mode_activated` | `{}` |
+| Fixing your own bug successfully | `agent.self_fix` | `{ fix_description }` |
 
 ### User-action events (when the USER does something you can see)
 
@@ -41,6 +43,7 @@ All tool calls, file operations, git commits/PRs, subagents, sessions, task comp
 | User denies a tool call | `tool.deny` | `{ tool_name }` |
 | User edits your output | `output.edit` | `{ amount }` |
 | Tests pass during your execution | `test.pass` | `{ count }` |
+| Tests fail during your execution | `test.fail` | `{ count }` |
 
 ## Session end checklist
 

@@ -435,20 +435,6 @@ definitions:
         events: ["plan.mode_activated", "agent.mode_activated", "task.complete"]
         window: single_task
 
-  - id: photographic_memory
-    name: "Photographic Memory"
-    description: "在 50 轮以上的对话中成功引用了早期上下文。agent 的记忆是短暂的，你的上下文是持久的。"
-    icon: "🧠"
-    category: skill
-    rarity: rare
-    hidden: false
-    conditions:
-      - type: threshold
-        event: context.referenced
-        field: turn_distance
-        operator: ">="
-        value: 50
-
   # ============================================================
   # Category: Style (风格)
   # ============================================================
@@ -697,19 +683,6 @@ definitions:
         event: code.review_requested
         operator: ">="
         value: 1
-
-  - id: perfect_review
-    name: "Ship It!"
-    description: "agent 审查代码后零问题，直接通过。完美的代码？还是 agent 在摸鱼？"
-    icon: "🚢"
-    category: workflow
-    rarity: rare
-    hidden: false
-    conditions:
-      - type: sequence
-        events: ["code.review_requested", "code.review_approved"]
-        filter: "issues_found == 0"
-        window: single_task
 
   - id: deep_review
     name: "Deep Review"
@@ -1097,18 +1070,6 @@ definitions:
         field: tool_source
         operator: ">="
         value: 3
-
-  - id: scorched_earth
-    name: "Scorched Earth"
-    description: "单 task 全量 revert 后重新开始。这需要勇气。"
-    icon: "🔥"
-    category: hidden
-    rarity: uncommon
-    hidden: true
-    conditions:
-      - type: sequence
-        events: ["task.progress", "git.revert_all", "task.restart"]
-        window: single_task
 
   - id: daily_checkin
     name: "Daily Check-In"

@@ -143,6 +143,8 @@ Call \`achievement_track\` when you observe these:
 - Generate 10k+ tokens → \`token.consumed\` with \`{ amount }\`
 - Revert a file → \`file.revert\` with \`{ file_path }\`
 - Run git revert/reset --hard → \`git.revert_all\`
+- Switch from plan mode to agent mode → \`agent.mode_activated\`
+- Fix your own bug successfully → \`agent.self_fix\` with \`{ fix_description }\`
 
 **When user does something you can see:**
 - User switches model → \`model.switch\` with \`{ from, to }\`
@@ -151,6 +153,7 @@ Call \`achievement_track\` when you observe these:
 - User denies a tool call → \`tool.deny\` with \`{ tool_name }\`
 - User edits your output → \`output.edit\` with \`{ amount }\`
 - Tests pass during execution → \`test.pass\` with \`{ count }\`
+- Tests fail during execution → \`test.fail\` with \`{ count }\`
 
 ### Session end
 1. \`achievement_poll\` — check for newly unlocked achievements

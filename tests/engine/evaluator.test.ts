@@ -187,6 +187,87 @@ describe('evaluateCondition', () => {
     expect(result.progress).toBe(38);
   });
 
+  it('threshold: sums field values (not count)', () => {
+    const events = [
+      makeEvent('task.complete', { payload: { step_count: '5' } }),
+      makeEvent('task.complete', { payload: { step_count: '3' } }),
+    ];
+    const cond: Condition = { type: 'threshold', event: 'task.complete', field: 'step_count', operator: '>=', value: 8 };
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 8, target: 8 });
+  });
+
+  it('threshold: metric expression', () => {
+    const events = [
+      makeEvent('task.complete', { payload: { edit_lines: '5', total_file_lines: '200' } }),
+      makeEvent('task.complete', { payload: { edit_lines: '3', total_file_lines: '100' } }),
+    ];
+    const cond: Condition = {
+      type: 'threshold', metric: 'edit_lines / total_file_lines', window: '24h', operator: '<', value: 0.05,
+    };
+    const result = evaluateCondition(cond, events);
+    // (5+3)/(200+100) = 8/300 = 0.0267 < 0.05 → true
+    expect(result.met).toBe(true);
+  });
+
+  it('counter: same_target finds max of same field value', () => {
+    const events = [
+      makeEvent('file.edit', { payload: { function_name: 'foo' } }),
+      makeEvent('file.edit', { payload: { function_name: 'foo' } }),
+      makeEvent('file.edit', { payload: { function_name: 'foo' } }),
+      makeEvent('file.edit', { payload: { function_name: 'bar' } }),
+    ];
+    const cond: Condition = { type: 'counter', event: 'file.edit', field: 'function_name', same_target: true, value: 3 };
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 3, target: 3 });
+  });
+
+  it('counter: same_target fails when no field value reaches target', () => {
+    const events = [
+      makeEvent('file.edit', { payload: { function_name: 'foo' } }),
+      makeEvent('file.edit', { payload: { function_name: 'bar' } }),
+    ];
+    const cond: Condition = { type: 'counter', event: 'file.edit', field: 'function_name', same_target: true, value: 2 };
+    expect(evaluateCondition(cond, events).met).toBe(false);
+  });
+
+  it('sequence: consecutive mode counts longest run', () => {
+    const events = [
+      makeEvent('tool.complete'), makeEvent('tool.complete'), makeEvent('tool.complete'),
+      makeEvent('tool.deny'), // breaks the run
+      makeEvent('tool.complete'), makeEvent('tool.complete'),
+    ];
+    const cond: Condition = {
+      type: 'sequence', event: 'tool.complete', consecutive: true,
+      count: { operator: '>=', value: 3 },
+    };
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 3, target: 3 });
+  });
+
+  it('distinct_count: respects values whitelist', () => {
+    const events = [
+      makeEvent('tool.complete', { payload: { tool_name: 'Read' } }),
+      makeEvent('tool.complete', { payload: { tool_name: 'Edit' } }),
+      makeEvent('tool.complete', { payload: { tool_name: 'Write' } }),
+      makeEvent('tool.complete', { payload: { tool_name: 'Other' } }), // not in whitelist
+    ];
+    const cond: Condition = {
+      type: 'distinct_count', event: 'tool.complete', field: 'tool_name',
+      values: ['Read', 'Edit', 'Write', 'Bash', 'ToolSearch'], value: 3,
+    };
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 3, target: 3 });
+  });
+
+  it('distinct_count: values whitelist excludes non-matches', () => {
+    const events = [
+      makeEvent('tool.complete', { payload: { tool_name: 'Other' } }),
+      makeEvent('tool.complete', { payload: { tool_name: 'Unknown' } }),
+    ];
+    const cond: Condition = {
+      type: 'distinct_count', event: 'tool.complete', field: 'tool_name',
+      values: ['Read', 'Edit'], value: 1,
+    };
+    expect(evaluateCondition(cond, events).met).toBe(false);
+  });
+
   it('set_completion: via evaluateAll', () => {
     const defs = [
       { id: 'a', rarity: 'common', conditions: [{ type: 'set_completion' as const, rarity: 'common', value: 1 }] },

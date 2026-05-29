@@ -74,7 +74,9 @@ function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_type: stri
 
   switch (hookEvent) {
     case 'PostToolUse':
-      results.push({ event_type: 'tool.complete', payload: { ...base } });
+      results.push({ event_type: 'tool.complete', payload: { ...base, role: 'assistant' } });
+      // Also emit conversation message (every tool use implies a conversation exchange)
+      results.push({ event_type: 'conversation.message', payload: {} });
       // Also emit file-type events based on tool name
       if (data.tool_name === 'Read') results.push({ event_type: 'file.read', payload: { ...base } });
       if (data.tool_name === 'Write') results.push({ event_type: 'file.create', payload: { ...base } });

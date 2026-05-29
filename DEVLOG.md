@@ -2,6 +2,32 @@
 
 ---
 
+## 2026-05-29 (evaluator-fix)
+
+### 完成
+- **修复 4 个 evaluator bug** — threshold/sequence/distinct_count/counter 全部正确实现：
+  - `threshold` 从 evalCounter fall-through 改为独立 evalThreshold（field 求和 + metric 表达式求值）
+  - `sequence` 支持 `consecutive: true` 模式（最长连续匹配）+ `count` 子对象
+  - `distinct_count` 支持 `values` 白名单过滤
+  - `counter` 支持 `same_target: true`（同 field 值重复计数）
+- **evalOp 提取** — 通用运算符比较函数，counter / threshold / sequence_count / ratio 共用
+- **事件链路补全** — hook auto-track 中 PostToolUse 派生 `conversation.message` 事件
+- **新增 7 个测试** — threshold field/度量、counter same_target、sequence consecutive、distinct_count values 白名单
+- **README.md 更新** — 项目结构（移除 counter-cache.ts，补充 utils/server/telemetry/tool-registry），CLI 表格补充 hook auto + mvp，依赖列表补全
+- **package.json 版本号** — 0.1.0 → 0.1.1
+
+### 改动文件
+- 修改：`src/engine/evaluator.ts`、`src/engine/types.ts`、`src/engine/yaml-parser.ts`、`src/cli/hook.ts`、`tests/engine/evaluator.test.ts`、`package.json`、`README.md`、`CHANGELOG.md`、`DEVLOG.md`
+
+### 影响成就
+- `marathon`、`one_shot`、`iterative_refiner`、`deep_review`、`lucky_777`、`the_all_nighter`、`speed_run_*`、`photographic_memory` — threshold field 求和已正确
+- `surgeon`、`trophy_case`、`parallel_universe` — metric 表达式求值已正确
+- `full_auto` — consecutive 最长连续模式已正确
+- `tool_completist` — values 白名单已正确
+- `perfectionist` — same_target 同 field 计数已正确
+
+---
+
 ## 2026-05-24 (condition-types)
 
 ### 完成

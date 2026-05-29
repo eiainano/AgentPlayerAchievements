@@ -89,6 +89,13 @@ function parseConditions(raw: unknown, achId: string): Condition[] {
 }
 
 function buildCondition(type: ConditionType, cond: Record<string, unknown>): Condition {
+  const count = cond.count && typeof cond.count === 'object'
+    ? {
+        operator: str(cond.count as Record<string, unknown>, 'operator') as Condition['operator'],
+        value: typeof (cond.count as Record<string, unknown>).value === 'number' ? (cond.count as Record<string, unknown>).value as number : Number((cond.count as Record<string, unknown>).value) || 0,
+      }
+    : undefined;
+
   return {
     type,
     value: typeof cond.value === 'number' ? cond.value : Number(cond.value) || 0,
@@ -109,6 +116,10 @@ function buildCondition(type: ConditionType, cond: Record<string, unknown>): Con
     threshold: typeof cond.threshold === 'number' ? cond.threshold : undefined,
     role: str(cond, 'role'),
     metric: str(cond, 'metric'),
+    values: strArr(cond, 'values'),
+    consecutive: cond.consecutive === true || undefined,
+    count,
+    same_target: cond.same_target === true || undefined,
   } satisfies Condition;
 }
 

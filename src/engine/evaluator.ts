@@ -152,6 +152,32 @@ function evalCounter(events: TrackedEvent[], cond: Condition): EvaluationResult 
   const sessionWindow = isSessionWindow(cond);
   const windowMs = sessionWindow ? 0 : parseWindow(cond.window || '24h');
   const now = Date.now();
+  const target = cond.value;
+  const op: ConditionOperator = cond.operator || '>=';
+
+  // same_target = true: find max count for any single field value
+  if (cond.same_target && cond.field) {
+    const fieldCounts: Record<string, number> = {};
+    for (const e of events) {
+      if (e.event_type !== cond.event) continue;
+      if (!sessionWindow && now - new Date(e.timestamp).getTime() > windowMs) continue;
+      if (cond.filter && !matchFilter(e, cond.filter)) continue;
+      if (!matchRole(e, cond.role)) continue;
+      const val = getField(e, cond.field);
+      if (!val) continue;
+      fieldCounts[val] = (fieldCounts[val] || 0) + 1;
+    }
+    let maxCount = 0;
+    for (const v of Object.values(fieldCounts)) {
+      if (v > maxCount) maxCount = v;
+    }
+    return {
+      met: evalOp(op, maxCount, target),
+      progress: maxCount,
+      target,
+    };
+  }
+
   let count = 0;
   for (const e of events) {
     if (e.event_type !== cond.event) continue;
@@ -160,18 +186,72 @@ function evalCounter(events: TrackedEvent[], cond: Condition): EvaluationResult 
     if (!matchRole(e, cond.role)) continue;
     count++;
   }
+  return { met: evalOp(op, count, target), progress: count, target };
+}
+
+function evalThreshold(events: TrackedEvent[], cond: Condition): EvaluationResult {
+  // Handle metric-based threshold (e.g. "edit_lines / total_file_lines")
+  if (cond.metric) {
+    const val = evaluateMetric(cond.metric, events);
+    if (val === null) return { met: false, progress: 0, target: cond.value };
+    const op: ConditionOperator = cond.operator || '>=';
+    return { met: evalOp(op, val, cond.value), progress: Math.round(val * 1000) / 1000, target: cond.value };
+  }
+
+  // Standard threshold: sum field values across matching events
+  const sessionWindow = isSessionWindow(cond);
+  const windowMs = sessionWindow ? 0 : parseWindow(cond.window || '24h');
+  const now = Date.now();
   const target = cond.value;
   const op: ConditionOperator = cond.operator || '>=';
-  const met = op === '>='
-    ? count >= target
-    : op === '<='
-      ? count <= target
-      : op === '=='
-        ? count === target
-        : op === '>'
-          ? count > target
-          : count < target;
-  return { met, progress: count, target };
+  let sum = 0;
+  for (const e of events) {
+    if (cond.event && e.event_type !== cond.event) continue;
+    if (!sessionWindow && now - new Date(e.timestamp).getTime() > windowMs) continue;
+    if (cond.filter && !matchFilter(e, cond.filter)) continue;
+    if (!matchRole(e, cond.role)) continue;
+    if (cond.field) {
+      sum += Number(e.payload?.[cond.field]) || 0;
+    } else {
+      sum += 1;
+    }
+  }
+  return { met: evalOp(op, sum, target), progress: Math.round(sum), target };
+}
+
+function evaluateMetric(expr: string, events: TrackedEvent[]): number | null {
+  // Support simple expressions like "edit_lines / total_file_lines"
+  const parts = expr.split('/');
+  if (parts.length === 2) {
+    const numField = parts[0]!.trim();
+    const denField = parts[1]!.trim();
+    let numerator = 0;
+    let denominator = 0;
+    for (const e of events) {
+      numerator += Number(e.payload?.[numField]) || 0;
+      denominator += Number(e.payload?.[denField]) || 0;
+    }
+    return denominator > 0 ? numerator / denominator : null;
+  }
+  // Single field: average
+  let sum = 0;
+  let count = 0;
+  for (const e of events) {
+    const v = Number(e.payload?.[expr.trim()]);
+    if (!isNaN(v)) { sum += v; count++; }
+  }
+  return count > 0 ? sum / count : null;
+}
+
+function evalOp(op: ConditionOperator, actual: number, target: number): boolean {
+  switch (op) {
+    case '>=': return actual >= target;
+    case '<=': return actual <= target;
+    case '==': return actual === target;
+    case '>':  return actual > target;
+    case '<':  return actual < target;
+    default:   return actual >= target;
+  }
 }
 
 function evalStreak(events: TrackedEvent[], cond: Condition): EvaluationResult {
@@ -195,8 +275,29 @@ function evalStreak(events: TrackedEvent[], cond: Condition): EvaluationResult {
 }
 
 function evalSequence(events: TrackedEvent[], cond: Condition): EvaluationResult {
+  // consecutive mode: count longest run of matching events without gaps
+  if (cond.consecutive) {
+    const sessionWindow = isSessionWindow(cond);
+    const windowMs = sessionWindow ? 0 : parseWindow(cond.window || '24h');
+    const now = Date.now();
+    const target = cond.count?.value ?? cond.value;
+    const op: ConditionOperator = cond.count?.operator ?? cond.operator ?? '>=';
+
+    let maxConsecutive = 0;
+    let currentRun = 0;
+    for (const e of events) {
+      if (e.event_type !== cond.event) { currentRun = 0; continue; }
+      if (!sessionWindow && now - new Date(e.timestamp).getTime() > windowMs) { currentRun = 0; continue; }
+      if (cond.filter && !matchFilter(e, cond.filter)) { currentRun = 0; continue; }
+      currentRun++;
+      if (currentRun > maxConsecutive) maxConsecutive = currentRun;
+    }
+    return { met: evalOp(op, maxConsecutive, target), progress: maxConsecutive, target };
+  }
+
+  // Standard ordered sequence mode
   const seq = cond.sequence || [];
-  if (seq.length === 0) return { met: false, progress: 0, target: seq.length };
+  if (seq.length === 0) return { met: false, progress: 0, target: 0 };
   let si = 0;
   for (const e of events) {
     if (si >= seq.length) break;
@@ -206,11 +307,19 @@ function evalSequence(events: TrackedEvent[], cond: Condition): EvaluationResult
 }
 
 function evalDistinctCount(events: TrackedEvent[], cond: Condition): EvaluationResult {
+  const sessionWindow = isSessionWindow(cond);
+  const windowMs = sessionWindow ? 0 : parseWindow(cond.window || '24h');
+  const now = Date.now();
+  const whitelist: Set<string> | null = cond.values ? new Set(cond.values) : null;
+
   const values = new Set<string>();
   for (const e of events) {
     if (e.event_type !== cond.event) continue;
+    if (!sessionWindow && now - new Date(e.timestamp).getTime() > windowMs) continue;
     const val = cond.field ? getField(e, cond.field) : null;
-    if (val) values.add(val);
+    if (!val) continue;
+    if (whitelist && !whitelist.has(val)) continue;
+    values.add(val);
   }
   const target = cond.value;
   return { met: values.size >= target, progress: values.size, target };
@@ -430,8 +539,8 @@ function evalPercentile(events: TrackedEvent[], cond: Condition): EvaluationResu
 
 export function evaluateCondition(cond: Condition, events: TrackedEvent[]): EvaluationResult {
   switch (cond.type) {
-    case 'counter':
-    case 'threshold': return evalCounter(events, cond);
+    case 'counter': return evalCounter(events, cond);
+    case 'threshold': return evalThreshold(events, cond);
     case 'streak': return evalStreak(events, cond);
     case 'sequence': return evalSequence(events, cond);
     case 'distinct_count': return evalDistinctCount(events, cond);

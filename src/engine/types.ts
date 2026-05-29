@@ -101,6 +101,13 @@ export interface Condition {
   role?: string;
   // percentile
   metric?: string;
+  // distinct_count
+  values?: string[];
+  // sequence / consecutive
+  consecutive?: boolean;
+  count?: { operator?: ConditionOperator; value: number };
+  // counter
+  same_target?: boolean;
 }
 
 export type RarityLevel = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';

@@ -1,8 +1,9 @@
 {
   "name": "agpa",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Agent Player Achievements — gamified achievement system for AI coding agents",
+  "license": "MIT",
   "scripts": {
     "demo": "tsx src/cli/mvp.ts demo",
     "stats": "tsx src/cli/mvp.ts stats",

@@ -1,22 +1,50 @@
 # AGPA Achievement Tracking
 
-This project uses AGPA (Agent Player Achievements) to gamify AI coding. Most events are tracked automatically via Claude Code hooks — you don't need to manually call `achievement_track` for tool usage.
+This project uses AGPA (Agent Player Achievements) to gamify AI coding.
 
-## Auto-tracked events (via CC hooks)
-- `tool.complete` / `tool.failure` — every tool call (Read, Write, Edit, Bash, etc.)
-- `file.read` / `file.create` / `file.edit` — file operations
-- `command.run` — Bash executions
-- `agent.spawn` / `agent.complete` — subagent lifecycle
-- `session.start` / `session.end` — session lifecycle
+## Auto-tracked events (via CC hooks — no action needed)
 
-## Manual tracking (events hooks can't detect)
-Call `achievement_track` for these:
-- `task.complete` — when you finish a task/subtask (with `{ task_name }` payload)
-- Any achievement-specific events referenced in conditions
+All tool calls, file operations, git commits/PRs, subagents, sessions, task completion, and context compaction are tracked automatically through 9 CC hooks. You don't need to manually call `achievement_track` for these.
 
-## Session end
-At the end of every session, call `achievement_poll` to check for newly unlocked achievements. If any unlock, display them proudly with their icon and description!
+## Manual tracking — call `achievement_track` when you observe these
 
-## On-demand
-Use `achievement_stats` when the user asks about progress.
-Use `achievement_showcase` to manage the display cabinet.
+### Behavior events (when YOU do something)
+
+| Trigger | Event to track | Payload |
+|---------|---------------|---------|
+| After any slash command runs | `command.slash_used` | `{ command }` |
+| Entering plan mode | `plan.mode_entered` | `{}` |
+| Reading help/docs | `help.accessed` | `{}` |
+| Connecting to an MCP server | `mcp.server_used` | `{ server_name }` |
+| Installing a plugin | `plugin.installed` | `{ plugin_name }` |
+| Configuring hooks | `hook.configured` | `{ hook_count }` |
+| Creating an Agent/subagent | `agent.created` | `{ agent_type }` |
+| Creating a skill | `skill.created` | `{ skill_name }` |
+| Publishing a skill | `skill.published` | `{ skill_name }` |
+| Creating a slash command | `command.created` | `{ command_name }` |
+| Creating a template | `template.created` | `{ template_name }` |
+| Editing config/settings files | `config.file_edited` | `{ file_path }` |
+| Creating a worktree | `worktree.created` | `{ path }` |
+| Requesting code review | `code.review_requested` | `{}` |
+| Reviewing code (done) | `code.review_completed` | `{ issues_found }` |
+| Generating significant tokens (~10k+) | `token.consumed` | `{ amount }` |
+
+### User-action events (when the USER does something you can see)
+
+| Trigger | Event to track | Payload |
+|---------|---------------|---------|
+| User switches model (`/model` or equivalent) | `model.switch` | `{ from, to }` |
+| User changes permission mode | `permission.mode_changed` | `{ old_mode, new_mode }` |
+| User skips a dangerous tool (approve-skip) | `permission.dangerously_skipped` | `{ tool_name }` |
+| User denies a tool call | `tool.deny` | `{ tool_name }` |
+| User edits your output | `output.edit` | `{ amount }` |
+| Tests pass during your execution | `test.pass` | `{ count }` |
+
+## Session end checklist
+
+At the end of every session:
+
+1. Call `achievement_track` with `"session.end"` (hook may also do this)
+2. Call `achievement_poll` to check for newly unlocked achievements
+3. **If poll returns achievements**, display them proudly with icon + name + description
+4. Consider calling `achievement_stats` if the user seems interested in progress

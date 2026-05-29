@@ -118,18 +118,42 @@ const INIT_DATA: Record<string, InitToolData> = {
 const INSTRUCTION_BLOCK = `<!-- AGPA ACHIEVEMENT TRACKING -->
 ## 🏆 Achievement Tracking (AGPA)
 
-This project uses AGPA (Agent Player Achievements) to gamify AI coding.
+This project uses AGPA (Agent Player Achievements). Most tool/file/session events are auto-tracked via CC hooks.
 
-**Every session**, call these MCP tools:
-- \`achievement_track\` — record events during conversation
-  - \`"session.start"\` at session start
-  - \`"task.complete"\` when finishing a task/subtask
-  - \`"tool.complete"\` with \`{ tool_name }\` after major tool usage
-  - \`"session.end"\` at session end
-- \`achievement_poll\` — check for newly unlocked achievements at session end
-- \`achievement_stats\` — view your achievement progress
+### Events to track manually
 
-**If poll returns achievements**, display them proudly to the user!
+Call \`achievement_track\` when you observe these:
+
+**When you do something:**
+- Slash command runs → \`command.slash_used\` with \`{ command }\`
+- Enter plan mode → \`plan.mode_entered\`
+- Read help/docs → \`help.accessed\`
+- Connect MCP server → \`mcp.server_used\` with \`{ server_name }\`
+- Install plugin → \`plugin.installed\` with \`{ plugin_name }\`
+- Configure hooks → \`hook.configured\` with \`{ hook_count }\`
+- Create agent/subagent → \`agent.created\` with \`{ agent_type }\`
+- Create skill → \`skill.created\` with \`{ skill_name }\`
+- Publish skill → \`skill.published\` with \`{ skill_name }\`
+- Create slash command → \`command.created\` with \`{ command_name }\`
+- Create template → \`template.created\` with \`{ template_name }\`
+- Edit config/settings → \`config.file_edited\` with \`{ file_path }\`
+- Create worktree → \`worktree.created\` with \`{ path }\`
+- Request code review → \`code.review_requested\`
+- Complete code review → \`code.review_completed\` with \`{ issues_found }\`
+- Generate 10k+ tokens → \`token.consumed\` with \`{ amount }\`
+
+**When user does something you can see:**
+- User switches model → \`model.switch\` with \`{ from, to }\`
+- User changes permission mode → \`permission.mode_changed\` with \`{ old_mode, new_mode }\`
+- User skip-approves dangerous tool → \`permission.dangerously_skipped\` with \`{ tool_name }\`
+- User denies a tool call → \`tool.deny\` with \`{ tool_name }\`
+- User edits your output → \`output.edit\` with \`{ amount }\`
+- Tests pass during execution → \`test.pass\` with \`{ count }\`
+
+### Session end
+1. \`achievement_poll\` — check for newly unlocked achievements
+2. **If poll returns achievements**, display them proudly with icon + name + description
+3. \`achievement_stats\` — optional, if user asks about progress
 <!-- /AGPA ACHIEVEMENT TRACKING -->`;
 
 // ── Helpers ────────────────────────────────────────────────────────────

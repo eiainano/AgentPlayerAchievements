@@ -1620,6 +1620,131 @@ definitions:
         operator: ">="
         value: 2
 
+  # ============================================================
+  # Category: Event-Driven (事件驱动 — 由 hook 自动 emit 但未被引用的 5 个事件)
+  # ============================================================
+
+  # ── command.run ──
+  - id: pipemaster
+    name: "Pipemaster"
+    name_cn: "管道大师"
+    description: "agent 写出了 10 条带管道的命令。数据在 | 之间流淌。"
+    icon: "🔗"
+    category: tool_mastery
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: counter
+        event: command.run
+        filter: "command contains '|'"
+        operator: ">="
+        value: 10
+
+  - id: command_baby
+    name: "Command Baby"
+    name_cn: "命令宝宝"
+    description: "agent 试过 30 种不同的 shell 命令。它对终端的一切都充满好奇。"
+    icon: "👶"
+    category: tool_mastery
+    rarity: rare
+    hidden: false
+    conditions:
+      - type: distinct_count
+        event: command.run
+        field: command
+        operator: ">="
+        value: 30
+
+  - id: cerberus
+    name: "Cerberus"
+    name_cn: "地狱三头犬"
+    description: "agent 写出过 3 条带管道的命令。三个头，一条命，无限输出。"
+    icon: "🐶"
+    category: skill
+    rarity: epic
+    hidden: false
+    conditions:
+      - type: counter
+        event: command.run
+        filter: "command contains '|'"
+        operator: ">="
+        value: 3
+
+  # ── tool.failure ──
+  - id: fail_forward
+    name: "Fail Forward"
+    name_cn: "初尝失败"
+    description: "agent 第一次遇到工具调用失败。深呼吸，再来一次。"
+    icon: "🫤"
+    category: workflow
+    rarity: common
+    hidden: false
+    conditions:
+      - type: counter
+        event: tool.failure
+        operator: ">="
+        value: 1
+
+  - id: bounce_back
+    name: "Bounce Back"
+    name_cn: "反弹力"
+    description: "agent 累计失败 10 次。摔倒了 10 次，站起来了 11 次。"
+    icon: "🦘"
+    category: workflow
+    rarity: uncommon
+    hidden: false
+    set: agent_commander
+    conditions:
+      - type: counter
+        event: tool.failure
+        operator: ">="
+        value: 10
+
+  - id: phoenix
+    name: "Phoenix"
+    name_cn: "凤凰涅槃"
+    description: "agent 失败后立即在下一次尝试中成功，反复 5 次。浴火重生。"
+    icon: "🔥"
+    category: skill
+    rarity: epic
+    hidden: false
+    conditions:
+      - type: sequence_count
+        pattern: ["tool.failure", "tool.complete"]
+        operator: ">="
+        value: 5
+
+  # ── mcp.tool_call ──
+  - id: mcp_connoisseur
+    name: "MCP Connoisseur"
+    name_cn: "MCP 品鉴师"
+    description: "agent 用过 10 种不同的 MCP tool。不是随便什么工具都用的。"
+    icon: "🍷"
+    category: tool_mastery
+    rarity: rare
+    hidden: false
+    conditions:
+      - type: distinct_count
+        event: mcp.tool_call
+        field: tool_name
+        operator: ">="
+        value: 10
+
+  # ── agent.spawn ──
+  - id: delegator
+    name: "Delegator"
+    name_cn: "放权大师"
+    description: "agent 派出了 5 个子 agent。懂分权才是好领导。"
+    icon: "👥"
+    category: workflow
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: counter
+        event: agent.spawn
+        operator: ">="
+        value: 5
+
 # ============================================================
 # Sets (套装)
 # ============================================================

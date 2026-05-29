@@ -128,6 +128,9 @@ body {
 
 .nav-links { display: flex; gap: 2px; }
 
+/* Right-side controls group — stay fixed on the right */
+.nav-controls { display: flex; align-items: center; gap: 20px; margin-left: auto; }
+
 .nav-link {
   color: var(--text-dim);
   text-decoration: none;

@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.1.1] — 2026-05-29
+
+### Added
+
+- **Dashboard 中英双语** — 完整 i18n 词典（16 个 UI 文本 + 10 个分类名 + 6 个稀有度名），`t()` 翻译函数支持 `{placeholder}` 替换，静态 HTML 通过 `data-i18n` 属性翻译，动态渲染文本全部走 `t()`
+- **Dashboard 分类名翻译** — `onboarding` → Onboarding / 入门，`milestones` → Milestones / 里程碑 等
+- **Dashboard 稀有度翻译** — `common` → Common / 普通 等，用于 badge 显示
+- **Rarity badge 本地化** — 原本硬编码英文 rarity 名，现根据当前语言翻译显示
+- **`renderI18n()`** — 统一处理 `data-i18n` 属性，切换语言时同步 `<html lang>`
+- **API `description_cn` 字段暴露** — `AchievementItem` 新增 `description_cn`，前端 `displayDesc()` 就绪（YAML 后续补上描述即自动生效）
+
+### Changed
+
+- **Filter tab 标签** — 由硬编码改为动态 i18n（All→ 全部/Unlocked→ 已解锁/Locked→ 未解锁）
+- **Category pill 标签** — 由英文 category ID 改为翻译后的分类名
+- **Stats card 标签** — Unlocked/Events/Day Streak/Complete → 中文对应翻译
+- **XP label** — 模板化 `{xp} XP • Level {level}` / `{xp} XP • {level} 级`
+- **Showcase tooltip** — `click to remove` / `Click to pick` / `Pin to showcase` 翻译
+- **Empty state 提示** — `No achievement sets defined.` → 中文"暂无套装定义"等
+- **Language toggle 切换** — 切语言时同步更新 `<html lang>` 属性
+
 ## [0.1.0] — 2026-05-29
 
 ### Added

@@ -12,24 +12,26 @@
     <div class="nav-inner">
       <span class="nav-brand">🎮 AGPA</span>
       <div class="nav-links">
-        <a href="#profile" class="nav-link active" data-section="profile">Profile</a>
-        <a href="#achievements" class="nav-link" data-section="achievements">Achievements</a>
-        <a href="#sets" class="nav-link" data-section="sets">Sets</a>
-        <a href="#timeline" class="nav-link" data-section="timeline">Timeline</a>
+        <a href="#profile" class="nav-link active" data-section="profile" data-i18n="nav_profile">Profile</a>
+        <a href="#achievements" class="nav-link" data-section="achievements" data-i18n="nav_achievements">Achievements</a>
+        <a href="#sets" class="nav-link" data-section="sets" data-i18n="nav_sets">Sets</a>
+        <a href="#timeline" class="nav-link" data-section="timeline" data-i18n="nav_timeline">Timeline</a>
       </div>
-      <label class="switch" title="Language">
-        <span class="switch-label">EN</span>
-        <input type="checkbox" id="lang-toggle">
-        <span class="switch-track"><span class="switch-knob"></span></span>
-        <span class="switch-label">中</span>
-      </label>
-      <label class="switch" title="Theme">
-        <span class="switch-label">☀️</span>
-        <input type="checkbox" id="theme-toggle">
-        <span class="switch-track"><span class="switch-knob"></span></span>
-        <span class="switch-label">🌙</span>
-      </label>
-      <span class="nav-stats" id="nav-stats">0/0</span>
+      <div class="nav-controls">
+        <label class="switch" title="Language">
+          <span class="switch-label">EN</span>
+          <input type="checkbox" id="lang-toggle">
+          <span class="switch-track"><span class="switch-knob"></span></span>
+          <span class="switch-label">中</span>
+        </label>
+        <label class="switch" title="Theme">
+          <span class="switch-label">☀️</span>
+          <input type="checkbox" id="theme-toggle">
+          <span class="switch-track"><span class="switch-knob"></span></span>
+          <span class="switch-label">🌙</span>
+        </label>
+        <span class="nav-stats" id="nav-stats">0/0</span>
+      </div>
     </div>
   </nav>
 
@@ -41,7 +43,7 @@
           <span class="level-number" id="level-number">0</span>
         </div>
       </div>
-      <h1 class="hero-title">Agent Achievements</h1>
+      <h1 class="hero-title" data-i18n="hero_title">Agent Achievements</h1>
       <div class="xp-bar-container">
         <div class="xp-bar" id="xp-bar">
           <div class="xp-bar-fill" id="xp-bar-fill"></div>
@@ -52,7 +54,7 @@
       <div class="showcase-actions">
         <span id="pick-banner" class="pick-banner" style="display:none">
           <span class="pick-banner-text"></span>
-          <button class="pick-cancel-btn" onclick="cancelPick()">✕ Cancel</button>
+          <button class="pick-cancel-btn" onclick="cancelPick()" data-i18n="pick_cancel">✕ Cancel</button>
         </span>
         <button id="showcase-auto" class="showcase-auto-btn" onclick="autoFillShowcase()" title="Auto-fill with rarest">⚡ Auto</button>
       </div>
@@ -63,7 +65,7 @@
   <!-- Achievement Grid -->
   <section id="achievements" class="section">
     <div class="section-header">
-      <h2>Achievements</h2>
+      <h2 data-i18n="section_achievements">Achievements</h2>
       <div class="filter-tabs" id="filter-tabs">
         <button class="filter-tab active" data-filter="all">All</button>
         <button class="filter-tab" data-filter="unlocked">Unlocked</button>
@@ -77,7 +79,7 @@
   <!-- Sets -->
   <section id="sets" class="section">
     <div class="section-header">
-      <h2>Sets</h2>
+      <h2 data-i18n="section_sets">Sets</h2>
     </div>
     <div class="sets-grid" id="sets-grid"></div>
   </section>
@@ -85,7 +87,7 @@
   <!-- Timeline -->
   <section id="timeline" class="section">
     <div class="section-header">
-      <h2>Timeline</h2>
+      <h2 data-i18n="section_timeline">Timeline</h2>
     </div>
     <div class="timeline" id="timeline-list"></div>
   </section>

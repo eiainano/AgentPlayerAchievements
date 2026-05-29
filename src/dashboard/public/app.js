@@ -50,11 +50,152 @@ function displayName(item) {
   return item.name;
 }
 
+function displayDesc(item) {
+  if (currentLang === 'zh' && item.description_cn) return item.description_cn;
+  return item.description;
+}
+
+// ── i18n ─────────────────────────────────────────────────
+
+const I18N = {
+  en: {
+    nav_profile: 'Profile',
+    nav_achievements: 'Achievements',
+    nav_sets: 'Sets',
+    nav_timeline: 'Timeline',
+    section_achievements: 'Achievements',
+    section_sets: 'Sets',
+    section_timeline: 'Timeline',
+    hero_title: 'Agent Achievements',
+    xp_label: '{xp} XP • Level {level}',
+    stat_unlocked: 'Unlocked',
+    stat_events: 'Events',
+    stat_streak: 'Day Streak',
+    stat_complete: 'Complete',
+    filter_all: 'All',
+    filter_unlocked: 'Unlocked',
+    filter_locked: 'Locked',
+    cat_all: 'All',
+    pick_cancel: '✕ Cancel',
+    pick_banner: 'Pick an achievement for slot {n}',
+    click_to_remove: 'click to remove',
+    click_to_pick: 'Click to pick an achievement',
+    showcase_auto: '⚡ Auto',
+    showcase_auto_title: 'Auto-fill with rarest',
+    no_sets: 'No achievement sets defined.',
+    no_timeline: 'No achievements unlocked yet.',
+    load_error: 'Failed to load dashboard data: {status}',
+    hidden_hint: '\u{1F512} Hidden',
+    pin_title: 'Pin to showcase',
+    rarity_common: 'Common',
+    rarity_uncommon: 'Uncommon',
+    rarity_rare: 'Rare',
+    rarity_epic: 'Epic',
+    rarity_legendary: 'Legendary',
+    rarity_mythic: 'Mythic',
+  },
+  zh: {
+    nav_profile: '个人主页',
+    nav_achievements: '成就',
+    nav_sets: '套装',
+    nav_timeline: '时间线',
+    section_achievements: '成就',
+    section_sets: '套装',
+    section_timeline: '时间线',
+    hero_title: 'Agent 成就系统',
+    xp_label: '{xp} XP • {level} 级',
+    stat_unlocked: '已解锁',
+    stat_events: '事件',
+    stat_streak: '连续天数',
+    stat_complete: '完成度',
+    filter_all: '全部',
+    filter_unlocked: '已解锁',
+    filter_locked: '未解锁',
+    cat_all: '全部',
+    pick_cancel: '✕ 取消',
+    pick_banner: '为第 {n} 格选择成就',
+    click_to_remove: '点击移除',
+    click_to_pick: '点击选择成就',
+    showcase_auto: '⚡ 自动',
+    showcase_auto_title: '自动填充(最稀有)',
+    no_sets: '暂无套装定义。',
+    no_timeline: '还没有解锁任何成就。',
+    load_error: '加载仪表盘数据失败: {status}',
+    hidden_hint: '\u{1F512} 隐藏成就',
+    pin_title: '放入展示柜',
+    rarity_common: '普通',
+    rarity_uncommon: '优秀',
+    rarity_rare: '稀有',
+    rarity_epic: '史诗',
+    rarity_legendary: '传说',
+    rarity_mythic: '神话',
+  },
+};
+
+const CATEGORY_NAMES = {
+  en: {
+    onboarding: 'Onboarding',
+    milestones: 'Milestones',
+    skill: 'Skill',
+    style: 'Style',
+    tool_mastery: 'Tool Mastery',
+    workflow: 'Workflow',
+    creator: 'Creator',
+    hidden: 'Hidden',
+    challenge: 'Challenge',
+    community: 'Community',
+  },
+  zh: {
+    onboarding: '入门',
+    milestones: '里程碑',
+    skill: '技能',
+    style: '风格',
+    tool_mastery: '工具精通',
+    workflow: '工作流',
+    creator: '创造者',
+    hidden: '隐藏',
+    challenge: '挑战',
+    community: '社区',
+  },
+};
+
+function t(key, replacements = {}) {
+  let str = (I18N[currentLang] || I18N.en)[key] || I18N.en[key] || key;
+  for (const [k, v] of Object.entries(replacements)) {
+    str = str.replace(`{${k}}`, v);
+  }
+  return str;
+}
+
+function displayCategory(catId) {
+  const map = CATEGORY_NAMES[currentLang] || CATEGORY_NAMES.en;
+  return map[catId] || catId;
+}
+
+function displayRarity(rarity) {
+  return t(`rarity_${rarity}`);
+}
+
+function renderI18n() {
+  // Apply data-i18n attributes on static HTML elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (key) el.textContent = t(key);
+  });
+  // Apply data-i18n-title attributes
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.getAttribute('data-i18n-title');
+    if (key) el.title = t(key);
+  });
+  document.documentElement.setAttribute('lang', currentLang === 'zh' ? 'zh-CN' : 'en');
+}
+
 // ── Data & Render ──────────────────────────────────────
 
 let dashboardData = null;
 
 function renderAll(data) {
+  renderI18n();
   renderNav(data);
   renderProfile(data);
   renderAchievements(data);
@@ -65,7 +206,7 @@ function renderAll(data) {
 (async function () {
   const res = await fetch('/api/data');
   if (!res.ok) {
-    document.body.innerHTML = `<div style="padding:40px;color:#888;">Failed to load dashboard data: ${res.status}</div>`;
+    document.body.innerHTML = `<div style="padding:40px;color:#888;">${t('load_error', { status: res.status })}</div>`;
     return;
   }
   const data = await res.json();
@@ -130,7 +271,7 @@ async function startPick(slot) {
   if (banner) {
     banner.style.display = 'flex';
     banner.querySelector('.pick-banner-text').textContent =
-      `Pick an achievement for slot ${slot + 1}`;
+      t('pick_banner', { n: slot + 1 });
   }
 
   // Re-render grid to show pin buttons
@@ -202,7 +343,7 @@ function renderProfile(data) {
       ? (stats.xp_progress.current / stats.xp_progress.target) * 100
       : 0;
     fill.style.width = `${Math.min(pct, 100)}%`;
-    label.textContent = `${stats.total_xp.toLocaleString()} XP • Level ${stats.level}`;
+    label.textContent = t('xp_label', { xp: stats.total_xp.toLocaleString(), level: stats.level });
   }
 
   const showcase = document.getElementById('showcase');
@@ -210,11 +351,11 @@ function renderProfile(data) {
     showcase.innerHTML = stats.showcase.map(s => {
       if (s.achievement) {
         return `<div class="showcase-slot filled" data-rarity="${s.achievement.rarity}"
-          title="${escHtml(displayName(s.achievement))} — click to remove"
+          title="${escHtml(displayName(s.achievement))} — ${t('click_to_remove')}"
           onclick="clearSlot(${s.slot})">${s.achievement.icon}</div>`;
       }
       return `<div class="showcase-slot empty"
-        title="Click to pick an achievement"
+        title="${t('click_to_pick')}"
         onclick="startPick(${s.slot})">+</div>`;
     }).join('');
 
@@ -222,6 +363,8 @@ function renderProfile(data) {
     const hasUnlocked = stats.showcase.some(s => !s.achievement) || true;
     const autoBtn = document.getElementById('showcase-auto');
     if (autoBtn) {
+      autoBtn.textContent = t('showcase_auto');
+      autoBtn.title = t('showcase_auto_title');
       autoBtn.style.display = stats.unlocked > 0 ? 'inline' : 'none';
     }
   }
@@ -230,10 +373,10 @@ function renderProfile(data) {
   if (row) {
     const unlockedCount = data.achievements.filter(a => a.unlocked).length;
     const statItems = [
-      { value: unlockedCount.toLocaleString(), label: 'Unlocked' },
-      { value: stats.total_events.toLocaleString(), label: 'Events' },
-      { value: String(stats.streak), label: 'Day Streak' },
-      { value: `${stats.completion_pct}%`, label: 'Complete' },
+      { value: unlockedCount.toLocaleString(), label: t('stat_unlocked') },
+      { value: stats.total_events.toLocaleString(), label: t('stat_events') },
+      { value: String(stats.streak), label: t('stat_streak') },
+      { value: `${stats.completion_pct}%`, label: t('stat_complete') },
     ];
     row.innerHTML = statItems.map(s => `
       <div class="stat-card">
@@ -258,8 +401,8 @@ function renderAchievements(data) {
   const catNav = document.getElementById('category-nav');
   if (catNav) {
     const cats = [...new Set(data.achievements.map(a => a.category))];
-    catNav.innerHTML = `<button class="category-pill active" data-cat="">All</button>` +
-      cats.map(c => `<button class="category-pill" data-cat="${c}">${c}</button>`).join('');
+    catNav.innerHTML = `<button class="category-pill active" data-cat="">${t('cat_all')}</button>` +
+      cats.map(c => `<button class="category-pill" data-cat="${c}">${displayCategory(c)}</button>`).join('');
     catNav.addEventListener('click', e => {
       const pill = e.target.closest('.category-pill');
       if (!pill) return;
@@ -273,6 +416,11 @@ function renderAchievements(data) {
   // Filter tabs
   const filterTabs = document.getElementById('filter-tabs');
   if (filterTabs) {
+    // Set i18n labels
+    filterTabs.querySelectorAll('.filter-tab').forEach(tab => {
+      const key = tab.dataset.filter === 'all' ? 'filter_all' : tab.dataset.filter === 'unlocked' ? 'filter_unlocked' : 'filter_locked';
+      tab.textContent = t(key);
+    });
     filterTabs.addEventListener('click', e => {
       const tab = e.target.closest('.filter-tab');
       if (!tab) return;
@@ -313,11 +461,11 @@ function renderGrid(data) {
     const progressHtml = a.progress && a.progress.target > 0
       ? `<div class="ach-progress"><div class="ach-progress-fill" style="width:${progressPct}%"></div><span class="ach-progress-text">${progressText}</span></div>`
       : '';
-    const hiddenHint = locked && a.hidden ? '<div class="ach-hidden-hint">&#128275; Hidden</div>' : '';
+    const hiddenHint = locked && a.hidden ? `<div class="ach-hidden-hint">${t('hidden_hint')}</div>` : '';
     const nameDisplay = locked && a.hidden ? '???' : displayName(a);
 
     const pinBtn = inPickMode && !locked
-      ? `<div class="ach-pin" onclick="event.stopPropagation(); pinToSlot('${escAttr(a.id)}')" title="Pin to showcase">📌</div>`
+      ? `<div class="ach-pin" onclick="event.stopPropagation(); pinToSlot('${escAttr(a.id)}')" title="${t('pin_title')}">📌</div>`
       : '';
 
     const pickableClass = inPickMode && !locked ? ' pickable' : '';
@@ -328,7 +476,7 @@ function renderGrid(data) {
       ${pinBtn}
       <div class="ach-icon-wrap"><span class="ach-icon">${showIcon}</span></div>
       <div class="ach-name">${escHtml(nameDisplay)}</div>
-      <span class="ach-rarity-badge">${a.rarity}</span>
+      <span class="ach-rarity-badge">${displayRarity(a.rarity)}</span>
       ${progressHtml}
       ${hiddenHint}
     </div>`;
@@ -352,7 +500,7 @@ function renderSets(data) {
   if (!grid) return;
 
   if (!data.sets || data.sets.length === 0) {
-    grid.innerHTML = '<p style="color:var(--text-dim);">No achievement sets defined.</p>';
+    grid.innerHTML = `<p style="color:var(--text-dim);">${t('no_sets')}</p>`;
     return;
   }
 
@@ -394,7 +542,7 @@ function renderTimeline(data) {
   if (!list) return;
 
   if (!data.timeline || data.timeline.length === 0) {
-    list.innerHTML = '<p style="color:var(--text-dim);">No achievements unlocked yet.</p>';
+    list.innerHTML = `<p style="color:var(--text-dim);">${t('no_timeline')}</p>`;
     return;
   }
 

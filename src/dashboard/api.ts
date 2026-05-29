@@ -21,6 +21,7 @@ export interface AchievementItem {
   name: string;
   name_cn?: string;
   description: string;
+  description_cn?: string;
   icon: string;
   category: string;
   rarity: RarityLevel;
@@ -97,6 +98,7 @@ export function buildAchievementsResponse(
       name: def.name,
       name_cn: def.name_cn,
       description: def.description,
+      description_cn: def.description_cn,
       icon: def.icon || '🏆',
       category: def.category,
       rarity: def.rarity,

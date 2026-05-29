@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.2.0] — 2026-05-30
+## [0.1.2] — 2026-05-30
 
 ### System Audit & P0 Bug Fixes (10 fixed)
 

@@ -1,6 +1,6 @@
 {
   "name": "agpa",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "description": "Agent Player Achievements — gamified achievement system for AI coding agents",
   "license": "MIT",

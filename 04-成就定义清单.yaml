@@ -1655,6 +1655,21 @@ definitions:
         operator: ">="
         value: 30
 
+  - id: command_master
+    name: "Command Master"
+    name_cn: "命令大师"
+    description: "agent 用过 100 种不同的 shell 命令。它的终端知识已经不在你之下了。"
+    icon: "🧙"
+    category: tool_mastery
+    rarity: legendary
+    hidden: false
+    conditions:
+      - type: distinct_count
+        event: command.run
+        field: command
+        operator: ">="
+        value: 100
+
   - id: cerberus
     name: "Cerberus"
     name_cn: "地狱三头犬"
@@ -1700,6 +1715,20 @@ definitions:
         operator: ">="
         value: 10
 
+  - id: failure_mother
+    name: "Failure Is the Mother of Success"
+    name_cn: "失败是成功之母"
+    description: "agent 累计失败 100 次。它早已不是当初那个菜鸟了。"
+    icon: "🧘"
+    category: workflow
+    rarity: legendary
+    hidden: false
+    conditions:
+      - type: counter
+        event: tool.failure
+        operator: ">="
+        value: 100
+
   - id: phoenix
     name: "Phoenix"
     name_cn: "凤凰涅槃"
@@ -1730,6 +1759,21 @@ definitions:
         operator: ">="
         value: 10
 
+  - id: mcp_collector
+    name: "MCP Collector"
+    name_cn: "MCP 收藏家"
+    description: "agent 用过 30 种不同的 MCP tool。它不是在用工具，是在收集工具。"
+    icon: "🏛️"
+    category: tool_mastery
+    rarity: epic
+    hidden: false
+    conditions:
+      - type: distinct_count
+        event: mcp.tool_call
+        field: tool_name
+        operator: ">="
+        value: 30
+
   # ── agent.spawn ──
   - id: delegator
     name: "Delegator"
@@ -1744,6 +1788,24 @@ definitions:
         event: agent.spawn
         operator: ">="
         value: 5
+
+  - id: swat_team
+    name: "SWAT Team"
+    name_cn: "特种小队"
+    description: "agent 同时保持 2-4 个子 agent 工作。小而精的战术单元。"
+    icon: "🎯"
+    category: workflow
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: counter
+        event: agent.spawn
+        operator: ">="
+        value: 2
+      - type: counter
+        event: agent.spawn
+        operator: "<="
+        value: 4
 
 # ============================================================
 # Sets (套装)

@@ -14,9 +14,9 @@ function createEngine(): AchievementEngine {
 }
 
 describe('integration: real YAML definitions', () => {
-  it('loads all 117 achievements without errors', () => {
+  it('loads all 121 achievements without errors', () => {
     const engine = createEngine();
-    expect(engine.definitions.length).toBe(117);
+    expect(engine.definitions.length).toBe(121);
   });
 
   it('unlocks basic achievements in a minimal session', () => {

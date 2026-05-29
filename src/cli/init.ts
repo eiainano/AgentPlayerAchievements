@@ -355,7 +355,7 @@ for (const inst of initData.instructionFiles) {
   }
 }
 
-// Step 5: Inject CC hooks (SessionStart + Stop → auto track)
+// Step 5: Inject CC hooks (9 hooks for auto event tracking)
 if (toolDef.id === 'claude-code') {
   let hookCfg = readJSON(toolDef.configPath);
   if (!hookCfg) {
@@ -383,8 +383,22 @@ if (toolDef.id === 'claude-code') {
       }];
       hooksInjected = true;
     }
+    if (!hookCfg.PreToolUse) {
+      hookCfg.PreToolUse = [{
+        matcher: '*',
+        hooks: [{ type: 'command', command: HOOK_AUTO, async: true, timeout: 5 }],
+      }];
+      hooksInjected = true;
+    }
     if (!hookCfg.PostToolUseFailure) {
       hookCfg.PostToolUseFailure = [{
+        matcher: '*',
+        hooks: [{ type: 'command', command: HOOK_AUTO, async: true, timeout: 5 }],
+      }];
+      hooksInjected = true;
+    }
+    if (!hookCfg.TaskCompleted) {
+      hookCfg.TaskCompleted = [{
         matcher: '*',
         hooks: [{ type: 'command', command: HOOK_AUTO, async: true, timeout: 5 }],
       }];
@@ -404,9 +418,16 @@ if (toolDef.id === 'claude-code') {
       }];
       hooksInjected = true;
     }
+    if (!hookCfg.PostCompact) {
+      hookCfg.PostCompact = [{
+        matcher: '*',
+        hooks: [{ type: 'command', command: HOOK_AUTO, async: true, timeout: 5 }],
+      }];
+      hooksInjected = true;
+    }
     if (hooksInjected) {
       writeJSON(toolDef.configPath, hookCfg);
-      console.log('  ✅ Hooks:    auto track (6 events) + poll');
+      console.log('  ✅ Hooks:    auto track (9 events) + poll');
     } else {
       console.log('  ⏭  Skipped:  hooks (already present)');
     }

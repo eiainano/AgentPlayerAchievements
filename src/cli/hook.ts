@@ -9,7 +9,13 @@
  *
  * Hook events → AGPA event mapping:
  *   PostToolUse        → tool.complete   { tool_name, tool_input, duration_ms }
+ *                     → conversation.message
+ *                     → file.read/create/edit/write (by tool type)
+ *                     → command.run, git.commit, git.pr_created (Bash)
+ *   PreToolUse         → tool.requested  { tool_name }
  *   PostToolUseFailure → tool.failure    { tool_name, tool_input, error }
+ *   TaskCompleted      → task.complete   { task_id, duration_ms }
+ *   PostCompact        → context.compacted
  *   SubagentStart      → agent.spawn     { agent_type }
  *   SubagentStop       → agent.complete  { agent_type }
  *   SessionStart       → session.start   { source }
@@ -28,10 +34,12 @@ const ENGINE = new AchievementEngine();
 interface HookStdin {
   hook_event_name?: string;
   session_id?: string;
+  task_id?: string;
   tool_name?: string;
   tool_input?: Record<string, unknown>;
   tool_response?: Record<string, unknown>;
   duration_ms?: number;
+  step_count?: number;
   agent_type?: string;
   source?: string;
   cwd?: string;
@@ -79,7 +87,10 @@ function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_type: stri
       results.push({ event_type: 'conversation.message', payload: {} });
       // Also emit file-type events based on tool name
       if (data.tool_name === 'Read') results.push({ event_type: 'file.read', payload: { ...base } });
-      if (data.tool_name === 'Write') results.push({ event_type: 'file.create', payload: { ...base } });
+      if (data.tool_name === 'Write') {
+        results.push({ event_type: 'file.create', payload: { ...base } });
+        results.push({ event_type: 'file.write', payload: { ...base } });
+      }
       if (data.tool_name === 'Edit') results.push({ event_type: 'file.edit', payload: { ...base } });
       if (data.tool_name === 'Bash' && typeof ti.command === 'string') {
         results.push({ event_type: 'command.run', payload: { ...base } });
@@ -99,7 +110,8 @@ function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_type: stri
       results.push({ event_type: 'tool.failure', payload: { ...base } });
       break;
     case 'PreToolUse':
-      break; // don't track pre-tool-use
+      results.push({ event_type: 'tool.requested', payload: { tool_name: data.tool_name } });
+      break;
     case 'SubagentStart':
       results.push({ event_type: 'agent.spawn', payload: { ...base } });
       break;
@@ -111,6 +123,19 @@ function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_type: stri
       break;
     case 'SessionEnd':
       results.push({ event_type: 'session.end', payload: { ...base } });
+      break;
+    case 'TaskCompleted':
+      results.push({
+        event_type: 'task.complete',
+        payload: {
+          task_id: data.task_id || '',
+          step_count: data.step_count || 0,
+          duration_ms: data.duration_ms || 0,
+        },
+      });
+      break;
+    case 'PostCompact':
+      results.push({ event_type: 'context.compacted', payload: {} });
       break;
   }
 

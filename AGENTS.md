@@ -28,6 +28,8 @@ All tool calls, file operations, git commits/PRs, subagents, sessions, task comp
 | Requesting code review | `code.review_requested` | `{}` |
 | Reviewing code (done) | `code.review_completed` | `{ issues_found }` |
 | Generating significant tokens (~10k+) | `token.consumed` | `{ amount }` |
+| Reverting a file to previous version | `file.revert` | `{ file_path }` |
+| Running git revert or git reset --hard | `git.revert_all` | `{}` |
 
 ### User-action events (when the USER does something you can see)
 

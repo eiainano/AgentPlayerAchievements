@@ -141,6 +141,8 @@ Call \`achievement_track\` when you observe these:
 - Request code review → \`code.review_requested\`
 - Complete code review → \`code.review_completed\` with \`{ issues_found }\`
 - Generate 10k+ tokens → \`token.consumed\` with \`{ amount }\`
+- Revert a file → \`file.revert\` with \`{ file_path }\`
+- Run git revert/reset --hard → \`git.revert_all\`
 
 **When user does something you can see:**
 - User switches model → \`model.switch\` with \`{ from, to }\`

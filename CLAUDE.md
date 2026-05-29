@@ -52,3 +52,7 @@ If evaluator behavior seems wrong, check src/engine/evaluator.ts — each type h
 - `percentile` conditions need opt-in telemetry + stats-server running. Without it, falls back to hardcoded thresholds.
 - Engine.stateDir defaults to `~/.agent-achievements/`. Tests use a temp dir.
 - Hook `auto` mode handles: PostToolUse, PreToolUse, PostToolUseFailure, TaskCompleted, PostCompact, SubagentStart, SubagentStop, SessionStart, SessionEnd. If CC adds new hook types, add cases to `mapEvents()`.
+
+## Known Issues & TODOs
+
+`docs/issues-todo.md` tracks all known bugs, gaps, and data inconsistencies in the achievement system. 10 P0 bugs, ~20 P1 gaps, ~6 P2 data issues. Always read it before starting evaluator or YAML work.

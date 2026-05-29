@@ -1,0 +1,79 @@
+# Achievement System Issues & TODOs
+
+> 最后更新: 2026-05-30 | 总成就数: 118 | 条件类型: 12
+
+---
+
+## P0 — 逻辑 Bug（影响成就正确性）
+
+- [ ] **evalStreak 忽略 filter** — `ten_task_no_edit` 的 `filter: "manual_edits == 0"` 静默无效，streak 函数从来不读 `cond.filter`。成就变成普通 10 天连续而非"无手动编辑的连续天"。
+- [ ] **evalStreak 忽略 operator** — 第 274 行写死 `>=`，YAML 里所有 streak 的 `operator` 字段等于无操作。
+- [ ] **set_completion 不支持 `all` / `exclude_hidden`** — parser 不解构这两个字段，evaluator 也不认识。`completionist_gold`(exclude_hidden) 和 `mythic_completionist`(all) 回退到 `rarity: common`，跟 `completionist_bronze` 同条件，三个普通等级同时解锁。
+- [ ] **max_per_day 被丢** — `daily_checkin` 第二个条件 `max_per_day: 1` 不在 Condition 接口中，parser 丢弃，evaluator 永远返回 true。成就退化为纯 15 天 streak。
+- [ ] **swat_team 逻辑矛盾** — `agent.spawn >= 2` + `agent.spawn <= 4` 无窗口，第 5 个 spawn 后 `<=4` 永久 false，成就永远无法解锁。需要改成窗口限制或有条件的条件组合。
+- [ ] **很多成就丢 window 默认用 24h** — `file_whisperer`(500 次)、`shell_shocker`(250 次)、`token_titan`(10M)、`token_legend`(50M)、`command_master`(100 种命令)、`web_wanderer`(100 次) 等 lifetime 成就变成 24h 内完成，几乎不可能。需要补 `window: all` 或不设时间限制。
+
+---
+
+## P1 — 事件覆盖缺口
+
+- [ ] **`plan.mode_activated` 无人 track** — `the_switch` 序列第一步永远匹配不上。AGENTS.md 里已有 `plan.mode_entered`（进 plan 模式），但 YAML 写的是 `plan.mode_activated`。两种修法：① 把 YAML 改成 `plan.mode_entered` ② AGENTS.md 补一个 `plan.mode_activated`。推荐①——`plan.mode_entered` 已经存在，语义一致。
+- [ ] **`achievement.shared` 无人 track** — AGENTS.md 没有记录这个事件，hook.ts 也不 emit。`storyteller` 永远无法解锁。需要加到 AGENTS.md 或者删 `storyteller` 成就。
+- [ ] **`agent.complete` emit 了没人用** — SubagentStop hook 产生 `agent.complete` 事件，但 118 个成就里没一个引用。两个选项：① 删掉这个 emit ② 加一个成就来消费它。
+- [ ] **`git.revert_all` 在 AGENTS.md 但没成就用** — `scorched_earth` 删掉后就没消费者了。如果短期不打算加新成就，可以从 AGENTS.md 删掉这条。
+
+---
+
+## P1 — Hook 不提取的 payload 字段（成就永远匹配不上）
+
+- [ ] **`file_type` 不被 hook 提取** — `visual_prompt`、`image_whisperer` 的 filter `file_type matches 'image/*'` 永远不匹配。hook.ts 只从 CC stdin 提取 tool_name/file_path/command/description，不提取 file_type。CC PostToolUse stdin 里有 `tool_response` 字段，可能包含文件类型信息——需要实测确认。
+- [ ] **`language` 不被 hook 提取** — `polyglot` 用 `field: language` 统计不同语言，但 `file.create` 事件 payload 里没有 `language` 字段。
+- [ ] **`function_name` 不被 hook 提取** — `perfectionist` 用 `same_target: true` + `field: function_name`，但 `file.edit` 事件 payload 里没有 `function_name`。Edit tool 的 stdin 不传函数级别的信息，这个成就可以考虑改成走手动 track。
+- [ ] **`showcase_count` 无数据源** — `trophy_case` 用 `metric: showcase_count`，evaluator 从事件 payload 找这个 field，但没有任何事件提供。
+- [ ] **`concurrent_sessions` 无数据源** — `parallel_universe` 用 `metric: concurrent_sessions`，同上问题。
+
+---
+
+## P1 — Evaluator 功能缺口
+
+- [ ] **sequence（非连续模式）忽略 window** — `the_debugger`、`the_switch`、`full_cycle`、`true_vibe_coder`、`u_turn`、`the_negotiator` 在 YAML 里指定了 `window: single_task` 或 `single_session`，但标准有序 sequence 分支不读 window。事件跨多天也不会重置。
+- [ ] **evalThreshold metric 路径忽略 window/filter/event/role** — 当 `cond.metric` 设值时，所有过滤（事件类型、时间窗口、filter 表达式）全部跳过。`surgeon` 的 `metric: "edit_lines / total_file_lines"` + `window: single_task` — 窗口被忽略，统计的是全局事件。
+- [ ] **空 conditions 数组提前解锁** — `[].every(f)` 永远返回 true，无条件的成就每次 poll 都会解锁（但目前 YAML 里没有无条件的成就，parser 对空返回 `[]` 而不是遗漏键）。
+- [ ] **evalMode 提前返回 target 不一致** — 无事件时返回 `target: cond.value`（通常是 0），有事件时返回 `target: Math.round(threshold * 100)`。如果 YAML 同时设了 value 和 threshold，两路径返回不同 target 显示给 Dashboard。
+- [ ] **evalPercentile 硬编码回退阈值** — `FALLBACK_THRESHOLDS` 只有一个 metric，两个百分位值。其他 metric 在无 telemetry server 时永远 false。
+- [ ] **matchFilter 上下文只有 8 个字段** — filter 表达式只能引用 tool_name/file_type/command/file_path/agent_involved/manual_edits/issues_found/event_type。任何其他 payload field 解析为空字符串，in/matches/contains 检查静默失败。
+- [ ] **`evalStreak` 是日历日连续而非事件连续** — 截断到日期级别统计，不是"连续 N 个事件"。这对基于天数的成就（streak_7/30/100）是对的，但对 `ten_task_no_edit`（"连续 10 个无编辑的 task"）可能是语义偏差——除非 "task" 可能一天多个。
+- [ ] **Condition.set_id 字段是死代码** — types.ts 定义了，parser 解析了，但没有任何 eval 函数读取。evalSetCompletion 按 rarity 过滤而非 set_id。
+
+---
+
+## P2 — 数据一致性
+
+- [ ] **Category 枚举 `milestone` vs `milestones`** — YAML 里是单数 `milestone`，Dashboard app.js 里 `CATEGORY_NAMES.en` 是复数 `milestones`。Dashboard 会显示裸字符串 "milestone" 而非翻译名，影响 8 个成就。
+- [ ] **`bounce_back` 声明 set: agent_commander 但不在 sets 列表里** — 成就上写了 `set: agent_commander`，但 sets 块里 agent_commander 的 achievements 列表只有 4 个（full_auto/chain_reaction/architect/surgeon），不包含 bounce_back。
+- [ ] **`mythic_completionist` 声明 set: completionist 但不在 sets 列表里** — 同上，sets 块里的 completionist 只有 3 个（completionist_bronze/silver/gold），不包含 mythic_completionist。
+- [ ] **8 个成就列在 sets 里但没有 `set:` 字段** — model_hopper/worktree_trial/mcp_first_contact/visual_prompt(属于 the_beginning)；mcp_explorer(属于 collectors_soul)；auto_committer/pr_champion/cicd_pioneer(属于 devops_triad)。成就卡片不展示所属套装。
+- [ ] **`im_sorry_dave` 无时间窗口** — 两个条件（sequence + pattern_match）都没有 window，跨月的 tool.deny + 跨月的道歉消息也能触发。设计意图是"同一次对话中发生"，应该加窗口或靠 Agent 感知时刻 track。
+- [ ] **`evalStreak` 不读 role/window/field/same_target** — 这些字段当前没需求但以后用 streak 过滤特定角色事件时会导致静默失败。
+
+---
+
+## P3 — YAML 质量提示（非阻塞）
+
+- [ ] **`unit: day` / `unit: tokens` 字段完全被忽略** — YAML 里有但不在 Condition 接口中，parser 也不读。token 成就应该从 `threshold`+`field` 来求和 token 量，而不是 counter。
+- [ ] **Hidden 分类占 22%** — 26 个隐藏成就是最大分类，可以考虑挪几个非隐藏的到更合适的分类。
+
+---
+
+## 已解决 ✓
+
+- [x] ~~evaluator threshold 错映射到 evalCounter~~ — 5/29 修好
+- [x] ~~sequence 不支持 consecutive/count~~ — 5/29 修好
+- [x] ~~distinct_count 忽略 values 白名单~~ — 5/29 修好
+- [x] ~~counter 忽略 same_target~~ — 5/29 修好
+- [x] ~~hook 补 4 个事件映射~~ — 5/29 修好（task.complete/context.compacted/file.write/tool.requested）
+- [x] ~~AGENTS.md 补充 24 个手动 track 事件~~ — 5/29-5/30 修好
+- [x] ~~12 个事件驱动型新成就~~ — 5/30 添加（Pipemaster/Command Baby/Cerberus/Fail Forward/Bounce Back/Phoenix/MCP Connoisseur/MCP Collector/Command Master/Failure Mother/Delegator/SWAT Team）
+- [x] ~~3 个不可达成就删除~~ — 5/30 删掉（perfect_review/photographic_memory/scorched_earth）
+- [x] ~~Dashboard 中英双语~~ — 5/29 完成
+- [x] ~~MCP context 硬编码~~ — 5/29 修好

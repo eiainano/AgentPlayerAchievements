@@ -172,6 +172,7 @@ function cmdAuto(): void {
     process.exit(0);
   }
 
+  if (data.session_id) ENGINE.sessionId = data.session_id;
   ENGINE.init();
   for (const { event_type, payload } of events) {
     const event = ENGINE.track(event_type, payload);

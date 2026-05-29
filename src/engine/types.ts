@@ -173,5 +173,6 @@ export interface EngineOptions {
   defsPath?: string;
   enabledCategories?: string[];
   toolSource?: string;
+  sessionId?: string;
 }
 

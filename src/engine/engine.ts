@@ -36,6 +36,7 @@ export class AchievementEngine {
   state: AchievementState = { unlocked: {}, stats: { total_unlocked: 0 } };
   unlockedThisPoll: AchievementDefinition[] = [];
   toolSource: string;
+  sessionId: string;
 
   private store: Store;
 
@@ -45,6 +46,7 @@ export class AchievementEngine {
     this.defsPath = opts.defsPath || path.join(ROOT, '04-成就定义清单.yaml');
     this.enabledCategories = opts.enabledCategories;
     this.toolSource = opts.toolSource || process.env.AGPA_TOOL_SOURCE || 'unknown';
+    this.sessionId = opts.sessionId || `agpa_${Date.now()}`;
     this.store = new Store(this.stateDir);
   }
 
@@ -90,7 +92,7 @@ export class AchievementEngine {
       tool_source: this.toolSource,
       event_type: eventType,
       payload,
-      context: { session_id: 'demo-session', model: 'sonnet' },
+      context: { session_id: this.sessionId, model: 'auto' },
     };
 
     this.events.push(event);

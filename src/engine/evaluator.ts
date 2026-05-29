@@ -4,6 +4,7 @@ import type { TrackedEvent, Condition, EvaluationResult } from './types.js';
 import type { ConditionOperator } from './types.js';
 
 function parseWindow(w: string): number {
+  if (w === 'all' || w === 'lifetime') return Infinity;
   const m = /(\d+)\s*(h|d|m)/.exec(w);
   if (!m) return 86400000;
   const nStr = m[1];

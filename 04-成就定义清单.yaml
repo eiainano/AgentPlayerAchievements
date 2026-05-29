@@ -187,6 +187,7 @@ definitions:
         event: task.complete
         operator: ">="
         value: 10
+        window: all
 
   - id: century
     name: "Century"
@@ -201,6 +202,7 @@ definitions:
         event: task.complete
         operator: ">="
         value: 100
+        window: all
 
   - id: millennium
     name: "Millennium"
@@ -215,6 +217,7 @@ definitions:
         event: task.complete
         operator: ">="
         value: 1000
+        window: all
 
   - id: marathon
     name: "Marathon"
@@ -552,6 +555,7 @@ definitions:
         event: file.edit
         operator: ">="
         value: 500
+        window: all
 
   - id: git_wizard
     name: "Git Wizard"
@@ -567,6 +571,7 @@ definitions:
         filter: "agent_involved == true"
         operator: ">="
         value: 100
+        window: all
 
   - id: shell_shocker
     name: "Shell Shocker"
@@ -582,6 +587,7 @@ definitions:
         filter: "tool_name in ['bash','terminal','execute']"
         operator: ">="
         value: 250
+        window: all
 
   - id: web_wanderer
     name: "Web Wanderer"
@@ -597,6 +603,7 @@ definitions:
         filter: "tool_name in ['web_search','web_fetch']"
         operator: ">="
         value: 100
+        window: all
 
   - id: parallel_universe
     name: "Parallel Universe"
@@ -725,6 +732,7 @@ definitions:
         event: plan.mode_entered
         operator: ">="
         value: 25
+        window: all
 
   - id: auto_committer
     name: "Auto Committer"
@@ -781,6 +789,7 @@ definitions:
         event: session.start
         operator: ">="
         value: 50
+        window: all
 
   - id: session_centurion
     name: "Session Centurion"
@@ -795,6 +804,7 @@ definitions:
         event: session.start
         operator: ">="
         value: 300
+        window: all
 
   - id: token_titan
     name: "Token Titan"
@@ -810,6 +820,7 @@ definitions:
         unit: tokens
         operator: ">="
         value: 10000000
+        window: all
 
   - id: token_legend
     name: "Token Legend"
@@ -825,6 +836,7 @@ definitions:
         unit: tokens
         operator: ">="
         value: 100000000
+        window: all
 
   - id: multi_project
     name: "Multi-Project"
@@ -898,6 +910,7 @@ definitions:
         event: command.created
         operator: ">="
         value: 10
+        window: all
 
   - id: skill_creator
     name: "Skill Creator"
@@ -1100,6 +1113,7 @@ definitions:
         event: config.file_edited
         operator: ">="
         value: 20
+        window: all
 
   - id: hold_my_beer
     name: "Hold My Beer"
@@ -1170,6 +1184,7 @@ definitions:
         filter: "file_path matches '*.py'"
         operator: ">="
         value: 100
+        window: all
 
   - id: gopher_gang
     name: "Gopher Gang"
@@ -1185,6 +1200,7 @@ definitions:
         filter: "file_path matches '*.go'"
         operator: ">="
         value: 100
+        window: all
 
   - id: rustacean
     name: "Rustacean"
@@ -1200,6 +1216,7 @@ definitions:
         filter: "file_path matches '*.rs'"
         operator: ">="
         value: 100
+        window: all
 
   - id: js_everywhere
     name: "JS Everywhere"
@@ -1215,6 +1232,7 @@ definitions:
         filter: "file_path matches '*.{js,ts,jsx,tsx}'"
         operator: ">="
         value: 100
+        window: all
 
   - id: true_vibe_coder
     name: "True Vibe Coder"
@@ -1600,6 +1618,7 @@ definitions:
         filter: "command contains '|'"
         operator: ">="
         value: 10
+        window: all
 
   - id: command_baby
     name: "Command Baby"
@@ -1615,6 +1634,7 @@ definitions:
         field: command
         operator: ">="
         value: 30
+        window: all
 
   - id: command_master
     name: "Command Master"
@@ -1630,6 +1650,7 @@ definitions:
         field: command
         operator: ">="
         value: 100
+        window: all
 
   - id: cerberus
     name: "Cerberus"
@@ -1675,6 +1696,7 @@ definitions:
         event: tool.failure
         operator: ">="
         value: 10
+        window: all
 
   - id: failure_mother
     name: "Failure Is the Mother of Success"
@@ -1689,6 +1711,7 @@ definitions:
         event: tool.failure
         operator: ">="
         value: 100
+        window: all
 
   - id: phoenix
     name: "Phoenix"
@@ -1719,6 +1742,7 @@ definitions:
         field: tool_name
         operator: ">="
         value: 10
+        window: all
 
   - id: mcp_collector
     name: "MCP Collector"
@@ -1734,6 +1758,7 @@ definitions:
         field: tool_name
         operator: ">="
         value: 30
+        window: all
 
   # ── agent.spawn ──
   - id: delegator

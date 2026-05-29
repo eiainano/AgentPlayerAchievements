@@ -10,7 +10,7 @@
 - [x] **evalStreak 忽略 operator** — 第 274 行写死 `>=`，YAML 里所有 streak 的 `operator` 字段等于无操作。
 - [x] **set_completion 不支持 `all` / `exclude_hidden`** — parser 不解构这两个字段，evaluator 也不认识。`completionist_gold`(exclude_hidden) 和 `mythic_completionist`(all) 回退到 `rarity: common`，跟 `completionist_bronze` 同条件，三个普通等级同时解锁。
 - [x] **max_per_day 被丢** — `daily_checkin` 第二个条件 `max_per_day: 1` 不在 Condition 接口中，parser 丢弃，evaluator 永远返回 true。成就退化为纯 15 天 streak。
-- [ ] **swat_team 逻辑矛盾** — `agent.spawn >= 2` + `agent.spawn <= 4` 无窗口，第 5 个 spawn 后 `<=4` 永久 false，成就永远无法解锁。需要改成窗口限制或有条件的条件组合。
+- [x] **swat_team 逻辑矛盾** — `agent.spawn >= 2` + `agent.spawn <= 4` 无窗口，第 5 个 spawn 后 `<=4` 永久 false。已加 `window: single_session` + evaluator 支持 session_id 过滤，每次 session 独立计数。
 - [ ] **很多成就丢 window 默认用 24h** — `file_whisperer`(500 次)、`shell_shocker`(250 次)、`token_titan`(10M)、`token_legend`(50M)、`command_master`(100 种命令)、`web_wanderer`(100 次) 等 lifetime 成就变成 24h 内完成，几乎不可能。需要补 `window: all` 或不设时间限制。
 
 ---

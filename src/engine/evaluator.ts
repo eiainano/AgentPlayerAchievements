@@ -148,7 +148,29 @@ function isSessionWindow(cond: Condition): boolean {
   return cond.window === 'single_session' || cond.window === 'same_session';
 }
 
+function isTaskWindow(cond: Condition): boolean {
+  return cond.window === 'single_task';
+}
+
+/** Return latest session_id from events, or null */
+function latestSessionId(events: TrackedEvent[]): string | null {
+  if (events.length === 0) return null;
+  return events[events.length - 1]!.context?.session_id || null;
+}
+
+/** Filter events to the scoped session/task, return subset */
+function scopeEvents(events: TrackedEvent[], cond: Condition): TrackedEvent[] {
+  if (isTaskWindow(cond)) return events; // task_id not available yet, no-op
+  if (isSessionWindow(cond)) {
+    const sid = latestSessionId(events);
+    if (!sid) return events;
+    return events.filter(e => e.context?.session_id === sid);
+  }
+  return events;
+}
+
 function evalCounter(events: TrackedEvent[], cond: Condition): EvaluationResult {
+  events = scopeEvents(events, cond);
   const sessionWindow = isSessionWindow(cond);
   const windowMs = sessionWindow ? 0 : parseWindow(cond.window || '24h');
   const now = Date.now();
@@ -190,6 +212,7 @@ function evalCounter(events: TrackedEvent[], cond: Condition): EvaluationResult 
 }
 
 function evalThreshold(events: TrackedEvent[], cond: Condition): EvaluationResult {
+  events = scopeEvents(events, cond);
   // Handle metric-based threshold (e.g. "edit_lines / total_file_lines")
   if (cond.metric) {
     const val = evaluateMetric(cond.metric, events);
@@ -302,6 +325,7 @@ function evalStreak(events: TrackedEvent[], cond: Condition): EvaluationResult {
 }
 
 function evalSequence(events: TrackedEvent[], cond: Condition): EvaluationResult {
+  events = scopeEvents(events, cond);
   // consecutive mode: count longest run of matching events without gaps
   if (cond.consecutive) {
     const sessionWindow = isSessionWindow(cond);
@@ -338,6 +362,7 @@ function evalSequence(events: TrackedEvent[], cond: Condition): EvaluationResult
 }
 
 function evalDistinctCount(events: TrackedEvent[], cond: Condition): EvaluationResult {
+  events = scopeEvents(events, cond);
   const sessionWindow = isSessionWindow(cond);
   const windowMs = sessionWindow ? 0 : parseWindow(cond.window || '24h');
   const now = Date.now();

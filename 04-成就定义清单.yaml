@@ -1761,10 +1761,12 @@ definitions:
     conditions:
       - type: counter
         event: agent.spawn
+        window: single_session
         operator: ">="
         value: 2
       - type: counter
         event: agent.spawn
+        window: single_session
         operator: "<="
         value: 4
 

@@ -291,6 +291,31 @@ describe('evaluateCondition', () => {
     expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 1, target: 1 });
   });
 
+  it('counter: single_session window scopes to latest session only', () => {
+    const events = [
+      makeEvent('agent.spawn', { context: { session_id: 'old', model: 'test' } }),
+      makeEvent('agent.spawn', { context: { session_id: 'old', model: 'test' } }),
+      makeEvent('agent.spawn', { context: { session_id: 'old', model: 'test' } }),
+      makeEvent('agent.spawn', { context: { session_id: 'old', model: 'test' } }),
+      makeEvent('agent.spawn', { context: { session_id: 'current', model: 'test' } }),
+      makeEvent('agent.spawn', { context: { session_id: 'current', model: 'test' } }),
+    ];
+    const cond: Condition = { type: 'counter', event: 'agent.spawn', window: 'single_session', operator: '>=', value: 2 };
+    // Latest session = 'current' with 2 spawns → >=2 is met
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 2, target: 2 });
+  });
+
+  it('counter: single_session scoped to <= also works per session', () => {
+    const events = [
+      makeEvent('agent.spawn', { context: { session_id: 'current', model: 'test' } }),
+      makeEvent('agent.spawn', { context: { session_id: 'current', model: 'test' } }),
+      makeEvent('agent.spawn', { context: { session_id: 'current', model: 'test' } }),
+    ];
+    const cond: Condition = { type: 'counter', event: 'agent.spawn', window: 'single_session', operator: '<=', value: 4 };
+    // 3 ≤ 4 → true (the 5th kill bug is fixed)
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 3, target: 4 });
+  });
+
   it('streak: respects filter', () => {
     const events = [
       makeEvent('task.complete', { payload: { manual_edits: 0 }, timestamp: '2025-06-03T00:00:00Z' }),

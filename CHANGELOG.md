@@ -1,5 +1,43 @@
 # Changelog
 
+## [0.1.3] — 2026-05-30
+
+### Init: Zero-config One-command Setup
+
+- **`npm run init` without `--tool`** — auto-detects all 5 AI coding tools by scanning config files, configures them all
+- **Hook merge injection** — appends AGPA hooks to existing CC hook entries (sound effects, etc.) instead of skipping when keys already exist
+- **Idempotent** — re-running never duplicates commands
+- **3 new npm scripts** — `npm run hook-auto`, `hook-track`, `hook-poll` for quick testing
+
+### Evaluator Fixes & Improvements
+
+- **evalThreshold metric path** — now respects `cond.event`, `cond.filter`, `cond.role`, and time windows (was silently ignoring all of them)
+- **single_task window** — uses `task.complete` events as task boundaries to infer scope (no per-event task_id needed)
+- **same_task window** — `isTaskWindow` now recognizes this alias (7 achievements were silently un-scoped)
+- **computeMetric expanded** — 2 new branches: `showcase_count` (reads showcase.json), `concurrent_sessions` (counts unique session_ids within 1h)
+
+### Event Coverage: 6 Previously-Blocked Achievements Fixed
+
+| Achievement | Fix |
+|-------------|-----|
+| visual_prompt, image_whisperer | YAML: `tool.complete` → `image.read` via AGENTS.md manual track |
+| polyglot | YAML: `file.create` → `file.language_used` via AGENTS.md `{ language }` |
+| perfectionist | YAML: `file.edit` → `function.edited` via AGENTS.md `{ function_name }` |
+| trophy_case | Code: `computeMetric` reads `showcase.json` non-null slot count |
+| parallel_universe | Code: `computeMetric` counts unique session_ids |
+
+### Cleanup
+
+- **storyteller** deleted (not implementing "share conversation" feature)
+- Achievement count: 118 → 117
+- Integration test updated to match new count
+
+### Tech Stack Unchanged
+
+Runtime: tsx, MCP: @modelcontextprotocol/sdk, Parsing: yaml, Validation: zod, Testing: vitest (55 tests, 5 files, all passing)
+
+---
+
 ## [0.1.2] — 2026-05-30
 
 ### System Audit & P0 Bug Fixes (10 fixed)

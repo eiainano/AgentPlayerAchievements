@@ -3,11 +3,8 @@
  * AGPA Init — detect & configure AI coding tools for achievement tracking
  *
  * Usage:
- *   npx tsx src/cli/init.ts --tool claude-code
- *   npx tsx src/cli/init.ts --tool kilocode
- *   npx tsx src/cli/init.ts --tool hermes
- *   npx tsx src/cli/init.ts --tool opencode
- *   npx tsx src/cli/init.ts --tool openclaw
+ *   npx tsx src/cli/init.ts               Auto-detect & configure all tools
+ *   npx tsx src/cli/init.ts --tool <tool>  Configure a specific tool
  */
 
 import * as fs from 'node:fs';
@@ -125,6 +122,9 @@ This project uses AGPA (Agent Player Achievements). Most tool/file/session event
 Call \`achievement_track\` when you observe these:
 
 **When you do something:**
+- Read an image file → \`image.read\` (auto: any Read of png/jpg/gif/svg counts)
+- Create a file in a specific language → \`file.language_used\` with \`{ language }\` (e.g. "typescript", "python")
+- Edit the same function repeatedly → \`function.edited\` with \`{ function_name }\`
 - Slash command runs → \`command.slash_used\` with \`{ command }\`
 - Enter plan mode → \`plan.mode_entered\`
 - Read help/docs → \`help.accessed\`
@@ -162,9 +162,9 @@ Call \`achievement_track\` when you observe these:
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
-function parseCliArgs(): { tool: string; profile: string | null } {
+function parseCliArgs(): { tool: string | null; profile: string | null } {
   const args = process.argv.slice(2);
-  let tool = '';
+  let tool: string | null = null;
   let profile: string | null = null;
 
   for (let i = 0; i < args.length; i++) {
@@ -188,7 +188,8 @@ function printHelp(): void {
 🏆 AGPA Init — Connect AI coding tools to the achievement system
 
 Usage:
-  npx tsx src/cli/init.ts --tool <tool> [--profile <name>]
+  npx tsx src/cli/init.ts               Auto-detect & configure all tools
+  npx tsx src/cli/init.ts --tool <name>  Configure a specific tool
 
 Tools:
   claude-code, cc        Claude Code
@@ -200,6 +201,9 @@ Tools:
 Options:
   --profile <name>       Use a named profile (default: "default")
   --help, -h             Show this help
+
+Without --tool, scans existing config files and configures all tools found.
+Default: Claude Code if nothing detected.
 `);
 }
 
@@ -300,178 +304,253 @@ function injectInstructions(filePath: string, marker: string): boolean {
   return true;
 }
 
-// ── Main ───────────────────────────────────────────────────────────────
+// ── Tool Detection ─────────────────────────────────────────────────────
 
-const { tool: toolArg, profile } = parseCliArgs();
-
-if (!toolArg) {
-  console.error('✖ Missing --tool argument. Use --help for usage.');
-  process.exit(1);
-}
-
-const toolDef = findTool(toolArg);
-if (!toolDef) {
-  console.error(`✖ Unknown tool: "${toolArg}"`);
-  console.error('  Supported: claude-code, kilocode, hermes, opencode, openclaw');
-  process.exit(1);
-}
-const initData = INIT_DATA[toolDef.id];
-if (!initData) {
-  console.error(`✖ No init data for tool: "${toolDef.id}"`);
-  process.exit(1);
-}
-
-// Step 1: Ensure data directory
-const dataDir = profile
-  ? path.join(AGPA_DIR, 'profiles', profile)
-  : AGPA_DIR;
-ensureDataDir(dataDir);
-initEngineState();
-console.log(`  📁 Data:     ${dataDir}`);
-
-// Step 2: Check tool config file & inject MCP
-const configExists = fs.existsSync(toolDef.configPath);
-if (configExists && fs.readFileSync(toolDef.configPath, 'utf-8').includes('agent-achievements')) {
-  console.log(`  ⏭  Skipped:  ${toolDef.configPath} (already present)`);
-} else {
-  // Step 3: Inject MCP config
-  if (toolDef.configFormat === 'yaml') {
-    if (!configExists) {
-      console.log(`  🆕 New file: ${toolDef.configPath}`);
-      const dir = path.dirname(toolDef.configPath);
-      fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(toolDef.configPath, '');
+/**
+ * When no --tool is provided, scan for existing tool config files
+ * and offer to configure all found tools.
+ */
+function detectTools(): string[] {
+  console.log('\n\u{1F50D}  Auto-detecting AI coding tools...\n');
+  const found: string[] = [];
+  for (const t of TOOLS) {
+    if (fs.existsSync(t.configPath)) {
+      found.push(t.id);
+      console.log(`  \u{2713}  Found: ${t.name}`);
     }
-    const injected = injectYamlMCPBlock(toolDef.configPath, 'agent-achievements', {
-      command: 'tsx',
-      args: [AGPA_MAIN],
-      enabled: true,
-      env: { AGPA_TOOL_SOURCE: 'hermes' },
-    });
-    if (injected) {
-      console.log(`  ✅ MCP:      ${toolDef.configPath}`);
-    } else {
-      console.log(`  ⏭  Skipped:  ${toolDef.configPath} (already present)`);
+  }
+  if (found.length === 0) {
+    console.log('  ℹ  No config files found. Defaulting to Claude Code.');
+    console.log('  ℹ  Use --tool <name> to configure a different tool.');
+    found.push('claude-code');
+  }
+  console.log('');
+  return found;
+}
+
+// ── CC Hook injector (merge-aware) ─────────────────────────────────────
+
+interface HookEntry {
+  type: string;
+  command: string;
+  async?: boolean;
+  timeout?: number;
+}
+
+/**
+ * Inject an AGPA hook command into a CC settings.json hook key.
+ * Merges with existing hook entries rather than overwriting.
+ * Returns true if the command was newly injected, false if already present.
+ */
+function injectHook(
+  hooks: Record<string, unknown>,
+  key: string,
+  command: string,
+  opts?: HookEntry,
+): boolean {
+  const matchers = (hooks[key] as Array<Record<string, unknown>>) || [];
+  if (matchers.length === 0) {
+    // Create new hook entry
+    hooks[key] = [{
+      matcher: '*',
+      hooks: [opts || { type: 'command', command, async: true, timeout: 5 }],
+    }];
+    return true;
+  }
+
+  // Deduplicate: check if this command already exists in any matcher
+  const existingCmds = new Set<string>();
+  for (const m of matchers) {
+    for (const h of (m.hooks as Array<{ type: string; command: string }>) || []) {
+      if (h.type === 'command') existingCmds.add(h.command);
     }
+  }
+  if (existingCmds.has(command)) return false;
+
+  // Append to the first matcher's hooks array
+  const firstMatcher = matchers[0] as Record<string, unknown> | undefined;
+  if (!firstMatcher) return false;
+  let mHooks = firstMatcher.hooks as Array<Record<string, unknown>> | undefined;
+  if (!Array.isArray(mHooks)) {
+    mHooks = [];
+    firstMatcher.hooks = mHooks;
+  }
+  // Ensure matcher field exists
+  if (!firstMatcher.matcher) firstMatcher.matcher = '*';
+  mHooks.push((opts || { type: 'command', command, async: true, timeout: 5 }) as unknown as Record<string, unknown>);
+  return true;
+}
+
+/**
+ * All CC hook keys that AGPA needs, with their commands and settings.
+ */
+const ALL_HOOK_KEYS: Array<{ key: string; command: string; async?: boolean; timeout?: number }> = [
+  { key: 'SessionStart',       command: HOOK_TRACK_START,                                          async: false },
+  { key: 'Stop',               command: `${HOOK_TRACK_END} && ${HOOK_POLL}`,                        async: true, timeout: 15 },
+  { key: 'PostToolUse',        command: HOOK_AUTO },
+  { key: 'PreToolUse',         command: HOOK_AUTO },
+  { key: 'PostToolUseFailure', command: HOOK_AUTO },
+  { key: 'TaskCompleted',      command: HOOK_AUTO },
+  { key: 'SubagentStart',      command: HOOK_AUTO },
+  { key: 'SubagentStop',       command: HOOK_AUTO },
+  { key: 'PostCompact',        command: HOOK_AUTO },
+];
+
+// ── Init a single tool ─────────────────────────────────────────────────
+
+/**
+ * Initialize one AI coding tool with MCP config, instruction files, and hooks.
+ */
+function initTool(
+  toolDef: ToolDef,
+  initData: InitToolData,
+  profile: string | null,
+  dataDir: string,
+  quiet: boolean,
+): string | null {
+  const label = toolDef.name;
+
+  if (!quiet) {
+    console.log(`\n  \u{2500}\u{2500} ${label} \u{2500}\u{2500}`);
+  }
+
+  // ── Inject MCP config ──────────────────────────────────────────────
+  const configExists = fs.existsSync(toolDef.configPath);
+  if (configExists && fs.readFileSync(toolDef.configPath, 'utf-8').includes('agent-achievements')) {
+    console.log(`  \u{23ED}  MCP:       ${toolDef.configPath} (already present)`);
   } else {
-    let config: Record<string, unknown> | null;
-    if (configExists) {
-      config = readJSON(toolDef.configPath);
-      if (!config) {
-        const bak = toolDef.configPath + '.agpa.bak';
-        try { fs.copyFileSync(toolDef.configPath, bak); } catch { /* ok */ }
-        console.log(`  📋 Backup:   ${bak}`);
-        config = {};
+    if (toolDef.configFormat === 'yaml') {
+      if (!configExists) {
+        console.log(`  \u{1F195} New file: ${toolDef.configPath}`);
+        const dir = path.dirname(toolDef.configPath);
+        fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(toolDef.configPath, '');
+      }
+      const injected = injectYamlMCPBlock(toolDef.configPath, 'agent-achievements', {
+        command: 'tsx',
+        args: [AGPA_MAIN],
+        enabled: true,
+        env: { AGPA_TOOL_SOURCE: toolDef.id },
+      });
+      if (injected) {
+        console.log(`  \u{2705} MCP:       ${toolDef.configPath}`);
+      } else {
+        console.log(`  \u{23ED}  MCP:       ${toolDef.configPath} (already present)`);
       }
     } else {
-      console.log(`  🆕 New file: ${toolDef.configPath}`);
-      config = {};
+      let config: Record<string, unknown> | null;
+      if (configExists) {
+        config = readJSON(toolDef.configPath);
+        if (!config) {
+          const bak = toolDef.configPath + '.agpa.bak';
+          try { fs.copyFileSync(toolDef.configPath, bak); } catch { /* ok */ }
+          console.log(`  \u{1F4CB} Backup:    ${bak}`);
+          config = {};
+        }
+      } else {
+        console.log(`  \u{1F195} New file: ${toolDef.configPath}`);
+        config = {};
+      }
+      const updated = initData.mcpInject(config);
+      writeJSON(toolDef.configPath, updated);
+      console.log(`  \u{2705} MCP:       ${toolDef.configPath}`);
     }
-    const updated = initData.mcpInject(config);
-    writeJSON(toolDef.configPath, updated);
-    console.log(`  ✅ MCP:      ${toolDef.configPath}`);
   }
-}
 
-// Step 4: Inject instruction files
-for (const inst of initData.instructionFiles) {
-  const injected = injectInstructions(inst.path, inst.marker);
-  if (injected) {
-    console.log(`  ✅ Injected: ${inst.path}`);
-  } else {
-    console.log(`  ⏭  Skipped:  ${inst.path} (already present)`);
-  }
-}
-
-// Step 5: Inject CC hooks (9 hooks for auto event tracking)
-if (toolDef.id === 'claude-code') {
-  let hookCfg = readJSON(toolDef.configPath);
-  if (!hookCfg) {
-    console.log(`  ⚠  Skipped hooks: cannot read ${toolDef.configPath}`);
-  } else {
-    let hooksInjected = false;
-    if (!hookCfg.SessionStart) {
-      hookCfg.SessionStart = [{
-        matcher: '*',
-        hooks: [{ type: 'command', command: HOOK_TRACK_START }],
-      }];
-      hooksInjected = true;
-    }
-    if (!hookCfg.Stop) {
-      hookCfg.Stop = [{
-        matcher: '*',
-        hooks: [{ type: 'command', command: `${HOOK_TRACK_END} && ${HOOK_POLL}` }],
-      }];
-      hooksInjected = true;
-    }
-    if (!hookCfg.PostToolUse) {
-      hookCfg.PostToolUse = [{
-        matcher: '*',
-        hooks: [{ type: 'command', command: HOOK_AUTO, async: true, timeout: 5 }],
-      }];
-      hooksInjected = true;
-    }
-    if (!hookCfg.PreToolUse) {
-      hookCfg.PreToolUse = [{
-        matcher: '*',
-        hooks: [{ type: 'command', command: HOOK_AUTO, async: true, timeout: 5 }],
-      }];
-      hooksInjected = true;
-    }
-    if (!hookCfg.PostToolUseFailure) {
-      hookCfg.PostToolUseFailure = [{
-        matcher: '*',
-        hooks: [{ type: 'command', command: HOOK_AUTO, async: true, timeout: 5 }],
-      }];
-      hooksInjected = true;
-    }
-    if (!hookCfg.TaskCompleted) {
-      hookCfg.TaskCompleted = [{
-        matcher: '*',
-        hooks: [{ type: 'command', command: HOOK_AUTO, async: true, timeout: 5 }],
-      }];
-      hooksInjected = true;
-    }
-    if (!hookCfg.SubagentStart) {
-      hookCfg.SubagentStart = [{
-        matcher: '*',
-        hooks: [{ type: 'command', command: HOOK_AUTO, async: true, timeout: 5 }],
-      }];
-      hooksInjected = true;
-    }
-    if (!hookCfg.SubagentStop) {
-      hookCfg.SubagentStop = [{
-        matcher: '*',
-        hooks: [{ type: 'command', command: HOOK_AUTO, async: true, timeout: 5 }],
-      }];
-      hooksInjected = true;
-    }
-    if (!hookCfg.PostCompact) {
-      hookCfg.PostCompact = [{
-        matcher: '*',
-        hooks: [{ type: 'command', command: HOOK_AUTO, async: true, timeout: 5 }],
-      }];
-      hooksInjected = true;
-    }
-    if (hooksInjected) {
-      writeJSON(toolDef.configPath, hookCfg);
-      console.log('  ✅ Hooks:    auto track (9 events) + poll');
+  // ── Inject instruction files ────────────────────────────────────────
+  for (const inst of initData.instructionFiles) {
+    const injected = injectInstructions(inst.path, inst.marker);
+    if (injected) {
+      console.log(`  \u{2705} Instruct:  ${inst.path}`);
     } else {
-      console.log('  ⏭  Skipped:  hooks (already present)');
+      console.log(`  \u{23ED}  Instruct:  ${inst.path} (already present)`);
     }
   }
+
+  // ── Inject CC hooks (merge-aware, only for claude-code) ────────────
+  if (toolDef.id === 'claude-code') {
+    let hookCfg = readJSON(toolDef.configPath);
+    if (!hookCfg) {
+      console.log(`  \u{26A0}  Hooks:     cannot read ${toolDef.configPath} \u{2014} skipping`);
+    } else {
+      const hooks = (hookCfg.hooks as Record<string, unknown>) || {};
+      const injectedKeys: string[] = [];
+
+      for (const hk of ALL_HOOK_KEYS) {
+        const opts: HookEntry = { type: 'command', command: hk.command };
+        if (hk.async !== undefined) opts.async = hk.async;
+        if (hk.timeout !== undefined) opts.timeout = hk.timeout;
+        if (injectHook(hooks, hk.key, hk.command, opts)) {
+          injectedKeys.push(hk.key);
+        }
+      }
+
+      if (injectedKeys.length > 0) {
+        hookCfg.hooks = hooks;
+        writeJSON(toolDef.configPath, hookCfg);
+        console.log(`  \u{2705} Hooks:     ${injectedKeys.join(', ')}`);
+      } else {
+        console.log(`  \u{23ED}  Hooks:     (all already present)`);
+      }
+    }
+  }
+
+  return toolDef.name;
 }
 
-// Step 6: Summary
-console.log(`\n  ┌─────────────────────────────────────────────────┐`);
-console.log(`  │  Agent Player Achievements initialized!          │`);
-console.log(`  │                                                 │`);
-console.log(`  │  Tool:    ${toolDef.name.padEnd(37)}│`);
-console.log(`  │  Data:    ${dataDir.padEnd(37)}│`);
-console.log(`  │                                                 │`);
-console.log(`  │  Next time you start ${toolDef.name}:${' '.repeat(19 + (24 - toolDef.name.length))}│`);
-console.log(`  │  First achievement awaits you!                  │`);
-console.log(`  │                                                 │`);
-console.log(`  │  Quick start:                                   │`);
-console.log(`  │    npm run dashboard    # View your achievements │`);
-console.log(`  └─────────────────────────────────────────────────┘`);
+// ── Main ───────────────────────────────────────────────────────────────
+
+function main(): void {
+  const { tool: toolArg, profile } = parseCliArgs();
+
+  // Determine which tools to configure
+  const toolIds = toolArg ? [toolArg] : detectTools();
+
+  // Shared data directory
+  const dataDir = profile
+    ? path.join(AGPA_DIR, 'profiles', profile)
+    : AGPA_DIR;
+  if (!toolArg) {
+    console.log(`  \u{1F4C1} Data:      ${dataDir}`);
+  }
+  ensureDataDir(dataDir);
+  initEngineState();
+
+  const configuredTools: string[] = [];
+  const multiTool = toolIds.length > 1;
+
+  for (const tid of toolIds) {
+    const toolDef = findTool(tid);
+    if (!toolDef) {
+      console.error(`  \u{2716} Unknown tool: "${tid}"`);
+      continue;
+    }
+    const initData = INIT_DATA[toolDef.id];
+    if (!initData) {
+      console.error(`  \u{2716} No init data for tool: "${toolDef.id}"`);
+      continue;
+    }
+
+    const name = initTool(toolDef, initData, profile, dataDir, !multiTool);
+    if (name) configuredTools.push(name);
+  }
+
+  // ── Summary ──────────────────────────────────────────────────────────
+  const toolList = configuredTools.join(', ');
+  const toolCount = configuredTools.length;
+  const toolLine = toolCount > 1
+    ? `${toolCount} tools configured`
+    : `Tool:      ${configuredTools[0]!}`;
+  console.log(`\n  ┌─────────────────────────────────────────────────┐`);
+  console.log(`  │  Agent Player Achievements initialized!          │`);
+  console.log(`  │                                                 │`);
+  console.log(`  │  ${toolLine.padEnd(47)}│`);
+  console.log(`  │  Data:    ${dataDir.padEnd(37)}│`);
+  console.log(`  │                                                 │`);
+  console.log(`  │  Quick start:                                   │`);
+  console.log(`  │    npm run dashboard    # View your achievements │`);
+  console.log(`  │    npm run doctor       # Diagnose your setup    │`);
+  console.log(`  └─────────────────────────────────────────────────┘`);
+}
+
+main();

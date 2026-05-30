@@ -37,6 +37,7 @@ export class AchievementEngine {
   unlockedThisPoll: AchievementDefinition[] = [];
   toolSource: string;
   sessionId: string;
+  taskId: string | null = null;
 
   private store: Store;
 
@@ -92,7 +93,7 @@ export class AchievementEngine {
       tool_source: this.toolSource,
       event_type: eventType,
       payload,
-      context: { session_id: this.sessionId, model: 'auto' },
+      context: { session_id: this.sessionId, model: 'auto', ...(this.taskId ? { task_id: this.taskId } : {}) },
     };
 
     this.events.push(event);

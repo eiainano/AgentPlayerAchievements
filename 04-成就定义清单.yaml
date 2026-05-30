@@ -166,8 +166,7 @@ definitions:
     hidden: false
     conditions:
       - type: counter
-        event: tool.complete
-        filter: "tool_name == 'Read' && file_type matches 'image/*'"
+        event: image.read
         operator: ">="
         value: 1
 
@@ -287,7 +286,7 @@ definitions:
     hidden: false
     conditions:
       - type: distinct_count
-        event: file.create
+        event: file.language_used
         field: language
         operator: ">="
         value: 5
@@ -642,8 +641,7 @@ definitions:
     hidden: false
     conditions:
       - type: counter
-        event: tool.complete
-        filter: "tool_name == 'Read' && file_type matches 'image/*'"
+        event: image.read
         operator: ">="
         value: 5
 
@@ -1034,7 +1032,7 @@ definitions:
     hidden: true
     conditions:
       - type: counter
-        event: file.edit
+        event: function.edited
         field: function_name
         same_target: true
         window: single_task
@@ -1509,19 +1507,6 @@ definitions:
   # ============================================================
   # Category: Community (社区)
   # ============================================================
-  - id: storyteller
-    name: "Storyteller"
-    description: "分享过一次 agent 对话到社交媒体或团队频道。"
-    icon: "📤"
-    category: community
-    rarity: uncommon
-    hidden: false
-    conditions:
-      - type: counter
-        event: achievement.shared
-        operator: ">="
-        value: 1
-
   - id: trophy_case
     name: "Trophy Case"
     description: "展示柜放满了 6 个成就。"

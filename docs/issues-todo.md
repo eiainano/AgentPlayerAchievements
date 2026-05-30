@@ -1,6 +1,6 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-05-30 | 总成就数: 118 | 条件类型: 12
+> 最后更新: 2026-05-30 | 总成就数: 117 | 条件类型: 12
 
 ---
 
@@ -18,7 +18,7 @@
 ## P1 — 事件覆盖缺口
 
 - [x] **`plan.mode_activated` 无人 track** — `the_switch` 序列第一步永远匹配不上。AGENTS.md 里已有 `plan.mode_entered`（进 plan 模式），但 YAML 写的是 `plan.mode_activated`。两种修法：① 把 YAML 改成 `plan.mode_entered` ② AGENTS.md 补一个 `plan.mode_activated`。推荐①——`plan.mode_entered` 已经存在，语义一致。
-- [ ] **`achievement.shared` 无人 track** — AGENTS.md 没有记录这个事件，hook.ts 也不 emit。`storyteller` 永远无法解锁。需要加到 AGENTS.md 或者删 `storyteller` 成就。
+- [x] **`achievement.shared` 无人 track** — storyteller 已删除（不实现）。AGENTS.md 无需补事件。
 - [x] **`agent.complete` emit 了没人用** — SubagentStop hook 产生 `agent.complete` 事件，但 118 个成就里没一个引用。两个选项：① 删掉这个 emit ② 加一个成就来消费它。
 - [x] **`git.revert_all` 在 AGENTS.md 但没成就用** — `scorched_earth` 删掉后就没消费者了。如果短期不打算加新成就，可以从 AGENTS.md 删掉这条。
 
@@ -26,18 +26,18 @@
 
 ## P1 — Hook 不提取的 payload 字段（成就永远匹配不上）
 
-- [ ] **`file_type` 不被 hook 提取** — `visual_prompt`、`image_whisperer` 的 filter `file_type matches 'image/*'` 永远不匹配。hook.ts 只从 CC stdin 提取 tool_name/file_path/command/description，不提取 file_type。CC PostToolUse stdin 里有 `tool_response` 字段，可能包含文件类型信息——需要实测确认。
-- [ ] **`language` 不被 hook 提取** — `polyglot` 用 `field: language` 统计不同语言，但 `file.create` 事件 payload 里没有 `language` 字段。
-- [ ] **`function_name` 不被 hook 提取** — `perfectionist` 用 `same_target: true` + `field: function_name`，但 `file.edit` 事件 payload 里没有 `function_name`。Edit tool 的 stdin 不传函数级别的信息，这个成就可以考虑改成走手动 track。
-- [ ] **`showcase_count` 无数据源** — `trophy_case` 用 `metric: showcase_count`，evaluator 从事件 payload 找这个 field，但没有任何事件提供。
-- [ ] **`concurrent_sessions` 无数据源** — `parallel_universe` 用 `metric: concurrent_sessions`，同上问题。
+- [x] **`file_type` 不被 hook 提取** — visual_prompt + image_whisperer: YAML 改为 `event: image.read`，AGENTS.md 加手动 track 指令。
+- [x] **`language` 不被 hook 提取** — polyglot: YAML 改为 `event: file.language_used`，AGENTS.md 加手动 track `{ language }` 指令。
+- [x] **`function_name` 不被 hook 提取** — perfectionist: YAML 改为 `event: function.edited`，AGENTS.md 加手动 track `{ function_name }` 指令。
+- [x] **`showcase_count` 无数据源** — trophy_case: `computeMetric` 加分支读 `showcase.json` 非空槽位数。
+- [x] **`concurrent_sessions` 无数据源** — parallel_universe: `computeMetric` 加分支统计 1h 内唯一 session_id 数。
 
 ---
 
 ## P1 — Evaluator 功能缺口
 
 - [x] **sequence（非连续模式）忽略 window** — `the_debugger`、`the_switch`、`full_cycle`、`true_vibe_coder`、`u_turn`、`the_negotiator` 在 YAML 里指定了 `window: single_task` 或 `single_session`，但标准有序 sequence 分支不读 window。事件跨多天也不会重置。
-- [ ] **evalThreshold metric 路径忽略 window/filter/event/role** — 当 `cond.metric` 设值时，所有过滤（事件类型、时间窗口、filter 表达式）全部跳过。`surgeon` 的 `metric: "edit_lines / total_file_lines"` + `window: single_task` — 窗口被忽略，统计的是全局事件。
+- [x] **evalThreshold metric 路径忽略 window/filter/event/role** — metric 分支现在做完整的 event/window/filter/role 过滤，`single_task` 用 task.complete 边界推断，`same_task` 也被正确识别。
 - [ ] **空 conditions 数组提前解锁** — `[].every(f)` 永远返回 true，无条件的成就每次 poll 都会解锁（但目前 YAML 里没有无条件的成就，parser 对空返回 `[]` 而不是遗漏键）。
 - [ ] **evalMode 提前返回 target 不一致** — 无事件时返回 `target: cond.value`（通常是 0），有事件时返回 `target: Math.round(threshold * 100)`。如果 YAML 同时设了 value 和 threshold，两路径返回不同 target 显示给 Dashboard。
 - [ ] **evalPercentile 硬编码回退阈值** — `FALLBACK_THRESHOLDS` 只有一个 metric，两个百分位值。其他 metric 在无 telemetry server 时永远 false。

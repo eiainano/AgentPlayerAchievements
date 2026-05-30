@@ -150,7 +150,7 @@ function isSessionWindow(cond: Condition): boolean {
 }
 
 function isTaskWindow(cond: Condition): boolean {
-  return cond.window === 'single_task';
+  return cond.window === 'single_task' || cond.window === 'same_task';
 }
 
 /** Return latest session_id from events, or null */
@@ -161,7 +161,17 @@ function latestSessionId(events: TrackedEvent[]): string | null {
 
 /** Filter events to the scoped session/task, return subset */
 function scopeEvents(events: TrackedEvent[], cond: Condition): TrackedEvent[] {
-  if (isTaskWindow(cond)) return events; // task_id not available yet, no-op
+  if (isTaskWindow(cond)) {
+    // Use task.complete events as boundaries to infer task grouping
+    const boundaries: number[] = [];
+    for (let i = 0; i < events.length; i++) {
+      if (events[i]!.event_type === 'task.complete') boundaries.push(i);
+    }
+    if (boundaries.length === 0) return events; // no task boundary yet
+    const lastIdx = boundaries[boundaries.length - 1]!;
+    const prevIdx = boundaries.length >= 2 ? boundaries[boundaries.length - 2]! : -1;
+    return events.slice(prevIdx + 1, lastIdx + 1);
+  }
   if (isSessionWindow(cond)) {
     const sid = latestSessionId(events);
     if (!sid) return events;
@@ -216,7 +226,17 @@ function evalThreshold(events: TrackedEvent[], cond: Condition): EvaluationResul
   events = scopeEvents(events, cond);
   // Handle metric-based threshold (e.g. "edit_lines / total_file_lines")
   if (cond.metric) {
-    const val = evaluateMetric(cond.metric, events);
+    const sessionWindow = isSessionWindow(cond);
+    const windowMs = sessionWindow ? 0 : parseWindow(cond.window || '24h');
+    const now = Date.now();
+    const filtered = events.filter(e => {
+      if (cond.event && e.event_type !== cond.event) return false;
+      if (!sessionWindow && now - new Date(e.timestamp).getTime() > windowMs) return false;
+      if (cond.filter && !matchFilter(e, cond.filter)) return false;
+      if (!matchRole(e, cond.role)) return false;
+      return true;
+    });
+    const val = evaluateMetric(cond.metric, filtered);
     if (val === null) return { met: false, progress: 0, target: cond.value };
     const op: ConditionOperator = cond.operator || '>=';
     return { met: evalOp(op, val, cond.value), progress: Math.round(val * 1000) / 1000, target: cond.value };
@@ -559,6 +579,27 @@ function computeMetric(events: TrackedEvent[], metric: string): number | null {
         .filter(n => n > 0);
       if (lengths.length === 0) return null;
       return lengths.reduce((a, b) => a + b, 0) / lengths.length;
+    }
+    case 'showcase_count': {
+      const p = path.join(AGPA_STATE_DIR, 'showcase.json');
+      try {
+        if (fs.existsSync(p)) {
+          const data = JSON.parse(fs.readFileSync(p, 'utf-8'));
+          return (data.slots as Array<string | null>).filter(s => s !== null).length;
+        }
+      } catch { /* ignore */ }
+      return 0;
+    }
+    case 'concurrent_sessions': {
+      // Count unique session_ids in events from the last hour
+      const oneHourAgo = Date.now() - 60 * 60 * 1000;
+      const sids = new Set<string>();
+      for (const e of events) {
+        if (new Date(e.timestamp).getTime() > oneHourAgo && e.context?.session_id) {
+          sids.add(e.context.session_id);
+        }
+      }
+      return sids.size;
     }
     default:
       return null;

@@ -56,6 +56,7 @@ export interface TrackedEvent {
   context: {
     session_id: string;
     model: string;
+    task_id?: string;
     [key: string]: unknown;
   };
 }

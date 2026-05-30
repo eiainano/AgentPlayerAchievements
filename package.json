@@ -1,6 +1,6 @@
 {
   "name": "agpa",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "module",
   "description": "Agent Player Achievements — gamified achievement system for AI coding agents",
   "license": "MIT",
@@ -11,6 +11,9 @@
     "reset": "tsx src/cli/mvp.ts reset",
     "init": "tsx src/cli/init.ts",
     "doctor": "tsx src/cli/doctor.ts",
+"hook-auto": "AGPA_TOOL_SOURCE=claude-code tsx src/cli/hook.ts auto",
+"hook-track": "AGPA_TOOL_SOURCE=claude-code tsx src/cli/hook.ts track",
+"hook-poll": "AGPA_TOOL_SOURCE=claude-code tsx src/cli/hook.ts poll",
     "dashboard": "tsx src/cli/dashboard.ts",
     "mcp": "tsx src/main.ts",
     "stats-server": "tsx src/server/stats-server.ts",

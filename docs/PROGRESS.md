@@ -4,7 +4,7 @@
 
 ## 总体状态
 
-v0.1.3 完成。Init 一键安装、Hook 合并注入、single_task 窗口、Surgeon 全自动 payload、evalStreak 事件连续模式。117 个成就全部可达成，81 个测试全绿。
+v0.1.3 完成。Init 一键安装、Hook 合并注入、single_task 窗口、Surgeon 全自动 payload、evalStreak 事件连续模式、Hermes Agent auto-track。117 个成就全部可达成，81 个测试全绿。
 
 ---
 
@@ -76,12 +76,12 @@ v0.1.3 完成。Init 一键安装、Hook 合并注入、single_task 窗口、Sur
 
 ### 中优先级
 - [ ] **用户审阅 117 成就清单**：用户之前提到"后面手动审阅"
-- [ ] **其余 4 工具的 auto-track 策略落地**
+- [ ] **其余 3 工具的 auto-track 策略落地**
 
 | 工具 | 策略 | 可靠性 |
 |------|------|--------|
 | Claude Code | Hook `SessionStart` | ⭐⭐⭐⭐⭐ |
-| Hermes Agent | `on_session_end` hook | ⭐⭐⭐⭐ |
+| Hermes Agent | Shell hooks (4 events) | ⭐⭐⭐⭐⭐ |
 | OpenClaw | `command:new` hook | ⭐⭐⭐⭐ |
 | OpenCode | `session.idle` 近似 | ⭐⭐⭐ |
 | Kilo Code | 指令驱动（hook 不可调 MCP） | ⭐⭐⭐ |

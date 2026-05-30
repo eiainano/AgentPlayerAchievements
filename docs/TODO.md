@@ -81,8 +81,9 @@
 - [x] evaluator 函数单测 — metric filtering×3、single_task/same_task×2、empty conditions、streak window、streak same_target
 - [x] hook.ts 测试 — mapEvents×16 覆盖全部 10 种 CC hook→AGPA 事件映射
 
-### 9. 其余 4 工具的 auto-track 策略落地
-- [ ] Hermes: `on_session_end` hook
+### 9. ✅ Hermes Agent auto-track 落地
+- [x] **hermes-auto 命令** — hook.ts 翻译层（事件名/工具名/字段名映射）
+- [x] **Shell hook 注入** — init.ts 注入 4 个 hooks 到 ~/.hermes/config.yaml
 - [ ] OpenClaw: `command:new` hook
 - [ ] OpenCode: `session.idle` 近似
 - [ ] Kilo Code: 指令驱动（hook 不可调 MCP）

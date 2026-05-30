@@ -64,6 +64,16 @@
 - **ten_task_no_edit** — now correctly counts consecutive zero-edit tasks, not consecutive days
 - Backward compatible: existing streak achievements (streak_7/30/100/365) unchanged
 
+### Condition `unit` Field
+
+- **Parser no longer drops `unit`** — 6 achievements now retain `unit: day` / `unit: tokens` metadata
+
+### Hermes Agent Auto-Track
+
+- **`hermes-auto` command** — translates Hermes stdin JSON → CC format via mapping tables (event names + tool names + field names)
+- **Shell hook injection** — `init.ts` injects 4 hooks (pre_tool_call, post_tool_call, on_session_start, on_session_end) into `~/.hermes/config.yaml`
+- **CC unchanged** — all existing CC paths untouched; Hermes has independent pipeline
+
 ### Known Gaps (HOLD)
 
 - evalPercentile fallback thresholds (2 percentile achievements work, others need telemetry)

@@ -24,9 +24,9 @@
 
 ---
 
-## OpenClaw 🔍 （调研完成，暂不做）
+## OpenClaw 🛠️（方案已定，待实现）
 
-- **版本**：2026.5.27（已从 2026.4.14 更新）
+- **版本**：2026.5.27
 - **接入方式**：TypeScript 插件 in `~/.openclaw/extensions/`
 - **注册 API**：`api.on("hook_name", handler, {priority, timeoutMs})`
 - **核心事件**（36 个 total）：
@@ -39,10 +39,39 @@
 | `after_tool_call` | `{toolName, params, result, error, durationMs, runId, toolCallId}` | ❌ |
 | `agent_end` | `{runId, messages, success, error, durationMs}` | ❌ |
 
-- **不能复用 CC/Hermes 模式**：没有 shell stdin JSON，必须是 in-process TS 插件
-- **接入方案**：写最小插件，`api.on(...)` 中用 `child_process.spawn` 调 `hook.ts track ...` 或直接用 MCP client 调 `achievement_track`
-- **工具名映射**：OpenClaw 用 `read_file/write_file/apply_patch/bash` 等，和 CC/Hermes 类似
-- **结论**：能做，但投入比 Hermes 大。等有需求再动手。
+### 为什么不能复用 CC/Hermes 模式
+
+CC 和 Hermes 的 hook 管理器会**自己 spawn 子进程并把事件 JSON 写到子进程 stdin**——hook.ts 只管 `readFileSync(0)` 读取即可。
+
+OpenClaw 是 **in-process 回调**——`api.on("after_tool_call", (payload) => {...})` 在 OpenClaw 自己的 Node 进程里直接拿到 JS 对象。**没有"hook 管理器帮你调"这回事**——你必须自己在回调里把数据送出去。
+
+### 接入方案：插件 spawn hook.ts + stdin pipe
+
+写一个极薄插件（~40 行 TS），在 `api.on(...)` 回调中**自己 spawn hook.ts 子进程，通过 stdin pipe 传入 JSON**——与 CC/Hermes 完全统一的数据流：
+
+```
+OpenClaw 进程
+┌────────────┐  api.on callback  ┌───────────────┐  spawn + stdin  ┌──────────┐
+│ after_tool │ ────────────────→ │ agpa-track.ts │ ──────────────→ │ hook.ts  │ → event.log
+│ _call hook │  JS 对象直接传入    │ (我们的插件)    │  JSON → fd 0    │ 读取 stdin│
+└────────────┘                   └───────────────┘                 └──────────┘
+```
+
+- **插件**只管 `api.on(...)` 注册 + spawn 子进程（`detached: true` + `unref()`，非阻塞）
+- **hook.ts** 新增 `openclaw-auto` 命令，负责翻译层（字段映射 → CC 标准格式 → `mapEvents()`）
+- **翻译层**与 Hermes 的 `normalizeHermesStdin()` 同模式：工具名映射（`read_file`→`Read` 等）、字段映射（`toolName`→`tool_name`、`params.path`→`tool_input.file_path` 等）
+- **MCP 通道不受影响**：auto-track 覆盖工具调用类事件，AGENTS.md 手动 track 继续覆盖语义类事件——与 CC/Hermes 对齐
+
+### 工具名映射
+
+| OpenClaw | CC 标准 |
+|----------|--------|
+| `read_file` | `Read` |
+| `write_file` | `Write` |
+| `apply_patch` | `Edit` |
+| `bash` | `Bash` |
+| `glob` | `Glob` |
+| `grep` | `Grep` |
 
 ---
 

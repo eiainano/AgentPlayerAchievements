@@ -16,6 +16,7 @@ export type EventType =
   | 'skill.invoke'
   | 'agent.spawn'
   | 'agent.complete'
+  | 'agent.end'
   | 'automode.start'
   | 'automode.end'
   | 'checkpoint.long'

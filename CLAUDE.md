@@ -12,21 +12,47 @@ npm run doctor     # diagnose system state
 
 ## Architecture
 
-Three layers, two channels:
+Three layers, **two channels**:
 
 ```
-Hook CLI (src/cli/hook.ts) ──┐
-                              ├──→ engine (src/engine/) ──→ ~/.agent-achievements/
-MCP Server (src/main.ts) ────┘                                   ├── event.log
-                                                                 ├── state.json
-                                                                 ├── showcase.json
-                                                                 └── config.json
+                    ┌─────────────────────────┐
+                    │   Engine (src/engine/)   │
+                    │   track() / poll()       │
+                    └─────────────────────────┘
+                      ↗                    ↖
+            MCP Server               Hook CLI
+          (src/main.ts)           (src/cli/hook.ts)
+                │                        │
+          STDIO 长连接              短命子进程 stdin pipe
+                │                        │
+          Agent 主动调用            Hook 回调自动触发
+          "有意识的行为"            "Agent 无感知"
+                │                        │
+          ┌─────┴─────┐          ┌──────┴──────┐
+          │ 手动 track │          │ auto-track  │
+          │ image.read │          │ tool.complete│
+          │ lang_used  │          │ file.edit   │
+          │ plan.mode  │          │ session.*   │
+          │ ...        │          │ agent.spawn │
+          └───────────┘          └─────────────┘
 ```
 
-- **Engine** — pure functions on in-memory data. `track()` appends to event.log, `poll()` evaluates and writes state.json. File I/O only in store.ts.
-- **Hook CLI** — called by CC hooks. `auto` mode reads stdin JSON, maps CC hook events to AGPA events, appends via engine. Useful for quick testing: `echo '{"hook_event_name":"PostToolUse","tool_name":"Read"}' | npx tsx src/cli/hook.ts auto`
-- **MCP Server** — 5 tools (track/poll/stats/showcase/config), STDIO protocol.
+- **MCP Server** (channel 1) — STDIO protocol, 5 tools (track/poll/stats/showcase/config). Agent **actively calls** these for semantic events that hooks can't capture (image.read, file.language_used, plan.mode_entered, etc.)
+- **Hook CLI** (channel 2) — Short-lived subprocess called by tool hooks. **Agent is unaware** — hooks fire automatically. Events: tool.complete, file.read/edit/write, session.start/end, task.complete, agent.spawn, git.commit, etc.
+- **Engine** — pure functions on in-memory data. `track()` appends to event.log via both channels. `poll()` evaluates and writes state.json. File I/O only in store.ts.
 - **Dashboard** — zero-framework HTML/CSS/JS, HTTP server in dashboard/server.ts, API layer in dashboard/api.ts.
+
+### Hook CLI modes (all stdin-pipe, short-lived)
+
+| Mode | Tool | How hook.ts gets data |
+|------|------|----------------------|
+| `auto` | CC | CC hook manager spawns hook.ts, writes JSON to stdin |
+| `hermes-auto` | Hermes | Hermes hook manager spawns hook.ts, writes JSON to stdin |
+| `openclaw-auto` | OpenClaw | Our TS plugin spawns hook.ts, writes JSON to stdin |
+
+All three share the same translation pattern: tool-specific fields → CC standard `HookStdin` → `mapEvents()` → `ENGINE.track()`.
+
+Useful for quick testing: `echo '{"hook_event_name":"PostToolUse","tool_name":"Read"}' | npx tsx src/cli/hook.ts auto`
 
 ## Conventions
 

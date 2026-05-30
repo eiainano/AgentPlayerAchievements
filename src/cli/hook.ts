@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 /**
- * AGPA Hook CLI — called by Claude Code hooks
+ * AGPA Hook CLI — event ingestion entry point for all AI coding tools
+ *
+ * Architecture: All tools feed events into hook.ts via stdin pipe (short-lived subprocess).
+ * hook.ts → translate tool format → CC standard format → mapEvents() → ENGINE.track() → event.log
  *
  * Modes:
  *   track <event_type> [payload_json]  — explicit tracking (legacy)
  *   poll                                — evaluate & notify
  *   auto                                — read CC hook stdin JSON, auto-map to AGPA event
  *   hermes-auto                         — read Hermes hook stdin JSON, translate → CC format → AGPA event
+ *   openclaw-auto                       — read OpenClaw hook stdin JSON, translate → CC format → AGPA event
  *
  * CC Hook events → AGPA event mapping:
  *   PostToolUse        → tool.complete   { tool_name, tool_input, duration_ms }
@@ -27,6 +31,13 @@
  *   pre_tool_call      → PreToolUse
  *   on_session_start   → SessionStart
  *   on_session_end     → SessionEnd
+ *
+ * OpenClaw Hook events → CC event mapping (translation layer):
+ *   after_tool_call    → PostToolUse
+ *   before_tool_call   → PreToolUse
+ *   session_start      → SessionStart
+ *   session_end        → SessionEnd
+ *   agent_end          → agent.end
  */
 
 import * as fs from 'fs';
@@ -269,6 +280,85 @@ function normalizeHermesStdin(raw: Record<string, unknown>): HookStdin {
   };
 }
 
+// ── OpenClaw → CC stdin translation ───────────────────────────
+
+/**
+ * OpenClaw hook event names → CC hook event names
+ */
+export const OPENCLAW_EVENT_MAP: Record<string, string> = {
+  'after_tool_call':  'PostToolUse',
+  'before_tool_call': 'PreToolUse',
+  'session_start':    'SessionStart',
+  'session_end':      'SessionEnd',
+  'agent_end':        'agent.end',
+};
+
+/**
+ * OpenClaw tool names → CC tool names
+ */
+export const OPENCLAW_TOOL_MAP: Record<string, string> = {
+  'read_file':    'Read',
+  'write_file':   'Write',
+  'apply_patch':  'Edit',
+  'bash':         'Bash',
+  'glob':         'Glob',
+  'grep':         'Grep',
+};
+
+interface OpenClawStdin {
+  hook_event_name: string;
+  toolName?: string;
+  params?: Record<string, unknown>;
+  sessionId?: string;
+  durationMs?: number;
+  runId?: string;
+  error?: string;
+  messageCount?: number;
+  reason?: string;
+  success?: boolean;
+  [key: string]: unknown;
+}
+
+/**
+ * Normalize OpenClaw stdin to CC-compatible HookStdin.
+ *
+ * Key field mappings:
+ *   toolName        → tool_name
+ *   params.path     → tool_input.file_path
+ *   params.command  → tool_input.command
+ *   params.content  → tool_input.content
+ *   params.old_string → tool_input.old_string
+ *   sessionId       → session_id
+ *   durationMs      → duration_ms
+ *   error           → tool_input.error  (for after_tool_call failures)
+ */
+export function normalizeOpenClawStdin(raw: OpenClawStdin): HookStdin {
+  const event = OPENCLAW_EVENT_MAP[raw.hook_event_name] || raw.hook_event_name;
+
+  let toolName = (raw.toolName || '') as string;
+  toolName = OPENCLAW_TOOL_MAP[toolName] || toolName;
+
+  // Map OpenClaw params → CC tool_input format
+  const params = raw.params || {};
+  const ti: Record<string, unknown> = {};
+  if (typeof params.path === 'string') ti.file_path = params.path;
+  if (typeof params.command === 'string') ti.command = params.command;
+  if (typeof params.content === 'string') ti.content = params.content;
+  if (typeof params.old_string === 'string') ti.old_string = params.old_string;
+  if (typeof params.description === 'string') ti.description = params.description;
+  // Capture error from after_tool_call for tool.failure detection
+  if (typeof raw.error === 'string' && raw.error) ti.error = raw.error;
+
+  return {
+    hook_event_name: event,
+    tool_name: toolName,
+    tool_input: Object.keys(ti).length > 0 ? ti : undefined,
+    session_id: (raw.sessionId as string) || '',
+    duration_ms: typeof raw.durationMs === 'number' ? raw.durationMs : undefined,
+    source: 'openclaw',
+  };
+}
+
 function cmdAuto(): void {
   const data = parseStdin();
   if (!data?.hook_event_name) {
@@ -315,6 +405,42 @@ function cmdHermesAuto(): void {
   }
 }
 
+function cmdOpenClawAuto(): void {
+  const raw = parseStdin() as Record<string, unknown> | null;
+  if (!raw?.hook_event_name) {
+    process.exit(0);
+  }
+
+  const hookName = process.argv[3] || (raw.hook_event_name as string);
+
+  const data = normalizeOpenClawStdin(raw as OpenClawStdin);
+  if (data.hook_event_name === 'agent.end') {
+    // agent_end is a standalone event — not routed through mapEvents()
+    if (data.session_id) ENGINE.sessionId = data.session_id;
+    ENGINE.init();
+    const event = ENGINE.track('agent.end', {
+      session_id: data.session_id,
+      duration_ms: typeof raw.durationMs === 'number' ? raw.durationMs : undefined,
+      success: raw.success,
+    });
+    process.stderr.write(`[AGPA:OpenClaw] ${hookName} → agent.end (${event.event_id})\n`);
+    return;
+  }
+
+  const events = mapEvents(data.hook_event_name!, data);
+  if (events.length === 0) {
+    process.exit(0);
+  }
+
+  if (data.session_id) ENGINE.sessionId = data.session_id;
+  if (data.task_id) ENGINE.taskId = data.task_id;
+  ENGINE.init();
+  for (const { event_type, payload } of events) {
+    const event = ENGINE.track(event_type, payload);
+    process.stderr.write(`[AGPA:OpenClaw] ${hookName} → ${event_type} (${event.event_id})\n`);
+  }
+}
+
 // ── Main ──────────────────────────────────────────────────────
 
 // Only execute CLI when run directly (not via import in tests)
@@ -334,8 +460,11 @@ switch (cmd) {
   case 'hermes-auto':
     cmdHermesAuto();
     break;
+  case 'openclaw-auto':
+    cmdOpenClawAuto();
+    break;
   default:
-    process.stderr.write('Usage: hook.ts <track|poll|auto|hermes-auto> [args...]\n');
+    process.stderr.write('Usage: hook.ts <track|poll|auto|hermes-auto|openclaw-auto> [args...]\n');
     process.exit(1);
 }
 } // isMain

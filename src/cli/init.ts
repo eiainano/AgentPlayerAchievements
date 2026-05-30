@@ -27,6 +27,9 @@ const HOOK_HERMES_ENV = 'AGPA_TOOL_SOURCE=hermes';
 const HOOK_HERMES_AUTO = `${HOOK_HERMES_ENV} ${TSX_BIN} ${AGPA_HOOK} hermes-auto`;
 const HOOK_HERMES_TRACK_START = `${HOOK_HERMES_ENV} ${TSX_BIN} ${AGPA_HOOK} track session.start`;
 const HOOK_HERMES_TRACK_END = `${HOOK_HERMES_ENV} ${TSX_BIN} ${AGPA_HOOK} track session.end`;
+const HOOK_OPENCLAW_ENV = 'AGPA_TOOL_SOURCE=openclaw';
+const HOOK_OPENCLAW_AUTO = `${HOOK_OPENCLAW_ENV} ${TSX_BIN} ${AGPA_HOOK} openclaw-auto`;
+const HOOK_OPENCLAW_POLL = `${HOOK_OPENCLAW_ENV} ${TSX_BIN} ${AGPA_HOOK} poll`;
 
 // ── Per-tool init data (mcpInject + instructionFiles) ──────────────────
 
@@ -350,6 +353,68 @@ function injectHermesHooks(filePath: string, hookCommands: {
   return true;
 }
 
+// ── OpenClaw TS plugin injection ──────────────────────────────────────
+
+const OPENCLAW_PLUGIN_MARKER = '// agpa-openclaw-track';
+
+function generateOpenClawPlugin(): string {
+  return `${OPENCLAW_PLUGIN_MARKER}
+/**
+ * AGPA Auto-Track plugin for OpenClaw
+ * Registers 5 hooks → spawns hook.ts via stdin pipe → event.log
+ */
+import { spawn } from 'node:child_process';
+import { createRequire } from 'node:module';
+
+const TSX_BIN = '${TSX_BIN}';
+const HOOK_TS = '${AGPA_HOOK}';
+
+function track(hookName: string, payload: unknown) {
+  const child = spawn(TSX_BIN, [HOOK_TS, 'openclaw-auto', hookName], {
+    stdio: ['pipe', 'inherit', 'inherit'],
+    env: { ...process.env, AGPA_TOOL_SOURCE: 'openclaw' },
+  });
+  if (child.stdin) {
+    const json = JSON.stringify(payload);
+    child.stdin.write(json);
+    child.stdin.end();
+  }
+  child.unref();
+}
+
+export function register(api: any) {
+  api.on('session_start', (payload: unknown) => track('session_start', payload));
+  api.on('session_end', (payload: unknown) => {
+    track('session_end', payload);
+    // Also run poll at session end
+    const pollChild = spawn(TSX_BIN, [HOOK_TS, 'poll'], {
+      stdio: ['ignore', 'inherit', 'inherit'],
+      env: { ...process.env, AGPA_TOOL_SOURCE: 'openclaw' },
+    });
+    pollChild.unref();
+  });
+  api.on('before_tool_call', (payload: unknown) => track('before_tool_call', payload));
+  api.on('after_tool_call', (payload: unknown) => track('after_tool_call', payload));
+  api.on('agent_end', (payload: unknown) => track('agent_end', payload));
+}
+`;
+}
+
+function injectOpenClawPlugin(): boolean {
+  const extDir = path.join(homedir(), '.openclaw', 'extensions');
+  const pluginPath = path.join(extDir, 'agpa-track.ts');
+
+  // Idempotency: check if already injected
+  if (fs.existsSync(pluginPath)) {
+    const existing = fs.readFileSync(pluginPath, 'utf-8');
+    if (existing.includes(OPENCLAW_PLUGIN_MARKER)) return false;
+  }
+
+  fs.mkdirSync(extDir, { recursive: true });
+  fs.writeFileSync(pluginPath, generateOpenClawPlugin());
+  return true;
+}
+
 // ── Instruction file injection ─────────────────────────────────────────
 
 function injectInstructions(filePath: string, marker: string): boolean {
@@ -573,6 +638,16 @@ function initTool(
       }
     } else {
       console.log(`  \u{23ED}  Hooks:     (already present or config missing)`);
+    }
+  }
+
+  // ── Inject OpenClaw TS plugin ──────────────────────────────────────
+  if (toolDef.id === 'openclaw') {
+    const injected = injectOpenClawPlugin();
+    if (injected) {
+      console.log(`  ✅ Hooks:     OpenClaw TS plugin (extensions/agpa-track.ts)`);
+    } else {
+      console.log(`  ⏭  Hooks:     (plugin already present)`);
     }
   }
 

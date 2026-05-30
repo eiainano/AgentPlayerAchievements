@@ -1,10 +1,10 @@
 # AGPA 开发进度
 
-> 最后更新: 2026-05-30
+> 最后更新: 2026-05-31
 
 ## 总体状态
 
-v0.1.3 完成。Init 一键安装、Hook 合并注入、single_task 窗口、Surgeon 全自动 payload、evalStreak 事件连续模式、Hermes Agent auto-track。117 个成就全部可达成，81 个测试全绿。
+v0.2.0 完成。OpenClaw auto-track 落地——与 CC/Hermes 对齐的三工具 auto-track 架构。117 个成就全部可达成，106 个测试全绿。
 
 ---
 
@@ -82,7 +82,7 @@ v0.1.3 完成。Init 一键安装、Hook 合并注入、single_task 窗口、Sur
 |------|------|--------|
 | Claude Code | Hook `SessionStart` | ⭐⭐⭐⭐⭐ |
 | Hermes Agent | Shell hooks (4 events) | ⭐⭐⭐⭐⭐ |
-| OpenClaw | TS 插件 (36 hooks) | ⭐⭐⭐⭐ | 🔍 调研完成，待实现 |
+| OpenClaw | TS 插件 (36 hooks) | ⭐⭐⭐⭐⭐ | ✅ v0.2.0 完成 |
 | OpenCode | TS 插件 (event bus) | ⭐⭐⭐ | ⏸ 待调研 |
 | Kilo Code | TS 插件 (hook不可调MCP) | ⭐⭐ | ⏸ 待调研 |
 

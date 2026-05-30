@@ -2,6 +2,31 @@
 
 ---
 
+## 2026-05-31 (v0.2.0 — OpenClaw auto-track)
+
+### 完成
+- **OpenClaw auto-track 落地** — 三工具 auto-track 架构成型（CC + Hermes + OpenClaw）
+- **`openclaw-auto` 命令** — hook.ts 新增 stdin pipe 翻译层，OpenClaw 事件/工具/字段名 → CC 标准 `HookStdin`
+- **OpenClaw TS 插件** — `init.ts` 生成 `~/.openclaw/extensions/agpa-track.ts`，5 hook → spawn hook.ts + stdin pipe
+- **`agent.end` 事件类型** — EventType 联合新增，agent_end hook 独立路由
+- **+25 测试** — 翻译层全覆盖，81→106 tests
+- **文档** — CLAUDE.md 架构图重构（两通道对比）、multi-tool-research.md OpenClaw 节更新、CHANGELOG v0.2.0
+
+### 架构洞察
+OpenClaw 与 CC/Hermes 唯一区别：数据如何到达 hook.ts。
+- CC/Hermes：hook 管理器 spawn 子进程 + stdin pipe
+- OpenClaw：我们的 TS 插件 self-spawn 子进程 + stdin pipe
+翻译层和 mapEvents() 三者完全共享。CC/Hermes 零影响。
+
+### 改动文件
+- 修改：`src/cli/hook.ts`、`src/cli/init.ts`、`src/engine/types.ts`、`tests/cli/hook.test.ts`
+- 文档：`CLAUDE.md`、`CHANGELOG.md`、`DEVLOG.md`、`docs/multi-tool-research.md`、`docs/PROGRESS.md`、`docs/TODO.md`
+
+### Commits
+- `e8c570b` v0.2.0 OpenClaw auto-track
+
+---
+
 ## 2026-05-30 (v0.1.3 — init + evaluator + data consistency)
 
 ### 完成

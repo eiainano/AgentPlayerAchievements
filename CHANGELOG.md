@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.2.0] — 2026-05-31
+
+### OpenClaw Auto-Track
+
+OpenClaw 从"仅 MCP + 指令文件"升级为完整的 auto-track 支持，与 CC / Hermes 对齐。
+
+- **`openclaw-auto` 命令** — hook.ts 新增 stdin pipe 模式，翻译层（事件名/工具名/字段名）→ CC 标准 `HookStdin` → `mapEvents()` 复用
+- **OpenClaw TS 插件** — `init.ts` 生成 `~/.openclaw/extensions/agpa-track.ts`，注册 5 个 hook（session_start/end、before/after_tool_call、agent_end），异步 spawn hook.ts + stdin pipe，unref'd 不阻塞主进程
+- **幂等注入** — `injectOpenClawPlugin()` 检测 `agpa-openclaw-track` 标记，不重复注入
+- **`agent.end` 事件类型** — `EventType` 联合新增，`agent_end` hook 独立路由（不经过 `mapEvents()`）
+- **工具名映射** — `read_file`→`Read`, `write_file`→`Write`, `apply_patch`→`Edit`, `bash`→`Bash`, `glob`/`grep`
+- **+25 测试** — 翻译层全量覆盖（事件名×5、工具名×7、字段映射×5、集成×5、边界×3），81→106 tests
+
+### 文档更新
+
+- **CLAUDE.md** — 架构图从双线改为两通道对比图（MCP 主动调用 vs Hook 自动触发），加 Hook CLI 三工具对照表
+- **`docs/multi-tool-research.md`** — OpenClaw 节从"调研完成暂不做"→"方案已定待实现"→现已实现，补数据流图、为什么不能复用 CC/Hermes、工具名映射表
+
+### 架构要点
+
+OpenClaw 与 CC/Hermes 本质区别仅在于数据如何到达 hook.ts：
+- CC/Hermes：hook 管理器 spawn 子进程 + stdin pipe（操作系统行为）
+- OpenClaw：我们的 TS 插件在 `api.on()` 回调中自己 spawn 子进程 + stdin pipe
+
+翻译层和 `mapEvents()` 三者完全共享。CC / Hermes 零影响。
+
+### Tech Stack Unchanged
+
+Runtime: tsx, MCP: @modelcontextprotocol/sdk, Parsing: yaml, Validation: zod, Testing: vitest (106 tests, 6 files, all passing)
+
+---
+
 ## [0.1.3] — 2026-05-30
 
 ### Init: Zero-config One-command Setup

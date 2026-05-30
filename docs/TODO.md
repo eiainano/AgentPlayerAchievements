@@ -85,10 +85,13 @@
 - [x] **hermes-auto 命令** — hook.ts 翻译层（事件名/工具名/字段名映射）
 - [x] **Shell hook 注入** — init.ts 注入 4 个 hooks 到 ~/.hermes/config.yaml
 
-### 10. 🔍 OpenClaw 调研完成（暂不做适配）
+### 10. ✅ OpenClaw auto-track 落地
 - [x] 版本已更新：2026.4.14 → **2026.5.27**
 - [x] Hook 系统：36 个事件，含 `before_tool_call` / `after_tool_call` / `session_start` / `session_end` / `agent_end`
-- **暂不做**：接入需写 TypeScript 插件（非 shell stdin JSON 模式），投入 > Hermes
+- [x] **hook.ts `openclaw-auto` 命令** — stdin pipe 翻译层（事件名/工具名/字段名 → CC 标准）
+- [x] **TS 插件注入** — `init.ts` 生成 `~/.openclaw/extensions/agpa-track.ts`，5 hook → spawn hook.ts + stdin pipe
+- [x] **幂等** — `agpa-openclaw-track` 标记检测
+- [x] **+25 测试** — 翻译层全覆盖，106 tests 全绿
 
 ### 11. 🔍 Kilo Code / OpenCode 调研完成（暂不做）
 - [x] **本质是同一产品**：OpenCode v1.15.1 是 Kilo Code 的 rebrand + 原生二进制打包

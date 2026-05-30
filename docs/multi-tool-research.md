@@ -46,22 +46,28 @@
 
 ---
 
-## Kilo Code / OpenCode 🔍 （调研完成，暂不做）
+## Kilo Code 🔍 （调研完成，暂不做）
 
 ### 版本
 - **Kilo Code**: v7.2.31（npm global `@kilocode/cli`）
-- **OpenCode**: v1.15.1（`@anthropic-ai/opencode`）
-- **关系**：OpenCode 是 Kilo Code 的开源内核，共享同一套插件体系（`@kilocode/plugin` v7.2.31）
+- **插件包**: `@kilocode/plugin` v7.2.31
 
-### 插件体系
+## OpenCode 🔍 （调研完成，暂不做）
+
+### 版本
+- **OpenCode**: v1.15.1（原生 Mach-O 二进制，`~/.opencode/bin/opencode`）
+- **插件包**: `@opencode-ai/plugin` v1.14.22（独立于 Kilo Code）
+- **与 Kilo Code 的关系**：两个独立项目，但插件 API 结构一致
+
+### 插件体系（两个工具共用模式）
 
 **加载顺序**（后覆盖前）：
 1. 全局 config (`~/.config/kilo/config.jsonc` / `~/.config/opencode/opencode.json`)
 2. 项目 config (`opencode.json`)
-3. 全局插件目录 (`~/.config/opencode/plugins/`)
-4. 项目插件目录 (`.opencode/plugins/`)
+3. 全局插件目录
+4. 项目插件目录 (`.opencode/plugins/` / `.kilo/plugin/`)
 
-### Hooks API（`@kilocode/plugin` 类型定义）
+### Hooks API（Kilo Code / OpenCode 共享相同 hook key 列表）
 
 | Hook | 触发时机 | 关键 Payload | 可决策？ |
 |------|---------|-------------|---------|
@@ -104,5 +110,5 @@
 | Claude Code | ✅ | 低 | ✅ 已支持 |
 | Hermes Agent | ✅ | 低 | ✅ 已支持 |
 | OpenClaw | ❌ (TS 插件) | 中 | 🔍 调研完成 |
-| Kilo Code | ❌ (TS 插件) | 高 | 🔍 调研完成，待实现 |
-| OpenCode | ❌ (TS 插件) | 高 | 🔍 调研完成，待实现 |
+| Kilo Code | ❌ (TS 插件, `@kilocode/plugin`) | 高 | 🔍 调研完成，待实现 |
+| OpenCode | ❌ (TS 插件, `@opencode-ai/plugin`) | 高 | 🔍 调研完成，待实现 |

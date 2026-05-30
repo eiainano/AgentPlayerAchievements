@@ -91,9 +91,9 @@
 - **暂不做**：接入需写 TypeScript 插件（非 shell stdin JSON 模式），投入 > Hermes
 
 ### 11. 🔍 Kilo Code / OpenCode 调研完成（暂不做）
-- [x] **Kilo Code v7.2.31**：`@kilocode/plugin`，`tool.execute.before/after` + `event` 总线 + 17 hooks
-- [x] **OpenCode v1.15.1**：同插件体系，额外有 `experimental.hook` config 选项
-- **暂不做**：无 `session.start/end` hook，hook 内不可调 MCP，需 shell-out 或 HTTP fetch，投入大
+- [x] **Kilo Code v7.2.31**：`@kilocode/plugin`（17 hooks），`tool.execute.before/after` + event bus
+- [x] **OpenCode v1.15.1**：`@opencode-ai/plugin` v1.14.22，独立包但 API 与 Kilo Code 一致
+- **暂不做**：无 session.start/end hook，hook 内不可调 MCP，需 shell-out，投入大
 
 ---
 

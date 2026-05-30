@@ -114,6 +114,8 @@ export interface Condition {
   max_per_day?: number;
   // streak
   event_level?: boolean;
+  // metadata
+  unit?: string;
 }
 
 export type RarityLevel = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';

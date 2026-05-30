@@ -60,7 +60,7 @@
 
 ## P3 — YAML 质量提示（非阻塞）
 
-- [ ] **`unit: day` / `unit: tokens` 字段完全被忽略** — YAML 里有但不在 Condition 接口中，parser 也不读。token 成就应该从 `threshold`+`field` 来求和 token 量，而不是 counter。
+- [x] **`unit: day` / `unit: tokens` 字段** — Condition 接口 + parser 已支持 `unit` 字段。元数据标注，不影响评估逻辑，YAML 中 6 处使用全部保留。
 - [ ] **Hidden 分类占 22%** — 26 个隐藏成就是最大分类，可以考虑挪几个非隐藏的到更合适的分类。
 
 ---

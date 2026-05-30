@@ -73,8 +73,8 @@
 
 ## 🔵 P3 — 扩展/维护
 
-### 7. YAML 质量提升
-- [ ] `unit: day` / `unit: tokens` 字段被忽略
+### 7. ✅ YAML 质量提升
+- [x] `unit: day` / `unit: tokens` — Condition 接口 + parser 已支持 `unit` 字段（元数据标注，不影响评估逻辑）
 - [ ] Hidden 分类占 22%，考虑调整
 
 ### 8. ✅ 测试覆盖

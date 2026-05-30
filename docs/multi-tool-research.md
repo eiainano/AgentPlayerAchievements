@@ -46,28 +46,25 @@
 
 ---
 
-## Kilo Code 🔍 （调研完成，暂不做）
+## Kilo Code / OpenCode 🔍 （调研完成，暂不做）
+
+### 关系
+
+**本质上是同一个产品**。OpenCode v1.15.1 是 Kilo Code 的 rebrand + 原生 Mach-O 二进制打包版本：
+- 共享同一个插件 API 结构（类型定义仅 2 行 import 路径不同：`@kilocode/sdk` ↔ `@opencode-ai/sdk`）
+- 其余 300+ 行 hooks 类型定义完全一致
+- 二进制内同时包含 `opencode.ai` 和 `kilocode` 引用
 
 ### 版本
-- **Kilo Code**: v7.2.31（npm global `@kilocode/cli`）
-- **插件包**: `@kilocode/plugin` v7.2.31
-
-## OpenCode 🔍 （调研完成，暂不做）
-
-### 版本
-- **OpenCode**: v1.15.1（原生 Mach-O 二进制，`~/.opencode/bin/opencode`）
-- **插件包**: `@opencode-ai/plugin` v1.14.22（独立于 Kilo Code）
-- **与 Kilo Code 的关系**：两个独立项目，但插件 API 结构一致
-
-### 插件体系（两个工具共用模式）
-
-**加载顺序**（后覆盖前）：
+- **Kilo Code**: v7.2.31（npm `@kilocode/cli`，JS 脚本）
+- **OpenCode**: v1.15.1（Mach-O 二进制，`~/.opencode/bin/opencode`）
+- **插件包**: Kilo 用 `@kilocode/plugin` v7.2.31，OpenCode 用 `@opencode-ai/plugin` v1.14.22（import 路径不同，API 一致）
 1. 全局 config (`~/.config/kilo/config.jsonc` / `~/.config/opencode/opencode.json`)
 2. 项目 config (`opencode.json`)
 3. 全局插件目录
 4. 项目插件目录 (`.opencode/plugins/` / `.kilo/plugin/`)
 
-### Hooks API（Kilo Code / OpenCode 共享相同 hook key 列表）
+### Hooks API（`@kilocode/plugin` / `@opencode-ai/plugin` — 同一套 hook key 列表）
 
 | Hook | 触发时机 | 关键 Payload | 可决策？ |
 |------|---------|-------------|---------|
@@ -99,7 +96,7 @@
 
 ### 结论
 
-能做，但限制多。TS 插件 + shell-out 可行但不优雅。**优先级最低**——等 CC + Hermes + OpenClaw 都稳了再回来看。
+Kilo Code 和 OpenCode 是同一产品的两个发行版本。TS 插件方式能做但限制多：无 session 生命周期 hook + 无 MCP 访问。**优先级最低**——等 CC + Hermes + OpenClaw 稳了再说。
 
 ---
 
@@ -110,5 +107,4 @@
 | Claude Code | ✅ | 低 | ✅ 已支持 |
 | Hermes Agent | ✅ | 低 | ✅ 已支持 |
 | OpenClaw | ❌ (TS 插件) | 中 | 🔍 调研完成 |
-| Kilo Code | ❌ (TS 插件, `@kilocode/plugin`) | 高 | 🔍 调研完成，待实现 |
-| OpenCode | ❌ (TS 插件, `@opencode-ai/plugin`) | 高 | 🔍 调研完成，待实现 |
+| Kilo Code / OpenCode | ❌ (TS 插件) | 高 | 🔍 调研完成（同一产品） |

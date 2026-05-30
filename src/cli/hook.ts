@@ -67,7 +67,7 @@ function parseStdin(): HookStdin | null {
 
 // ── CC hook event → AGPA event mapping ────────────────────────
 
-function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_type: string; payload: Record<string, unknown> }> {
+export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_type: string; payload: Record<string, unknown> }> {
   const base: Record<string, unknown> = {};
   if (data.tool_name) base.tool_name = data.tool_name;
   if (data.agent_type) base.agent_type = data.agent_type;
@@ -228,6 +228,9 @@ function cmdAuto(): void {
 
 // ── Main ──────────────────────────────────────────────────────
 
+// Only execute CLI when run directly (not via import in tests)
+const isMain = process.argv[1]?.endsWith('hook.ts') || process.argv[1]?.endsWith('hook');
+if (isMain) {
 const cmd = process.argv[2];
 switch (cmd) {
   case 'track':
@@ -243,3 +246,4 @@ switch (cmd) {
     process.stderr.write('Usage: hook.ts <track|poll|auto> [args...]\n');
     process.exit(1);
 }
+} // isMain

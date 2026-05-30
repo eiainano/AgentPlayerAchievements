@@ -380,4 +380,123 @@ describe('evaluateAll', () => {
     const unlocked: Record<string, string> = { 'ach-1': '2025-01-01T00:00:00Z' };
     expect(evaluateAll(defs, events, unlocked)).toEqual([]);
   });
+
+  it('empty conditions array does not unlock', () => {
+    const defs = [
+      { id: 'empty-ach', conditions: [] },
+    ];
+    const events = [makeEvent('any.event')];
+    const unlocked: Record<string, string> = {};
+    expect(evaluateAll(defs, events, unlocked)).toEqual([]);
+  });
+});
+
+describe('evalThreshold metric path filtering', () => {
+  it('metric respects event type filter', () => {
+    const events = [
+      makeEvent('file.edit', { payload: { edit_lines: 5, total_file_lines: 100 } }),
+      makeEvent('conversation.message', { payload: { edit_lines: 999 } }),
+    ];
+    const cond: Condition = {
+      type: 'threshold', metric: 'edit_lines / total_file_lines', event: 'file.edit',
+      window: 'all', operator: '<', value: 0.1,
+    };
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({
+      met: true, progress: 0.05, target: 0.1,
+    });
+  });
+
+  it('metric respects filter expression', () => {
+    const events = [
+      makeEvent('file.edit', { payload: { edit_lines: 10, total_file_lines: 50, tool_name: 'Edit' } }),
+      makeEvent('file.edit', { payload: { edit_lines: 100, total_file_lines: 50, tool_name: 'Write' } }),
+    ];
+    const cond: Condition = {
+      type: 'threshold', metric: 'edit_lines / total_file_lines',
+      filter: "tool_name == 'Edit'", window: 'all', operator: '==', value: 0.2,
+    };
+    expect(evaluateCondition(cond, events).met).toBe(true);
+    expect(evaluateCondition(cond, events).progress).toBeCloseTo(0.2);
+  });
+
+  it('metric respects time window', () => {
+    const now = Date.now();
+    const events = [
+      makeEvent('file.edit', { timestamp: new Date(now - 1000).toISOString(), payload: { edit_lines: 3, total_file_lines: 60 } }),
+      makeEvent('file.edit', { timestamp: new Date(now - 3600001).toISOString(), payload: { edit_lines: 900, total_file_lines: 60 } }),
+    ];
+    const cond: Condition = {
+      type: 'threshold', metric: 'edit_lines / total_file_lines', window: '1h', operator: '<', value: 0.1,
+    };
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 0.05, target: 0.1 });
+  });
+});
+
+describe('single_task / same_task window', () => {
+  it('single_task uses task.complete as boundary', () => {
+    const events = [
+      makeEvent('file.edit', { payload: { file_path: 'a.ts' }, context: { session_id: 's1', model: 'auto' } }),
+      makeEvent('file.edit', { payload: { file_path: 'a.ts' }, context: { session_id: 's1', model: 'auto' } }),
+      makeEvent('file.edit', { payload: { file_path: 'a.ts' }, context: { session_id: 's1', model: 'auto' } }),
+      makeEvent('task.complete', { payload: {}, context: { session_id: 's1', model: 'auto' } }),
+      // above events are in a completed task, count=3
+      makeEvent('file.edit', { payload: { file_path: 'b.ts' }, context: { session_id: 's1', model: 'auto' } }),
+      // below events are in current (incomplete) task
+      makeEvent('file.edit', { payload: { file_path: 'c.ts' }, context: { session_id: 's1', model: 'auto' } }),
+      makeEvent('file.edit', { payload: { file_path: 'd.ts' }, context: { session_id: 's1', model: 'auto' } }),
+      makeEvent('task.complete', { payload: {}, context: { session_id: 's1', model: 'auto' } }),
+      // latest completed task has 3 edits: b.ts, c.ts, d.ts + task.complete
+    ];
+    const cond: Condition = {
+      type: 'counter', event: 'file.edit', window: 'single_task', value: 3, operator: '>=',
+    };
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 3, target: 3 });
+  });
+
+  it('same_task is recognized as task window', () => {
+    const events = [
+      makeEvent('task.complete', { payload: {}, context: { session_id: 's1', model: 'auto' } }),
+      makeEvent('file.edit', { payload: {}, context: { session_id: 's1', model: 'auto' } }),
+      makeEvent('file.edit', { payload: {}, context: { session_id: 's1', model: 'auto' } }),
+      makeEvent('task.complete', { payload: {}, context: { session_id: 's1', model: 'auto' } }),
+    ];
+    const cond: Condition = {
+      type: 'counter', event: 'file.edit', window: 'same_task', value: 2, operator: '>=',
+    };
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 2, target: 2 });
+  });
+});
+
+describe('evalStreak window / field / same_target', () => {
+  it('streak respects time window (not window:all)', () => {
+    const now = Date.now();
+    const events = [
+      makeEvent('daily', { timestamp: new Date(now - 86400000).toISOString() }),
+      makeEvent('daily', { timestamp: new Date(now - 2 * 86400000).toISOString() }),
+      makeEvent('daily', { timestamp: new Date(now - 3 * 86400000).toISOString() }),
+      makeEvent('daily', { timestamp: new Date(now - 10 * 86400000).toISOString() }), // outside 7d window
+    ];
+    const cond: Condition = { type: 'streak', event: 'daily', window: '7d', value: 3 };
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 3, target: 3 });
+  });
+
+  it('streak with same_target counts max streak per field value', () => {
+    const d = (daysAgo: number) => new Date(Date.now() - daysAgo * 86400000).toISOString();
+    const events = [
+      makeEvent('tool.use', { payload: { tool_name: 'Read' }, timestamp: d(3) }),
+      makeEvent('tool.use', { payload: { tool_name: 'Read' }, timestamp: d(2) }),
+      makeEvent('tool.use', { payload: { tool_name: 'Read' }, timestamp: d(1) }),
+      makeEvent('tool.use', { payload: { tool_name: 'Edit' }, timestamp: d(5) }),
+      makeEvent('tool.use', { payload: { tool_name: 'Edit' }, timestamp: d(4) }),
+      // Read: 3-day streak, Edit: 2-day streak (non-consecutive days apart?)
+      // Actually d(5), d(4) = 2 consecutive days. d(3), d(2), d(1) = 3 consecutive days
+    ];
+    const cond: Condition = {
+      type: 'streak', event: 'tool.use', field: 'tool_name', same_target: true,
+      window: 'all', value: 2, operator: '>=',
+    };
+    const result = evaluateCondition(cond, events);
+    expect(result.met).toBe(true);
+    expect(result.progress).toBe(3); // max streak is Read with 3
+  });
 });

@@ -12,6 +12,9 @@
 - **P2 数据一致性全清** — milestone 命名、set 成员补全、缺失 set 字段、im_sorry_dave 窗口
 - **P1 evaluator 4 项修复** — 空 conditions guard、evalMode target、set_id 删除、evalStreak 窗口
 - **storyteller 删除** — 不实现，成就数 118→117
+- **Surgeon 自动化** — hook.ts 从 Edit 的 `old_string` 提取 `edit_lines`，从磁盘读 `total_file_lines`（带路径遍历 guard）
+- **路径遍历 guard** — `fs.readFileSync` 限制在 cwd/home 内，拒绝 `..` 和绝对越界路径
+- **+25 单元测试** — evaluator (metric/task/streak×9) + hook mapEvents×16，55→80 tests (6 files)
 - **文档** — CHANGELOG v0.1.3、TODO.md、issues-todo.md、PROGRESS.md 全部同步
 
 ### 改动文件
@@ -25,6 +28,9 @@
 - `e6774c6` v0.1.3 init + evaluator + events
 - `697ba74` P2 data consistency  
 - `64e59e0` P1 evaluator hardening
+- `ee0a432` Surgeon payload (edit_lines + total_file_lines)
+- `c45f6df` Path traversal guard
+- `ca9f22d` 25 new unit tests (80 total)
 
 ---
 

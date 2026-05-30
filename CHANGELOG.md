@@ -46,6 +46,18 @@
 - **`set_id` removed** — dead code from Condition interface + yaml-parser (never read by any evaluator)
 - **evalStreak window/field/same_target** — now reads scopeEvents, time windows, field filtering, and same_target (consistent with all other evaluators)
 
+### Surgeon Achievement Unblocked
+
+- **hook.ts Edit payload** — extracts `edit_lines` from `tool_input.old_string`, `total_file_lines` from file on disk (within cwd/home boundary)
+- **Path traversal guard** — rejects `..` paths and absolute paths outside cwd/home
+- **Zero AGENTS.md dependency** — fully automatic from CC stdin data
+
+### Test Coverage (P3)
+
+- **+25 unit tests** — metric path filtering×3, single_task/same_task×2, empty conditions guard, streak window, streak same_target, hook mapEvents×16
+- **New test file** — `tests/cli/hook.test.ts` covering all 10 CC hook→AGPA event mappings
+- 55 → 80 tests (6 files), all passing
+
 ### Known Gaps (HOLD)
 
 - evalPercentile fallback thresholds (2 percentile achievements work, others need telemetry)
@@ -54,7 +66,7 @@
 
 ### Tech Stack Unchanged
 
-Runtime: tsx, MCP: @modelcontextprotocol/sdk, Parsing: yaml, Validation: zod, Testing: vitest (55 tests, 5 files, all passing)
+Runtime: tsx, MCP: @modelcontextprotocol/sdk, Parsing: yaml, Validation: zod, Testing: vitest (80 tests, 6 files, all passing)
 
 ---
 

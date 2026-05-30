@@ -1,6 +1,6 @@
 # AGPA — 今日 TODO
 
-> 日期: 2026-05-30 | 当前版本: v0.1.3 | 成就: 117 | Tests: 55 ✅
+> 日期: 2026-05-31 | 当前版本: v0.1.3 | 成就: 117 | Tests: 80 ✅
 
 ---
 
@@ -74,9 +74,9 @@
 - [ ] `unit: day` / `unit: tokens` 字段被忽略
 - [ ] Hidden 分类占 22%，考虑调整
 
-### 8. 测试覆盖
-- [ ] 为 fix 过的 evaluator 函数补充单元测试
-- [ ] hook.ts stdin 解析测试
+### 8. ✅ 测试覆盖
+- [x] evaluator 函数单测 — metric filtering×3、single_task/same_task×2、empty conditions、streak window、streak same_target
+- [x] hook.ts 测试 — mapEvents×16 覆盖全部 10 种 CC hook→AGPA 事件映射
 
 ### 9. 其余 4 工具的 auto-track 策略落地
 - [ ] Hermes: `on_session_end` hook
@@ -95,6 +95,9 @@
 4. [x] Hook payload 字段提取 ──────── 4 成就改 AGENTS.md + 2 成就改代码
 5. [x] 数据一致性问题 ────────────── P2 全清
 6. [x] P1 evaluator 4 项 ────────── 空 conditions + mode target + set_id + streak 窗口
+7. [x] Surgeon edit_lines payload ── hook.ts 自动提取，零 AGENTS.md 依赖
+8. [x] 路径遍历 guard ────────────── cwd/home 边界，拒绝 .. 和越界路径
+9. [x] +25 单元测试 ──────────────── 80 tests, 6 files
 ```
 
 > 关联文档: `docs/issues-todo.md`（Bug 追踪）、`docs/PROGRESS.md`（进度总览）

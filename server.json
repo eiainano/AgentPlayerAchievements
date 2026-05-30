@@ -2,12 +2,12 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
   "name": "io.github.agpa/agpa-server",
   "description": "Gamified achievement system for AI coding agents. Tracks events, evaluates conditions, and unlocks achievements as agents work.",
-  "version": "0.1.0",
+  "version": "0.1.3",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "agpa",
-      "version": "0.1.0"
+      "version": "0.1.3"
     }
   ]
 }

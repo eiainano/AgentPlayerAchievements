@@ -19,7 +19,7 @@
 
 - [x] **`plan.mode_activated` 无人 track** — `the_switch` 序列第一步永远匹配不上。AGENTS.md 里已有 `plan.mode_entered`（进 plan 模式），但 YAML 写的是 `plan.mode_activated`。两种修法：① 把 YAML 改成 `plan.mode_entered` ② AGENTS.md 补一个 `plan.mode_activated`。推荐①——`plan.mode_entered` 已经存在，语义一致。
 - [x] **`achievement.shared` 无人 track** — storyteller 已删除（不实现）。AGENTS.md 无需补事件。
-- [x] **`agent.complete` emit 了没人用** — SubagentStop hook 产生 `agent.complete` 事件，但 118 个成就里没一个引用。两个选项：① 删掉这个 emit ② 加一个成就来消费它。
+- [x] **`agent.complete` emit 了没人用** — SubagentStop 不再 emit agent.complete 事件。hook.ts 中 SubagentStop case 返回空数组（无成就依赖此事件）。
 - [x] **`git.revert_all` 在 AGENTS.md 但没成就用** — `scorched_earth` 删掉后就没消费者了。如果短期不打算加新成就，可以从 AGENTS.md 删掉这条。
 
 ---

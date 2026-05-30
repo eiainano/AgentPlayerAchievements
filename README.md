@@ -10,12 +10,8 @@
 # 1. 安装依赖
 npm install
 
-# 2. 注册到你的 Agent 工具（自动配置 MCP 和 hook）
-npx tsx src/cli/init.ts --tool claude-code
-# npx tsx src/cli/init.ts --tool kilocode
-# npx tsx src/cli/init.ts --tool opencode
-# npx tsx src/cli/init.ts --tool hermes
-# npx tsx src/cli/init.ts --tool openclaw
+# 2. 注册到你的 Agent 工具（自动检测并配置所有工具）
+npm run init
 
 # 3. 启动 Dashboard 看看
 npm run dashboard
@@ -59,14 +55,14 @@ npx tsx src/cli/dashboard.ts 8080
 
 | 命令 | 用途 |
 |------|------|
-| `hook.ts track <event_type>` | 记录一个事件（hook 自动调用） |
-| `hook.ts poll` | 评估成就条件（hook 自动调用） |
-| `hook.ts auto` | 读取 CC hook stdin JSON 自动映射 AGPA 事件 |
-| `dashboard.ts [port]` | 启动仪表盘 |
-| `doctor.ts` | 诊断系统状态 |
-| `init.ts --tool <name>` | 注册到 Agent 工具 |
-| `mvp.ts demo` | 生成 MVP 演示数据 |
-| `mvp.ts stats` | 查看成就进度 |
+| `npm run init` | 自动检测并注册到 Agent 工具 |
+| `npm run doctor` | 诊断系统状态 |
+| `npm run dashboard` | 启动仪表盘 (localhost:3867) |
+| `npm run hook-auto` | stdin JSON → AGPA 事件（hook 自动调用） |
+| `npm run hook-track <event>` | 手动记录事件 |
+| `npm run hook-poll` | 评估成就条件 |
+| `npm run demo` | 生成 MVP 演示数据 |
+| `npm run stats` | 查看成就进度 |
 
 ## macOS 通知
 
@@ -113,7 +109,7 @@ tools/                      # 像素画生成工具
 ├── preview.html            # 像素画预览
 ├── pixelart-*.png          # 像素画素材
 
-04-成就定义清单.yaml         # 118 个完整成就定义
+04-成就定义清单.yaml         # 117 个完整成就定义
 ```
 
 ## 成就定义
@@ -131,7 +127,6 @@ tools/                      # 像素画生成工具
 ```bash
 npm run build    # 编译检查
 npm run test     # 运行测试
-npm run dev      # 开发模式
 ```
 
 ## 依赖

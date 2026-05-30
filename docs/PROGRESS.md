@@ -86,8 +86,6 @@ v0.1.3 完成。Init 一键安装、Hook 合并注入、single_task 窗口、Sur
 | OpenCode | `session.idle` 近似 | ⭐⭐⭐ |
 | Kilo Code | 指令驱动（hook 不可调 MCP） | ⭐⭐⭐ |
 
-- [x] **测试覆盖**：80 tests, 6 files（evaluator 35 + integration 4 + yaml-parser 16 + api 4 + dashboard 1 + hook 16）
-
 ### 低优先级（v1.0）
 - [ ] 全球统计 opt-in + 稀有度动态计算
 - [ ] agpa export/import

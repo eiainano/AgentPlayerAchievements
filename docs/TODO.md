@@ -84,9 +84,16 @@
 ### 9. ✅ Hermes Agent auto-track 落地
 - [x] **hermes-auto 命令** — hook.ts 翻译层（事件名/工具名/字段名映射）
 - [x] **Shell hook 注入** — init.ts 注入 4 个 hooks 到 ~/.hermes/config.yaml
-- [ ] OpenClaw: `command:new` hook
-- [ ] OpenCode: `session.idle` 近似
-- [ ] Kilo Code: 指令驱动（hook 不可调 MCP）
+
+### 10. 🔍 OpenClaw 调研完成（暂不做适配）
+- [x] 版本已更新：2026.4.14 → **2026.5.27**
+- [x] Hook 系统：36 个事件，含 `before_tool_call` / `after_tool_call` / `session_start` / `session_end` / `agent_end`
+- **暂不做**：接入需写 TypeScript 插件（非 shell stdin JSON 模式），投入 > Hermes
+
+### 11. ⏸ Kilo Code / OpenCode 调研（暂不做）
+- Kilo Code v7.2.31：插件体系，`tool.execute.before` / `tool.execute.after` + event bus
+- OpenCode v1.15.1：Kilo Code 开源内核，同插件体系
+- **暂不做**：hook 不可调 MCP tool，需写 TS 插件，投入大
 
 ---
 

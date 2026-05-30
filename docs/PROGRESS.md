@@ -82,9 +82,9 @@ v0.1.3 完成。Init 一键安装、Hook 合并注入、single_task 窗口、Sur
 |------|------|--------|
 | Claude Code | Hook `SessionStart` | ⭐⭐⭐⭐⭐ |
 | Hermes Agent | Shell hooks (4 events) | ⭐⭐⭐⭐⭐ |
-| OpenClaw | `command:new` hook | ⭐⭐⭐⭐ |
-| OpenCode | `session.idle` 近似 | ⭐⭐⭐ |
-| Kilo Code | 指令驱动（hook 不可调 MCP） | ⭐⭐⭐ |
+| OpenClaw | TS 插件 (36 hooks) | ⭐⭐⭐⭐ | 🔍 调研完成，待实现 |
+| OpenCode | TS 插件 (event bus) | ⭐⭐⭐ | ⏸ 待调研 |
+| Kilo Code | TS 插件 (hook不可调MCP) | ⭐⭐ | ⏸ 待调研 |
 
 ### 低优先级（v1.0）
 - [ ] 全球统计 opt-in + 稀有度动态计算

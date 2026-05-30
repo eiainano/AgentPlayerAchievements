@@ -54,7 +54,7 @@ describe('evaluateCondition', () => {
       makeEvent('daily', { timestamp: '2025-01-02T00:00:00Z' }),
       makeEvent('daily', { timestamp: '2025-01-01T00:00:00Z' }),
     ];
-    const cond: Condition = { type: 'streak', event: 'daily', value: 3 };
+    const cond: Condition = { type: 'streak', event: 'daily', value: 3, window: 'all' };
     expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 3, target: 3 });
   });
 
@@ -64,7 +64,7 @@ describe('evaluateCondition', () => {
       makeEvent('daily', { timestamp: '2025-01-03T00:00:00Z' }), // gap on the 4th
       makeEvent('daily', { timestamp: '2025-01-02T00:00:00Z' }),
     ];
-    const cond: Condition = { type: 'streak', event: 'daily', value: 3 };
+    const cond: Condition = { type: 'streak', event: 'daily', value: 3, window: 'all' };
     expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: false, progress: 1, target: 3 });
   });
 
@@ -323,7 +323,7 @@ describe('evaluateCondition', () => {
       makeEvent('task.complete', { payload: { manual_edits: 5 }, timestamp: '2025-06-01T00:00:00Z' }),
     ];
     const cond: Condition = {
-      type: 'streak', event: 'task.complete', filter: "manual_edits == 0", operator: '>=', value: 2,
+      type: 'streak', event: 'task.complete', filter: "manual_edits == 0", operator: '>=', value: 2, window: 'all',
     };
     // Only the two manual_edits==0 events count → 2-day streak
     expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 2, target: 2 });
@@ -334,7 +334,7 @@ describe('evaluateCondition', () => {
       makeEvent('daily', { timestamp: '2025-06-03T00:00:00Z' }),
       makeEvent('daily', { timestamp: '2025-06-02T00:00:00Z' }),
     ];
-    const cond: Condition = { type: 'streak', event: 'daily', operator: '==', value: 2 };
+    const cond: Condition = { type: 'streak', event: 'daily', operator: '==', value: 2, window: 'all' };
     expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 2, target: 2 });
   });
 

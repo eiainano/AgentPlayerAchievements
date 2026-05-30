@@ -106,7 +106,6 @@ function buildCondition(type: ConditionType, cond: Record<string, unknown>): Con
     field: str(cond, 'field'),
     sequence: strArr(cond, 'sequence') || strArr(cond, 'events'),
     pattern: cond.pattern && (typeof cond.pattern === 'string' || Array.isArray(cond.pattern)) ? cond.pattern as string | string[] : undefined,
-    set_id: str(cond, 'set_id'),
     numerator: str(cond, 'numerator'),
     denominator: str(cond, 'denominator'),
     rarity: str(cond, 'rarity'),

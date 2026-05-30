@@ -323,13 +323,51 @@ function evalOp(op: ConditionOperator, actual: number, target: number): boolean 
 }
 
 function evalStreak(events: TrackedEvent[], cond: Condition): EvaluationResult {
+  events = scopeEvents(events, cond);
+  const sessionWindow = isSessionWindow(cond);
+  const windowMs = sessionWindow ? 0 : parseWindow(cond.window || '24h');
+  const now = Date.now();
+
   const days = new Set<string>();
   for (const e of events) {
     if (e.event_type !== cond.event) continue;
+    if (!sessionWindow && now - new Date(e.timestamp).getTime() > windowMs) continue;
     if (cond.filter && !matchFilter(e, cond.filter)) continue;
     if (!matchRole(e, cond.role)) continue;
+    if (cond.field && !getField(e, cond.field)) continue;
     days.add(e.timestamp.slice(0, 10));
   }
+
+  if (cond.same_target && cond.field) {
+    // Find max streak for any single field value
+    const byTarget: Record<string, Set<string>> = {};
+    for (const e of events) {
+      if (e.event_type !== cond.event) continue;
+      if (!sessionWindow && now - new Date(e.timestamp).getTime() > windowMs) continue;
+      if (cond.filter && !matchFilter(e, cond.filter)) continue;
+      if (!matchRole(e, cond.role)) continue;
+      const val = getField(e, cond.field);
+      if (!val) continue;
+      if (!byTarget[val]) byTarget[val] = new Set();
+      byTarget[val]!.add(e.timestamp.slice(0, 10));
+    }
+    let maxStreak = 0;
+    for (const targetDays of Object.values(byTarget)) {
+      const sorted = [...targetDays].sort().reverse();
+      let streak = 1;
+      for (let i = 0; i < sorted.length - 1; i++) {
+        const d1 = new Date(sorted[i]!);
+        const d2 = new Date(sorted[i + 1]!);
+        if ((d1.getTime() - d2.getTime()) / 86400000 <= 1) streak++;
+        else break;
+      }
+      if (streak > maxStreak) maxStreak = streak;
+    }
+    const target = cond.value;
+    const op: ConditionOperator = cond.operator || '>=';
+    return { met: evalOp(op, maxStreak, target), progress: maxStreak, target };
+  }
+
   const sorted = [...days].sort().reverse();
   if (sorted.length === 0) return { met: false, progress: 0, target: cond.value };
 
@@ -456,7 +494,7 @@ function evalMode(events: TrackedEvent[], cond: Condition): EvaluationResult {
     total++;
   }
 
-  if (total === 0) return { met: false, progress: 0, target: cond.value };
+  if (total === 0) return { met: false, progress: 0, target: Math.round((cond.threshold ?? cond.value) * 100) };
 
   let modeVal = '';
   let modeCount = 0;
@@ -669,6 +707,7 @@ export function evaluateAll(
   const newlyUnlocked: string[] = [];
   for (const def of definitions) {
     if (unlocked[def.id]) continue;
+    if (def.conditions.length === 0) continue; // empty conditions = never unlock
 
     const allMet = def.conditions.every(c => {
       if (c.type === 'set_completion') {

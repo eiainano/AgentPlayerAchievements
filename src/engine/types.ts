@@ -89,7 +89,6 @@ export interface Condition {
   field?: string;
   sequence?: string[];
   pattern?: string[] | string;
-  set_id?: string;
   numerator?: Condition | string;
   denominator?: Condition | string;
   // set_completion

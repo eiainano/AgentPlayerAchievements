@@ -54,6 +54,21 @@
 
 ---
 
+## 🟡 P1 — Evaluator 边角问题 (3 HOLD + 4 已修)
+
+### ✅ 7. 已修
+- [x] 空 conditions 提前解锁 — guard added
+- [x] evalMode target 不一致 — 统一为 `Math.round((cond.threshold ?? cond.value) * 100)`
+- [x] Condition.set_id 死代码 — 从 types.ts + yaml-parser.ts 删除
+- [x] evalStreak 不读 window/field/same_target — scopeEvents + window + field/same_target 支持已补
+
+### ⏸ HOLD
+- [ ] evalPercentile 硬编码回退 — 当前 2 个成就刚好命中，等 telemetry 基础设施
+- [ ] matchFilter 上下文只有 8 个字段 — 受影响成就已改手动 track，无影响
+- [ ] evalStreak 日历日 vs 事件连续 — ten_task_no_edit 语义偏差，需单独讨论
+
+---
+
 ## 🔵 P3 — 扩展/维护
 
 ### 7. YAML 质量提升
@@ -80,6 +95,7 @@
 3. [x] evalThreshold metric window ── metric 路径过滤 + single_task 边界推断
 4. [x] Hook payload 字段提取 ──────── 4 成就改 AGENTS.md + 2 成就改代码
 5. [x] 数据一致性问题 ────────────── P2 全清
+6. [x] P1 evaluator 4 项 ────────── 空 conditions + mode target + set_id + streak 窗口
 ```
 
 > 关联文档: `docs/issues-todo.md`（Bug 追踪）、`docs/PROGRESS.md`（进度总览）

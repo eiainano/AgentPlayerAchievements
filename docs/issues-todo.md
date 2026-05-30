@@ -38,12 +38,12 @@
 
 - [x] **sequence（非连续模式）忽略 window** — `the_debugger`、`the_switch`、`full_cycle`、`true_vibe_coder`、`u_turn`、`the_negotiator` 在 YAML 里指定了 `window: single_task` 或 `single_session`，但标准有序 sequence 分支不读 window。事件跨多天也不会重置。
 - [x] **evalThreshold metric 路径忽略 window/filter/event/role** — metric 分支现在做完整的 event/window/filter/role 过滤，`single_task` 用 task.complete 边界推断，`same_task` 也被正确识别。
-- [ ] **空 conditions 数组提前解锁** — `[].every(f)` 永远返回 true，无条件的成就每次 poll 都会解锁（但目前 YAML 里没有无条件的成就，parser 对空返回 `[]` 而不是遗漏键）。
-- [ ] **evalMode 提前返回 target 不一致** — 无事件时返回 `target: cond.value`（通常是 0），有事件时返回 `target: Math.round(threshold * 100)`。如果 YAML 同时设了 value 和 threshold，两路径返回不同 target 显示给 Dashboard。
-- [ ] **evalPercentile 硬编码回退阈值** — `FALLBACK_THRESHOLDS` 只有一个 metric，两个百分位值。其他 metric 在无 telemetry server 时永远 false。
-- [ ] **matchFilter 上下文只有 8 个字段** — filter 表达式只能引用 tool_name/file_type/command/file_path/agent_involved/manual_edits/issues_found/event_type。任何其他 payload field 解析为空字符串，in/matches/contains 检查静默失败。
-- [ ] **`evalStreak` 是日历日连续而非事件连续** — 截断到日期级别统计，不是"连续 N 个事件"。这对基于天数的成就（streak_7/30/100）是对的，但对 `ten_task_no_edit`（"连续 10 个无编辑的 task"）可能是语义偏差——除非 "task" 可能一天多个。
-- [ ] **Condition.set_id 字段是死代码** — types.ts 定义了，parser 解析了，但没有任何 eval 函数读取。evalSetCompletion 按 rarity 过滤而非 set_id。
+- [x] **空 conditions 数组提前解锁** — guard: `if (def.conditions.length === 0) continue;`
+- [x] **evalMode 提前返回 target 不一致** — 无事件路径改为 `Math.round((cond.threshold ?? cond.value) * 100)`
+- [ ] **evalPercentile 硬编码回退阈值** — HOLD，等 telemetry 基础设施。当前 2 个 percentile 成就刚好命中唯一回退值。
+- [ ] **matchFilter 上下文只有 8 个字段** — HOLD。受影响成就已改为手动 track，无实际影响。
+- [ ] **`evalStreak` 日历日 vs 事件连续** — HOLD。ten_task_no_edit 语义偏差需单独讨论。
+- [x] **Condition.set_id 字段** — 从 types.ts + yaml-parser.ts 删除，dead code。
 
 ---
 
@@ -54,7 +54,7 @@
 - [x] **`mythic_completionist`** — 加入 completionist 的 achievements 列表。
 - [x] **8 个成就缺 `set:` 字段** — the_beginning ×4 / collectors_soul ×1 / devops_triad ×3 已补。
 - [x] **`im_sorry_dave` 无时间窗口** — 两个 condition 加 `window: single_session`。
-- [ ] **`evalStreak` 不读 role/window/field/same_target** — 这些字段当前没需求但以后用 streak 过滤特定角色事件时会导致静默失败。
+- [x] **`evalStreak` 不读 role/window/field/same_target** — scopeEvents + window/filter + field/same_target 支持已补。
 
 ---
 

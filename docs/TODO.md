@@ -90,10 +90,10 @@
 - [x] Hook 系统：36 个事件，含 `before_tool_call` / `after_tool_call` / `session_start` / `session_end` / `agent_end`
 - **暂不做**：接入需写 TypeScript 插件（非 shell stdin JSON 模式），投入 > Hermes
 
-### 11. ⏸ Kilo Code / OpenCode 调研（暂不做）
-- Kilo Code v7.2.31：插件体系，`tool.execute.before` / `tool.execute.after` + event bus
-- OpenCode v1.15.1：Kilo Code 开源内核，同插件体系
-- **暂不做**：hook 不可调 MCP tool，需写 TS 插件，投入大
+### 11. 🔍 Kilo Code / OpenCode 调研完成（暂不做）
+- [x] **Kilo Code v7.2.31**：`@kilocode/plugin`，`tool.execute.before/after` + `event` 总线 + 17 hooks
+- [x] **OpenCode v1.15.1**：同插件体系，额外有 `experimental.hook` config 选项
+- **暂不做**：无 `session.start/end` hook，hook 内不可调 MCP，需 shell-out 或 HTTP fetch，投入大
 
 ---
 

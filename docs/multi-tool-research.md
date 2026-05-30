@@ -46,13 +46,54 @@
 
 ---
 
-## Kilo Code / OpenCode ⏸
+## Kilo Code / OpenCode 🔍 （调研完成，暂不做）
 
-- **Kilo Code**：v7.2.31，插件体系`.tool.execute.before` / `tool.execute.after` + SSE event bus
-- **OpenCode**：v1.15.1，Kilo Code 开源内核，同体系
-- **接入方式**：TypeScript 插件
-- **限制**：hook 内不能调 MCP tool（架构限制），只能用指令驱动
-- **结论**：能做，但效果打折。低优先级。
+### 版本
+- **Kilo Code**: v7.2.31（npm global `@kilocode/cli`）
+- **OpenCode**: v1.15.1（`@anthropic-ai/opencode`）
+- **关系**：OpenCode 是 Kilo Code 的开源内核，共享同一套插件体系（`@kilocode/plugin` v7.2.31）
+
+### 插件体系
+
+**加载顺序**（后覆盖前）：
+1. 全局 config (`~/.config/kilo/config.jsonc` / `~/.config/opencode/opencode.json`)
+2. 项目 config (`opencode.json`)
+3. 全局插件目录 (`~/.config/opencode/plugins/`)
+4. 项目插件目录 (`.opencode/plugins/`)
+
+### Hooks API（`@kilocode/plugin` 类型定义）
+
+| Hook | 触发时机 | 关键 Payload | 可决策？ |
+|------|---------|-------------|---------|
+| `tool.execute.before` | 工具调用前 | `{tool, sessionID, callID}` → mutate `output.args` | ✅ args rewrite |
+| `tool.execute.after` | 工具调用后 | `{tool, sessionID, callID, args}` → mutate `output.title/output/metadata` | ✅ output rewrite |
+| `chat.message` | 新用户消息 | `{sessionID, agent, model}` → mutate `output.message/parts` | ✅ |
+| `chat.params` | LLM 参数发送前 | `{sessionID, model}` → mutate `output.temperature/topP/maxOutputTokens` | ✅ |
+| `chat.headers` | LLM HTTP 头 | → mutate `output.headers` | ✅ |
+| `permission.ask` | 权限请求 | → `output.status = "ask" \| "deny" \| "allow"` | ✅ |
+| `command.execute.before` | 斜杠命令 | `{command, sessionID, arguments}` → `output.parts` | ✅ |
+| `config` | 启动时 | 全量配置（只读） | ❌ |
+| `event` | **全局事件总线** | 所有 Bus event（含 `session.idle` / `session.created` / `session.deleted`） | ❌ 只读 |
+| `auth` | 认证注册 | 注册 OAuth / API Key 方法 | — |
+| `provider` | 模型提供者注册 | 动态注入 model catalog | — |
+| `shell.env` | Shell 执行前 | 注入环境变量 | ✅ |
+| `experimental.chat.messages.transform` | 消息发 LLM 前 | 改写完整 message history | ✅ |
+| `experimental.chat.system.transform` | System prompt 发前 | 改写 system prompt | ✅ |
+| `experimental.session.compacting` | 压缩前 | 注入上下文 / 替换 compaction prompt | ✅ |
+| `experimental.text.complete` | LLM 输出后 | 后处理文本 | ✅ |
+| `tool.definition` | 工具定义发模型前 | 改写工具描述和参数 | ✅ |
+
+### 核心缺陷
+
+1. **没有 `session.start` / `session.end` hook** — 只能通过 `event` 总线监听 `session.idle` / `session.created` / `session.deleted`，但 `event` 是只读的，不适合做 track
+2. **hook 内不能直接调 MCP** — Kilo Code 的 MCP 在 hook 执行期间不可用，只能：
+   - 方案 A：`child_process.spawn` 调 `hook.ts track ...`
+   - 方案 B：HTTP fetch 到 stats-server 间接写 event.log
+3. **OpenCode 有 experimental config hooks** — `opencode.json` 里可以声明 `experimental.hook.session_completed` + shell 命令，但当前是 experimental，不可靠
+
+### 结论
+
+能做，但限制多。TS 插件 + shell-out 可行但不优雅。**优先级最低**——等 CC + Hermes + OpenClaw 都稳了再回来看。
 
 ---
 
@@ -63,5 +104,5 @@
 | Claude Code | ✅ | 低 | ✅ 已支持 |
 | Hermes Agent | ✅ | 低 | ✅ 已支持 |
 | OpenClaw | ❌ (TS 插件) | 中 | 🔍 调研完成 |
-| Kilo Code | ❌ (TS 插件) | 高 | ⏸ 待调研 |
-| OpenCode | ❌ (TS 插件) | 高 | ⏸ 待调研 |
+| Kilo Code | ❌ (TS 插件) | 高 | 🔍 调研完成，待实现 |
+| OpenCode | ❌ (TS 插件) | 高 | 🔍 调研完成，待实现 |

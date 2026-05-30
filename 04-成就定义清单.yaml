@@ -122,6 +122,7 @@ definitions:
     category: onboarding
     rarity: common
     hidden: false
+    set: the_beginning
     conditions:
       - type: counter
         event: model.switch
@@ -136,6 +137,7 @@ definitions:
     category: onboarding
     rarity: common
     hidden: false
+    set: the_beginning
     conditions:
       - type: counter
         event: worktree.created
@@ -150,6 +152,7 @@ definitions:
     category: onboarding
     rarity: uncommon
     hidden: false
+    set: the_beginning
     conditions:
       - type: counter
         event: mcp.server_used
@@ -164,6 +167,7 @@ definitions:
     category: onboarding
     rarity: uncommon
     hidden: false
+    set: the_beginning
     conditions:
       - type: counter
         event: image.read
@@ -177,7 +181,7 @@ definitions:
     name: "Double Digits"
     description: "10 个 task 完成。你已经不是新手了。"
     icon: "🔟"
-    category: milestone
+    category: milestones
     rarity: uncommon
     hidden: false
     progress_trackable: true
@@ -192,7 +196,7 @@ definitions:
     name: "Century"
     description: "100 个 task。你开始怀疑没有 agent 的日子是怎么过的。"
     icon: "💯"
-    category: milestone
+    category: milestones
     rarity: rare
     hidden: false
     progress_trackable: true
@@ -207,7 +211,7 @@ definitions:
     name: "Millennium"
     description: "1000 个 task。你和 agent 已是一种共生关系。"
     icon: "🏆"
-    category: milestone
+    category: milestones
     rarity: epic
     hidden: false
     progress_trackable: true
@@ -222,7 +226,7 @@ definitions:
     name: "Marathon"
     description: "单 session 持续超过 3 小时。你还活着吗？"
     icon: "🏃"
-    category: milestone
+    category: milestones
     rarity: uncommon
     hidden: false
     conditions:
@@ -236,7 +240,7 @@ definitions:
     name: "Streak 7"
     description: "连续 7 天使用。agent 已经是你的日常。"
     icon: "🔥"
-    category: milestone
+    category: milestones
     rarity: uncommon
     hidden: false
     progress_trackable: true
@@ -251,7 +255,7 @@ definitions:
     name: "Streak 30"
     description: "连续 30 天。不仅是工具，是生活方式。"
     icon: "📅"
-    category: milestone
+    category: milestones
     rarity: rare
     hidden: false
     progress_trackable: true
@@ -266,7 +270,7 @@ definitions:
     name: "Streak 100"
     description: "连续 100 天。应该给你做个纪录片。"
     icon: "🎬"
-    category: milestone
+    category: milestones
     rarity: legendary
     hidden: false
     progress_trackable: true
@@ -281,7 +285,7 @@ definitions:
     name: "Polyglot"
     description: "agent 对话涉及过 5 种以上编程语言。"
     icon: "🌐"
-    category: milestone
+    category: milestones
     rarity: uncommon
     hidden: false
     conditions:
@@ -625,6 +629,7 @@ definitions:
     category: tool_mastery
     rarity: epic
     hidden: false
+    set: collectors_soul
     progress_trackable: true
     conditions:
       - type: distinct_count
@@ -655,6 +660,7 @@ definitions:
     category: workflow
     rarity: uncommon
     hidden: false
+    set: devops_triad
     conditions:
       - type: counter
         event: git.pr_created
@@ -669,6 +675,7 @@ definitions:
     category: workflow
     rarity: rare
     hidden: false
+    set: devops_triad
     conditions:
       - type: counter
         event: file.create
@@ -739,6 +746,7 @@ definitions:
     category: workflow
     rarity: common
     hidden: false
+    set: devops_triad
     conditions:
       - type: counter
         event: git.commit
@@ -1268,9 +1276,11 @@ definitions:
     conditions:
       - type: sequence
         events: ["tool.requested", "tool.deny"]
+        window: single_session
       - type: pattern_match
         event: conversation.message
         pattern: "I'm sorry.*can't.*|I'm afraid.*can't.*|抱歉.*无法.*"
+        window: single_session
 
   - id: early_bird
     name: "Early Bird"
@@ -1791,7 +1801,7 @@ sets:
 
   agent_commander:
     name: "Agent Commander"
-    achievements: [full_auto, chain_reaction, architect, surgeon]
+    achievements: [full_auto, chain_reaction, architect, surgeon, bounce_back]
     reward: { type: showcase_border, value: "gold" }
 
   the_bug_catcher:
@@ -1826,5 +1836,5 @@ sets:
 
   completionist:
     name: "Completionist"
-    achievements: [completionist_bronze, completionist_silver, completionist_gold]
+    achievements: [completionist_bronze, completionist_silver, completionist_gold, mythic_completionist]
     reward: { type: badge, value: "100% Complete" }

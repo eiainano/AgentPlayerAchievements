@@ -49,11 +49,11 @@
 
 ## P2 — 数据一致性
 
-- [ ] **Category 枚举 `milestone` vs `milestones`** — YAML 里是单数 `milestone`，Dashboard app.js 里 `CATEGORY_NAMES.en` 是复数 `milestones`。Dashboard 会显示裸字符串 "milestone" 而非翻译名，影响 8 个成就。
-- [ ] **`bounce_back` 声明 set: agent_commander 但不在 sets 列表里** — 成就上写了 `set: agent_commander`，但 sets 块里 agent_commander 的 achievements 列表只有 4 个（full_auto/chain_reaction/architect/surgeon），不包含 bounce_back。
-- [ ] **`mythic_completionist` 声明 set: completionist 但不在 sets 列表里** — 同上，sets 块里的 completionist 只有 3 个（completionist_bronze/silver/gold），不包含 mythic_completionist。
-- [ ] **8 个成就列在 sets 里但没有 `set:` 字段** — model_hopper/worktree_trial/mcp_first_contact/visual_prompt(属于 the_beginning)；mcp_explorer(属于 collectors_soul)；auto_committer/pr_champion/cicd_pioneer(属于 devops_triad)。成就卡片不展示所属套装。
-- [ ] **`im_sorry_dave` 无时间窗口** — 两个条件（sequence + pattern_match）都没有 window，跨月的 tool.deny + 跨月的道歉消息也能触发。设计意图是"同一次对话中发生"，应该加窗口或靠 Agent 感知时刻 track。
+- [x] **Category 枚举** — YAML `milestone` → `milestones`，与 Dashboard 对齐，8 成就修复。
+- [x] **`bounce_back`** — 加入 agent_commander 的 achievements 列表。
+- [x] **`mythic_completionist`** — 加入 completionist 的 achievements 列表。
+- [x] **8 个成就缺 `set:` 字段** — the_beginning ×4 / collectors_soul ×1 / devops_triad ×3 已补。
+- [x] **`im_sorry_dave` 无时间窗口** — 两个 condition 加 `window: single_session`。
 - [ ] **`evalStreak` 不读 role/window/field/same_target** — 这些字段当前没需求但以后用 streak 过滤特定角色事件时会导致静默失败。
 
 ---

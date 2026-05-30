@@ -43,14 +43,14 @@
 
 ## 🟢 P2 — 数据一致性
 
-### 5. 命名不一致
-- [ ] Category `milestone` vs `milestones`（YAML vs Dashboard）
-- [ ] bounce_back 声明 set: agent_commander 但不在 sets 列表
-- [ ] mythic_completionist 声明 set: completionist 但不在 sets 列表
-- [ ] 8 个成就列在 sets 里但没有 `set:` 字段
+### 5. ✅ 数据一致性 — 全部修好
+- [x] Category `milestone` → `milestones`（YAML 统一为复数，匹配 Dashboard）
+- [x] bounce_back → 加入 agent_commander 的 achievements 列表
+- [x] mythic_completionist → 加入 completionist 的 achievements 列表
+- [x] 8 个成就补上 `set:` 字段（the_beginning ×4 / collectors_soul ×1 / devops_triad ×3）
 
-### 6. `im_sorry_dave` 缺少时间窗口
-- [ ] 加 window: single_session 或靠 Agent 感知手动 track
+### 6. ✅ `im_sorry_dave` 加窗口
+- [x] 两个 condition 都加了 `window: single_session`
 
 ---
 
@@ -79,7 +79,7 @@
 2. [x] storyteller 已删 ─────────── 不实现，成就数 118→117
 3. [x] evalThreshold metric window ── metric 路径过滤 + single_task 边界推断
 4. [x] Hook payload 字段提取 ──────── 4 成就改 AGENTS.md + 2 成就改代码
-5. [ ] 数据一致性问题 ────────────── P2 清理
+5. [x] 数据一致性问题 ────────────── P2 全清
 ```
 
 > 关联文档: `docs/issues-todo.md`（Bug 追踪）、`docs/PROGRESS.md`（进度总览）

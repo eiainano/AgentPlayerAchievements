@@ -328,6 +328,57 @@ function evalStreak(events: TrackedEvent[], cond: Condition): EvaluationResult {
   const windowMs = sessionWindow ? 0 : parseWindow(cond.window || '24h');
   const now = Date.now();
 
+  // ── event_level mode: count consecutive events (not calendar days) ──
+  if (cond.event_level) {
+    const target = cond.value;
+    const op: ConditionOperator = cond.operator || '>=';
+
+    // Filter to matching events in chronological order
+    const matching = events.filter(e => {
+      if (e.event_type !== cond.event) return false;
+      if (!sessionWindow && now - new Date(e.timestamp).getTime() > windowMs) return false;
+      if (cond.filter && !matchFilter(e, cond.filter)) return false;
+      if (!matchRole(e, cond.role)) return false;
+      if (cond.field && !getField(e, cond.field)) return false;
+      return true;
+    });
+    if (matching.length === 0) return { met: false, progress: 0, target };
+
+    if (cond.same_target && cond.field) {
+      // Count max consecutive events per field value
+      const runs: Record<string, number> = {};
+      const current: Record<string, number> = {};
+      for (const e of matching) {
+        const val = getField(e, cond.field);
+        if (!val) continue;
+        current[val] = (current[val] || 0) + 1;
+        if (current[val]! > (runs[val] || 0)) runs[val] = current[val]!;
+      }
+      const maxRun = Math.max(0, ...Object.values(runs));
+      return { met: evalOp(op, maxRun, target), progress: maxRun, target };
+    }
+
+    // Count streak of consecutive matches, scanning forward
+    let maxStreak = 0;
+    let currentRun = 0;
+    for (let i = 0; i < events.length; i++) {
+      const e = events[i]!;
+      const isMatch = e.event_type === cond.event
+        && (!sessionWindow || now - new Date(e.timestamp).getTime() <= windowMs)
+        && (!cond.filter || matchFilter(e, cond.filter))
+        && (!cond.role || matchRole(e, cond.role))
+        && (!cond.field || !!getField(e, cond.field));
+      if (isMatch) {
+        currentRun++;
+        if (currentRun > maxStreak) maxStreak = currentRun;
+      } else {
+        currentRun = 0;
+      }
+    }
+    return { met: evalOp(op, maxStreak, target), progress: maxStreak, target };
+  }
+
+  // ── Calendar-day mode (default) ──
   const days = new Set<string>();
   for (const e of events) {
     if (e.event_type !== cond.event) continue;

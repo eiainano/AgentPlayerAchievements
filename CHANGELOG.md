@@ -58,6 +58,12 @@
 - **New test file** — `tests/cli/hook.test.ts` covering all 10 CC hook→AGPA event mappings
 - 55 → 80 tests (6 files), all passing
 
+### evalStreak event_level Mode
+
+- **`event_level: true`** — new Condition field for per-event streak counting (not calendar-day)
+- **ten_task_no_edit** — now correctly counts consecutive zero-edit tasks, not consecutive days
+- Backward compatible: existing streak achievements (streak_7/30/100/365) unchanged
+
 ### Known Gaps (HOLD)
 
 - evalPercentile fallback thresholds (2 percentile achievements work, others need telemetry)
@@ -66,7 +72,7 @@
 
 ### Tech Stack Unchanged
 
-Runtime: tsx, MCP: @modelcontextprotocol/sdk, Parsing: yaml, Validation: zod, Testing: vitest (80 tests, 6 files, all passing)
+Runtime: tsx, MCP: @modelcontextprotocol/sdk, Parsing: yaml, Validation: zod, Testing: vitest (81 tests, 6 files, all passing)
 
 ---
 

@@ -4,7 +4,7 @@
 
 ## 总体状态
 
-v0.1.3 完成。Init 一键安装、Hook 合并注入、single_task 窗口、Surgeon 全自动 payload。117 个成就全部可达成，80 个测试全绿。
+v0.1.3 完成。Init 一键安装、Hook 合并注入、single_task 窗口、Surgeon 全自动 payload、evalStreak 事件连续模式。117 个成就全部可达成，81 个测试全绿。
 
 ---
 
@@ -72,7 +72,7 @@ v0.1.3 完成。Init 一键安装、Hook 合并注入、single_task 窗口、Sur
 - [x] **路径遍历 guard**：拒绝 .. 和越界绝对路径读文件
 - [x] **P1 evaluator 4 项修复**：空 conditions guard、evalMode target、set_id 删除、evalStreak窗口/field/same_target
 - [x] **P2 数据一致性**：milestone 命名、set 成员补全、缺失 set 字段、im_sorry_dave 窗口
-- [x] **测试覆盖**：55→80 tests, 6 files（新增 hook mapEvents×16 + evaluator×9）
+- [x] **测试覆盖**：81 tests, 6 files（evaluator 43 + integration 4 + yaml-parser 6 + api 5 + xp 6 + hook 17）
 
 ### 中优先级
 - [ ] **用户审阅 117 成就清单**：用户之前提到"后面手动审阅"

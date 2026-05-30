@@ -1479,6 +1479,7 @@ definitions:
         filter: "manual_edits == 0"
         operator: ">="
         value: 10
+        event_level: true
 
   - id: multi_model
     name: "Multi-Model"

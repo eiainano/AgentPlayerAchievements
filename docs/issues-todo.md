@@ -42,7 +42,7 @@
 - [x] **evalMode 提前返回 target 不一致** — 无事件路径改为 `Math.round((cond.threshold ?? cond.value) * 100)`
 - [ ] **evalPercentile 硬编码回退阈值** — HOLD，等 telemetry 基础设施。当前 2 个 percentile 成就刚好命中唯一回退值。
 - [ ] **matchFilter 上下文只有 8 个字段** — HOLD。受影响成就已改为手动 track，无实际影响。
-- [ ] **`evalStreak` 日历日 vs 事件连续** — HOLD。ten_task_no_edit 语义偏差需单独讨论。
+- [x] **`evalStreak` 日历日 vs 事件连续** — Condition 加 `event_level` 字段。`ten_task_no_edit` 设 `event_level: true` 后按连续事件计数，不再按日历日。
 - [x] **Condition.set_id 字段** — 从 types.ts + yaml-parser.ts 删除，dead code。
 
 ---

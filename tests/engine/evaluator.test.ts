@@ -499,4 +499,23 @@ describe('evalStreak window / field / same_target', () => {
     expect(result.met).toBe(true);
     expect(result.progress).toBe(3); // max streak is Read with 3
   });
+
+  it('streak event_level counts consecutive events not days', () => {
+    const sameDay = new Date().toISOString().slice(0, 10);
+    const events = [
+      makeEvent('task.complete', { payload: { manual_edits: 0 }, timestamp: `${sameDay}T10:00:00Z` }),
+      makeEvent('task.complete', { payload: { manual_edits: 0 }, timestamp: `${sameDay}T10:05:00Z` }),
+      makeEvent('task.complete', { payload: { manual_edits: 5 }, timestamp: `${sameDay}T10:10:00Z` }), // break!
+      makeEvent('task.complete', { payload: { manual_edits: 0 }, timestamp: `${sameDay}T10:15:00Z` }),
+      makeEvent('task.complete', { payload: { manual_edits: 0 }, timestamp: `${sameDay}T10:20:00Z` }),
+    ];
+    const cond: Condition = {
+      type: 'streak', event: 'task.complete', filter: "manual_edits == 0",
+      window: 'all', value: 2, operator: '>=', event_level: true,
+    };
+    const result = evaluateCondition(cond, events);
+    // Longest run of consecutive zero-edit tasks: 2 (first two, then break, then last two)
+    expect(result.met).toBe(true);
+    expect(result.progress).toBe(2);
+  });
 });

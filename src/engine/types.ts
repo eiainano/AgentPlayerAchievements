@@ -112,6 +112,8 @@ export interface Condition {
   same_target?: boolean;
   // threshold / counter
   max_per_day?: number;
+  // streak
+  event_level?: boolean;
 }
 
 export type RarityLevel = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';

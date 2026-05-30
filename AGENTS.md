@@ -1,3 +1,4 @@
+<!-- AGPA ACHIEVEMENT TRACKING -->
 # AGPA Achievement Tracking
 
 This project uses AGPA (Agent Player Achievements) to gamify AI coding.
@@ -55,4 +56,3 @@ At the end of every session:
 2. Call `achievement_poll` to check for newly unlocked achievements
 3. **If poll returns achievements**, display them proudly with icon + name + description
 4. Consider calling `achievement_stats` if the user seems interested in progress
-

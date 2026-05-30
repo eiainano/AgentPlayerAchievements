@@ -23,6 +23,10 @@ const HOOK_TRACK_START = `${HOOK_ENV} ${TSX_BIN} ${AGPA_HOOK} track session.star
 const HOOK_TRACK_END = `${HOOK_ENV} ${TSX_BIN} ${AGPA_HOOK} track session.end`;
 const HOOK_POLL = `${HOOK_ENV} ${TSX_BIN} ${AGPA_HOOK} poll`;
 const HOOK_AUTO = `${HOOK_ENV} ${TSX_BIN} ${AGPA_HOOK} auto`;
+const HOOK_HERMES_ENV = 'AGPA_TOOL_SOURCE=hermes';
+const HOOK_HERMES_AUTO = `${HOOK_HERMES_ENV} ${TSX_BIN} ${AGPA_HOOK} hermes-auto`;
+const HOOK_HERMES_TRACK_START = `${HOOK_HERMES_ENV} ${TSX_BIN} ${AGPA_HOOK} track session.start`;
+const HOOK_HERMES_TRACK_END = `${HOOK_HERMES_ENV} ${TSX_BIN} ${AGPA_HOOK} track session.end`;
 
 // ── Per-tool init data (mcpInject + instructionFiles) ──────────────────
 
@@ -287,6 +291,65 @@ function injectYamlMCPBlock(
   return true;
 }
 
+// ── Hermes YAML shell hook injection ──────────────────────────────────
+
+function injectHermesHooks(filePath: string, hookCommands: {
+  pre_tool_call: string;
+  post_tool_call: string;
+  on_session_start: string;
+  on_session_end: string;
+}): boolean {
+  if (!fs.existsSync(filePath)) return false;
+  const raw = fs.readFileSync(filePath, 'utf-8');
+
+  // Check if already injected
+  if (raw.includes('agpa-hermes-hook')) return false;
+
+  const hookBlock = [
+    'hooks:',
+    '  # ── AGPA Hermes auto-track hooks (agpa-hermes-hook) ──',
+    '  pre_tool_call:',
+    '    - matcher: ".*"',
+    `      command: "${hookCommands.pre_tool_call}"`,
+    '      timeout: 5',
+    '  post_tool_call:',
+    '    - matcher: ".*"',
+    `      command: "${hookCommands.post_tool_call}"`,
+    '      timeout: 5',
+    '  on_session_start:',
+    `    - command: "${hookCommands.on_session_start}"`,
+    '      timeout: 10',
+    '  on_session_end:',
+    `    - command: "${hookCommands.on_session_end}"`,
+    '      timeout: 10',
+    'hooks_auto_accept: true',
+  ];
+
+  // Line-by-line: replace hooks: {} / hooks_auto_accept section, preserving rest
+  const lines = raw.split('\n');
+  const resultLines: string[] = [];
+  let skipUntilHooksAuto = false;
+  for (let i = 0; i < lines.length; i++) {
+    const stripped = lines[i]!.trim();
+    if (skipUntilHooksAuto) {
+      if (stripped.startsWith('hooks_auto_accept:')) skipUntilHooksAuto = false;
+      continue;
+    }
+    if (stripped === 'hooks: {}' || stripped === 'hooks:') {
+      resultLines.push(...hookBlock);
+      skipUntilHooksAuto = true;
+    } else if (stripped.startsWith('hooks_auto_accept:')) {
+      // skip — already injected in hookBlock
+      continue;
+    } else {
+      resultLines.push(lines[i]!);
+    }
+  }
+
+  fs.writeFileSync(filePath, resultLines.join('\n'));
+  return true;
+}
+
 // ── Instruction file injection ─────────────────────────────────────────
 
 function injectInstructions(filePath: string, marker: string): boolean {
@@ -492,6 +555,24 @@ function initTool(
       } else {
         console.log(`  \u{23ED}  Hooks:     (all already present)`);
       }
+    }
+  }
+
+  // ── Inject Hermes shell hooks (YAML config) ─────────────────────────
+  if (toolDef.id === 'hermes') {
+    const cfgPath = toolDef.configPath;
+    if (fs.existsSync(cfgPath) && !fs.readFileSync(cfgPath, 'utf-8').includes('agpa-hermes-hook')) {
+      const injected = injectHermesHooks(cfgPath, {
+        pre_tool_call:     HOOK_HERMES_AUTO,
+        post_tool_call:    HOOK_HERMES_AUTO,
+        on_session_start:  HOOK_HERMES_TRACK_START,
+        on_session_end:    `${HOOK_HERMES_TRACK_END} && ${HOOK_HERMES_ENV} ${TSX_BIN} ${AGPA_HOOK} poll`,
+      });
+      if (injected) {
+        console.log(`  \u{2705} Hooks:     hermes shell hooks (4 events)`);
+      }
+    } else {
+      console.log(`  \u{23ED}  Hooks:     (already present or config missing)`);
     }
   }
 

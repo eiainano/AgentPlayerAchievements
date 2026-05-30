@@ -2,12 +2,13 @@
 /**
  * AGPA Hook CLI — called by Claude Code hooks
  *
- * Three modes:
+ * Modes:
  *   track <event_type> [payload_json]  — explicit tracking (legacy)
  *   poll                                — evaluate & notify
  *   auto                                — read CC hook stdin JSON, auto-map to AGPA event
+ *   hermes-auto                         — read Hermes hook stdin JSON, translate → CC format → AGPA event
  *
- * Hook events → AGPA event mapping:
+ * CC Hook events → AGPA event mapping:
  *   PostToolUse        → tool.complete   { tool_name, tool_input, duration_ms }
  *                     → conversation.message
  *                     → file.read/create/edit/write (by tool type)
@@ -20,6 +21,12 @@
  *   SubagentStop       → (no event emitted)
  *   SessionStart       → session.start   { source }
  *   SessionEnd         → session.end     { reason }
+ *
+ * Hermes Hook events → CC event mapping (translation layer):
+ *   post_tool_call     → PostToolUse
+ *   pre_tool_call      → PreToolUse
+ *   on_session_start   → SessionStart
+ *   on_session_end     → SessionEnd
  */
 
 import * as fs from 'fs';
@@ -206,6 +213,62 @@ function cmdPoll(): void {
   process.stderr.write(`[AGPA] poll: ${newlyUnlocked.length} new achievement(s) unlocked!\n`);
 }
 
+// ── Hermes → CC stdin translation ─────────────────────────────
+
+/**
+ * Hermes hook event names → CC hook event names
+ */
+const HERMES_EVENT_MAP: Record<string, string> = {
+  'post_tool_call':   'PostToolUse',
+  'pre_tool_call':    'PreToolUse',
+  'on_session_start': 'SessionStart',
+  'on_session_end':   'SessionEnd',
+};
+
+/**
+ * Hermes tool names → CC tool names
+ */
+const HERMES_TOOL_MAP: Record<string, string> = {
+  'read_file':    'Read',
+  'write_file':   'Write',
+  'edit_file':    'Edit',
+  'bash':         'Bash',
+  'terminal':     'Bash',
+};
+
+/**
+ * Normalize Hermes stdin to CC-compatible HookStdin.
+ * - Maps event names: post_tool_call → PostToolUse
+ * - Maps tool names: write_file → Write, read_file → Read, etc.
+ * - Maps field names: tool_input.path → tool_input.file_path
+ */
+function normalizeHermesStdin(raw: Record<string, unknown>): HookStdin {
+  const event = HERMES_EVENT_MAP[raw.hook_event_name as string] || raw.hook_event_name as string;
+  let toolName = (raw.tool_name as string) || '';
+  toolName = HERMES_TOOL_MAP[toolName] || toolName;
+
+  const ti = (raw.tool_input || {}) as Record<string, unknown>;
+  // Hermes uses 'path', CC uses 'file_path'
+  const normalizedTi: Record<string, unknown> = { ...ti };
+  if (typeof ti.path === 'string' && !ti.file_path) {
+    normalizedTi.file_path = ti.path;
+  }
+
+  const extra = (raw.extra || {}) as Record<string, unknown>;
+
+  return {
+    hook_event_name: event,
+    tool_name: toolName,
+    tool_input: normalizedTi,
+    session_id: (raw.session_id as string) || '',
+    task_id: (extra.task_id as string) || '',
+    duration_ms: typeof raw.duration_ms === 'number' ? raw.duration_ms : undefined,
+    agent_type: (extra.agent_type || raw.agent_type) as string | undefined,
+    source: 'hermes',
+    cwd: raw.cwd as string | undefined,
+  };
+}
+
 function cmdAuto(): void {
   const data = parseStdin();
   if (!data?.hook_event_name) {
@@ -226,6 +289,32 @@ function cmdAuto(): void {
   }
 }
 
+function cmdHermesAuto(): void {
+  const raw = parseStdin() as Record<string, unknown> | null;
+  if (!raw?.hook_event_name) {
+    process.exit(0);
+  }
+
+  const data = normalizeHermesStdin(raw);
+  const events = mapEvents(data.hook_event_name!, data);
+  if (events.length === 0) {
+    process.exit(0);
+  }
+
+  // Hermes session_id can be empty for pre_tool_call — use latest from engine
+  if (data.session_id) ENGINE.sessionId = data.session_id;
+  if (data.task_id) ENGINE.taskId = data.task_id;
+  ENGINE.init();
+  // Fallback: if Hermes didn't provide session_id, trust engine's stored one
+  if (!data.session_id && ENGINE.sessionId && !ENGINE.sessionId.startsWith('agpa_')) {
+    // Engine already has a real session_id from a previous on_session_start
+  }
+  for (const { event_type, payload } of events) {
+    const event = ENGINE.track(event_type, payload);
+    process.stderr.write(`[AGPA:Hermes] ${raw.hook_event_name} → ${event_type} (${event.event_id})\n`);
+  }
+}
+
 // ── Main ──────────────────────────────────────────────────────
 
 // Only execute CLI when run directly (not via import in tests)
@@ -242,8 +331,11 @@ switch (cmd) {
   case 'auto':
     cmdAuto();
     break;
+  case 'hermes-auto':
+    cmdHermesAuto();
+    break;
   default:
-    process.stderr.write('Usage: hook.ts <track|poll|auto> [args...]\n');
+    process.stderr.write('Usage: hook.ts <track|poll|auto|hermes-auto> [args...]\n');
     process.exit(1);
 }
 } // isMain

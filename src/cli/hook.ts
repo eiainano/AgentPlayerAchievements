@@ -23,6 +23,8 @@
  */
 
 import * as fs from 'fs';
+import * as path from 'path';
+import { homedir } from 'os';
 import { AchievementEngine } from '../engine/engine.js';
 import { loadConfig } from '../config.js';
 import { sendNotification } from '../utils/notify.js';
@@ -98,7 +100,16 @@ function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_type: stri
           editPayload.edit_lines = ti.old_string.split('\n').length;
         }
         if (typeof ti.file_path === 'string') {
-          try { editPayload.total_file_lines = fs.readFileSync(ti.file_path, 'utf-8').split('\n').length; } catch { /* file gone */ }
+          // Guard: only read files within cwd or home, no traversal
+          const fp = ti.file_path as string;
+          const resolved = fp.startsWith('/') ? fp : path.resolve(data.cwd || process.cwd(), fp);
+          const cwdBase = path.resolve(data.cwd || process.cwd());
+          const homeBase = path.resolve(homedir());
+          if (fp.includes('..') || (!resolved.startsWith(cwdBase + '/') && !resolved.startsWith(homeBase + '/'))) {
+            // skip — path outside allowed boundary
+          } else {
+            try { editPayload.total_file_lines = fs.readFileSync(resolved, 'utf-8').split('\n').length; } catch { /* file gone */ }
+          }
         }
         results.push({ event_type: 'file.edit', payload: editPayload });
       }

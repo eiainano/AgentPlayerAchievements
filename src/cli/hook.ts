@@ -91,7 +91,17 @@ function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_type: stri
         results.push({ event_type: 'file.create', payload: { ...base } });
         results.push({ event_type: 'file.write', payload: { ...base } });
       }
-      if (data.tool_name === 'Edit') results.push({ event_type: 'file.edit', payload: { ...base } });
+      if (data.tool_name === 'Edit') {
+        // Extract edit_lines from old_string, total_file_lines from file on disk (for surgeon metric)
+        const editPayload = { ...base };
+        if (typeof ti.old_string === 'string') {
+          editPayload.edit_lines = ti.old_string.split('\n').length;
+        }
+        if (typeof ti.file_path === 'string') {
+          try { editPayload.total_file_lines = fs.readFileSync(ti.file_path, 'utf-8').split('\n').length; } catch { /* file gone */ }
+        }
+        results.push({ event_type: 'file.edit', payload: editPayload });
+      }
       if (data.tool_name === 'Bash' && typeof ti.command === 'string') {
         results.push({ event_type: 'command.run', payload: { ...base } });
         if (ti.command.includes('git commit') || ti.command.includes('git add')) {

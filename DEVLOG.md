@@ -2,6 +2,32 @@
 
 ---
 
+## 2026-05-30 (v0.1.3 — init + evaluator + data consistency)
+
+### 完成
+- **Init 一键安装** — `npm run init` 无参自动检测 5 工具，Hook 合并注入不覆盖已有音效
+- **single_task 窗口** — 用 `task.complete` 事件作为边界推断任务范围，不依赖 task_id
+- **evalThreshold metric 路径** — 现在读 cond.event/filter/role/window，之前完全跳过
+- **6 个被阻塞成就修复** — 4 个改 AGENTS.md 手动 track + 2 个改 computeMetric 代码
+- **P2 数据一致性全清** — milestone 命名、set 成员补全、缺失 set 字段、im_sorry_dave 窗口
+- **P1 evaluator 4 项修复** — 空 conditions guard、evalMode target、set_id 删除、evalStreak 窗口
+- **storyteller 删除** — 不实现，成就数 118→117
+- **文档** — CHANGELOG v0.1.3、TODO.md、issues-todo.md、PROGRESS.md 全部同步
+
+### 改动文件
+- 修改：`04-成就定义清单.yaml`、`AGENTS.md`、`src/cli/hook.ts`、`src/cli/init.ts`、`src/engine/engine.ts`、`src/engine/evaluator.ts`、`src/engine/types.ts`、`src/engine/yaml-parser.ts`、`src/main.ts`、`package.json`、`tests/engine/evaluator.test.ts`、`tests/engine/integration.test.ts`、`docs/TODO.md`、`docs/PROGRESS.md`、`docs/issues-todo.md`、`docs/design/01-成就分类体系.md`、`CHANGELOG.md`、`DEVLOG.md`
+- 新增：`docs/TODO.md`
+
+### P1 HOLD
+- evalPercentile 回退阈值、matchFilter 字段扩展、evalStreak 日历日 vs 事件连续
+
+### Commits
+- `e6774c6` v0.1.3 init + evaluator + events
+- `697ba74` P2 data consistency  
+- `64e59e0` P1 evaluator hardening
+
+---
+
 ## 2026-05-29 (evaluator-fix)
 
 ### 完成

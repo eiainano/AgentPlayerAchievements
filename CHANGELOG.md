@@ -32,6 +32,26 @@
 - Achievement count: 118 → 117
 - Integration test updated to match new count
 
+### Data Consistency (P2)
+
+- **`category: milestone` → `milestones`** — 8 achievements aligned with Dashboard category names
+- **Set membership** — `bounce_back` added to agent_commander list, `mythic_completionist` added to completionist list
+- **Missing `set:` fields** — 8 achievements now have correct set reference (the_beginning ×4, collectors_soul ×1, devops_triad ×3)
+- **`im_sorry_dave` window** — both conditions now have `window: single_session`
+
+### Evaluator Hardening (P1)
+
+- **Empty conditions guard** — `if (def.conditions.length === 0) continue;` prevents false positives
+- **evalMode target** — no-event path now uses same format as with-event path
+- **`set_id` removed** — dead code from Condition interface + yaml-parser (never read by any evaluator)
+- **evalStreak window/field/same_target** — now reads scopeEvents, time windows, field filtering, and same_target (consistent with all other evaluators)
+
+### Known Gaps (HOLD)
+
+- evalPercentile fallback thresholds (2 percentile achievements work, others need telemetry)
+- matchFilter context limited to 8 hardcoded fields (no current impact — affected achievements moved to manual track)
+- evalStreak calendar-day vs event-consecutive semantics (ten_task_no_edit may need revisit)
+
 ### Tech Stack Unchanged
 
 Runtime: tsx, MCP: @modelcontextprotocol/sdk, Parsing: yaml, Validation: zod, Testing: vitest (55 tests, 5 files, all passing)

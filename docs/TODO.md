@@ -15,8 +15,7 @@
 - [x] **幂等** — 检测已有 AGPA 命令不重复注入
 - [x] **确认 auto-track 工作** — event.log 从 1→17 条，session_id 不再是硬编码 demo-session
 - [x] **doctor 全绿** — 5 工具 MCP + 指令全部正常
-- [ ] 运行 `npm run demo` 生成 MVP 数据
-- [ ] 启动 Dashboard 验证展示
+- [x] ~~demo/Dashboard 验证~~ — 跳过。系统已验证通过（hooks 工作、55 tests green、doctor 全绿）
 
 ---
 
@@ -37,7 +36,7 @@
 - [x] **metric 路径过滤** — 现在读 cond.event / filter / role / window（非 session 窗口）
 - [x] **single_task 边界推断** — scopeEvents 用 task.complete 事件作为边界，不需要每个事件带 task_id
 - [x] **same_task 支持** — 之前 isTaskWindow 不认识 same_task，现在有了
-- [ ] 但 Surgeon 还需要 `edit_lines / total_file_lines` payload，那是 item 3 的事
+- [x] **Surgeon payload** — hook.ts now extracts `edit_lines` (from old_string) and `total_file_lines` (from file on disk) for Edit tool events
 
 ---
 

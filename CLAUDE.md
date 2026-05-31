@@ -82,4 +82,10 @@ If evaluator behavior seems wrong, check src/engine/evaluator.ts — each type h
 
 ## Known Issues & TODOs
 
+### 代码更新后：文档核查
+
+每次代码变更后（尤其是改动成就数量、condition type数量、事件映射、架构设计），运行"文档核查"——扫描 `docs/` 下所有 `.md` 文件，将过时的数字（成就总数、条件类型数、套装成员数等）同步到与代码一致。**CHANGELOG.md 中的历史记录不修改。**
+
+用户说"文档核查"或"根据代码核查文档"时执行此操作。
+
 `docs/issues-todo.md` tracks all known bugs, gaps, and data inconsistencies in the achievement system. 10 P0 bugs, ~20 P1 gaps, ~6 P2 data issues. Always read it before starting evaluator or YAML work.

@@ -1,6 +1,6 @@
 # AGPA — 今日 TODO
 
-> 日期: 2026-05-31 | 当前版本: v0.2.0 | 成就: 117 | Tests: 106 ✅ | 条件类型: 11
+> 日期: 2026-05-31 | 当前版本: v0.1.4 | 成就: 138 | Tests: 106 ✅ | 条件类型: 11
 
 ---
 
@@ -61,7 +61,7 @@
 - [x] Condition.set_id 死代码 — 从 types.ts + yaml-parser.ts 删除
 - [x] evalStreak 不读 window/field/same_target — scopeEvents + window + field/same_target 支持已补
 
-### ✅ Percentile 子系统已移除（v0.2.0）
+### ✅ Percentile 子系统已移除（v0.1.4）
 - [x] **evalPercentile 硬编码回退** — 整个 percentile 子系统移除，Minimalist/Novelist 改为 `threshold` + `metric: "length"` 绝对阈值。stats-server.ts / telemetry.ts 删除。
 
 ### ⏸ HOLD

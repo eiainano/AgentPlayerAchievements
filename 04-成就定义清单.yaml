@@ -787,25 +787,7 @@ definitions:
         operator: ">="
         value: 5
 
-  # ── Steam-inspired: 三档递进 + Factorio 失败庆祝 ──
-  - id: diff_diver
-    name: "Diff Diver"
-    name_cn: "潜水员"
-    description: "审查了 50 个 agent 产生的 diff。你确实在看它改了什么，不是闭眼接受。"
-    icon: "🤿"
-    category: tool_mastery
-    rarity: rare
-    hidden: false
-    progress_trackable: true
-    future: true
-    # FUTURE: 需要 diff.reviewed 事件（hook 当前未捕获 diff 审查行为）
-    conditions:
-      - type: counter
-        event: diff.reviewed
-        operator: ">="
-        value: 50
-        window: all
-
+  # ── Steam-inspired: Factorio 失败庆祝 ──
   - id: undo_master
     name: "Undo Master"
     name_cn: "撤回大师"
@@ -1270,22 +1252,6 @@ definitions:
         value: 5
 
   # ── Steam-inspired: 克制设计 — "体验过即可" — ──
-  - id: three_tricks
-    name: "Three Tricks"
-    name_cn: "三招"
-    description: "在自己的成就配置文件中使用过 3 种不同的 condition type。你不是写成就，是在设计玩法。"
-    icon: "🎪"
-    category: creator
-    rarity: rare
-    hidden: false
-    future: true
-    # FUTURE: 需要解析用户自定义 achievement config 并统计 condition types（meta-achievement）
-    conditions:
-      - type: distinct_count
-        metric: "custom_condition_types_used"
-        operator: ">="
-        value: 3
-
   # ============================================================
   # Category: Hidden (隐藏成就)
   # ============================================================
@@ -1735,23 +1701,6 @@ definitions:
         field: duration_ms
         operator: ">="
         value: 60000
-
-  - id: tab_hoarder
-    name: "Tab Hoarder"
-    name_cn: "标签仓鼠"
-    description: "同时打开了 10+ 个文件。你的工作区是一片混沌，但你知道每个文件在哪。"
-    icon: "🐹"
-    category: hidden
-    rarity: uncommon
-    hidden: true
-    future: true
-    # FUTURE: 需要 file.open 事件 + 并发计数
-    conditions:
-      - type: threshold
-        event: file.open
-        metric: "concurrent_open_files"
-        operator: ">="
-        value: 10
 
   - id: undying_curiosity
     name: "Undying Curiosity"

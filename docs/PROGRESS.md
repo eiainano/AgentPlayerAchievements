@@ -4,7 +4,7 @@
 
 ## 总体状态
 
-v0.2.0 完成。OpenClaw auto-track 落地——与 CC/Hermes 对齐的三工具 auto-track 架构。117 个成就全部可达成，106 个测试全绿。
+v0.1.4 完成。OpenClaw auto-track 落地——与 CC/Hermes 对齐的三工具 auto-track 架构。138 个成就全部可达成，106 个测试全绿。
 
 ---
 
@@ -12,7 +12,7 @@ v0.2.0 完成。OpenClaw auto-track 落地——与 CC/Hermes 对齐的三工具
 
 ### 核心引擎
 - [x] 12 种 Condition Type：Counter、Threshold（含 field 求和 + metric 表达式）、Streak、Sequence（含 consecutive 模式）、DistinctCount（含 values 白名单）、Event、SetCompletion、Mode、SequenceCount、PatternMatch、Ratio、Percentile
-- [x] YAML 解析器加载 117 个成就定义（含 12 个事件驱动型，4 个不可达已删除）
+- [x] YAML 解析器加载 138 个成就定义（含 12 个事件驱动型，4 个不可达已删除）
 - [x] PendingQueue 并发安全
 - [x] MCP Tools：`achievement_track`、`achievement_poll`、`achievement_stats`、`achievement_showcase`、`achievement_config`
 - [x] macOS Notification Center 弹窗（poll 时触发）
@@ -75,14 +75,14 @@ v0.2.0 完成。OpenClaw auto-track 落地——与 CC/Hermes 对齐的三工具
 - [x] **测试覆盖**：81 tests, 6 files（evaluator 43 + integration 4 + yaml-parser 6 + api 5 + xp 6 + hook 17）
 
 ### 中优先级
-- [ ] **用户审阅 117 成就清单**：用户之前提到"后面手动审阅"
+- [ ] **用户审阅 138 成就清单**：用户之前提到"后面手动审阅"
 - [ ] **其余 3 工具的 auto-track 策略落地**
 
 | 工具 | 策略 | 可靠性 |
 |------|------|--------|
 | Claude Code | Hook `SessionStart` | ⭐⭐⭐⭐⭐ |
 | Hermes Agent | Shell hooks (4 events) | ⭐⭐⭐⭐⭐ |
-| OpenClaw | TS 插件 (36 hooks) | ⭐⭐⭐⭐⭐ | ✅ v0.2.0 完成 |
+| OpenClaw | TS 插件 (36 hooks) | ⭐⭐⭐⭐⭐ | ✅ v0.1.4 完成 |
 | OpenCode | TS 插件 (event bus) | ⭐⭐⭐ | ⏸ 待调研 |
 | Kilo Code | TS 插件 (hook不可调MCP) | ⭐⭐ | ⏸ 待调研 |
 
@@ -100,7 +100,7 @@ v0.2.0 完成。OpenClaw auto-track 落地——与 CC/Hermes 对齐的三工具
 | 维度 | MVP 原计划 | 当前实际 |
 |------|-----------|---------|
 | 工具支持 | Claude Code 独占 | 5 工具 init 完成 |
-| 成就数量 | 30 个 | 117 个全部可达成 |
+| 成就数量 | 30 个 | 138 个全部可达成 |
 | Evaluator | 3 种 | 12 种全部实现 |
 | Dashboard | 基础网格 | 完整 4 section + 主题 + 双语 |
 | Event Capture | CC Hook | 9 hooks auto-track + 27 手动 track |

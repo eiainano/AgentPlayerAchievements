@@ -1,6 +1,6 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-05-31 | 总成就数: 117 | 条件类型: 11 | Tests: 106 ✅ | 5 Agent 全接入
+> 最后更新: 2026-05-31 | 总成就数: 138 | 条件类型: 11 | Tests: 106 ✅ | 5 Agent 全接入
 
 ---
 
@@ -21,7 +21,7 @@
 ## P1 — Evaluator 功能缺口（2 项 HOLD）
 
 - [x] sequence 忽略 window / evalThreshold metric 路径 / 空 conditions / evalMode target / evalStreak 事件连续 / set_id 死代码 — 全部修好
-- [x] **evalPercentile 硬编码回退阈值** — 整个 percentile 子系统已移除（v0.2.0）。Minimalist/Novelist 改为 `threshold` + `metric: "length"` + AGENTS.md 手动 track。stats-server.ts / telemetry.ts 删除。
+- [x] **evalPercentile 硬编码回退阈值** — 整个 percentile 子系统已移除（v0.1.4）。Minimalist/Novelist 改为 `threshold` + `metric: "length"` + AGENTS.md 手动 track。stats-server.ts / telemetry.ts 删除。
 - [ ] **matchFilter 上下文只有 8 个字段** — HOLD。受影响成就已改为手动 track，无实际影响。
 
 ---
@@ -42,7 +42,7 @@
 
 ---
 
-## 已完成 — Dashboard UX Overhaul（v0.2.0, 5/31）
+## 已完成 — Dashboard UX Overhaul（v0.1.4, 5/31）
 
 - [x] **搜索框** — 实时过滤，搜 ID/英文名/中文名/描述，空结果友好提示
 - [x] **排序下拉** — Default / Rarity ↓ / Recently Unlocked / A → Z

@@ -29,6 +29,18 @@ Dashboard 从"功能骨架"升级为"可日常使用的成就浏览器"。
 - **YAML icon 对象格式** — parseIconField 支持 `icon: { src: "pixelart/x.png" }`，兼容原有 emoji 字符串
 - **UI 微调** — Level ring 移除，hero-section 最小高度 92vh → 60vh，暗色模式 emoji `brightness(1.15)`
 
+### Percentile 子系统移除
+
+Percentile 依赖社区数据做排名评估，与"个人成就系统"定位不符。整体移除，改用绝对数值。
+
+- **2 成就改写** — Minimalist（`threshold` + `metric: "length"` + ≤80 字符）、Novelist（≥500 字符）
+- **AGENTS.md** — 新增 `conversation.message` + `{ length }` 手动 track 指令
+- **types.ts** — `ConditionType` 从 12 种缩减为 11 种（移除 `percentile`）
+- **evaluator.ts** — 删除 `evalPercentile`（~50 行）、`FALLBACK_THRESHOLDS`、`computeMetric`（~40 行）、`fs`/`path` imports
+- **engine.ts** — 移除 `runTelemetry` import + `poll()` 内遥测调用
+- **文件删除** — `src/telemetry.ts` + `src/server/stats-server.ts`（零消费者）
+- **效果** — 2 个 P1 HOLD 中的 percentile 项清零，代码净删 ~180 行
+
 ### 文档更新
 
 - **CLAUDE.md** — 架构图从双线改为两通道对比图（MCP 主动调用 vs Hook 自动触发），加 Hook CLI 三工具对照表

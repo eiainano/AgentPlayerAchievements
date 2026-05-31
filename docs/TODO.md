@@ -1,6 +1,6 @@
 # AGPA — 今日 TODO
 
-> 日期: 2026-05-31 | 当前版本: v0.1.3 | 成就: 117 | Tests: 81 ✅
+> 日期: 2026-05-31 | 当前版本: v0.2.0 | 成就: 117 | Tests: 106 ✅ | 条件类型: 11
 
 ---
 
@@ -61,8 +61,10 @@
 - [x] Condition.set_id 死代码 — 从 types.ts + yaml-parser.ts 删除
 - [x] evalStreak 不读 window/field/same_target — scopeEvents + window + field/same_target 支持已补
 
+### ✅ Percentile 子系统已移除（v0.2.0）
+- [x] **evalPercentile 硬编码回退** — 整个 percentile 子系统移除，Minimalist/Novelist 改为 `threshold` + `metric: "length"` 绝对阈值。stats-server.ts / telemetry.ts 删除。
+
 ### ⏸ HOLD
-- [ ] evalPercentile 硬编码回退 — 当前 2 个成就刚好命中，等 telemetry 基础设施
 - [ ] matchFilter 上下文只有 8 个字段 — 受影响成就已改手动 track，无影响
 
 ### ✅ evalStreak 事件连续
@@ -100,19 +102,17 @@
 
 ---
 
-## ✅ 今日计划
+## ✅ 今日进展（5/31）
 
 ```
-1. [x] Init 重构 + 真实环境测试 ── 修复 hooks, npm run init 即用
-2. [x] storyteller 已删 ─────────── 不实现，成就数 118→117
-3. [x] evalThreshold metric window ── metric 路径过滤 + single_task 边界推断
-4. [x] Hook payload 字段提取 ──────── 4 成就改 AGENTS.md + 2 成就改代码
-5. [x] 数据一致性问题 ────────────── P2 全清
-6. [x] P1 evaluator 4 项 ────────── 空 conditions + mode target + set_id + streak 窗口
-7. [x] Surgeon edit_lines payload ── hook.ts 自动提取，零 AGENTS.md 依赖
-8. [x] 路径遍历 guard ────────────── cwd/home 边界，拒绝 .. 和越界路径
-9. [x] +26 单元测试 ──────────────── 81 tests, 6 files
-10. [x] evalStreak event_level ────── 事件连续模式，ten_task_no_edit 修复
+1. [x] Dashboard UX Overhaul — 搜索、排序、稀有度筛选、Modal 详情、自动轮询、锁定/解锁视觉重设计
+2. [x] Showcase 显示名称 — icon + 成就名两行
+3. [x] engine.reload() — 修复 Dashboard 0% bug
+4. [x] iconHtml() 渲染函数 — emoji / 像素画自动适配，YAML icon 对象格式支持
+5. [x] 移除 Percentile 子系统 — 2 成就改 threshold 绝对阈值，删 telemetry/stats-server
+6. [x] AGENTS.md 补 conversation.message + { length } 手动 track
+7. [x] issues-todo.md 全面同步 — 记录 Dashboard UX、Percentile 移除、P2 新缺口
+8. [x] Level ring 移除 — Profile 精简
 ```
 
 > 关联文档: `docs/issues-todo.md`（Bug 追踪）、`docs/PROGRESS.md`（进度总览）

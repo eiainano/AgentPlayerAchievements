@@ -1,5 +1,3 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import type { TrackedEvent, Condition, EvaluationResult } from './types.js';
 import type { ConditionOperator } from './types.js';
 
@@ -29,6 +27,8 @@ function matchFilter(event: TrackedEvent, filter: string): boolean {
     agent_involved: event.payload?.agent_involved || false,
     manual_edits: event.payload?.manual_edits || 0,
     issues_found: event.payload?.issues_found || 0,
+    day_of_week: event.payload?.day_of_week != null ? Number(event.payload.day_of_week) : -1,
+    duration_ms: event.payload?.duration_ms != null ? Number(event.payload.duration_ms) : 0,
   };
   try {
     return evalFilter(filter, ctx);
@@ -651,86 +651,6 @@ function evalRatio(events: TrackedEvent[], cond: Condition): EvaluationResult {
   return { met, progress: Math.round(ratio * 100), target: Math.round(target * 100) };
 }
 
-// ── Percentile ──────────────────────────────────────────────────────
-
-const AGPA_STATE_DIR = path.join(process.env.HOME || '~', '.agent-achievements');
-
-const FALLBACK_THRESHOLDS: Record<string, Record<number, number>> = {
-  avg_prompt_length: { 10: 80, 90: 600 },
-};
-
-function computeMetric(events: TrackedEvent[], metric: string): number | null {
-  switch (metric) {
-    case 'avg_prompt_length': {
-      const lengths = events
-        .filter(e => e.event_type === 'conversation.message' || e.event_type === 'user.prompt')
-        .map(e => Number(e.payload?.length))
-        .filter(n => n > 0);
-      if (lengths.length === 0) return null;
-      return lengths.reduce((a, b) => a + b, 0) / lengths.length;
-    }
-    case 'showcase_count': {
-      const p = path.join(AGPA_STATE_DIR, 'showcase.json');
-      try {
-        if (fs.existsSync(p)) {
-          const data = JSON.parse(fs.readFileSync(p, 'utf-8'));
-          return (data.slots as Array<string | null>).filter(s => s !== null).length;
-        }
-      } catch { /* ignore */ }
-      return 0;
-    }
-    case 'concurrent_sessions': {
-      // Count unique session_ids in events from the last hour
-      const oneHourAgo = Date.now() - 60 * 60 * 1000;
-      const sids = new Set<string>();
-      for (const e of events) {
-        if (new Date(e.timestamp).getTime() > oneHourAgo && e.context?.session_id) {
-          sids.add(e.context.session_id);
-        }
-      }
-      return sids.size;
-    }
-    default:
-      return null;
-  }
-}
-
-function evalPercentile(events: TrackedEvent[], cond: Condition): EvaluationResult {
-  const metric = cond.metric;
-  if (!metric) return { met: false, progress: 0, target: cond.value };
-
-  const localValue = computeMetric(events, metric);
-  if (localValue === null) return { met: false, progress: 0, target: cond.value };
-
-  const targetPct = cond.value; // e.g. 10 (p10) or 90 (p90)
-  const pctKey = `p${targetPct}`;
-
-  // Try cached thresholds from telemetry server
-  let threshold: number | null = null;
-  try {
-    const cachePath = path.join(AGPA_STATE_DIR, 'thresholds.json');
-    if (fs.existsSync(cachePath)) {
-      const cache = JSON.parse(fs.readFileSync(cachePath, 'utf-8'));
-      threshold = cache.thresholds?.[metric]?.[pctKey] ?? null;
-    }
-  } catch { /* ignore */ }
-
-  // Fallback to hardcoded thresholds
-  if (threshold === null) {
-    threshold = FALLBACK_THRESHOLDS[metric]?.[targetPct] ?? null;
-  }
-  if (threshold === null) return { met: false, progress: Math.round(localValue), target: cond.value };
-
-  const operator = cond.operator || '>=';
-  const met = operator === '>='
-    ? localValue >= threshold
-    : operator === '<='
-      ? localValue <= threshold
-      : localValue === threshold;
-
-  return { met, progress: Math.round(localValue), target: Math.round(threshold) };
-}
-
 // ── Dispatcher ──────────────────────────────────────────────────────
 
 export function evaluateCondition(cond: Condition, events: TrackedEvent[]): EvaluationResult {
@@ -745,7 +665,6 @@ export function evaluateCondition(cond: Condition, events: TrackedEvent[]): Eval
     case 'sequence_count': return evalSequenceCount(events, cond);
     case 'pattern_match': return evalPatternMatch(events, cond);
     case 'ratio': return evalRatio(events, cond);
-    case 'percentile': return evalPercentile(events, cond);
     default: return { met: false, progress: 0, target: 0 };
   }
 }

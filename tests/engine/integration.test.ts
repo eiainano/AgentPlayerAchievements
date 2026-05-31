@@ -14,9 +14,9 @@ function createEngine(): AchievementEngine {
 }
 
 describe('integration: real YAML definitions', () => {
-  it('loads all 117 achievements without errors', () => {
+  it('loads all 141 achievements without errors', () => {
     const engine = createEngine();
-    expect(engine.definitions.length).toBe(117);
+    expect(engine.definitions.length).toBe(141);
   });
 
   it('unlocks basic achievements in a minimal session', () => {
@@ -91,7 +91,7 @@ describe('integration: real YAML definitions', () => {
     // All 12 condition types should be handled
     const unimplemented = defined.filter(t => ![
       'counter', 'threshold', 'streak', 'sequence', 'distinct_count', 'event',
-      'set_completion', 'mode', 'sequence_count', 'pattern_match', 'ratio', 'percentile',
+      'set_completion', 'mode', 'sequence_count', 'pattern_match', 'ratio',
     ].includes(t));
 
     if (unimplemented.length > 0) {

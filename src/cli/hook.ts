@@ -132,12 +132,26 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
         results.push({ event_type: 'file.edit', payload: editPayload });
       }
       if (data.tool_name === 'Bash' && typeof ti.command === 'string') {
-        results.push({ event_type: 'command.run', payload: { ...base } });
+        const cmdPayload: Record<string, unknown> = { ...base, command: ti.command };
+        if (typeof data.duration_ms === 'number') {
+          cmdPayload.duration_ms = data.duration_ms;
+        }
+        results.push({ event_type: 'command.run', payload: cmdPayload });
         if (ti.command.includes('git commit') || ti.command.includes('git add')) {
           results.push({ event_type: 'git.commit', payload: { ...base } });
         }
         if (ti.command.includes('gh pr create')) {
           results.push({ event_type: 'git.pr_created', payload: { ...base } });
+        }
+        if (ti.command.includes('git bisect')) {
+          results.push({ event_type: 'git.bisect', payload: { ...base } });
+        }
+        if (ti.command.includes('git merge') && ti.command.includes('--continue')) {
+          results.push({ event_type: 'merge.conflict_resolved', payload: { ...base, agent_involved: true } });
+        }
+        if (ti.command.includes('git push')) {
+          const now = new Date();
+          results.push({ event_type: 'git.push', payload: { ...base, day_of_week: now.getDay() } });
         }
       }
       // MCP tool call

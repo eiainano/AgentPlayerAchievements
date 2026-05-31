@@ -4,7 +4,6 @@ import { fileURLToPath } from 'url';
 import { parseYAML } from './yaml-parser.js';
 import { evaluateAll } from './evaluator.js';
 import { Store } from './store.js';
-import { runTelemetry } from '../telemetry.js';
 import type {
   TrackedEvent, EventType, EventPayload,
   AchievementDefinition, AchievementState, AchievementStats,
@@ -125,9 +124,6 @@ export class AchievementEngine {
     if (newlyUnlocked.length > 0) {
       this.store.saveState(this.state);
     }
-
-    // Fire-and-forget telemetry (non-blocking)
-    runTelemetry(this.stateDir, this.events).catch(() => { /* silent */ });
 
     this.unlockedThisPoll = newlyUnlocked;
     return newlyUnlocked;

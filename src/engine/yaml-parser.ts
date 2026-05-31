@@ -7,7 +7,7 @@ const VALID_REWARD_TYPES: Set<string> = new Set([
 
 const VALID_CONDITION_TYPES: Set<string> = new Set([
   'counter', 'threshold', 'streak', 'sequence', 'distinct_count',
-  'event', 'set_completion', 'ratio', 'pattern_match', 'percentile',
+  'event', 'set_completion', 'ratio', 'pattern_match',
   'mode', 'sequence_count',
 ]);
 
@@ -50,6 +50,8 @@ export function parseYAML(text: string): { definitions: AchievementDefinition[];
       progress_trackable: entry.progress_trackable === true || undefined,
       set_id: typeof entry.set === 'string' ? entry.set : typeof entry.set_id === 'string' ? entry.set_id : undefined,
       conditions,
+      future: entry.future === true || undefined,
+      challenge: entry.challenge === true || undefined,
     });
   }
 

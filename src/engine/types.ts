@@ -74,7 +74,6 @@ export type ConditionType =
   | 'set_completion'
   | 'ratio'
   | 'pattern_match'
-  | 'percentile'
   | 'mode'
   | 'sequence_count';
 
@@ -102,7 +101,7 @@ export interface Condition {
   threshold?: number;
   // pattern_match
   role?: string;
-  // percentile
+  // threshold (metric expressions)
   metric?: string;
   // distinct_count
   values?: string[];
@@ -136,6 +135,8 @@ export interface AchievementDefinition {
   conditions: Condition[];
   pixel_art?: Record<string, unknown>;
   unlocked_at?: string;
+  future?: boolean;  // pending event/hook support before reachable
+  challenge?: boolean;  // requires user to actively attempt (opt-in challenge)
 }
 
 export interface EvaluationResult {

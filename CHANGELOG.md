@@ -13,6 +13,22 @@ OpenClaw 从"仅 MCP + 指令文件"升级为完整的 auto-track 支持，与 C
 - **工具名映射** — `read_file`→`Read`, `write_file`→`Write`, `apply_patch`→`Edit`, `bash`→`Bash`, `glob`/`grep`
 - **+25 测试** — 翻译层全量覆盖（事件名×5、工具名×7、字段映射×5、集成×5、边界×3），81→106 tests
 
+### Dashboard UX Overhaul
+
+Dashboard 从"功能骨架"升级为"可日常使用的成就浏览器"。
+
+- **搜索框** — 实时过滤成就，搜 ID / 英文名 / 中文名 / 描述，输入框带清除按钮。空结果友好提示
+- **排序下拉** — 4 种排序：默认（YAML 定义序）/ 稀有度 ↓ / 最近解锁 / A → Z
+- **稀有度筛选** — 一排 rarity pills（All + 6 级），可与分类筛选叠加
+- **成就详情 Modal** — 点击任意卡片弹出：完整图标 + 名称 + 中英双语描述 + 稀有度/分类标签 + 进度条（未解锁）+ 解锁时间（已解锁）。Esc 或遮罩关闭
+- **10s 自动轮询** — 静默拉取 `/api/data`，新解锁成就 → Toast 通知 + 自动刷新界面（Modal 打开中不刷新，Toast 不影响）
+- **锁定/解锁视觉重设计** — 锁定卡：`grayscale(85%)`（冻结灰阶） + 色条统一灰 + 无稀有度 glow。已解锁卡：永久 ambient glow + `✓ Unlocked` 绿色标签 + icon-wrap 高亮边框
+- **Showcase 显示名称** — 展示柜格子从纯 icon → icon + 成就名称两行，76px → 90px 宽高
+- **`engine.reload()`** — Dashboard 每次请求从磁盘重读 state + events，修复"明明有解锁却显示 0%" bug
+- **`iconHtml()` 渲染函数** — 统一 9 处渲染点：emoji → `<span>`，图片路径 → `<img>`（`image-rendering: pixelated`）。icon 切换只需改 YAML，零代码改动
+- **YAML icon 对象格式** — parseIconField 支持 `icon: { src: "pixelart/x.png" }`，兼容原有 emoji 字符串
+- **UI 微调** — Level ring 移除，hero-section 最小高度 92vh → 60vh，暗色模式 emoji `brightness(1.15)`
+
 ### 文档更新
 
 - **CLAUDE.md** — 架构图从双线改为两通道对比图（MCP 主动调用 vs Hook 自动触发），加 Hook CLI 三工具对照表

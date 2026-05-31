@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.5] — 2026-05-31
+
+### Evaluator Bug 修复
+
+代码审查发现并修复 6 个问题，3 个新增测试覆盖（106→109）。
+
+- **streak event_level 时间窗口取反** — `evaluator.ts:367`: `!sessionWindow` → `sessionWindow`，与所有其他 evaluator 一致。`uncanny_accuracy` 成就受益
+- **same_target event-level streak 计数总次数而非连续次数** — `evaluator.ts:347-356`: 重写跟踪算法，检测不同字段值出现时重置计数器
+- **distinct_count 忽略 operator** — `evaluator.ts:491`: 始终 `>=` → 改用 `evalOp()`，支持全部 5 种操作符
+- **evalRatio 缺少 scope/window/filter** — `evaluator.ts:623+`: 添加 `scopeEvents()` + time window + custom filter + role，与所有其他 evaluator 对齐
+- **Hermes 会话 ID 死代码** — `hook.ts:413-414`: 空 if 块 → 从 event log 反向扫描恢复 session_id
+- **numerator/denominator 不支持嵌套 Condition 对象** — `yaml-parser.ts`: 新增 `parseConditionField()` 处理 `Condition | string` 两种类型
+
 ## [0.2.0] — 2026-05-31
 
 ### OpenClaw Auto-Track

@@ -1,6 +1,6 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-05-31 | 总成就数: 138 | 条件类型: 11 | Tests: 109 ✅ | 5 Agent 全接入
+> 最后更新: 2026-06-01 | 总成就数: 138 | 条件类型: 11 | Tests: 109 ✅ | 5 Agent 全接入
 
 ---
 
@@ -28,7 +28,7 @@
 
 ## P2 — 数据与体验缺口
 
-- [ ] **中文描述（`description_cn`）大面积缺失** — Dashboard 双语切换就绪，但大部分成就只有英文 `description`，切中文后描述为空或 fallback 英文。138 个成就逐条补中文描述。纯 YAML 改动，无代码风险，用户侧感知极强。
+- [x] **中文描述（`description_cn`）大面积缺失** — Dashboard 双语切换已就绪，但大多数成就只有英文。通过脚本逐条翻译并添加 138 条 description_cn，中文模式下完整显示中文描述。
 - [ ] **Dashboard 默认 0 成就解锁** — 新用户（或 `rm state.json` 后）Dashboard 全空。`npm run demo` 只生成 MVP 数据到 stateDir，Dashboard 不感知。考虑：Dashboard 加一个"加载 Demo 数据"按钮 or 首次访问时预设 6-10 个基础解锁。
 - [x] **issues-todo 上次更新 5/31，跟进 6 项 evaluator bugfix** — streak window/same_target/distinct_count op/ratio scope/Hermes session/nested Condition。+3 测试（106→109）。
 

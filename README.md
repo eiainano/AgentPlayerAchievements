@@ -88,7 +88,7 @@ src/
 │   └── mvp.ts              # MVP 数据生成
 ├── engine/
 │   ├── engine.ts           # 核心引擎（track / poll / stats）
-│   ├── evaluator.ts        # 条件评估器（12 种条件类型）
+│   ├── evaluator.ts        # 条件评估器（11 种条件类型）
 │   ├── store.ts            # 持久化存储
 │   ├── types.ts            # 类型定义
 │   └── yaml-parser.ts      # YAML 解析器
@@ -109,12 +109,12 @@ tools/                      # 像素画生成工具
 ├── preview.html            # 像素画预览
 ├── pixelart-*.png          # 像素画素材
 
-04-成就定义清单.yaml         # 117 个完整成就定义
+04-成就定义清单.yaml         # 138 个完整成就定义
 ```
 
 ## 成就定义
 
-所有成就定义在 `04-成就定义清单.yaml`，包含 10 个分类共 118 个成就。
+所有成就定义在 `04-成就定义清单.yaml`，包含 10 个分类共 138 个成就。
 
 每个成就包含：
 - id / name / description（中英文）

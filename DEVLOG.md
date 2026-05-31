@@ -2,6 +2,17 @@
 
 ---
 
+## 2026-05-31 (v0.1.5 — 6 evaluator/hook/parser bugfix)
+
+### 完成
+- **代码审查** — 5 代理并行审查全部 28 个 TS 源文件（4,108 行），交叉对照 19 份文档
+- **6 项修复**：streak event_level 时间窗口取反、same_target 连续计数、distinct_count operator、evalRatio scope/window/filter、Hermes 会话 ID 死代码、numerator/denominator 嵌套 Condition 对象
+- **+3 测试** — evaluator.test.ts 新增 streak 24h 窗口、distinct_count operator、ratio window+filter（106→109）
+- **版本同步** — package.json 0.1.4→0.1.5，main.ts 版本字符串 0.1.3→0.1.5
+- **文档核查** — 4 文件 stale 数字修复（issues-todo / TODO / PROGRESS / README）
+
+---
+
 ## 2026-05-31 (v0.2.0 — OpenClaw auto-track)
 
 ### 完成

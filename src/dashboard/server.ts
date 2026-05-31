@@ -7,6 +7,12 @@ import { formatAchievement, RARITY_RANK, loadShowcase, saveShowcase } from '../h
 import type { ShowcaseData } from '../helpers.js';
 import { buildApiResponse } from './api.js';
 import type { AchievementItem } from './api.js';
+import {
+  handleGetAchievements,
+  handleUpdateAchievement,
+  handleBatchUpdate,
+  handleReload,
+} from './customize-api.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.resolve(__dirname, 'public');
@@ -48,6 +54,24 @@ function parseJsonBody<T>(req: http.IncomingMessage): Promise<T | null> {
       catch { resolve(null); }
     });
   });
+}
+
+function serveStaticFile(res: http.ServerResponse, filePath: string): void {
+  if (!filePath.startsWith(PUBLIC_DIR)) {
+    res.writeHead(403);
+    res.end('Forbidden');
+    return;
+  }
+  const ext = path.extname(filePath);
+  const mime = MIME_TYPES[ext] || 'application/octet-stream';
+  try {
+    const content = fs.readFileSync(filePath);
+    res.writeHead(200, { 'Content-Type': mime });
+    res.end(content);
+  } catch {
+    res.writeHead(404);
+    res.end('Not Found');
+  }
 }
 
 function serveStatic(res: http.ServerResponse, urlPath: string): void {
@@ -135,6 +159,71 @@ export function createServer(engine: AchievementEngine, port = 3867): http.Serve
       return;
     }
 
+    // ═══════════════════════════════════════════════════════════════════
+    // Self-Customize API — achievement name/description personalization
+    // ═══════════════════════════════════════════════════════════════════
+
+    // GET /api/customize/achievements — load all with suggestions
+    if (url.pathname === '/api/customize/achievements' && req.method === 'GET') {
+      try {
+        const data = handleGetAchievements();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(data));
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: msg }));
+      }
+      return;
+    }
+
+    // PUT /api/customize/achievement — update single field
+    if (url.pathname === '/api/customize/achievement' && req.method === 'PUT') {
+      const body = await parseJsonBody<{ id: string; changes: Record<string, string | null> }>(req);
+      if (!body?.id || !body?.changes) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'Missing id or changes' }));
+        return;
+      }
+      try {
+        const result = handleUpdateAchievement(body);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: msg }));
+      }
+      return;
+    }
+
+    // POST /api/customize/batch — apply multiple changes at once
+    if (url.pathname === '/api/customize/batch' && req.method === 'POST') {
+      const body = await parseJsonBody<{ changes: Array<{ id: string; field: string; value: string }> }>(req);
+      if (!body?.changes || !Array.isArray(body.changes)) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'Missing changes array' }));
+        return;
+      }
+      try {
+        const result = handleBatchUpdate(body);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: msg }));
+      }
+      return;
+    }
+
+    // POST /api/customize/reload — reload YAML from disk
+    if (url.pathname === '/api/customize/reload' && req.method === 'POST') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(handleReload()));
+      return;
+    }
+
     // ── POST /api/showcase/auto ────────────────────────────────────────
     if (url.pathname === '/api/showcase/auto' && req.method === 'POST') {
       const unlocked = engine.definitions
@@ -148,6 +237,12 @@ export function createServer(engine: AchievementEngine, port = 3867): http.Serve
       const result = buildShowcaseResponse(engine);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ status: 'ok', showcase: result }));
+      return;
+    }
+
+    // ── Self-Customize page ─────────────────────────────────────────
+    if (url.pathname === '/customize' && req.method === 'GET') {
+      serveStaticFile(res, path.join(PUBLIC_DIR, 'customize.html'));
       return;
     }
 

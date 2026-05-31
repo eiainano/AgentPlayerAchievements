@@ -1,6 +1,6 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-05-31 | 总成就数: 138 | 条件类型: 11 | Tests: 106 ✅ | 5 Agent 全接入
+> 最后更新: 2026-05-31 | 总成就数: 138 | 条件类型: 11 | Tests: 109 ✅ | 5 Agent 全接入
 
 ---
 
@@ -28,16 +28,16 @@
 
 ## P2 — 数据与体验缺口
 
-- [ ] **中文描述（`description_cn`）大面积缺失** — Dashboard 双语切换就绪，但大部分成就只有英文 `description`，切中文后描述为空或 fallback 英文。117 个成就逐条补中文描述。纯 YAML 改动，无代码风险，用户侧感知极强。
+- [ ] **中文描述（`description_cn`）大面积缺失** — Dashboard 双语切换就绪，但大部分成就只有英文 `description`，切中文后描述为空或 fallback 英文。138 个成就逐条补中文描述。纯 YAML 改动，无代码风险，用户侧感知极强。
 - [ ] **Dashboard 默认 0 成就解锁** — 新用户（或 `rm state.json` 后）Dashboard 全空。`npm run demo` 只生成 MVP 数据到 stateDir，Dashboard 不感知。考虑：Dashboard 加一个"加载 Demo 数据"按钮 or 首次访问时预设 6-10 个基础解锁。
-- [ ] **issues-todo 上次更新 5/30，漏录多项** — Dashboard UX 大改（搜索/排序/筛选/Modal/自动轮询）、0% bug 修复（engine.reload）、像素画 icon 适配、level ring 移除等均未记录。
+- [ ] **issues-todo 上次更新 5/31，跟进 6 项 evaluator bugfix** — streak window/same_target/distinct_count op/ratio scope/Hermes session/nested Condition。+3 测试（106→109）。
 
 ---
 
 ## P3 — YAML 质量 / 资产
 
 - [ ] **Hidden 分类占 22%** — 26 个隐藏成就是最大分类，部分可重新归类到更合适的 category。
-- [ ] **像素画 icon 资产暂缺** — `iconHtml()` + `parseIconField({ src })` 已就绪，YAML 也支持 `icon: { src, alt }` 对象格式。但 117 个成就全部仍是 emoji 字符串，没有实际的像素画 PNG。需要逐成就设计/生成像素画图标（可渐进替换，emoji 和像素画共存）。
+- [ ] **像素画 icon 资产暂缺** — `iconHtml()` + `parseIconField({ src })` 已就绪，YAML 也支持 `icon: { src, alt }` 对象格式。但 138 个成就全部仍是 emoji 字符串，没有实际的像素画 PNG。需要逐成就设计/生成像素画图标（可渐进替换，emoji 和像素画共存）。
 - [ ] **Set 名称只有英文** — 9 个 set 定义无 `name_cn`，Dashboard 套装页切中文后仍显示英文名。
 
 ---

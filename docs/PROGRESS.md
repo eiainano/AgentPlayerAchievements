@@ -4,14 +4,14 @@
 
 ## 总体状态
 
-v0.1.4 完成。OpenClaw auto-track 落地——与 CC/Hermes 对齐的三工具 auto-track 架构。138 个成就全部可达成，106 个测试全绿。
+v0.1.5 完成。6 项 evaluator/hook/parser bug 修复 + OpenClaw auto-track 落地。138 个成就全部可达成，109 个测试全绿。
 
 ---
 
 ## 已完成 ✅
 
 ### 核心引擎
-- [x] 12 种 Condition Type：Counter、Threshold（含 field 求和 + metric 表达式）、Streak、Sequence（含 consecutive 模式）、DistinctCount（含 values 白名单）、Event、SetCompletion、Mode、SequenceCount、PatternMatch、Ratio、Percentile
+- [x] 11 种 Condition Type：Counter、Threshold（含 field 求和 + metric 表达式）、Streak、Sequence（含 consecutive 模式）、DistinctCount（含 values 白名单）、Event、SetCompletion、Mode、SequenceCount、PatternMatch、Ratio（Percentile 已移除）
 - [x] YAML 解析器加载 138 个成就定义（含 12 个事件驱动型，4 个不可达已删除）
 - [x] PendingQueue 并发安全
 - [x] MCP Tools：`achievement_track`、`achievement_poll`、`achievement_stats`、`achievement_showcase`、`achievement_config`

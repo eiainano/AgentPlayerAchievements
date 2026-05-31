@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AGPA — Self-Customize</title>
+  <link rel="stylesheet" href="/customize.css">
+</head>
+<body>
+  <header id="top-bar">
+    <div class="bar-inner">
+      <span class="bar-brand">🎨 Self-Customize</span>
+      <div class="bar-info">
+        <span id="stat-total">138 total</span>
+        <span id="stat-cn">44 CN</span>
+        <span id="stat-missing">94 missing</span>
+        <span id="stat-suggestions">0 suggestions</span>
+      </div>
+      <div class="bar-actions">
+        <button id="btn-save-all" class="btn primary" disabled>💾 Save Changes (<span id="dirty-count">0</span>)</button>
+        <button id="btn-reload" class="btn">🔄 Reload</button>
+      </div>
+    </div>
+  </header>
+
+  <div id="main-layout">
+    <!-- Left: Achievement list -->
+    <aside id="sidebar">
+      <div class="sidebar-toolbar">
+        <input type="search" id="search-input" placeholder="Search ID / name…" autocomplete="off">
+        <div class="filter-row">
+          <select id="filter-category">
+            <option value="">All Categories</option>
+          </select>
+          <select id="filter-rarity">
+            <option value="">All Rarities</option>
+            <option value="common">Common</option>
+            <option value="uncommon">Uncommon</option>
+            <option value="rare">Rare</option>
+            <option value="epic">Epic</option>
+            <option value="legendary">Legendary</option>
+            <option value="mythic">Mythic</option>
+          </select>
+        </div>
+        <label class="toggle-filter">
+          <input type="checkbox" id="filter-no-cn" checked>
+          <span>Only missing CN</span>
+        </label>
+        <label class="toggle-filter">
+          <input type="checkbox" id="filter-suggestions">
+          <span>Only with suggestions</span>
+        </label>
+      </div>
+      <ul id="ach-list"></ul>
+    </aside>
+
+    <!-- Right: Edit panel -->
+    <main id="editor">
+      <div id="editor-empty" class="editor-state">
+        <div class="empty-hint">
+          <span class="empty-icon">👈</span>
+          <p>Select an achievement from the list to edit</p>
+          <p class="empty-sub">Edit Chinese / English names and descriptions. Use ↑↓ to navigate, Ctrl+S to save.</p>
+        </div>
+      </div>
+
+      <div id="editor-content" class="editor-state" style="display:none">
+        <div class="editor-header">
+          <span id="edit-icon" class="edit-icon"></span>
+          <div class="edit-meta">
+            <span id="edit-id" class="edit-id"></span>
+            <span id="edit-category" class="badge badge-cat"></span>
+            <span id="edit-rarity" class="badge badge-rarity"></span>
+            <span id="edit-hidden" class="badge badge-hidden" style="display:none">hidden</span>
+            <span id="edit-set" class="badge badge-set" style="display:none"></span>
+          </div>
+        </div>
+
+        <div class="editor-nav">
+          <button id="btn-prev" class="btn small">← Prev</button>
+          <span id="edit-pos">1 / 138</span>
+          <button id="btn-next" class="btn small">Next →</button>
+        </div>
+
+        <div id="edit-fields">
+          <!-- name (EN) -->
+          <div class="field-group">
+            <label class="field-label">
+              <span class="label-text">English Name</span>
+              <span class="label-lang">EN ✏️</span>
+            </label>
+            <input type="text" id="field-name" class="field-input" data-field="name">
+            <div id="suggestions-name" class="suggestions-area"></div>
+          </div>
+
+          <!-- name_cn (中文) -->
+          <div class="field-group">
+            <label class="field-label">
+              <span class="label-text">Chinese Name</span>
+              <span class="label-lang">中文 ✏️</span>
+            </label>
+            <input type="text" id="field-name_cn" class="field-input" data-field="name_cn" placeholder="(missing)">
+            <div id="suggestions-name_cn" class="suggestions-area"></div>
+          </div>
+
+          <!-- description (中文，可编辑) -->
+          <div class="field-group">
+            <label class="field-label">
+              <span class="label-text">Chinese Description</span>
+              <span class="label-lang">中文 ✏️</span>
+            </label>
+            <textarea id="field-description" class="field-input field-textarea" data-field="description" rows="2"></textarea>
+            <div id="suggestions-description" class="suggestions-area"></div>
+          </div>
+
+          <!-- description_en (英文，只读预览) -->
+          <div class="field-group">
+            <label class="field-label">
+              <span class="label-text">English Description</span>
+              <span class="label-lang">EN 👁️</span>
+              <span class="label-hint">— 编辑中文后保存，我们会统一翻译成英文</span>
+            </label>
+            <div id="field-description_en" class="field-en-preview">
+              <span class="en-placeholder">(will be translated from Chinese)</span>
+            </div>
+          </div>
+
+          <!-- conditions (read-only) -->
+          <div class="field-group">
+            <label class="field-label">
+              <span class="label-text">Conditions</span>
+              <span class="label-lang">只读</span>
+            </label>
+            <pre id="field-conditions" class="field-conditions"></pre>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast notifications -->
+  <div id="toast-container"></div>
+
+  <script src="/customize.js"></script>
+</body>
+</html>

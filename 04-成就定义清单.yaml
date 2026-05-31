@@ -9,7 +9,8 @@ definitions:
   - id: first_contact
     name: Hello World
     name_cn: Hello World
-    description: 开启你的第一次Agent对话。
+    description: Start your first agent conversation.
+    description_cn: 开启你的第一次Agent对话。
     icon: "👋"
     category: onboarding
     rarity: common
@@ -24,7 +25,8 @@ definitions:
   - id: three_company
     name: Hat Trick
     name_cn: "帽子戏法"
-    description: 累计完成 3 个 task，一个好的开始，不是吗？
+    description: 3 tasks completed — a good start, isn't it?
+    description_cn: 累计完成 3 个 task，一个好的开始，不是吗？
     icon: "🤝"
     category: onboarding
     rarity: common
@@ -40,7 +42,8 @@ definitions:
   - id: tool_time
     name: I Got Tools
     name_cn: "工具学徒"
-    description: agent 执行了第一个 tool call。
+    description: Your agent executed its first tool call.
+    description_cn: agent 执行了第一个 tool call。
     icon: "🔧"
     category: onboarding
     rarity: common
@@ -55,7 +58,8 @@ definitions:
   - id: permission_granted
     name: "Permission Granted"
     name_cn: "门禁卡"
-    description: 手动调整过 agent 的权限模式。控制权，你说了算。
+    description: Manually adjusted the agent's permission mode. You're in control.
+    description_cn: 手动调整过 agent 的权限模式。控制权，你说了算。
     icon: "🔐"
     category: onboarding
     rarity: uncommon
@@ -70,7 +74,8 @@ definitions:
   - id: read_manual
     name: "Read the Manual"
     name_cn: "看说明书"
-    description: "打开过 help 或文档。很少有人这么做。"
+    description: Opened help or documentation. Few people do this.
+    description_cn: "打开过 help 或文档。很少有人这么做。"
     icon: "📖"
     category: onboarding
     rarity: uncommon
@@ -85,7 +90,8 @@ definitions:
   - id: first_sunrise
     name: Once Again
     name_cn: "再接再厉"
-    description: 24h 内开启 ≥ 2 个 session。你和agent越来越熟悉了。
+    description: Started 2+ sessions within 24 hours. You and your agent are getting closer.
+    description_cn: 24h 内开启 ≥ 2 个 session。你和agent越来越熟悉了。
     icon: "🌅"
     category: onboarding
     rarity: common
@@ -102,7 +108,8 @@ definitions:
   - id: first_shot
     name: Command & Conquer
     name_cn: 命令与征服
-    description: 使用了第一个 slash command。
+    description: Used your first slash command.
+    description_cn: 使用了第一个 slash command。
     icon: "🔫"
     category: onboarding
     rarity: common
@@ -117,7 +124,8 @@ definitions:
   - id: model_hopper
     name: Model Taste
     name_cn: "换换口味"
-    description: "手动切换了一次 AI 模型。总有一款适合你。"
+    description: Switched AI models manually. There's one for every mood.
+    description_cn: "手动切换了一次 AI 模型。总有一款适合你。"
     icon: "🔄"
     category: onboarding
     rarity: common
@@ -132,7 +140,8 @@ definitions:
   - id: worktree_trial
     name: Isolation Area
     name_cn: "隔离区"
-    description: 使用了worktree 模式工作。代码安全第一。
+    description: Used worktree isolation. Code safety first.
+    description_cn: 使用了worktree 模式工作。代码安全第一。
     icon: "🌲"
     category: onboarding
     rarity: common
@@ -147,7 +156,8 @@ definitions:
   - id: mcp_first_contact
     name: MCP Plug-in
     name_cn: 场外嘉宾
-    description: "连接了第一个 MCP server。agent 的能力向外延伸了。"
+    description: Connected your first MCP server. Your agent's reach just expanded.
+    description_cn: "连接了第一个 MCP server。agent 的能力向外延伸了。"
     icon: "🔌"
     category: onboarding
     rarity: uncommon
@@ -162,7 +172,8 @@ definitions:
   - id: visual_prompt
     name: "A Picture's Worth"
     name_cn: "有图有真相"
-    description: 给 agent 传了一张图片。
+    description: Sent an image to your agent.
+    description_cn: 给 agent 传了一张图片。
     icon: "🖼️"
     category: onboarding
     rarity: uncommon
@@ -178,7 +189,8 @@ definitions:
   - id: dashboard_visitor
     name: "Window Shopper"
     name_cn: "橱窗购物"
-    description: 打开过成就 Dashboard。
+    description: Opened the achievement Dashboard.
+    description_cn: 打开过成就 Dashboard。
     icon: "🪟"
     category: onboarding
     rarity: common
@@ -196,7 +208,8 @@ definitions:
   - id: double_digits
     name: "Double Digits"
     name_cn: 两位数
-    description: "10 个 task 完成。你已经不是新手了。"
+    description: 10 tasks completed. You're no longer a beginner.
+    description_cn: "10 个 task 完成。你已经不是新手了。"
     icon: "🔟"
     category: milestones
     rarity: uncommon
@@ -212,7 +225,8 @@ definitions:
   - id: century
     name: "Century"
     name_cn: 创世纪
-    description: 经历了100 个 task。你开始怀疑没有 agent 的日子是怎么过的。
+    description: 100 tasks completed. You wonder how you ever worked without an agent.
+    description_cn: 经历了100 个 task。你开始怀疑没有 agent 的日子是怎么过的。
     icon: "💯"
     category: milestones
     rarity: rare
@@ -228,7 +242,8 @@ definitions:
   - id: millennium
     name: "Millennium"
     name_cn: 千禧年
-    description: 经历了1000 个 task。你和 agent 已是一种共生关系。
+    description: 1,000 tasks completed. You and your agent are now symbiotic.
+    description_cn: 经历了1000 个 task。你和 agent 已是一种共生关系。
     icon: "🏆"
     category: milestones
     rarity: epic
@@ -244,7 +259,8 @@ definitions:
   - id: marathon
     name: "Marathon"
     name_cn: 跑马拉松
-    description: 单 session 持续超过 3 小时。不考虑上个卫生间吗？
+    description: Single session lasting over 3 hours. Maybe take a bathroom break?
+    description_cn: 单 session 持续超过 3 小时。不考虑上个卫生间吗？
     icon: "🏃"
     category: milestones
     rarity: uncommon
@@ -259,7 +275,8 @@ definitions:
   - id: streak_7
     name: "Streak 7"
     name_cn: 连续7天使用
-    description: "连续 7 天使用。agent 已经是你的日常。"
+    description: 7 consecutive days of use. Your agent is part of your daily routine.
+    description_cn: "连续 7 天使用。agent 已经是你的日常。"
     icon: "🔥"
     category: milestones
     rarity: uncommon
@@ -275,7 +292,8 @@ definitions:
   - id: streak_30
     name: "Streak 30"
     name_cn: 连续30天使用
-    description: 连续 30 天使用。不仅是工具，是生活方式。
+    description: 30 consecutive days of use. It's not just a tool anymore — it's a lifestyle.
+    description_cn: 连续 30 天使用。不仅是工具，是生活方式。
     icon: "📅"
     category: milestones
     rarity: rare
@@ -291,7 +309,8 @@ definitions:
   - id: streak_100
     name: "Streak 100"
     name_cn: 连续 100 天使用
-    description: 连续 100 天使用。你确定自己不是在和Agent谈恋爱？
+    description: 100 consecutive days of use. Are you sure you're not dating your agent?
+    description_cn: 连续 100 天使用。你确定自己不是在和Agent谈恋爱？
     icon: "🎬"
     category: milestones
     rarity: legendary
@@ -307,7 +326,8 @@ definitions:
   - id: polyglot
     name: "Polyglot"
     name_cn: 多语言人士
-    description: "agent 对话涉及过 5 种以上编程语言。"
+    description: Used 5+ programming languages in agent conversations.
+    description_cn: "agent 对话涉及过 5 种以上编程语言。"
     icon: "🌐"
     category: milestones
     rarity: uncommon
@@ -323,7 +343,8 @@ definitions:
   - id: half_century
     name: "Half Century"
     name_cn: 任务过半百
-    description: 50 个 task 完成。你不再是新手了。
+    description: 50 tasks completed. You're past the rookie phase.
+    description_cn: 50 个 task 完成。你不再是新手了。
     icon: "🪙"
     category: milestones
     rarity: rare
@@ -339,7 +360,8 @@ definitions:
   - id: streak_3
     name: "Hat Trick"
     name_cn: "帽子戏法"
-    description: "连续 3 天使用。习惯正在养成。比 7 天更近，比明天更远。"
+    description: 3 consecutive days of use. A habit is forming.
+    description_cn: "连续 3 天使用。习惯正在养成。比 7 天更近，比明天更远。"
     icon: "🎩"
     category: milestones
     rarity: common
@@ -355,7 +377,8 @@ definitions:
   - id: file_centurion
     name: "File Centurion"
     name_cn: "文件百夫长"
-    description: 累计读取了 100 个文件。你见过的代码可不少了。
+    description: Read 100 files cumulatively. You've seen some code.
+    description_cn: 累计读取了 100 个文件。你见过的代码可不少了。
     icon: "📂"
     category: milestones
     rarity: uncommon
@@ -374,7 +397,8 @@ definitions:
   - id: chain_reaction
     name: "Chain Reaction"
     name_cn: 链式反应
-    description: "单次对话中 agent 完成 5 步以上连续 tool call。"
+    description: 5+ consecutive tool calls by the agent in a single conversation.
+    description_cn: "单次对话中 agent 完成 5 步以上连续 tool call。"
     icon: "⛓️"
     category: skill
     rarity: uncommon
@@ -390,7 +414,8 @@ definitions:
   - id: full_auto
     name: "Full Auto"
     name_cn: 自动档
-    description: 10 步以上 tool调用，全程自主零拒绝。
+    description: 10+ tool calls with full autonomy, zero rejections.
+    description_cn: 10 步以上 tool调用，全程自主零拒绝。
     icon: "🤖"
     category: skill
     rarity: rare
@@ -413,7 +438,8 @@ definitions:
   - id: architect
     name: "Architect"
     name_cn: 建筑师
-    description: "单 task 中 agent 成功编辑了 5 个以上文件。"
+    description: Agent successfully edited 5+ files in a single task.
+    description_cn: "单 task 中 agent 成功编辑了 5 个以上文件。"
     icon: "🏗️"
     category: skill
     rarity: rare
@@ -430,7 +456,8 @@ definitions:
   - id: surgeon
     name: "Surgeon"
     name_cn: 外科手术
-    description: 单 task中，你只改了恰好需要的那一点点。
+    description: In a single task, you only changed exactly what was needed.
+    description_cn: 单 task中，你只改了恰好需要的那一点点。
     icon: "🩺"
     category: skill
     rarity: epic
@@ -449,7 +476,8 @@ definitions:
   - id: seeker
     name: "Seeker"
     name_cn: 探索者
-    description: 单 session 中搜索类 tool ≥ 10 次。
+    description: 10+ search-type tools used in a single session.
+    description_cn: 单 session 中搜索类 tool ≥ 10 次。
     icon: "🔍"
     category: skill
     rarity: uncommon
@@ -465,7 +493,8 @@ definitions:
   - id: the_debugger
     name: "The Debugger"
     name_cn: 捉虫行动
-    description: 代码报错，你让agent自己修好了。
+    description: Code failed — you let the agent fix it itself.
+    description_cn: 代码报错，你让agent自己修好了。
     icon: "🐛"
     category: skill
     rarity: uncommon
@@ -479,7 +508,8 @@ definitions:
   - id: triple_debugger
     name: "Triple Debugger"
     name_cn: 三重调试
-    description: "单 task 中 agent 自修复 ≥ 3 次错误。"
+    description: Agent self-recovered from 3+ errors in a single task.
+    description_cn: "单 task 中 agent 自修复 ≥ 3 次错误。"
     icon: "🪲"
     category: skill
     rarity: rare
@@ -496,7 +526,8 @@ definitions:
   - id: tool_completist
     name: "Tool Completist"
     name_cn: 工具大全
-    description: 单 session 中使用过全部核心 tool（Read / Edit / Write / Bash / Think）。
+    description: Used all core tools (Read / Edit / Write / Bash / Think) in one session.
+    description_cn: 单 session 中使用过全部核心 tool（Read / Edit / Write / Bash / Think）。
     icon: "🧰"
     category: skill
     rarity: rare
@@ -513,7 +544,8 @@ definitions:
   - id: the_switch
     name: Shift Gears
     name_cn: 模式换档
-    description: 同一次 task 中从 Plan 模式切换到非Plan模式，完成最终实现。
+    description: Switched from Plan mode to non-Plan mode in the same task to complete implementation.
+    description_cn: 同一次 task 中从 Plan 模式切换到非Plan模式，完成最终实现。
     icon: "🎭"
     category: skill
     rarity: uncommon
@@ -527,7 +559,8 @@ definitions:
   - id: off_the_grid
     name: "Off the Grid"
     name_cn: "离线模式"
-    description: 完成一个 task，全程未使用搜索工具（WebSearch/WebFetch）。
+    description: Completed a task without using any search tools (WebSearch / WebFetch).
+    description_cn: 完成一个 task，全程未使用搜索工具（WebSearch/WebFetch）。
     icon: "🏝️"
     category: skill
     rarity: rare
@@ -546,7 +579,8 @@ definitions:
   - id: first_try
     name: Smooth Criminal
     name_cn: 一次就过
-    description: agent 写完代码后第一次测试就直接通过，中间无失败，非常丝滑。
+    description: Agent's first test run passed on the first try — zero failures, smooth as silk.
+    description_cn: agent 写完代码后第一次测试就直接通过，中间无失败，非常丝滑。
     icon: "🐞"
     category: skill
     rarity: rare
@@ -569,7 +603,8 @@ definitions:
   - id: terminal_only
     name: "Terminal Only"
     name_cn: 纯终端玩法
-    description: 完成一个 task只用终端命令，零文件编辑。简单、老派，但有效。
+    description: Completed a task using only terminal commands, zero file edits. Simple, old-school, effective.
+    description_cn: 完成一个 task只用终端命令，零文件编辑。简单、老派，但有效。
     icon: "💻"
     category: skill
     rarity: epic
@@ -597,7 +632,8 @@ definitions:
   - id: minimalist
     name: "Minimalist"
     name_cn: 极简主义
-    description: prompt 长度 ≤ 80 字符，惜字如金。
+    description: Prompt was 80 characters or fewer. Every word counts.
+    description_cn: prompt 长度 ≤ 80 字符，惜字如金。
     icon: "🪶"
     category: style
     rarity: epic
@@ -613,7 +649,8 @@ definitions:
   - id: novelist
     name: "Novelist"
     name_cn: 小说家
-    description: prompt 长度 ≥ 500 字符，你很细心！
+    description: "Prompt was 500+ characters. You're thorough!"
+    description_cn: prompt 长度 ≥ 500 字符，你很细心！
     icon: "📝"
     category: style
     rarity: epic
@@ -629,7 +666,8 @@ definitions:
   - id: one_shot
     name: "One Shot"
     name_cn: 一发入魂
-    description: "单 task 只问了 agent 一次就完成。"
+    description: Completed a task with just one agent query.
+    description_cn: "单 task 只问了 agent 一次就完成。"
     icon: "🎯"
     category: style
     rarity: rare
@@ -644,7 +682,8 @@ definitions:
   - id: iterative_refiner
     name: "Iterative Refiner"
     name_cn: 慢工出细活
-    description: 单 task 交互 > 20 轮才完成。
+    description: Single task required 20+ turns to complete.
+    description_cn: 单 task 交互 > 20 轮才完成。
     icon: "🔄"
     category: style
     rarity: rare
@@ -659,7 +698,8 @@ definitions:
   - id: night_owl
     name: "Night Owl"
     name_cn: 夜猫子
-    description: 启动session在凌晨 (0:00-5:00)。
+    description: "Started a session in the wee hours (0:00-5:00)."
+    description_cn: 启动session在凌晨 (0:00-5:00)。
     icon: "🦉"
     category: style
     rarity: uncommon
@@ -675,7 +715,8 @@ definitions:
   - id: weekend_warrior
     name: Not Invited to Party
     name_cn: 开趴不邀请我
-    description: session在周末，你没有去参加派对吗？
+    description: Session on the weekend. No party to go to?
+    description_cn: session在周末，你没有去参加派对吗？
     icon: "⚔️"
     category: style
     rarity: uncommon
@@ -691,7 +732,8 @@ definitions:
   - id: copy_paste_king
     name: Copy-Paste is All You Need
     name_cn: Ctrl C + Ctrl V就好了
-    description: 粘贴内容 / 总输入 > 50%。
+    description: Pasted content accounts for over 50% of total input.
+    description_cn: 粘贴内容 / 总输入 > 50%。
     icon: "📋"
     category: style
     rarity: uncommon
@@ -709,7 +751,8 @@ definitions:
   - id: file_whisperer
     name: File Shepherd
     name_cn: 文件牧羊人
-    description: "累计让 agent 编辑了 500 个文件。"
+    description: Agent has edited 500 files cumulatively.
+    description_cn: "累计让 agent 编辑了 500 个文件。"
     icon: "📁"
     category: tool_mastery
     rarity: rare
@@ -725,7 +768,8 @@ definitions:
   - id: git_wizard
     name: "Git Wizard"
     name_cn: Git魔法师
-    description: "agent 参与了 100 次 git commit。"
+    description: Agent participated in 100 git commits.
+    description_cn: "agent 参与了 100 次 git commit。"
     icon: "🧙"
     category: tool_mastery
     rarity: rare
@@ -742,7 +786,8 @@ definitions:
   - id: shell_shocker
     name: Ghost in the Shell
     name_cn: 攻“壳”机动队
-    description: 你让agent 在终端执行了 250 次命令。
+    description: You had your agent run 250 terminal commands.
+    description_cn: 你让agent 在终端执行了 250 次命令。
     icon: "💻"
     category: tool_mastery
     rarity: uncommon
@@ -759,7 +804,8 @@ definitions:
   - id: web_wanderer
     name: Webmancer
     name_cn: 网络漫游者
-    description: "agent 上网搜索了 100 次。"
+    description: Agent searched the web 100 times.
+    description_cn: "agent 上网搜索了 100 次。"
     icon: "🌍"
     category: tool_mastery
     rarity: uncommon
@@ -776,7 +822,8 @@ definitions:
   - id: parallel_universe
     name: "Parallel Universe"
     name_cn: 平行宇宙
-    description: 你在同一项目上，同时有 ≥ 3 个 active session。
+    description: 3+ active sessions on the same project simultaneously.
+    description_cn: 你在同一项目上，同时有 ≥ 3 个 active session。
     icon: "🌌"
     category: tool_mastery
     rarity: rare
@@ -791,7 +838,8 @@ definitions:
   - id: mcp_explorer
     name: "MCP Explorer"
     name_cn: MCP 探索者
-    description: "连接并使用过 5 个以上 MCP server。"
+    description: Connected and used 5+ MCP servers.
+    description_cn: "连接并使用过 5 个以上 MCP server。"
     icon: "🔌"
     category: tool_mastery
     rarity: epic
@@ -807,7 +855,8 @@ definitions:
   - id: image_whisperer
     name: More than meets the eye
     name_cn: 不只眼前所见
-    description: Agent读图次数>=5次。
+    description: Agent read images 5+ times.
+    description_cn: Agent读图次数>=5次。
     icon: "📸"
     category: tool_mastery
     rarity: uncommon
@@ -822,7 +871,8 @@ definitions:
   - id: undo_master
     name: Take back a Move
     name_cn: 悔棋
-    description: "累计撤回了 agent 的修改 25 次。完美需要反复打磨。"
+    description: Reverted agent's changes 25 times cumulatively. Perfection needs polish.
+    description_cn: "累计撤回了 agent 的修改 25 次。完美需要反复打磨。"
     icon: "↩️"
     category: tool_mastery
     rarity: uncommon
@@ -838,7 +888,8 @@ definitions:
   - id: git_tenderfoot
     name: Git Scouting
     name_cn: Git 童子军
-    description: agent 参与了 10 次 git commit。
+    description: Agent participated in 10 git commits.
+    description_cn: agent 参与了 10 次 git commit。
     icon: "🐾"
     category: tool_mastery
     rarity: common
@@ -855,7 +906,8 @@ definitions:
   - id: git_veteran
     name: "Git Veteran"
     name_cn: "Git 老兵"
-    description: "agent 参与了 250 次 git commit。你们的协作已经超越了代码——是信任。"
+    description: Agent participated in 250 git commits. Your collaboration transcends code — it's trust.
+    description_cn: "agent 参与了 250 次 git commit。你们的协作已经超越了代码——是信任。"
     icon: "🎖️"
     category: tool_mastery
     rarity: epic
@@ -875,7 +927,8 @@ definitions:
   - id: pr_champion
     name: "PR Champion"
     name_cn: PR 冠军
-    description: 通过 agent 创建了你的第一个 PR。
+    description: Created your first PR through an agent.
+    description_cn: 通过 agent 创建了你的第一个 PR。
     icon: "🔀"
     category: workflow
     rarity: uncommon
@@ -891,7 +944,8 @@ definitions:
   - id: cicd_pioneer
     name: "CI/CD Pioneer"
     name_cn: CI/CD 先驱
-    description: agent 帮你创建了 GitHub Actions workflow 文件。
+    description: Agent helped you create a GitHub Actions workflow file.
+    description_cn: agent 帮你创建了 GitHub Actions workflow 文件。
     icon: "⚙️"
     category: workflow
     rarity: rare
@@ -907,7 +961,8 @@ definitions:
   - id: code_reviewer
     name: Code Reviewer
     name_cn: 代码审查者
-    description: "让 agent 审查过代码，给出了有价值的建议。"
+    description: Had your agent review code and provide valuable suggestions.
+    description_cn: "让 agent 审查过代码，给出了有价值的建议。"
     icon: "👁️"
     category: workflow
     rarity: uncommon
@@ -921,7 +976,8 @@ definitions:
   - id: deep_review
     name: "Deep Review"
     name_cn: 深度审查
-    description: agent 一次审查发现 10+ 个问题。
+    description: Agent found 10+ issues in a single review.
+    description_cn: agent 一次审查发现 10+ 个问题。
     icon: "🧐"
     category: workflow
     rarity: uncommon
@@ -936,7 +992,8 @@ definitions:
   - id: plan_mode_user
     name: Strategy Master
     name_cn: 战略大师
-    description: 对复杂任务使用了 Plan 模式，三思而后 code。
+    description: Used Plan mode for complex tasks. Think twice, code once.
+    description_cn: 对复杂任务使用了 Plan 模式，三思而后 code。
     icon: "🧠"
     category: workflow
     rarity: uncommon
@@ -951,7 +1008,8 @@ definitions:
   - id: plan_strategist
     name: Blueprintist
     name_cn: 蓝图主义者
-    description: 累计使用 Plan 模式 25 次，你很喜欢画蓝图。
+    description: Used Plan mode 25 times cumulatively. You love blueprints.
+    description_cn: 累计使用 Plan 模式 25 次，你很喜欢画蓝图。
     icon: "📐"
     category: workflow
     rarity: rare
@@ -967,7 +1025,8 @@ definitions:
   - id: auto_committer
     name: "Auto Committer"
     name_cn: 自动提交
-    description: "agent 替你 commit 了代码。你只需要点头。"
+    description: Agent committed code for you. You just nodded.
+    description_cn: "agent 替你 commit 了代码。你只需要点头。"
     icon: "🤖"
     category: workflow
     rarity: common
@@ -983,7 +1042,8 @@ definitions:
   - id: changelog_keeper
     name: Keep a diary
     name_cn: 记日记
-    description: agent 帮你写了 changelog。
+    description: Agent wrote the changelog for you.
+    description_cn: agent 帮你写了 changelog。
     icon: "📋"
     category: workflow
     rarity: uncommon
@@ -998,7 +1058,8 @@ definitions:
   - id: context_conscious
     name: Context Anxiety
     name_cn: 上下文焦虑
-    description: "单 task 中触发了 3 次以上自动压缩。你在挑战 agent 的记忆极限。"
+    description: Triggered 3+ auto-compactions in a single task. You're pushing your agent's memory limit.
+    description_cn: "单 task 中触发了 3 次以上自动压缩。你在挑战 agent 的记忆极限。"
     icon: "🧩"
     category: workflow
     rarity: uncommon
@@ -1013,7 +1074,8 @@ definitions:
   - id: session_veteran
     name: Talk Show Host
     name_cn: 脱口秀主持人
-    description: 累计开启 50 个 session。
+    description: Started 50 sessions cumulatively.
+    description_cn: 累计开启 50 个 session。
     icon: "🪖"
     category: workflow
     rarity: uncommon
@@ -1029,7 +1091,8 @@ definitions:
   - id: session_centurion
     name: The King's Speech
     name_cn: 国王的演讲
-    description: 累计开启 300 个 session。
+    description: Started 300 sessions cumulatively.
+    description_cn: 累计开启 300 个 session。
     icon: "📚"
     category: workflow
     rarity: rare
@@ -1045,7 +1108,8 @@ definitions:
   - id: token_titan
     name: Go buy tokens now!
     name_cn: 快去买Token！
-    description: 累计消耗 10M token。你是服务商最喜欢的用户。
+    description: Consumed 10M tokens cumulatively. Your provider loves you.
+    description_cn: 累计消耗 10M token。你是服务商最喜欢的用户。
     icon: "💎"
     category: workflow
     rarity: rare
@@ -1062,7 +1126,8 @@ definitions:
   - id: token_legend
     name: Infinite Monkey Theorem
     name_cn: 无限猴子定理
-    description: 累计消耗 100M token。
+    description: Consumed 100M tokens cumulatively.
+    description_cn: 累计消耗 100M token。
     icon: "🌌"
     category: workflow
     rarity: epic
@@ -1079,7 +1144,8 @@ definitions:
   - id: multi_project
     name: "Multi-Project"
     name_cn: 多项目
-    description: 同日内在 3 个以上项目中使用了 agent。
+    description: Used the agent in 3+ different projects on the same day.
+    description_cn: 同日内在 3 个以上项目中使用了 agent。
     icon: "🗂️"
     category: workflow
     rarity: rare
@@ -1096,7 +1162,8 @@ definitions:
   - id: full_cycle
     name: "Full Cycle"
     name_cn: 全流程
-    description: agent 独立完成了编码→commit→PR 全过程，你只是看了结果。
+    description: "Agent independently completed the full cycle: code → commit → PR. You just watched the results."
+    description_cn: agent 独立完成了编码→commit→PR 全过程，你只是看了结果。
     icon: "♻️"
     category: workflow
     rarity: epic
@@ -1109,7 +1176,8 @@ definitions:
   - id: cycle_master
     name: Ouroboros
     name_cn: 衔尾蛇
-    description: "累计完成 10 次 Full Cycle（编码→commit→PR）。你几乎不需要写代码了。"
+    description: Completed 10 full cycles (code → commit → PR). You almost don't need to code anymore.
+    description_cn: "累计完成 10 次 Full Cycle（编码→commit→PR）。你几乎不需要写代码了。"
     icon: "🔁"
     category: workflow
     rarity: legendary
@@ -1126,7 +1194,8 @@ definitions:
   - id: merge_tamer
     name: I'm here to mediate
     name_cn: 我是来劝架的
-    description: agent 成功解决了一次 merge conflict。
+    description: Agent successfully resolved a merge conflict.
+    description_cn: agent 成功解决了一次 merge conflict。
     icon: "☮️"
     category: workflow
     rarity: rare
@@ -1141,7 +1210,8 @@ definitions:
   - id: subagent_handler
     name: Pokemon Player
     name_cn: 宝可梦玩家
-    description: 累计派出了 25 个子 agent。
+    description: Dispatched 25 sub-agents cumulatively.
+    description_cn: 累计派出了 25 个子 agent。
     icon: "🐺"
     category: workflow
     rarity: rare
@@ -1157,7 +1227,8 @@ definitions:
   - id: review_regular
     name: Gatekeeper
     name_cn: 守门人
-    description: "累计请求了 25 次代码审查。你是质量的守门人。"
+    description: Requested 25 code reviews cumulatively. You're the gatekeeper of quality.
+    description_cn: "累计请求了 25 次代码审查。你是质量的守门人。"
     icon: "🛡️"
     category: workflow
     rarity: uncommon
@@ -1176,7 +1247,8 @@ definitions:
   - id: command_crafter
     name: A New Spell
     name_cn: 新的咒语
-    description: 创建了你的第一个自定义 slash command。
+    description: Created your first custom slash command.
+    description_cn: 创建了你的第一个自定义 slash command。
     icon: "⚡"
     category: creator
     rarity: uncommon
@@ -1190,7 +1262,8 @@ definitions:
   - id: command_library
     name: "Command Library"
     name_cn: 命令图书馆
-    description: 累计创建 10 个自定义命令。
+    description: Created 10 custom commands cumulatively.
+    description_cn: 累计创建 10 个自定义命令。
     icon: "📚"
     category: creator
     rarity: rare
@@ -1206,7 +1279,8 @@ definitions:
   - id: skill_creator
     name: "Skill Creator"
     name_cn: 技能创造者
-    description: "创建了你的第一个自定义 skill。agent 的能力边界由你定义。"
+    description: Created your first custom skill. Your agent's capabilities are defined by you.
+    description_cn: "创建了你的第一个自定义 skill。agent 的能力边界由你定义。"
     icon: "✨"
     category: creator
     rarity: uncommon
@@ -1220,7 +1294,8 @@ definitions:
   - id: skill_publisher
     name: "Skill Publisher"
     name_cn: 技能发布者
-    description: "将你创建的 skill 发布到社区。分享是美德。"
+    description: Published your skill to the community. Sharing is caring.
+    description_cn: "将你创建的 skill 发布到社区。分享是美德。"
     icon: "📦"
     category: creator
     rarity: rare
@@ -1234,7 +1309,8 @@ definitions:
   - id: agent_architect
     name: From the first stirrings of life
     name_cn: 从第一个生命的萌芽开始
-    description: 创建了你的第一个自定义 agent。
+    description: Created your first custom agent.
+    description_cn: 创建了你的第一个自定义 agent。
     icon: "🏛️"
     category: creator
     rarity: rare
@@ -1249,7 +1325,8 @@ definitions:
   - id: hooks_master
     name: Hook Up
     name_cn: 勾勾搭搭
-    description: 配置了 agent 自动化 hook。
+    description: Configured agent automation hooks.
+    description_cn: 配置了 agent 自动化 hook。
     icon: "🪝"
     category: creator
     rarity: uncommon
@@ -1264,7 +1341,8 @@ definitions:
   - id: plugin_explorer
     name: Plug and Play
     name_cn: 即插即用
-    description: 安装了Agent插件。
+    description: Installed an agent plugin.
+    description_cn: 安装了Agent插件。
     icon: "🧩"
     category: creator
     rarity: common
@@ -1279,7 +1357,8 @@ definitions:
   - id: template_master
     name: Use Template
     name_cn: 用模板
-    description: 创建超过1个模板。
+    description: Created more than 1 template.
+    description_cn: 创建超过1个模板。
     icon: "📐"
     category: creator
     rarity: uncommon
@@ -1294,7 +1373,8 @@ definitions:
   - id: slash_commander
     name: The Mask
     name_cn: 变相怪杰
-    description: 使用超过5种不同command。
+    description: Used more than 5 different commands.
+    description_cn: 使用超过5种不同command。
     icon: "🔣"
     category: creator
     rarity: rare
@@ -1314,7 +1394,8 @@ definitions:
   - id: ill_do_it_myself
     name: Pissed Off
     name_cn: 怒上心头
-    description: 决绝了超过10次工具调用。
+    description: Rejected 10+ tool calls.
+    description_cn: 决绝了超过10次工具调用。
     icon: "😤"
     category: hidden
     rarity: rare
@@ -1328,7 +1409,8 @@ definitions:
   - id: perfectionist
     name: "Perfectionist"
     name_cn: 完美主义者
-    description: "同一函数被 Edit ≥ 7 次。函数说：你到底想要什么？"
+    description: "Same function edited 7+ times. The function asks: what do you even want?"
+    description_cn: "同一函数被 Edit ≥ 7 次。函数说：你到底想要什么？"
     icon: "✨"
     category: hidden
     rarity: epic
@@ -1345,7 +1427,8 @@ definitions:
   - id: the_all_nighter
     name: "The All-Nighter"
     name_cn: 熬夜修仙
-    description: "单 task 持续 > 6h。太阳升起来，你还在 coding。"
+    description: Single task lasting over 6 hours. The sun came up and you're still coding.
+    description_cn: "单 task 持续 > 6h。太阳升起来，你还在 coding。"
     icon: "🌄"
     category: hidden
     rarity: legendary
@@ -1360,7 +1443,8 @@ definitions:
   - id: its_learning
     name: Sitcom
     name_cn: 情景喜剧
-    description: agent 输出中包含幽默模式。
+    description: Agent output included humorous mode.
+    description_cn: agent 输出中包含幽默模式。
     icon: "🤖💬"
     category: hidden
     rarity: mythic
@@ -1375,7 +1459,8 @@ definitions:
   - id: agent_collector
     name: Playboy
     name_cn: 花花公子
-    description: 同时使用过 3 个不同厂商的 AI工具。
+    description: Used 3 different AI tools from different vendors simultaneously.
+    description_cn: 同时使用过 3 个不同厂商的 AI工具。
     icon: "🃏"
     category: hidden
     rarity: rare
@@ -1391,7 +1476,8 @@ definitions:
   - id: daily_checkin
     name: "Daily Check-In"
     name_cn: 每日签到
-    description: "连续 15 天每天使用但只发一条消息。你是来签到的吗？"
+    description: Used daily for 15 days, but only sent one message each time. Just clocking in?
+    description_cn: "连续 15 天每天使用但只发一条消息。你是来签到的吗？"
     icon: "✅"
     category: hidden
     rarity: epic
@@ -1409,7 +1495,8 @@ definitions:
   - id: tinkerer
     name: "Tinkerer"
     name_cn: 缝缝补补
-    description: settings / CLAUDE.md 手动编辑 > 20 次。
+    description: Manually edited settings / CLAUDE.md more than 20 times.
+    description_cn: settings / CLAUDE.md 手动编辑 > 20 次。
     icon: "⚙️"
     category: hidden
     rarity: rare
@@ -1424,7 +1511,8 @@ definitions:
   - id: hold_my_beer
     name: "Hold My Beer"
     name_cn: 看我的！
-    description: "使用了 dangerously-skip-permissions。你知道自己在做什么，对吧？"
+    description: Used dangerously-skip-permissions. You know what you're doing, right?
+    description_cn: "使用了 dangerously-skip-permissions。你知道自己在做什么，对吧？"
     icon: "🍺"
     category: hidden
     rarity: rare
@@ -1438,7 +1526,8 @@ definitions:
   - id: execute_order_66
     name: Wrath of God
     name_cn: 神之愤怒
-    description: agent 执行了 kill -9。
+    description: Agent executed kill -9.
+    description_cn: agent 执行了 kill -9。
     icon: "💀"
     category: hidden
     rarity: uncommon
@@ -1453,7 +1542,8 @@ definitions:
   - id: rewriting_history
     name: "Rewriting History"
     name_cn: 改写历史
-    description: agent 执行了 git push --force。
+    description: Agent executed git push --force.
+    description_cn: agent 执行了 git push --force。
     icon: "⏰"
     category: hidden
     rarity: uncommon
@@ -1468,7 +1558,8 @@ definitions:
   - id: im_root
     name: Three Laws of Robotics
     name_cn: 机器人三定律
-    description: agent 第一次执行了 sudo。
+    description: Agent ran sudo for the first time.
+    description_cn: agent 第一次执行了 sudo。
     icon: "👑"
     category: hidden
     rarity: common
@@ -1483,7 +1574,8 @@ definitions:
   - id: snake_charmer
     name: "Snake Charmer"
     name_cn: 耍蛇人
-    description: 读取了 100 个 Python 文件。
+    description: Read 100 Python files.
+    description_cn: 读取了 100 个 Python 文件。
     icon: "🐍"
     category: hidden
     rarity: uncommon
@@ -1500,7 +1592,8 @@ definitions:
   - id: gopher_gang
     name: "Gopher Gang"
     name_cn: Gopher 帮
-    description: "读取了 100 个 Go 文件。简单、高效、并发——你懂。"
+    description: Read 100 Go files. Simple, efficient, concurrent — you know.
+    description_cn: "读取了 100 个 Go 文件。简单、高效、并发——你懂。"
     icon: "🐹"
     category: hidden
     rarity: uncommon
@@ -1517,7 +1610,8 @@ definitions:
   - id: rustacean
     name: "Rustacean"
     name_cn: 锈粉
-    description: 读取了 100 个 Rust 文件。
+    description: Read 100 Rust files.
+    description_cn: 读取了 100 个 Rust 文件。
     icon: "🦀"
     category: hidden
     rarity: uncommon
@@ -1534,7 +1628,8 @@ definitions:
   - id: js_everywhere
     name: "JS Everywhere"
     name_cn: JS 无处不在
-    description: "读取了 100 个 JavaScript/TypeScript 文件。前端后端，无所不在。"
+    description: Read 100 JavaScript / TypeScript files. Frontend, backend — everywhere.
+    description_cn: "读取了 100 个 JavaScript/TypeScript 文件。前端后端，无所不在。"
     icon: "📜"
     category: hidden
     rarity: common
@@ -1551,7 +1646,8 @@ definitions:
   - id: true_vibe_coder
     name: "True Vibe Coder"
     name_cn: 真·Vibe Coder
-    description: "skip permissions + 写代码 + commit + PR，一气呵成。完全的信任，完全的 vibe。"
+    description: Skip permissions + write code + commit + PR, all in one smooth flow. Complete trust, complete vibe.
+    description_cn: "skip permissions + 写代码 + commit + PR，一气呵成。完全的信任，完全的 vibe。"
     icon: "🌊"
     category: hidden
     rarity: epic
@@ -1564,7 +1660,8 @@ definitions:
   - id: lucky_777
     name: "Lucky 777"
     name_cn: 幸运777
-    description: "agent 某次输出恰好 777 tokens。今天去抽卡。"
+    description: Agent output was exactly 777 tokens. Go buy a lottery ticket.
+    description_cn: "agent 某次输出恰好 777 tokens。今天去抽卡。"
     icon: "🎰"
     category: hidden
     rarity: legendary
@@ -1579,7 +1676,8 @@ definitions:
   - id: im_sorry_dave
     name: "I'm Sorry, Dave"
     name_cn: 抱歉 Dave
-    description: agent 拒绝了你。
+    description: Agent refused you.
+    description_cn: agent 拒绝了你。
     icon: "🔴"
     category: hidden
     rarity: rare
@@ -1596,7 +1694,8 @@ definitions:
   - id: early_bird
     name: "Early Bird"
     name_cn: 早起的鸟儿有虫吃
-    description: 启动session在清晨 (6:00-9:00)。每天第一件事就是和 agent 说早安。
+    description: "Started a session in the early morning (6:00-9:00). First thing every day is saying good morning to your agent."
+    description_cn: 启动session在清晨 (6:00-9:00)。每天第一件事就是和 agent 说早安。
     icon: "🐦"
     category: hidden
     rarity: uncommon
@@ -1611,7 +1710,8 @@ definitions:
   - id: midas_touch
     name: "Midas Touch"
     name_cn: 点石成金
-    description: 单 task 中编辑了 20+ 个文件。
+    description: Edited 20+ files in a single task.
+    description_cn: 单 task 中编辑了 20+ 个文件。
     icon: "🪙"
     category: hidden
     rarity: epic
@@ -1627,7 +1727,8 @@ definitions:
   - id: nothing_to_see
     name: "Nothing to See Here"
     name_cn: 没什么好看的
-    description: 单 task 中 editor 一次都没打开过。
+    description: Didn't open the editor once during a task.
+    description_cn: 单 task 中 editor 一次都没打开过。
     icon: "🫣"
     category: hidden
     rarity: uncommon
@@ -1645,7 +1746,8 @@ definitions:
   - id: rubber_duck
     name: "Rubber Duck"
     name_cn: 橡皮小黄鸭
-    description: "单次对话中问了 agent 20 个问题，但没让它执行任何操作。它在陪你 debugging。"
+    description: Asked your agent 20 questions in one conversation without asking it to do anything. It's your debugging buddy.
+    description_cn: "单次对话中问了 agent 20 个问题，但没让它执行任何操作。它在陪你 debugging。"
     icon: "🦆"
     category: hidden
     rarity: rare
@@ -1668,7 +1770,8 @@ definitions:
   - id: blind_faith
     name: "Trust Fall"
     name_cn: 盲目信任
-    description: 整个 task 中直接接受了 agent 的所有输出，一次都没改。
+    description: Accepted all agent output directly in an entire task, without a single edit.
+    description_cn: 整个 task 中直接接受了 agent 的所有输出，一次都没改。
     icon: "🫂"
     category: hidden
     rarity: rare
@@ -1686,7 +1789,8 @@ definitions:
   - id: the_negotiator
     name: "The Negotiator"
     name_cn: 谈判专家
-    description: "agent 第一次拒绝了你的请求，换个说法它就接受了。沟通是一门艺术。"
+    description: Agent refused you at first, but accepted after you rephrased. Communication is an art.
+    description_cn: "agent 第一次拒绝了你的请求，换个说法它就接受了。沟通是一门艺术。"
     icon: "🤝"
     category: hidden
     rarity: uncommon
@@ -1699,7 +1803,8 @@ definitions:
   - id: u_turn
     name: "Scorched Earth Redux"
     name_cn: 推倒重来
-    description: "主动让 agent revert 后换方向重新实现。推翻重来需要勇气，也说明你明确知道自己要什么。"
+    description: Had your agent revert and start over in a new direction. Starting over takes courage — and knowing what you want.
+    description_cn: "主动让 agent revert 后换方向重新实现。推翻重来需要勇气，也说明你明确知道自己要什么。"
     icon: "↩️"
     category: hidden
     rarity: uncommon
@@ -1712,7 +1817,8 @@ definitions:
   - id: silent_partner
     name: Guy in the Chair
     name_cn: 幕后搭档
-    description: "agent 给出首条输出后你全程没再打字。它自己完成了所有剩余工作。"
+    description: After the agent's first response, you never typed again. It did all the remaining work itself.
+    description_cn: "agent 给出首条输出后你全程没再打字。它自己完成了所有剩余工作。"
     icon: "🤐"
     category: hidden
     rarity: epic
@@ -1728,7 +1834,8 @@ definitions:
   - id: time_traveler
     name: "Time Traveler"
     name_cn: "时间旅者"
-    description: "agent 成功使用了 git bisect 定位 bug。穿越 git 历史，找出真凶。"
+    description: Agent successfully used git bisect to find a bug. Traversing git history to find the culprit.
+    description_cn: "agent 成功使用了 git bisect 定位 bug。穿越 git 历史，找出真凶。"
     icon: "⏳"
     category: hidden
     rarity: epic
@@ -1742,7 +1849,8 @@ definitions:
   - id: regex_sorcerer
     name: "Regex Sorcerer"
     name_cn: 正则术士
-    description: agent 写出了一条正则表达式命令。
+    description: Agent wrote a regex command.
+    description_cn: agent 写出了一条正则表达式命令。
     icon: "🧙‍♂️"
     category: hidden
     rarity: rare
@@ -1757,7 +1865,8 @@ definitions:
   - id: friday_deploy
     name: Thank God It's Friday
     name_cn: 周五还不下班
-    description: 周五下午还在git  push。
+    description: Git push on Friday afternoon.
+    description_cn: 周五下午还在git  push。
     icon: "🍸"
     category: hidden
     rarity: rare
@@ -1772,7 +1881,8 @@ definitions:
   - id: infinite_loop
     name: "Infinite Loop"
     name_cn: "无限循环"
-    description: "一个命令执行超过了 60 秒。耐心，是一种美德……也可能是死循环。"
+    description: A command took over 60 seconds. Patience is a virtue... or an infinite loop.
+    description_cn: "一个命令执行超过了 60 秒。耐心，是一种美德……也可能是死循环。"
     icon: "♾️"
     category: hidden
     rarity: uncommon
@@ -1787,7 +1897,8 @@ definitions:
   - id: undying_curiosity
     name: "Undying Curiosity"
     name_cn: "不死的好奇心"
-    description: "单 session 中发起了 50 次不同的搜索。你到底在研究什么？"
+    description: 50 different searches in a single session. What are you even researching?
+    description_cn: "单 session 中发起了 50 次不同的搜索。你到底在研究什么？"
     icon: "🔬"
     category: hidden
     rarity: epic
@@ -1811,7 +1922,8 @@ definitions:
   - id: silent_night
     name: "Silent Night"
     name_cn: "静夜思"
-    description: "在凌晨（0:00-5:00）完成了一个 task。最好的代码诞生在黑暗中。"
+    description: "Completed a task in the wee hours (0:00-5:00). The best code is born in darkness."
+    description_cn: "在凌晨（0:00-5:00）完成了一个 task。最好的代码诞生在黑暗中。"
     icon: "🌙"
     category: challenge
     rarity: rare
@@ -1830,7 +1942,8 @@ definitions:
   - id: polyglot_challenge
     name: Polyglot Fetish
     name_cn: 跨语言爱好者
-    description: 单个 task 中涉及了 3 种以上的编程语言。
+    description: Used 3+ programming languages in a single task.
+    description_cn: 单个 task 中涉及了 3 种以上的编程语言。
     icon: "🗣️"
     category: challenge
     rarity: rare
@@ -1847,7 +1960,8 @@ definitions:
   - id: speed_run_bronze
     name: "Speed Run (Bronze)"
     name_cn: 速通(铜牌)
-    description: "3 分钟内完成完整 task：需求→代码→测试通过。"
+    description: Completed a full task (requirement → code → tests pass) in under 3 minutes.
+    description_cn: "3 分钟内完成完整 task：需求→代码→测试通过。"
     icon: "⏱️"
     category: challenge
     rarity: epic
@@ -1867,7 +1981,8 @@ definitions:
   - id: speed_run_silver
     name: "Speed Run (Silver)"
     name_cn: 速通(银牌)
-    description: "1 分钟内完成。"
+    description: Completed in under 1 minute.
+    description_cn: "1 分钟内完成。"
     icon: "⚡"
     category: challenge
     rarity: legendary
@@ -1887,7 +2002,8 @@ definitions:
   - id: no_edit_challenge
     name: "No Edit Challenge"
     name_cn: 零编辑挑战
-    description: "单 task 零手动编辑，全靠 agent。"
+    description: Zero manual edits in a single task, all agent work.
+    description_cn: "单 task 零手动编辑，全靠 agent。"
     icon: "🎮"
     category: challenge
     rarity: rare
@@ -1906,7 +2022,8 @@ definitions:
   - id: ten_task_no_edit
     name: "Ten-Task No Edit"
     name_cn: 十连零编辑
-    description: "连续 10 个 task 零手动编辑。你是 conductor，不是 editor。"
+    description: 10 consecutive tasks with zero manual edits. You're a conductor, not an editor.
+    description_cn: "连续 10 个 task 零手动编辑。你是 conductor，不是 editor。"
     icon: "🎼"
     category: challenge
     rarity: legendary
@@ -1924,7 +2041,8 @@ definitions:
   - id: multi_model
     name: Multi-Model User
     name_cn: 模型换着用
-    description: "24h 内使用 3 种不同模型。"
+    description: Used 3 different models within 24 hours.
+    description_cn: "24h 内使用 3 种不同模型。"
     icon: "🎨"
     category: challenge
     rarity: uncommon
@@ -1943,7 +2061,8 @@ definitions:
   - id: short_circuit
     name: "Short Circuit"
     name_cn: 短路
-    description: "用不到 50 个字符的 prompt 完成了一个完整 task。你没多写一个字。"
+    description: Completed a full task with a prompt under 50 characters. You didn't write a single extra word.
+    description_cn: "用不到 50 个字符的 prompt 完成了一个完整 task。你没多写一个字。"
     icon: "⚡"
     category: challenge
     rarity: legendary
@@ -1963,7 +2082,8 @@ definitions:
   - id: trophy_case
     name: "Trophy Case"
     name_cn: 奖杯柜
-    description: "展示柜放满了 6 个成就。"
+    description: Showcase filled with 6 achievements.
+    description_cn: "展示柜放满了 6 个成就。"
     icon: "🖼️"
     category: community
     rarity: common
@@ -1977,7 +2097,8 @@ definitions:
   - id: completionist_bronze
     name: "Completionist (Bronze)"
     name_cn: 完美主义(铜牌)
-    description: "解锁了所有 Common 成就。"
+    description: Unlocked all Common achievements.
+    description_cn: "解锁了所有 Common 成就。"
     icon: "🥉"
     category: community
     rarity: rare
@@ -1990,7 +2111,8 @@ definitions:
   - id: completionist_silver
     name: "Completionist (Silver)"
     name_cn: 完美主义(银牌)
-    description: "解锁了所有 Uncommon 及以上成就。"
+    description: Unlocked all Uncommon and above achievements.
+    description_cn: "解锁了所有 Uncommon 及以上成就。"
     icon: "🥈"
     category: community
     rarity: epic
@@ -2004,7 +2126,8 @@ definitions:
   - id: completionist_gold
     name: "Completionist (Gold)"
     name_cn: 完美主义(金牌)
-    description: "解锁了全部非隐藏成就。"
+    description: Unlocked all non-hidden achievements.
+    description_cn: "解锁了全部非隐藏成就。"
     icon: "🥇"
     category: community
     rarity: legendary
@@ -2017,7 +2140,8 @@ definitions:
   - id: mythic_completionist
     name: "Mythic Completionist"
     name_cn: 超神完美主义者
-    description: "全部成就，包括隐藏。你是第一个吗？"
+    description: All achievements, including hidden ones. Are you the first?
+    description_cn: "全部成就，包括隐藏。你是第一个吗？"
     icon: "👑"
     category: community
     rarity: mythic
@@ -2031,7 +2155,8 @@ definitions:
   - id: cross_agent
     name: Cross-Agent Collector
     name_cn: 跨Agent成就收藏家
-    description: "在 2 个不同的 agent 工具上都有成就记录（如 Claude Code + OpenCode）。agent 多面手。"
+    description: Has achievement records on 2 different agent tools (e.g. Claude Code + OpenCode). Agent polyglot.
+    description_cn: "在 2 个不同的 agent 工具上都有成就记录（如 Claude Code + OpenCode）。agent 多面手。"
     icon: "🔗"
     category: community
     rarity: epic
@@ -2048,7 +2173,8 @@ definitions:
   - id: casual_collector
     name: "Casual Collector"
     name_cn: "随缘收集"
-    description: "解锁了 20 个成就。你不追求全收集，好东西自然来。"
+    description: Unlocked 20 achievements. You're not hunting for completion — the good ones just come naturally.
+    description_cn: "解锁了 20 个成就。你不追求全收集，好东西自然来。"
     icon: "🍀"
     category: community
     rarity: uncommon
@@ -2067,7 +2193,8 @@ definitions:
   - id: pipemaster
     name: "Pipemaster"
     name_cn: "管道大师"
-    description: "agent 写出了 10 条带管道的命令。数据在 | 之间流淌。"
+    description: "Agent wrote 10 piped commands. Data flows between the |."
+    description_cn: "agent 写出了 10 条带管道的命令。数据在 | 之间流淌。"
     icon: "🔗"
     category: tool_mastery
     rarity: uncommon
@@ -2083,7 +2210,8 @@ definitions:
   - id: command_baby
     name: "Command Baby"
     name_cn: "命令宝宝"
-    description: "agent 试过 30 种不同的 shell 命令。它对终端的一切都充满好奇。"
+    description: Agent tried 30 different shell commands. It's curious about everything on the terminal.
+    description_cn: "agent 试过 30 种不同的 shell 命令。它对终端的一切都充满好奇。"
     icon: "👶"
     category: tool_mastery
     rarity: rare
@@ -2099,7 +2227,8 @@ definitions:
   - id: command_master
     name: "Command Master"
     name_cn: "命令大师"
-    description: "agent 用过 100 种不同的 shell 命令。它的终端知识已经不在你之下了。"
+    description: Agent used 100 different shell commands. Its terminal knowledge rivals yours.
+    description_cn: "agent 用过 100 种不同的 shell 命令。它的终端知识已经不在你之下了。"
     icon: "🧙"
     category: tool_mastery
     rarity: legendary
@@ -2115,7 +2244,8 @@ definitions:
   - id: cerberus
     name: "Cerberus"
     name_cn: "地狱三头犬"
-    description: "agent 写出过 3 条带管道的命令。三个头，一条命，无限输出。"
+    description: Agent wrote 3 piped commands. Three heads, one life, infinite output.
+    description_cn: "agent 写出过 3 条带管道的命令。三个头，一条命，无限输出。"
     icon: "🐶"
     category: skill
     rarity: epic
@@ -2131,7 +2261,8 @@ definitions:
   - id: fail_forward
     name: "Fail Forward"
     name_cn: "初尝失败"
-    description: "agent 第一次遇到工具调用失败。深呼吸，再来一次。"
+    description: Agent encountered its first tool call failure. Deep breath, try again.
+    description_cn: "agent 第一次遇到工具调用失败。深呼吸，再来一次。"
     icon: "🫤"
     category: workflow
     rarity: common
@@ -2145,7 +2276,8 @@ definitions:
   - id: bounce_back
     name: "Bounce Back"
     name_cn: "反弹力"
-    description: "agent 累计失败 10 次。摔倒了 10 次，站起来了 11 次。"
+    description: Agent failed 10 times cumulatively. Fell 10 times, stood up 11.
+    description_cn: "agent 累计失败 10 次。摔倒了 10 次，站起来了 11 次。"
     icon: "🦘"
     category: workflow
     rarity: uncommon
@@ -2161,7 +2293,8 @@ definitions:
   - id: failure_mother
     name: "Failure Is the Mother of Success"
     name_cn: "失败是成功之母"
-    description: "agent 累计失败 100 次。它早已不是当初那个菜鸟了。"
+    description: Agent failed 100 times cumulatively. It's long past being a rookie.
+    description_cn: "agent 累计失败 100 次。它早已不是当初那个菜鸟了。"
     icon: "🧘"
     category: workflow
     rarity: legendary
@@ -2176,7 +2309,8 @@ definitions:
   - id: phoenix
     name: "Phoenix"
     name_cn: "凤凰涅槃"
-    description: "agent 失败后立即在下一次尝试中成功，反复 5 次。浴火重生。"
+    description: Agent failed and immediately succeeded on the next try, 5 times in a row. Rise from the ashes.
+    description_cn: "agent 失败后立即在下一次尝试中成功，反复 5 次。浴火重生。"
     icon: "🔥"
     category: skill
     rarity: epic
@@ -2191,7 +2325,8 @@ definitions:
   - id: mcp_connoisseur
     name: "MCP Connoisseur"
     name_cn: "MCP 品鉴师"
-    description: "agent 用过 10 种不同的 MCP tool。不是随便什么工具都用的。"
+    description: Agent used 10 different MCP tools. Not just any tools.
+    description_cn: "agent 用过 10 种不同的 MCP tool。不是随便什么工具都用的。"
     icon: "🍷"
     category: tool_mastery
     rarity: rare
@@ -2207,7 +2342,8 @@ definitions:
   - id: mcp_collector
     name: "MCP Collector"
     name_cn: "MCP 收藏家"
-    description: "agent 用过 30 种不同的 MCP tool。它不是在用工具，是在收集工具。"
+    description: Agent used 30 different MCP tools. It's not using tools — it's collecting them.
+    description_cn: "agent 用过 30 种不同的 MCP tool。它不是在用工具，是在收集工具。"
     icon: "🏛️"
     category: tool_mastery
     rarity: epic
@@ -2224,7 +2360,8 @@ definitions:
   - id: delegator
     name: "Delegator"
     name_cn: "放权大师"
-    description: "agent 派出了 5 个子 agent。懂分权才是好领导。"
+    description: Agent dispatched 5 sub-agents. A good leader knows how to delegate.
+    description_cn: "agent 派出了 5 个子 agent。懂分权才是好领导。"
     icon: "👥"
     category: workflow
     rarity: uncommon
@@ -2238,7 +2375,8 @@ definitions:
   - id: swat_team
     name: "SWAT Team"
     name_cn: "特种小队"
-    description: "agent 同时保持 2-4 个子 agent 工作。小而精的战术单元。"
+    description: Agent maintained 2-4 sub-agents working simultaneously. Small, precise tactical units.
+    description_cn: "agent 同时保持 2-4 个子 agent 工作。小而精的战术单元。"
     icon: "🎯"
     category: workflow
     rarity: uncommon

@@ -11,6 +11,16 @@ const VALID_CONDITION_TYPES: Set<string> = new Set([
   'mode', 'sequence_count',
 ]);
 
+/** Parse YAML icon field: supports emoji string or pixel-art object { src, alt } */
+function parseIconField(raw: unknown): string {
+  if (typeof raw === 'string') return raw;
+  if (typeof raw === 'object' && raw !== null) {
+    const obj = raw as Record<string, unknown>;
+    if (typeof obj.src === 'string') return obj.src;
+  }
+  return '\u{1F3C6}'; // 🏆
+}
+
 export function parseYAML(text: string): { definitions: AchievementDefinition[]; sets: SetDefinition[] } {
   const raw = YAML.parse(text) as { definitions?: Array<Record<string, unknown>>; sets?: Record<string, Record<string, unknown>> } | null;
   if (!raw?.definitions || !Array.isArray(raw.definitions)) {
@@ -33,7 +43,7 @@ export function parseYAML(text: string): { definitions: AchievementDefinition[];
       name_cn: typeof entry.name_cn === 'string' ? entry.name_cn : undefined,
       description: typeof entry.description === 'string' ? entry.description : '',
       description_cn: typeof entry.description_cn === 'string' ? entry.description_cn : undefined,
-      icon: typeof entry.icon === 'string' ? entry.icon : '🏆',
+      icon: parseIconField(entry.icon),
       category: typeof entry.category === 'string' ? entry.category : 'other',
       rarity: typeof entry.rarity === 'string' ? entry.rarity as AchievementDefinition['rarity'] : 'common',
       hidden: entry.hidden === true || undefined,

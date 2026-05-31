@@ -93,6 +93,20 @@ const I18N = {
     rarity_epic: 'Epic',
     rarity_legendary: 'Legendary',
     rarity_mythic: 'Mythic',
+    search_placeholder: 'Search by name or keyword...',
+    sort_default: 'Default',
+    sort_rarity: 'Rarity ↓',
+    sort_recent: 'Recently Unlocked',
+    sort_name: 'A → Z',
+    rarity_all: 'All Rarities',
+    modal_close: 'Close',
+    modal_unlocked: 'Unlocked',
+    modal_locked: 'Locked',
+    unlocked_label: '✓ Unlocked',
+    modal_category: 'Category',
+    modal_progress: 'Progress',
+    modal_no_desc: 'No description available.',
+    search_empty: 'No achievements match your search.',
   },
   zh: {
     nav_profile: '个人主页',
@@ -129,6 +143,20 @@ const I18N = {
     rarity_epic: '史诗',
     rarity_legendary: '传说',
     rarity_mythic: '神话',
+    search_placeholder: '搜索名称或关键词...',
+    sort_default: '默认',
+    sort_rarity: '稀有度 ↓',
+    sort_recent: '最近解锁',
+    sort_name: '名称 A → Z',
+    rarity_all: '全部稀有度',
+    modal_close: '关闭',
+    modal_unlocked: '已解锁',
+    modal_locked: '未解锁',
+    unlocked_label: '✓ 已解锁',
+    modal_category: '分类',
+    modal_progress: '进度',
+    modal_no_desc: '暂无描述。',
+    search_empty: '没有匹配的成就。',
   },
 };
 
@@ -177,22 +205,50 @@ function displayRarity(rarity) {
 }
 
 function renderI18n() {
-  // Apply data-i18n attributes on static HTML elements
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     if (key) el.textContent = t(key);
   });
-  // Apply data-i18n-title attributes
   document.querySelectorAll('[data-i18n-title]').forEach(el => {
     const key = el.getAttribute('data-i18n-title');
     if (key) el.title = t(key);
   });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (key) el.placeholder = t(key);
+  });
   document.documentElement.setAttribute('lang', currentLang === 'zh' ? 'zh-CN' : 'en');
 }
 
-// ── Data & Render ──────────────────────────────────────
+// ── Data & State ──────────────────────────────────────
 
 let dashboardData = null;
+let currentFilter = 'all';
+let currentCategory = null;
+let currentSearch = '';
+let currentSort = 'default';
+let currentRarity = null;
+let lastUnlockedIds = new Set();
+let isModalOpen = false;
+let controlsSetup = false;
+
+// ── Icon render helper ─────────────────────────────────
+
+/** Render achievement icon as emoji span or pixel-art img */
+function iconHtml(icon, opts = {}) {
+  const { size = 20, className = '' } = opts;
+  // Image path (starts with /, has file extension)
+  if (icon.startsWith('/') || /\.(png|svg|webp|jpg|gif)$/i.test(icon)) {
+    const sizeStyle = `width:${size}px;height:${size}px;object-fit:contain`;
+    return `<img src="${escAttr(icon)}" class="ach-icon-img ${className}" style="${sizeStyle}" alt="">`;
+  }
+  // Emoji / Unicode text
+  return `<span class="ach-icon ${className}">${icon}</span>`;
+}
+let pickSlot = null;
+
+const RARITY_ORDER = { common: 0, uncommon: 1, rare: 2, epic: 3, legendary: 4, mythic: 5 };
+const RARITY_LEVELS = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'mythic'];
 
 function renderAll(data) {
   renderI18n();
@@ -203,7 +259,42 @@ function renderAll(data) {
   renderTimeline(data);
 }
 
+// ── Setup global listeners (once) ──────────────────────
+
+function setupGlobalHandlers() {
+  // Click on achievement grid → open modal (delegated)
+  const grid = document.getElementById('achievement-grid');
+  if (grid) {
+    grid.addEventListener('click', e => {
+      if (pickSlot !== null) return; // suppress during showcase pick
+      if (isModalOpen) return;
+      const card = e.target.closest('.ach-card');
+      if (!card) return;
+      const achId = card.dataset.id;
+      if (!achId) return;
+      const ach = dashboardData?.achievements.find(a => a.id === achId);
+      if (ach) openModal(ach);
+    });
+  }
+
+  // Keyboard: Escape to close modal
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && isModalOpen) {
+      closeModal();
+    }
+  });
+
+  // Click backdrop to close modal
+  document.addEventListener('click', e => {
+    if (e.target.id === 'modal-backdrop') {
+      closeModal();
+    }
+  });
+}
+
 (async function () {
+  setupGlobalHandlers();
+
   const res = await fetch('/api/data');
   if (!res.ok) {
     document.body.innerHTML = `<div style="padding:40px;color:#888;">${t('load_error', { status: res.status })}</div>`;
@@ -213,9 +304,12 @@ function renderAll(data) {
   dashboardData = data;
   initLang(data.config?.lang);
 
+  // Track initial unlocked IDs
+  lastUnlockedIds = new Set(data.achievements.filter(a => a.unlocked).map(a => a.id));
+
   renderAll(data);
 
-  // Toast for recently unlocked
+  // Toast for recently unlocked (within 5 min)
   const now = Date.now();
   data.timeline.forEach(t => {
     if (now - new Date(t.unlocked_at).getTime() < 300000) {
@@ -223,7 +317,49 @@ function renderAll(data) {
       if (ach) showToast(ach.icon, displayName(ach), ach.rarity);
     }
   });
+
+  startAutoPoll();
 })();
+
+// ── Auto-Poll (10s) ───────────────────────────────────
+
+function startAutoPoll() {
+  setInterval(async () => {
+    try {
+      const res = await fetch('/api/data');
+      if (!res.ok) return;
+      const newData = await res.json();
+
+      const newUnlocked = new Set(
+        newData.achievements.filter(a => a.unlocked).map(a => a.id)
+      );
+
+      // Genuinely new unlocks
+      const freshIds = [...newUnlocked].filter(id => !lastUnlockedIds.has(id));
+      lastUnlockedIds = newUnlocked;
+
+      // Detect any stats change
+      const oldUnlockedCount = dashboardData.stats?.unlocked || 0;
+      const hasNewUnlocks = freshIds.length > 0;
+      const statsChanged = JSON.stringify(dashboardData.stats) !== JSON.stringify(newData.stats);
+
+      if (hasNewUnlocks || statsChanged) {
+        dashboardData = newData;
+
+        // Toast for new unlocks
+        for (const id of freshIds) {
+          const ach = newData.achievements.find(a => a.id === id);
+          if (ach) showToast(ach.icon, displayName(ach), ach.rarity);
+        }
+
+        // Re-render only if modal isn't open
+        if (!isModalOpen) {
+          renderAll(newData);
+        }
+      }
+    } catch {}
+  }, 10000);
+}
 
 // ── Helpers ──────────────────────────────────────────
 
@@ -256,17 +392,13 @@ function renderNav(data) {
 
 // ── Showcase management ──────────────────────────────
 
-let pickSlot = null; // slot index currently being picked, or null
-
 async function startPick(slot) {
   if (pickSlot === slot) { cancelPick(); return; }
   pickSlot = slot;
 
-  // Highlight the selected showcase slot
   const slots = document.querySelectorAll('.showcase-slot');
   slots.forEach((el, i) => el.classList.toggle('picking', i === slot));
 
-  // Show pick mode header
   const banner = document.getElementById('pick-banner');
   if (banner) {
     banner.style.display = 'flex';
@@ -274,10 +406,8 @@ async function startPick(slot) {
       t('pick_banner', { n: slot + 1 });
   }
 
-  // Re-render grid to show pin buttons
   if (dashboardData) renderGrid(dashboardData);
 
-  // Scroll to achievements section
   document.getElementById('achievements')?.scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -325,6 +455,7 @@ async function refreshData() {
   const res = await fetch('/api/data');
   if (!res.ok) return;
   dashboardData = await res.json();
+  lastUnlockedIds = new Set(dashboardData.achievements.filter(a => a.unlocked).map(a => a.id));
   renderAll(dashboardData);
 }
 
@@ -332,9 +463,6 @@ async function refreshData() {
 
 function renderProfile(data) {
   const { stats } = data;
-
-  const levelEl = document.getElementById('level-number');
-  if (levelEl) levelEl.textContent = String(stats.level);
 
   const fill = document.getElementById('xp-bar-fill');
   const label = document.getElementById('xp-label');
@@ -350,17 +478,19 @@ function renderProfile(data) {
   if (showcase) {
     showcase.innerHTML = stats.showcase.map(s => {
       if (s.achievement) {
+        const nameDisplay = displayName(s.achievement);
         return `<div class="showcase-slot filled" data-rarity="${s.achievement.rarity}"
-          title="${escHtml(displayName(s.achievement))} — ${t('click_to_remove')}"
-          onclick="clearSlot(${s.slot})">${s.achievement.icon}</div>`;
+          title="${escHtml(nameDisplay)} — ${t('click_to_remove')}"
+          onclick="clearSlot(${s.slot})">
+          ${iconHtml(s.achievement.icon, { size: 28, className: 'showcase-slot-icon' })}
+          <span class="showcase-slot-name">${escHtml(nameDisplay)}</span>
+        </div>`;
       }
       return `<div class="showcase-slot empty"
         title="${t('click_to_pick')}"
         onclick="startPick(${s.slot})">+</div>`;
     }).join('');
 
-    // Auto-fill button
-    const hasUnlocked = stats.showcase.some(s => !s.achievement) || true;
     const autoBtn = document.getElementById('showcase-auto');
     if (autoBtn) {
       autoBtn.textContent = t('showcase_auto');
@@ -386,23 +516,64 @@ function renderProfile(data) {
     `).join('');
   }
 
-  // Pick mode banner visibility
   const banner = document.getElementById('pick-banner');
   if (banner && pickSlot === null) banner.style.display = 'none';
 }
 
 // ── Achievement Grid ────────────────────────────────
 
-let currentFilter = 'all';
-let currentCategory = null;
-
 function renderAchievements(data) {
-  // Category nav
+  // ── Controls setup (once) ──
+  if (!controlsSetup) {
+    const searchInput = document.getElementById('search-input');
+    const searchClear = document.getElementById('search-clear');
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        currentSearch = searchInput.value.trim();
+        if (searchClear) searchClear.style.display = currentSearch ? 'flex' : 'none';
+        renderGrid(data);
+      });
+    }
+    if (searchClear) {
+      searchClear.addEventListener('click', () => {
+        if (searchInput) { searchInput.value = ''; currentSearch = ''; }
+        searchClear.style.display = 'none';
+        renderGrid(data);
+      });
+    }
+
+    const sortSelect = document.getElementById('sort-select');
+    if (sortSelect) {
+      sortSelect.addEventListener('change', () => {
+        currentSort = sortSelect.value;
+        renderGrid(data);
+      });
+    }
+
+    controlsSetup = true;
+  }
+
+  // ── Update search placeholder (i18n) ──
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) searchInput.placeholder = t('search_placeholder');
+
+  // ── Populate sort options (i18n) ──
+  const sortSelect = document.getElementById('sort-select');
+  if (sortSelect) {
+    sortSelect.innerHTML = `
+      <option value="default" ${currentSort === 'default' ? 'selected' : ''}>${t('sort_default')}</option>
+      <option value="rarity" ${currentSort === 'rarity' ? 'selected' : ''}>${t('sort_rarity')}</option>
+      <option value="recent" ${currentSort === 'recent' ? 'selected' : ''}>${t('sort_recent')}</option>
+      <option value="name" ${currentSort === 'name' ? 'selected' : ''}>${t('sort_name')}</option>
+    `;
+  }
+
+  // ── Category nav ──
   const catNav = document.getElementById('category-nav');
   if (catNav) {
     const cats = [...new Set(data.achievements.map(a => a.category))];
-    catNav.innerHTML = `<button class="category-pill active" data-cat="">${t('cat_all')}</button>` +
-      cats.map(c => `<button class="category-pill" data-cat="${c}">${displayCategory(c)}</button>`).join('');
+    catNav.innerHTML = `<button class="category-pill ${!currentCategory ? 'active' : ''}" data-cat="">${t('cat_all')}</button>` +
+      cats.map(c => `<button class="category-pill ${currentCategory === c ? 'active' : ''}" data-cat="${c}">${displayCategory(c)}</button>`).join('');
     catNav.addEventListener('click', e => {
       const pill = e.target.closest('.category-pill');
       if (!pill) return;
@@ -413,10 +584,24 @@ function renderAchievements(data) {
     });
   }
 
-  // Filter tabs
+  // ── Rarity nav ──
+  const rarityNav = document.getElementById('rarity-nav');
+  if (rarityNav) {
+    rarityNav.innerHTML = `<button class="rarity-pill ${!currentRarity ? 'active' : ''}" data-rarity="">${t('rarity_all')}</button>` +
+      RARITY_LEVELS.map(r => `<button class="rarity-pill ${currentRarity === r ? 'active' : ''}" data-rarity="${r}">${displayRarity(r)}</button>`).join('');
+    rarityNav.addEventListener('click', e => {
+      const pill = e.target.closest('.rarity-pill');
+      if (!pill) return;
+      rarityNav.querySelectorAll('.rarity-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      currentRarity = pill.dataset.rarity || null;
+      renderGrid(data);
+    });
+  }
+
+  // ── Filter tabs ──
   const filterTabs = document.getElementById('filter-tabs');
   if (filterTabs) {
-    // Set i18n labels
     filterTabs.querySelectorAll('.filter-tab').forEach(tab => {
       const key = tab.dataset.filter === 'all' ? 'filter_all' : tab.dataset.filter === 'unlocked' ? 'filter_unlocked' : 'filter_locked';
       tab.textContent = t(key);
@@ -440,14 +625,65 @@ function renderGrid(data) {
 
   let items = data.achievements;
 
+  // Step 1: Filter by unlock state
   if (currentFilter === 'unlocked') items = items.filter(a => a.unlocked);
   else if (currentFilter === 'locked') items = items.filter(a => !a.unlocked);
 
+  // Step 2: Filter by category
   if (currentCategory) items = items.filter(a => a.category === currentCategory);
 
-  const inPickMode = pickSlot !== null;
+  // Step 3: Filter by search query
+  if (currentSearch) {
+    const q = currentSearch.toLowerCase();
+    items = items.filter(a =>
+      a.id.toLowerCase().includes(q) ||
+      a.name.toLowerCase().includes(q) ||
+      (a.name_cn || '').toLowerCase().includes(q) ||
+      a.description.toLowerCase().includes(q) ||
+      (a.description_cn || '').toLowerCase().includes(q)
+    );
+  }
 
+  // Step 4: Filter by rarity
+  if (currentRarity) {
+    items = items.filter(a => a.rarity === currentRarity);
+  }
+
+  // Step 5: Sort
+  if (currentSort !== 'default') {
+    const sorted = [...items];
+    switch (currentSort) {
+      case 'rarity':
+        sorted.sort((a, b) => (RARITY_ORDER[b.rarity] || 0) - (RARITY_ORDER[a.rarity] || 0));
+        break;
+      case 'recent':
+        sorted.sort((a, b) => {
+          if (a.unlocked && !b.unlocked) return -1;
+          if (!a.unlocked && b.unlocked) return 1;
+          if (a.unlocked && b.unlocked) {
+            return new Date(b.unlocked_at).getTime() - new Date(a.unlocked_at).getTime();
+          }
+          return 0;
+        });
+        break;
+      case 'name':
+        sorted.sort((a, b) => displayName(a).localeCompare(displayName(b)));
+        break;
+    }
+    items = sorted;
+  }
+
+  const inPickMode = pickSlot !== null;
   grid.className = inPickMode ? 'achievement-grid picking' : 'achievement-grid';
+
+  // ── Empty state ──
+  if (items.length === 0) {
+    grid.innerHTML = `<div class="search-empty">
+      <div class="search-empty-icon">${currentSearch ? '🔍' : '🏆'}</div>
+      <div class="search-empty-text">${currentSearch ? t('search_empty') : '—'}</div>
+    </div>`;
+    return;
+  }
 
   grid.innerHTML = items.map((a, idx) => {
     const locked = !a.unlocked;
@@ -468,14 +704,17 @@ function renderGrid(data) {
       ? `<div class="ach-pin" onclick="event.stopPropagation(); pinToSlot('${escAttr(a.id)}')" title="${t('pin_title')}">📌</div>`
       : '';
 
+    const unlockedLabel = !locked ? `<span class="ach-unlocked-label">${t('unlocked_label')}</span>` : '';
+
     const pickableClass = inPickMode && !locked ? ' pickable' : '';
     const lockedClass = locked ? ' locked' : '';
 
-    return `<div class="ach-card${lockedClass}${pickableClass}" data-rarity="${a.rarity}" style="--delay:${idx * 30}ms">
+    return `<div class="ach-card${lockedClass}${pickableClass}" data-rarity="${a.rarity}" data-id="${escAttr(a.id)}" style="--delay:${idx * 30}ms">
       <div class="ach-stripe"></div>
       ${pinBtn}
-      <div class="ach-icon-wrap"><span class="ach-icon">${showIcon}</span></div>
+      <div class="ach-icon-wrap">${iconHtml(showIcon)}</div>
       <div class="ach-name">${escHtml(nameDisplay)}</div>
+      ${unlockedLabel}
       <span class="ach-rarity-badge">${displayRarity(a.rarity)}</span>
       ${progressHtml}
       ${hiddenHint}
@@ -483,14 +722,76 @@ function renderGrid(data) {
   }).join('');
 }
 
-function escHtml(s) {
-  const div = document.createElement('div');
-  div.textContent = s;
-  return div.innerHTML;
+// ── Modal ────────────────────────────────────────────
+
+function openModal(ach) {
+  isModalOpen = true;
+  const backdrop = document.getElementById('modal-backdrop');
+  const container = document.getElementById('modal-container');
+  if (!backdrop || !container) return;
+
+  const locked = !ach.unlocked;
+  const name = displayName(ach);
+  const hasNameCn = currentLang === 'zh'
+    ? !!(ach.name_cn && ach.name_cn !== ach.name)
+    : !!(ach.name_cn && ach.name_cn !== name);
+  const nameCn = ach.name_cn || '';
+  const desc = ach.description || t('modal_no_desc');
+  const descCn = ach.description_cn || '';
+
+  let bottomSections = '';
+  if (locked && ach.progress && ach.progress.target > 0) {
+    const pct = Math.min((ach.progress.current / ach.progress.target) * 100, 100);
+    bottomSections += `
+      <div class="modal-divider"></div>
+      <div class="modal-progress-section">
+        <div class="modal-progress-label">${t('modal_progress')}</div>
+        <div class="modal-progress-bar">
+          <div class="modal-progress-fill" style="width:${pct}%"></div>
+        </div>
+        <div class="modal-progress-text">${ach.progress.current} / ${ach.progress.target}</div>
+      </div>`;
+  }
+
+  if (ach.unlocked && ach.unlocked_at) {
+    const date = new Date(ach.unlocked_at);
+    const dateStr = date.toLocaleDateString(undefined, {
+      year: 'numeric', month: 'long', day: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    });
+    bottomSections += `
+      <div class="modal-divider"></div>
+      <div class="modal-unlock-info">
+        ${t('modal_unlocked')}: <span class="modal-unlock-date">${dateStr}</span>
+      </div>`;
+  }
+
+  container.innerHTML = `
+    <div class="modal-header">
+      ${iconHtml(locked && ach.hidden ? '\u{1F512}' : ach.icon, { size: 48, className: 'modal-icon' })}
+      <button class="modal-close" onclick="closeModal()" title="${t('modal_close')}">✕</button>
+    </div>
+    <div class="modal-body">
+      <div>
+        <div class="modal-title">${escHtml(name)}</div>
+        ${hasNameCn ? `<div class="modal-title-cn">${escHtml(nameCn)}</div>` : ''}
+      </div>
+      <div class="modal-meta">
+        <span class="modal-badge rarity-${ach.rarity}">${displayRarity(ach.rarity)}</span>
+        <span class="modal-badge category">${displayCategory(ach.category)}</span>
+      </div>
+      <div class="modal-desc">${escHtml(desc)}</div>
+      ${descCn ? `<div class="modal-desc-cn">${escHtml(descCn)}</div>` : ''}
+      ${bottomSections}
+    </div>`;
+
+  backdrop.style.display = 'flex';
 }
 
-function escAttr(s) {
-  return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;');
+function closeModal() {
+  isModalOpen = false;
+  const backdrop = document.getElementById('modal-backdrop');
+  if (backdrop) backdrop.style.display = 'none';
 }
 
 // ── Sets ─────────────────────────────────────────────
@@ -512,7 +813,7 @@ function renderSets(data) {
     }, 'common');
 
     const membersHtml = set.achievements.map(a =>
-      `<div class="set-member ${a.unlocked ? 'unlocked' : 'locked'}" title="${escHtml(displayName(a))}">${a.unlocked ? a.icon : '?'}</div>`
+      `<div class="set-member ${a.unlocked ? 'unlocked' : 'locked'}" title="${escHtml(displayName(a))}">${iconHtml(a.unlocked ? a.icon : '?', { size: 16 })}</div>`
     ).join('');
 
     const complete = set.completed === set.total && set.total > 0;
@@ -522,7 +823,7 @@ function renderSets(data) {
 
     return `<div class="set-card ${complete ? 'complete' : ''}">
       <div class="set-header">
-        <span style="font-size:24px;">${set.achievements.find(a => a.unlocked)?.icon || '\u{1F4E6}'}</span>
+        ${iconHtml(set.achievements.find(a => a.unlocked)?.icon || '\u{1F4E6}', { size: 24 })}
         <span class="set-name">${escHtml(set.name)}</span>
       </div>
       <div class="set-count">${set.completed}/${set.total}</div>
@@ -557,11 +858,21 @@ function renderTimeline(data) {
     return `<div class="timeline-entry" data-rarity="${ach.rarity}">
       <div class="tl-time">${timeStr}</div>
       <div class="tl-ach">
-        <span class="tl-icon">${ach.icon}</span>
+        ${iconHtml(ach.icon, { size: 18, className: 'tl-icon' })}
         <span class="tl-name" style="color:${rarityColor(ach.rarity)}">${escHtml(displayName(ach))}</span>
       </div>
     </div>`;
   }).filter(Boolean).join('');
+}
+
+function escHtml(s) {
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+function escAttr(s) {
+  return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;');
 }
 
 // ── Toast ────────────────────────────────────────────
@@ -572,7 +883,7 @@ function showToast(icon, name, rarity) {
 
   const toast = document.createElement('div');
   toast.className = 'toast';
-  toast.innerHTML = `<span class="toast-icon">${icon}</span><span class="toast-text" style="color:${rarityColor(rarity)}">${escHtml(name)}</span>`;
+  toast.innerHTML = `${iconHtml(icon, { size: 22, className: 'toast-icon' })}<span class="toast-text" style="color:${rarityColor(rarity)}">${escHtml(name)}</span>`;
   container.appendChild(toast);
 
   setTimeout(() => {

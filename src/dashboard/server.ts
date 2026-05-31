@@ -79,6 +79,7 @@ export function createServer(engine: AchievementEngine, port = 3867): http.Serve
 
     // ── GET /api/data ──────────────────────────────────────────────────
     if (url.pathname === '/api/data' && req.method === 'GET') {
+      engine.reload();
       const showcaseData = buildShowcaseResponse(engine);
       const data = buildApiResponse(engine.definitions, engine.state, engine.events, showcaseData, engine.stats(), engine.setDefinitions);
       res.writeHead(200, { 'Content-Type': 'application/json' });

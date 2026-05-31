@@ -38,11 +38,6 @@
   <!-- Profile Hero -->
   <section id="profile" class="section hero-section">
     <div class="hero-inner">
-      <div class="level-ring-container">
-        <div class="level-ring" id="level-ring">
-          <span class="level-number" id="level-number">0</span>
-        </div>
-      </div>
       <h1 class="hero-title" data-i18n="hero_title">Agent Achievements</h1>
       <div class="xp-bar-container">
         <div class="xp-bar" id="xp-bar">
@@ -72,7 +67,16 @@
         <button class="filter-tab" data-filter="locked">Locked</button>
       </div>
     </div>
+    <div class="section-controls">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" class="search-input" data-i18n-placeholder="search_placeholder" placeholder="Search...">
+        <button class="search-clear" id="search-clear" style="display:none" aria-label="Clear">✕</button>
+      </div>
+      <select id="sort-select" class="sort-select"></select>
+    </div>
     <div class="category-nav" id="category-nav"></div>
+    <div class="rarity-nav" id="rarity-nav"></div>
     <div class="achievement-grid" id="achievement-grid"></div>
   </section>
 
@@ -94,6 +98,11 @@
 
   <!-- Toast container -->
   <div id="toast-container"></div>
+
+  <!-- Achievement detail modal -->
+  <div class="modal-backdrop" id="modal-backdrop" style="display:none">
+    <div class="modal-container" id="modal-container"></div>
+  </div>
 
   <script src="/app.js"></script>
 </body>

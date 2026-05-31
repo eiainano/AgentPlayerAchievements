@@ -163,6 +163,13 @@ export class AchievementEngine {
     };
   }
 
+  /** Reload state + events from disk (for long-running servers like Dashboard) */
+  reload(): void {
+    const latest = this.store.load();
+    this.state = latest.state;
+    this.events = latest.events;
+  }
+
   resetState(): void {
     this.state = { unlocked: {}, stats: { total_unlocked: 0 } };
     this.events = [];

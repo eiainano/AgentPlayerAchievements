@@ -345,14 +345,20 @@ function evalStreak(events: TrackedEvent[], cond: Condition): EvaluationResult {
     if (matching.length === 0) return { met: false, progress: 0, target };
 
     if (cond.same_target && cond.field) {
-      // Count max consecutive events per field value
+      // Count max consecutive events per field value (consecutive = no other value interleaved)
       const runs: Record<string, number> = {};
-      const current: Record<string, number> = {};
+      let currentVal = '';
+      let currentRun = 0;
       for (const e of matching) {
         const val = getField(e, cond.field);
-        if (!val) continue;
-        current[val] = (current[val] || 0) + 1;
-        if (current[val]! > (runs[val] || 0)) runs[val] = current[val]!;
+        if (!val) { currentVal = ''; currentRun = 0; continue; }
+        if (val === currentVal) {
+          currentRun++;
+        } else {
+          currentVal = val;
+          currentRun = 1;
+        }
+        if (currentRun > (runs[val] || 0)) runs[val] = currentRun;
       }
       const maxRun = Math.max(0, ...Object.values(runs));
       return { met: evalOp(op, maxRun, target), progress: maxRun, target };
@@ -364,7 +370,7 @@ function evalStreak(events: TrackedEvent[], cond: Condition): EvaluationResult {
     for (let i = 0; i < events.length; i++) {
       const e = events[i]!;
       const isMatch = e.event_type === cond.event
-        && (!sessionWindow || now - new Date(e.timestamp).getTime() <= windowMs)
+        && (sessionWindow || now - new Date(e.timestamp).getTime() <= windowMs)
         && (!cond.filter || matchFilter(e, cond.filter))
         && (!cond.role || matchRole(e, cond.role))
         && (!cond.field || !!getField(e, cond.field));
@@ -488,7 +494,8 @@ function evalDistinctCount(events: TrackedEvent[], cond: Condition): EvaluationR
     values.add(val);
   }
   const target = cond.value;
-  return { met: values.size >= target, progress: values.size, target };
+  const op: ConditionOperator = cond.operator || '>=';
+  return { met: evalOp(op, values.size, target), progress: values.size, target };
 }
 
 function evalEvent(events: TrackedEvent[], cond: Condition): EvaluationResult {
@@ -625,10 +632,18 @@ function evalRatio(events: TrackedEvent[], cond: Condition): EvaluationResult {
   const denField = typeof cond.denominator === 'string' ? cond.denominator : null;
   if (!numField || !denField) return { met: false, progress: 0, target: cond.value };
 
+  events = scopeEvents(events, cond);
+  const sessionWindow = isSessionWindow(cond);
+  const windowMs = sessionWindow ? 0 : parseWindow(cond.window || '24h');
+  const now = Date.now();
+
   let numerator = 0;
   let denominator = 0;
   for (const e of events) {
     if (cond.event && e.event_type !== cond.event) continue;
+    if (!sessionWindow && now - new Date(e.timestamp).getTime() > windowMs) continue;
+    if (cond.filter && !matchFilter(e, cond.filter)) continue;
+    if (!matchRole(e, cond.role)) continue;
     numerator += Number(e.payload?.[numField]) || 0;
     denominator += Number(e.payload?.[denField]) || 0;
   }

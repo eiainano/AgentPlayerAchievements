@@ -409,9 +409,15 @@ function cmdHermesAuto(): void {
   if (data.session_id) ENGINE.sessionId = data.session_id;
   if (data.task_id) ENGINE.taskId = data.task_id;
   ENGINE.init();
-  // Fallback: if Hermes didn't provide session_id, trust engine's stored one
-  if (!data.session_id && ENGINE.sessionId && !ENGINE.sessionId.startsWith('agpa_')) {
-    // Engine already has a real session_id from a previous on_session_start
+  // Fallback: if Hermes didn't provide session_id, recover from event log
+  if (!data.session_id || ENGINE.sessionId.startsWith('agpa_')) {
+    for (let i = ENGINE.events.length - 1; i >= 0; i--) {
+      const sid = ENGINE.events[i]?.context?.session_id;
+      if (sid && !sid.startsWith('agpa_')) {
+        ENGINE.sessionId = sid;
+        break;
+      }
+    }
   }
   for (const { event_type, payload } of events) {
     const event = ENGINE.track(event_type, payload);

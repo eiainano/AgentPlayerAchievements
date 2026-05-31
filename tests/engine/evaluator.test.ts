@@ -518,4 +518,61 @@ describe('evalStreak window / field / same_target', () => {
     expect(result.met).toBe(true);
     expect(result.progress).toBe(2);
   });
+
+  it('streak event_level respects time window (24h) when not session-scoped', () => {
+    const now = new Date();
+    const recent = new Date(now.getTime() - 3600000).toISOString();     // 1h ago
+    const old = new Date(now.getTime() - 25 * 3600000).toISOString();   // 25h ago
+    const events = [
+      makeEvent('task.complete', { timestamp: old }),
+      makeEvent('task.complete', { timestamp: recent }),
+      makeEvent('task.complete', { timestamp: recent }),
+    ];
+    const cond: Condition = {
+      type: 'streak', event: 'task.complete',
+      window: '24h', value: 2, operator: '>=', event_level: true,
+    };
+    const result = evaluateCondition(cond, events);
+    // Only 2 recent events within 24h window → streak = 2
+    expect(result.met).toBe(true);
+    expect(result.progress).toBe(2);
+  });
+
+  it('distinct_count respects operator (not just >=)', () => {
+    const events = [
+      makeEvent('mcp.server_used', { payload: { server_name: 's1' } }),
+      makeEvent('mcp.server_used', { payload: { server_name: 's2' } }),
+    ];
+    // Using > operator: 2 > 2 → false
+    const condGt: Condition = {
+      type: 'distinct_count', event: 'mcp.server_used',
+      field: 'server_name', operator: '>', value: 2,
+    };
+    expect(evaluateCondition(condGt, events).met).toBe(false);
+    // Using <= operator: 2 <= 2 → true
+    const condLe: Condition = {
+      type: 'distinct_count', event: 'mcp.server_used',
+      field: 'server_name', operator: '<=', value: 2,
+    };
+    expect(evaluateCondition(condLe, events).met).toBe(true);
+  });
+
+  it('ratio respects time window and filter', () => {
+    const now = new Date();
+    const recent = new Date(now.getTime() - 3600000).toISOString();
+    const old = new Date(now.getTime() - 25 * 3600000).toISOString();
+    const events = [
+      makeEvent('input', { payload: { paste: '50', total: '100' }, timestamp: old }),
+      makeEvent('input', { payload: { paste: '30', total: '100' }, timestamp: recent }),
+    ];
+    const cond: Condition = {
+      type: 'ratio', event: 'input',
+      numerator: 'paste', denominator: 'total',
+      window: '24h', operator: '>=', value: 0.3,
+    };
+    const result = evaluateCondition(cond, events);
+    // Only the recent event (30/100 = 0.3) is within 24h window
+    expect(result.met).toBe(true);
+    expect(result.progress).toBe(30);
+  });
 });

@@ -118,8 +118,8 @@ function buildCondition(type: ConditionType, cond: Record<string, unknown>): Con
     field: str(cond, 'field'),
     sequence: strArr(cond, 'sequence') || strArr(cond, 'events'),
     pattern: cond.pattern && (typeof cond.pattern === 'string' || Array.isArray(cond.pattern)) ? cond.pattern as string | string[] : undefined,
-    numerator: str(cond, 'numerator'),
-    denominator: str(cond, 'denominator'),
+    numerator: parseConditionField(cond, 'numerator'),
+    denominator: parseConditionField(cond, 'denominator'),
     rarity: str(cond, 'rarity'),
     include_above: cond.include_above === true || undefined,
     in_range: Array.isArray(cond.in_range) && cond.in_range.length === 2
@@ -147,4 +147,14 @@ function str(o: Record<string, unknown>, k: string): string | undefined {
 function strArr(o: Record<string, unknown>, k: string): string[] | undefined {
   const v = o[k];
   return Array.isArray(v) && v.every(x => typeof x === 'string') ? v as string[] : undefined;
+}
+
+/** Parse a field that can be a plain string or a nested Condition object */
+function parseConditionField(o: Record<string, unknown>, k: string): Condition | string | undefined {
+  const v = o[k];
+  if (typeof v === 'string') return v;
+  if (typeof v === 'object' && v !== null && typeof (v as Record<string, unknown>).type === 'string') {
+    return buildCondition((v as Record<string, unknown>).type as ConditionType, v as Record<string, unknown>);
+  }
+  return undefined;
 }

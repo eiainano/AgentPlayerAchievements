@@ -56,6 +56,7 @@ Useful for quick testing: `echo '{"hook_event_name":"PostToolUse","tool_name":"R
 
 ## Conventions
 
+- **版本号永远沿用 0.1.x**（0.1.4 → 0.1.5 → 0.1.6 …），除非用户明确说要跳大版本号。不要自行升 0.2、1.0 等。
 - The YAML file (`04-成就定义清单.yaml`) is the **authoritative data source**. If you add a condition field, update `types.ts` Condition interface AND `yaml-parser.ts` buildCondition().
 - **After each commit + push, update `CHANGELOG.md`** with the changes you just pushed. Don't batch changes across multiple commits — update it with each push.
 - No new npm dependencies without strong reason. We have exactly 3: mcp-sdk, yaml, zod.

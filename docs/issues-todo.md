@@ -30,7 +30,7 @@
 
 - [ ] **中文描述（`description_cn`）大面积缺失** — Dashboard 双语切换就绪，但大部分成就只有英文 `description`，切中文后描述为空或 fallback 英文。138 个成就逐条补中文描述。纯 YAML 改动，无代码风险，用户侧感知极强。
 - [ ] **Dashboard 默认 0 成就解锁** — 新用户（或 `rm state.json` 后）Dashboard 全空。`npm run demo` 只生成 MVP 数据到 stateDir，Dashboard 不感知。考虑：Dashboard 加一个"加载 Demo 数据"按钮 or 首次访问时预设 6-10 个基础解锁。
-- [ ] **issues-todo 上次更新 5/31，跟进 6 项 evaluator bugfix** — streak window/same_target/distinct_count op/ratio scope/Hermes session/nested Condition。+3 测试（106→109）。
+- [x] **issues-todo 上次更新 5/31，跟进 6 项 evaluator bugfix** — streak window/same_target/distinct_count op/ratio scope/Hermes session/nested Condition。+3 测试（106→109）。
 
 ---
 
@@ -41,6 +41,14 @@
 - [ ] **Set 名称只有英文** — 9 个 set 定义无 `name_cn`，Dashboard 套装页切中文后仍显示英文名。
 
 ---
+
+## 已完成 — 自定义 + Steam 化命名（v0.1.6, 5/31）
+
+- [x] **Customize 页面** — 4 个新文件，YAML 注入防护 + XSS 防护
+- [x] **英文名全面 Steam 化** — pop culture 梗：`Ghost in the Shell`、`Copy-Paste is All You Need` 等
+- [x] **`name_cn` 基本全覆盖** — 几乎所有成就都有中文名
+- [x] **`streak_30` 名字回正** — 与 value:30 一致
+- [x] **issues-todo 同步** — 6 项 evaluator bugfix 标记完成
 
 ## 已完成 — Dashboard UX Overhaul（v0.1.4, 5/31）
 

@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.1.6] — 2026-05-31
+
+### 成就名称全面升级（Steam 化）
+
+通过 `/customize` 页面整体过了一遍 138 个成就的英文名、中文名和描述。
+
+- **英文名 Steam 化** — 大量改用 pop culture 梗：`Ghost in the Shell`、`Copy-Paste is All You Need`、`Command & Conquer`、`Smooth Criminal`、`Not Invited to Party` 等
+- **`name_cn` 基本全覆盖** — 之前大量缺失中文名，现在几乎每个成就都有中文名
+- **描述去冗长** — 删掉主观抒情，保留客观陈述，该幽默的地方保留
+- **`streak_30` 名字回正** — `Streak 3` → `Streak 30`，与 `condition.value: 30` 一致
+- **`Hold My Beer` 去感叹号** — 避免裸 YAML 解析风险
+
+### 新增 Customize 页面
+
+独立于 Dashboard 的成就名称编辑器，路由隔离，支持文本安全的 YAML 写回并保留注释。
+
+- 4 个新文件：`customize-api.ts`、`customize.html`、`customize.css`、`customize.js`
+- YAML 注入防护 + 防 XSS（textContent 而非 innerHTML）
+
 ## [0.1.5] — 2026-05-31
 
 ### Evaluator Bug 修复

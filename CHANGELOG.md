@@ -19,6 +19,13 @@
 - 4 个新文件：`customize-api.ts`、`customize.html`、`customize.css`、`customize.js`
 - YAML 注入防护 + 防 XSS（textContent 而非 innerHTML）
 
+### 138 条描述中译英 + description_cn 字段
+
+- **`description`** — 138 条全替换为英文翻译，与 Steam 化新名称风格统一
+- **`description_cn`** — 新增字段，保留原始中文描述
+- **Dashboard 双语完整** — 中文模式显示中文描述，英文模式显示英文描述，不再是同一种语言
+- 零代码变更（YAML-only），全线测试通过
+
 ## [0.1.5] — 2026-05-31
 
 ### Evaluator Bug 修复

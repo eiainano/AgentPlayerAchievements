@@ -104,7 +104,13 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
     case 'PostToolUse':
       results.push({ event_type: 'tool.complete', payload: { ...base, role: 'assistant' } });
       // Also emit conversation message (every tool use implies a conversation exchange)
-      results.push({ event_type: 'conversation.message', payload: {} });
+      const msgPayload: Record<string, unknown> = { role: 'assistant' };
+      if (data.tool_response && typeof (data.tool_response as Record<string, unknown>).output === 'string') {
+        const output = (data.tool_response as Record<string, unknown>).output as string;
+        msgPayload.content = output;
+        msgPayload.length = output.length;
+      }
+      results.push({ event_type: 'conversation.message', payload: msgPayload });
       // Also emit file-type events based on tool name
       if (data.tool_name === 'Read') results.push({ event_type: 'file.read', payload: { ...base } });
       if (data.tool_name === 'Write') {
@@ -151,7 +157,7 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
         }
         if (ti.command.includes('git push')) {
           const now = new Date();
-          results.push({ event_type: 'git.push', payload: { ...base, day_of_week: now.getDay() } });
+          results.push({ event_type: 'git.push', payload: { ...base, day_of_week: now.getDay(), hour: now.getHours() } });
         }
       }
       // MCP tool call

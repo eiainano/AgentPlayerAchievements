@@ -1,6 +1,6 @@
 # AGPA — 今日 TODO
 
-> 日期: 2026-05-31 | 当前版本: v0.1.5 | 成就: 138 | Tests: 109 ✅ | 条件类型: 11
+> 日期: 2026-06-01 | 当前版本: v0.1.6 | 成就: 158 | Tests: 110 ✅ | 条件类型: 11
 
 ---
 
@@ -29,8 +29,8 @@
 | visual_prompt / image_whisperer | YAML: `tool.complete` → `image.read`，AGENTS.md: Agent 读图时手动 track |
 | polyglot | YAML: `file.create` → `file.language_used`，AGENTS.md: 创建文件时手动 track `{ language }` |
 | perfectionist | YAML: `file.edit` → `function.edited`，AGENTS.md: 编辑函数时手动 track `{ function_name }` |
-| trophy_case | 代码: `computeMetric` 加 `showcase_count` 分支，读 `showcase.json` 非空槽位数 |
-| parallel_universe | 代码: `computeMetric` 加 `concurrent_sessions` 分支，统计 1h 内唯一 session_id 数 |
+| trophy_case | ✅ 已修复：改为 `counter achievement.unlocked >= 6` |
+| parallel_universe | ✅ 已修复：改为 Heart of the Swarm，`counter agent.spawn >= 10` |
 
 ### 4. ✅ evalThreshold metric 路径 + single_task 窗口 → 修好了
 - [x] **metric 路径过滤** — 现在读 cond.event / filter / role / window（非 session 窗口）

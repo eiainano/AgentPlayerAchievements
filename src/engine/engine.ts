@@ -37,6 +37,7 @@ export class AchievementEngine {
   toolSource: string;
   sessionId: string;
   taskId: string | null = null;
+  sessionStartTime: number | null = null;
 
   private store: Store;
 
@@ -79,10 +80,40 @@ export class AchievementEngine {
     this.state = state;
     this.events = events;
 
+    // Bootstrap achievement.unlocked events for existing unlocks (idempotent)
+    const hasUnlockEvents = this.events.some(e => e.event_type === 'achievement.unlocked');
+    if (!hasUnlockEvents) {
+      for (const [id, unlockedAt] of Object.entries(state.unlocked)) {
+        const def = this.definitions.find(d => d.id === id);
+        const evt: TrackedEvent = {
+          protocol_version: '1.0',
+          event_id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+          timestamp: unlockedAt as string,
+          tool_source: this.toolSource,
+          event_type: 'achievement.unlocked',
+          payload: { achievement_id: id, rarity: def?.rarity || 'common' },
+          context: { session_id: this.sessionId, model: 'auto' },
+        };
+        this.events.push(evt);
+        this.store.appendEvent(evt);
+      }
+    }
+
     return this;
   }
 
   track(eventType: EventType, payload: EventPayload = {}): TrackedEvent {
+    // Enrich payload based on event type
+    let enrichedPayload: Record<string, unknown> = { ...payload, tool_source: this.toolSource };
+    if (eventType === 'session.start') {
+      const now = new Date();
+      enrichedPayload.hour = now.getHours();
+      enrichedPayload.day_of_week = now.getDay();
+      this.sessionStartTime = now.getTime();
+    }
+    if (eventType === 'task.complete' && this.sessionStartTime != null) {
+      enrichedPayload.elapsed_ms = Date.now() - this.sessionStartTime;
+    }
     const event: TrackedEvent = {
       protocol_version: '1.0',
       event_id: crypto.randomUUID
@@ -91,7 +122,7 @@ export class AchievementEngine {
       timestamp: new Date().toISOString(),
       tool_source: this.toolSource,
       event_type: eventType,
-      payload,
+      payload: enrichedPayload,
       context: { session_id: this.sessionId, model: 'auto', ...(this.taskId ? { task_id: this.taskId } : {}) },
     };
 
@@ -123,6 +154,14 @@ export class AchievementEngine {
 
     if (newlyUnlocked.length > 0) {
       this.store.saveState(this.state);
+    }
+
+    // Emit achievement.unlocked events so downstream achievements (casual_collector, trophy_case) can count them
+    for (const def of newlyUnlocked) {
+      this.track('achievement.unlocked', {
+        achievement_id: def.id,
+        rarity: def.rarity,
+      } as EventPayload);
     }
 
     this.unlockedThisPoll = newlyUnlocked;

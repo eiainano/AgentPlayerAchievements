@@ -29,6 +29,7 @@ function matchFilter(event: TrackedEvent, filter: string): boolean {
     issues_found: event.payload?.issues_found || 0,
     day_of_week: event.payload?.day_of_week != null ? Number(event.payload.day_of_week) : -1,
     duration_ms: event.payload?.duration_ms != null ? Number(event.payload.duration_ms) : 0,
+    hour: event.payload?.hour != null ? Number(event.payload.hour) : -1,
     model: event.context?.model || '',
   };
   try {
@@ -138,7 +139,7 @@ function ctxValue(ctx: Record<string, string | boolean | number>, field: string)
 }
 
 function getField(event: TrackedEvent, field: string): string {
-  return String(event.payload?.[field] || '');
+  return String(event.payload?.[field] ?? (event as unknown as Record<string, unknown>)[field] ?? '');
 }
 
 function matchRole(event: TrackedEvent, role?: string): boolean {
@@ -265,6 +266,27 @@ function evalThreshold(events: TrackedEvent[], cond: Condition): EvaluationResul
     }
     const op: ConditionOperator = cond.operator || '<=';
     return { met: evalOp(op, maxCount, cond.max_per_day), progress: maxCount, target: cond.max_per_day };
+  }
+
+  // per_event: check each matching event individually (for single-event semantics like lucky_777, deep_review)
+  if (cond.per_event && cond.field) {
+    const peSessionWindow = isSessionWindow(cond);
+    const peWindowMs = peSessionWindow ? 0 : parseWindow(cond.window || '24h');
+    const peNow = Date.now();
+    const peTarget = cond.value;
+    const peOp: ConditionOperator = cond.operator || '>=';
+    for (const e of events) {
+      if (cond.event && e.event_type !== cond.event) continue;
+      if (!peSessionWindow && peNow - new Date(e.timestamp).getTime() > peWindowMs) continue;
+      if (cond.filter && !matchFilter(e, cond.filter)) continue;
+      if (!matchRole(e, cond.role)) continue;
+      const val = Number(e.payload?.[cond.field]) || 0;
+      if (evalOp(peOp, val, peTarget)) {
+        if (cond.max_value != null && val >= cond.max_value) continue; // upper bound (exclusive)
+        return { met: true, progress: val, target: peTarget };
+      }
+    }
+    return { met: false, progress: 0, target: peTarget };
   }
 
   // Standard threshold: sum field values across matching events

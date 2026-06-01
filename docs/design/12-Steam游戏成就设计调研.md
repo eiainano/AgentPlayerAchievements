@@ -224,7 +224,7 @@
 - 不是纯粹的"高难度通关"，而是**增加机制限制**（禁止手造、禁止太阳能、禁止激光炮塔）
 - 每个限制强迫玩家探索不同的解决方法，相当于**游戏机制的教学工具**
 
-**AGPA 借鉴：** "speed_run_bronze"/"speed_run_silver"（3 分钟/1 分钟完成任务）和 "no_edit_challenge"（零手动编辑）已经属于这类挑战型成就。
+**AGPA 借鉴：** "speed_run_bronze"/"speed_run_silver"（3 分钟/1 分钟完成任务）和 "ten_task_no_edit"（连续 10 个 task 零手动编辑）已经属于这类挑战型成就。
 
 ---
 

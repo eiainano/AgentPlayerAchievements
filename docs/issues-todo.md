@@ -1,6 +1,6 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-01 | 总成就数: 160 | 条件类型: 11 | Tests: 110 ✅ | 5 Agent 全接入
+> 最后更新: 2026-06-01 | 总成就数: 158 | 条件类型: 11 | Tests: 110 ✅ | 5 Agent 全接入
 
 ---
 
@@ -16,7 +16,7 @@
 
 ## P1 — Hook 不提取的 payload 字段
 
-✅ **全部修完。** file_type→image.read、language→file.language_used、function_name→function.edited、showcase_count/concurrent_sessions→computeMetric 新分支。
+✅ **全部修完。** file_type→image.read、language→file.language_used、function_name→function.edited、showcase_count/concurrent_sessions→改条件为 counter 可测量事件。
 
 ## P1 — Evaluator 功能缺口（2 项 HOLD）
 
@@ -37,8 +37,8 @@
 ## P3 — YAML 质量 / 资产
 
 - [x] **Hidden 分类占 22%** — 41→21（26%→13%）。25 个重新归类到 tool_mastery（+10）、milestones（+3）、style/workflow（各+2）等。剩余 21 个全是真彩蛋。
-- [ ] **像素画 icon 资产暂缺** — `iconHtml()` + `parseIconField({ src })` 已就绪，YAML 也支持 `icon: { src, alt }` 对象格式。但 160 个成就全部仍是 emoji 字符串，没有实际的像素画 PNG。需要逐成就设计/生成像素画图标（可渐进替换，emoji 和像素画共存）。
-- [x] **Set 名称只有英文** — 9→10 个 set，全部添加 `name_cn`，套装页中英双语切换。Set 系统重构：合并散装 set，扩充合理 set。`git_flow`（7→9）、`agent_commander`（5→6）、`polar_night`（2→4）。57/160 有归属。
+- [ ] **像素画 icon 资产暂缺** — 下一步：选 The Beginning（14 个）做第一批试点。方案：AI 生成 32×32 pixel art PNG → `public/icons/` → YAML `icon: { src, alt }` → Dashboard `iconHtml()` 渲染。验证全链路后再铺开全量 158 个。emoji 和 pixel art 并存，渐进替换。
+- [x] **Set 名称只有英文** — 9→10 个 set，全部添加 `name_cn`，套装页中英双语切换。Set 系统重构：合并散装 set，扩充合理 set。`git_flow`（7→9）、`agent_commander`（5→6）、`polar_night`（2→3）。57/158 有归属。
 
 ---
 

@@ -44,6 +44,9 @@ export interface EventPayload {
   agent_involved?: boolean;
   manual_edits?: number;
   issues_found?: number;
+  hour?: number;
+  day_of_week?: number;
+  elapsed_ms?: number;
   [key: string]: unknown;
 }
 
@@ -116,6 +119,10 @@ export interface Condition {
   event_level?: boolean;
   // metadata
   unit?: string;
+  // threshold: check each event individually instead of summing
+  per_event?: boolean;
+  // threshold: upper bound for per_event range checks (exclusive)
+  max_value?: number;
 }
 
 export type RarityLevel = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';

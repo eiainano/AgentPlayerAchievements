@@ -154,8 +154,8 @@ definitions:
   - id: visual_prompt
     name: A Picture's Worth
     name_cn: 有图有真相
-    description: Sent an image to your agent.
-    description_cn: 给 agent 传了一张图片。
+    description: Agent read an image you shared. Visual context unlocked.
+    description_cn: agent 读取了你分享的图片。视觉上下文已解锁。
     icon: 🖼️
     category: onboarding
     rarity: uncommon
@@ -270,10 +270,10 @@ definitions:
         operator: ">="
         value: 10
   - id: dual_wielder
-    name: Dual Wielder
-    name_cn: 双持流
-    description: Used 3+ different tools in a single task. Versatility is key.
-    description_cn: 同一个 task 里用了 3 种以上不同工具。多面手。
+    name: Three-Sword Style
+    name_cn: 三刀流
+    description: Used 3+ different tools in a single task. Santoryu — three swords, one warrior.
+    description_cn: 同一个 task 里用了 3 种以上不同工具。三刀流——三把刀，一个剑士。
     icon: ⚔️
     category: tool_mastery
     rarity: uncommon
@@ -282,6 +282,7 @@ definitions:
       - type: distinct_count
         event: tool.complete
         field: tool_name
+        window: single_task
         operator: ">="
         value: 3
     set: tool_connoisseur
@@ -432,8 +433,8 @@ definitions:
         value: 50
         window: all
   - id: streak_3
-    name: Hat Trick
-    name_cn: 帽子戏法
+    name: Three-Day Streak
+    name_cn: 三日连击
     description: 3 consecutive days of use. A habit is forming.
     description_cn: 连续 3 天使用。习惯正在养成。比 7 天更近，比明天更远。
     icon: 🎩
@@ -475,8 +476,9 @@ definitions:
     hidden: false
     progress_trackable: true
     conditions:
-      - type: counter
+      - type: threshold
         event: token.consumed
+        field: amount
         operator: ">="
         value: 1000000
         window: all
@@ -514,8 +516,8 @@ definitions:
   - id: chain_reaction
     name: Chain Reaction
     name_cn: 链式反应
-    description: 5+ consecutive tool calls by the agent in a single conversation.
-    description_cn: 单次对话中 agent 完成 5 步以上连续 tool call。
+    description: 5+ tool calls by the agent in a single conversation.
+    description_cn: 单次对话中 agent 完成 5 步以上 tool call。
     icon: ⛓️
     category: skill
     rarity: uncommon
@@ -656,7 +658,7 @@ definitions:
           - Edit
           - Write
           - Bash
-          - ToolSearch
+          - Think
         window: single_session
         operator: ">="
         value: 5
@@ -748,35 +750,37 @@ definitions:
   - id: minimalist
     name: Minimalist
     name_cn: 极简主义
-    description: Prompt was 80 characters or fewer. Every word counts.
-    description_cn: prompt 长度 ≤ 80 字符，惜字如金。
+    description: An agent message was 80 characters or fewer. Every word counts.
+    description_cn: agent 某条消息长度 ≤ 80 字符，惜字如金。
     icon: 🪶
     category: style
     rarity: epic
     hidden: false
     conditions:
       - type: threshold
-        metric: length
         event: conversation.message
+        field: length
+        per_event: true
+        role: assistant
         operator: <=
         value: 80
-        window: all
   - id: novelist
     name: Novelist
     name_cn: 小说家
-    description: Prompt was 500+ characters. You're thorough!
-    description_cn: prompt 长度 ≥ 500 字符，你很细心！
+    description: An agent message was 500+ characters. You're thorough!
+    description_cn: agent 某条消息长度 ≥ 500 字符，你很细心！
     icon: 📝
     category: style
     rarity: epic
     hidden: false
     conditions:
       - type: threshold
-        metric: length
         event: conversation.message
+        field: length
+        per_event: true
+        role: assistant
         operator: ">="
         value: 500
-        window: all
   - id: one_shot
     name: One Shot
     name_cn: 一发入魂
@@ -790,6 +794,8 @@ definitions:
       - type: threshold
         event: task.complete
         field: step_count
+        per_event: true
+        window: single_task
         operator: ==
         value: 1
   - id: iterative_refiner
@@ -810,21 +816,19 @@ definitions:
   - id: night_owl
     name: Night Owl
     name_cn: 夜猫子
-    description: Started a session in the wee hours (0:00-5:00).
-    description_cn: 启动session在凌晨 (0:00-5:00)。
+    description: Started a session in the wee hours (0:00-5:00). You're a creature of the night.
+    description_cn: 某次在凌晨 (0:00-5:00) 启动了 session。你是夜行动物。
     icon: 🦉
     category: style
     rarity: uncommon
     hidden: true
     set: polar_night
     conditions:
-      - type: mode
+      - type: counter
         event: session.start
-        field: hour
-        in_range:
-          - 0
-          - 5
-        threshold: 0.5
+        filter: hour in [0, 1, 2, 3, 4, 5]
+        operator: ">="
+        value: 1
   - id: weekend_warrior
     name: Not Invited to Party
     name_cn: 开趴不邀请我
@@ -836,13 +840,26 @@ definitions:
     hidden: true
     set: polar_night
     conditions:
-      - type: mode
+      - type: counter
         event: session.start
-        field: day_of_week
-        in_range:
-          - 0
-          - 6
-        threshold: 0.5
+        filter: day_of_week in [0, 6]
+        operator: ">="
+        value: 1
+  - id: afternoon_tea
+    name: Afternoon Tea
+    name_cn: 下午茶
+    description: Started a session during tea time (3pm-5pm). Tea, biscuits, and code.
+    description_cn: 在下午茶时段 (15:00-17:00) 启动了 session。茶、饼干、代码。
+    icon: 🫖
+    category: style
+    rarity: uncommon
+    hidden: true
+    conditions:
+      - type: counter
+        event: session.start
+        filter: hour in [15, 16, 17]
+        operator: ">="
+        value: 1
   - id: copy_paste_king
     name: Copy-Paste is All You Need
     name_cn: Ctrl C + Ctrl V就好了
@@ -928,20 +945,20 @@ definitions:
         value: 100
         window: all
   - id: parallel_universe
-    name: Parallel Universe
-    name_cn: 平行宇宙
-    description: 3+ active sessions on the same project simultaneously.
-    description_cn: 你在同一项目上，同时有 ≥ 3 个 active session。
+    name: Heart of the Swarm
+    name_cn: 虫群之心
+    description: Spawned 10+ sub-agents in a single session. Parallel processing at its finest.
+    description_cn: 单 session 中 spawn 了 10+ 个子 agent。极致并行。
     icon: 🌌
     category: tool_mastery
     rarity: rare
     hidden: false
     conditions:
-      - type: threshold
-        metric: concurrent_sessions
-        window: same_project
+      - type: counter
+        event: agent.spawn
+        window: single_session
         operator: ">="
-        value: 3
+        value: 10
   - id: mcp_explorer
     name: MCP Explorer
     name_cn: MCP 探索者
@@ -1053,7 +1070,7 @@ definitions:
     conditions:
       - type: counter
         event: file.create
-        filter: file_path matches '.github/workflows/*.yml'
+        filter: file_path matches '*.github/workflows/*.yml'
         operator: ">="
         value: 1
   - id: code_reviewer
@@ -1083,6 +1100,7 @@ definitions:
       - type: threshold
         event: code.review_completed
         field: issues_found
+        per_event: true
         operator: ">="
         value: 10
   - id: plan_mode_user
@@ -1144,7 +1162,7 @@ definitions:
     conditions:
       - type: counter
         event: file.create
-        filter: file_path matches 'CHANGELOG*'
+        filter: file_path matches '*CHANGELOG*'
         operator: ">="
         value: 1
   - id: context_conscious
@@ -1205,9 +1223,9 @@ definitions:
     hidden: false
     progress_trackable: true
     conditions:
-      - type: counter
+      - type: threshold
         event: token.consumed
-        unit: tokens
+        field: amount
         operator: ">="
         value: 10000000
         window: all
@@ -1222,9 +1240,9 @@ definitions:
     hidden: false
     progress_trackable: true
     conditions:
-      - type: counter
+      - type: threshold
         event: token.consumed
-        unit: tokens
+        field: amount
         operator: ">="
         value: 100000000
         window: all
@@ -1444,11 +1462,11 @@ definitions:
     conditions:
       - type: counter
         event: template.created
-        operator: ">="
+        operator: ">"
         value: 1
   - id: slash_commander
-    name: The Mask
-    name_cn: 变相怪杰
+    name: Welcome back, Commander
+    name_cn: 欢迎回家，指挥官
     description: Used more than 5 different commands.
     description_cn: 使用超过5种不同command。
     icon: 🔣
@@ -1460,22 +1478,23 @@ definitions:
       - type: distinct_count
         event: command.slash_used
         field: command_name
-        operator: ">="
+        operator: ">"
         value: 5
   - id: ill_do_it_myself
     name: Pissed Off
     name_cn: 怒上心头
-    description: Rejected 10+ tool calls.
-    description_cn: 决绝了超过10次工具调用。
+    description: Rejected 10+ tool calls within 1 hour.
+    description_cn: 1 小时内拒绝了超过 10 次工具调用。
     icon: 😤
     category: tool_mastery
     rarity: rare
     hidden: true
     conditions:
-      - type: streak
+      - type: counter
         event: tool.deny
         operator: ">="
         value: 10
+        window: 1h
   - id: perfectionist
     name: Perfectionist
     name_cn: 完美主义者
@@ -1568,7 +1587,7 @@ definitions:
       - type: counter
         event: config.file_edited
         operator: ">="
-        value: 20
+        value: 21
         window: all
   - id: hold_my_beer
     name: Hold My Beer
@@ -1717,8 +1736,8 @@ definitions:
   - id: lucky_777
     name: Lucky 777
     name_cn: 幸运777
-    description: Agent output was exactly 777 tokens. Go buy a lottery ticket.
-    description_cn: agent 某次输出恰好 777 tokens。今天去抽卡。
+    description: Agent output was 777–799 tokens. Go buy a lottery ticket.
+    description_cn: agent 某次输出在 777–799 tokens 之间。今天去抽卡。
     icon: 🎰
     category: hidden
     rarity: legendary
@@ -1727,8 +1746,10 @@ definitions:
       - type: threshold
         event: conversation.message
         field: output_tokens
-        operator: ==
+        per_event: true
+        operator: ">="
         value: 777
+        max_value: 800
   - id: im_sorry_dave
     name: I'm Sorry, Dave
     name_cn: 抱歉 Dave
@@ -1751,20 +1772,18 @@ definitions:
   - id: early_bird
     name: Early Bird
     name_cn: 早起的鸟儿有虫吃
-    description: Started a session in the early morning (6:00-9:00). First thing every day is saying good morning to your agent.
-    description_cn: 启动session在清晨 (6:00-9:00)。每天第一件事就是和 agent 说早安。
+    description: Started a session in the early morning (6:00-9:00). The early bird gets the worm.
+    description_cn: 某次在清晨 (6:00-9:00) 启动了 session。早起的鸟儿有虫吃。
     icon: 🐦
     category: style
     rarity: uncommon
     hidden: true
     conditions:
-      - type: mode
+      - type: counter
         event: session.start
-        field: hour
-        in_range:
-          - 6
-          - 9
-        threshold: 0.5
+        filter: hour in [6, 7, 8, 9]
+        operator: ">="
+        value: 1
   - id: midas_touch
     name: Midas Touch
     name_cn: 点石成金
@@ -1781,64 +1800,22 @@ definitions:
         window: single_task
         operator: ">="
         value: 20
-  - id: nothing_to_see
-    name: Nothing to See Here
-    name_cn: 没什么好看的
-    description: Didn't open the editor once during a task.
-    description_cn: 单 task 中 editor 一次都没打开过。
-    icon: 🫣
-    category: hidden
-    rarity: uncommon
-    hidden: true
-    conditions:
-      - type: counter
-        event: output.edit
-        window: single_task
-        operator: ==
-        value: 0
-      - type: event
-        event: task.complete
-        window: same_task
   - id: rubber_duck
     name: Rubber Duck
     name_cn: 橡皮小黄鸭
-    description: Asked your agent 20 questions in one conversation without asking it to do anything. It's your debugging buddy.
-    description_cn: 单次对话中问了 agent 20 个问题，但没让它执行任何操作。它在陪你 debugging。
+    description: Agent sent 20+ messages in a single session. It's your chatty debugging buddy.
+    description_cn: 单 session 中 agent 发送了 20+ 条消息。它是个爱说话的 debugging 伙伴。
     icon: 🦆
     category: hidden
     rarity: rare
     hidden: true
     conditions:
-      - type: threshold
+      - type: counter
         event: conversation.message
-        role: user
-        filter: contains '?'
+        role: assistant
         window: single_session
         operator: ">="
         value: 20
-      - type: counter
-        event: tool.complete
-        window: same_session
-        operator: ==
-        value: 0
-  - id: blind_faith
-    name: Trust Fall
-    name_cn: 盲目信任
-    description: Accepted all agent output directly in an entire task, without a single edit.
-    description_cn: 整个 task 中直接接受了 agent 的所有输出，一次都没改。
-    icon: 🫂
-    category: challenge
-    rarity: rare
-    hidden: true
-    conditions:
-      - type: counter
-        event: output.edit
-        window: single_task
-        operator: ==
-        value: 0
-      - type: event
-        event: task.complete
-        window: same_task
   - id: the_negotiator
     name: The Negotiator
     name_cn: 谈判专家
@@ -1874,18 +1851,21 @@ definitions:
   - id: silent_partner
     name: Guy in the Chair
     name_cn: 幕后搭档
-    description: After the agent's first response, you never typed again. It did all the remaining work itself.
-    description_cn: agent 给出首条输出后你全程没再打字。它自己完成了所有剩余工作。
+    description: Agent edited files and completed a task — you just watched. Pure delegation.
+    description_cn: agent 编辑了文件并完成了一个 task——你只是看着。纯粹的委派。
     icon: 🤐
     category: style
     rarity: epic
     hidden: true
     conditions:
       - type: counter
-        event: conversation.message
-        window: single_session
-        operator: ==
+        event: file.edit
+        window: single_task
+        operator: ">="
         value: 1
+      - type: event
+        event: task.complete
+        window: same_task
   - id: time_traveler
     name: Time Traveler
     name_cn: 时间旅者
@@ -1913,7 +1893,7 @@ definitions:
     conditions:
       - type: counter
         event: command.run
-        filter: command contains 'grep -E' or command contains 'sed -E' or command contains "grep -P"
+        filter: command contains 'grep -E' || command contains 'sed -E' || command contains "grep -P"
         operator: ">="
         value: 1
   - id: friday_deploy
@@ -1928,7 +1908,7 @@ definitions:
     conditions:
       - type: counter
         event: git.push
-        filter: day_of_week == 5
+        filter: day_of_week == 5 && hour in [12, 13, 14, 15, 16, 17, 18, 19, 20]
         operator: ">="
         value: 1
   - id: infinite_loop
@@ -2119,7 +2099,7 @@ definitions:
     name: Silent Night
     name_cn: 静夜思
     description: Completed a task in the wee hours (0:00-5:00). The best code is born in darkness.
-    description_cn: 在凌晨（0:00-5:00）完成了一个 task。最好的代码诞生在黑暗中。
+    description_cn: 某次在凌晨（0:00-5:00）完成了一个 task。最好的代码诞生在黑暗中。
     icon: 🌙
     category: challenge
     rarity: rare
@@ -2129,13 +2109,11 @@ definitions:
       - type: event
         event: task.complete
         window: single_task
-      - type: mode
+      - type: counter
         event: session.start
-        field: hour
-        in_range:
-          - 0
-          - 5
-        threshold: 0.5
+        filter: hour in [0, 1, 2, 3, 4, 5]
+        operator: ">="
+        value: 1
     set: polar_night
   - id: polyglot_challenge
     name: Polyglot Fetish
@@ -2194,25 +2172,6 @@ definitions:
       - type: event
         event: test.pass
         window: same_task
-  - id: no_edit_challenge
-    name: No Edit Challenge
-    name_cn: 零编辑挑战
-    description: Zero manual edits in a single task, all agent work.
-    description_cn: 单 task 零手动编辑，全靠 agent。
-    icon: 🎮
-    category: challenge
-    rarity: rare
-    hidden: false
-    challenge: true
-    conditions:
-      - type: counter
-        event: output.edit
-        window: single_task
-        operator: ==
-        value: 0
-      - type: event
-        event: task.complete
-        window: same_task
   - id: ten_task_no_edit
     name: Ten-Task No Edit
     name_cn: 十连零编辑
@@ -2251,8 +2210,8 @@ definitions:
   - id: short_circuit
     name: Short Circuit
     name_cn: 短路
-    description: Completed a full task with a prompt under 50 characters. You didn't write a single extra word.
-    description_cn: 用不到 50 个字符的 prompt 完成了一个完整 task。你没多写一个字。
+    description: Completed a task in 3 steps or fewer. Short and sweet.
+    description_cn: 3 步以内完成了一个 task。短平快。
     icon: ⚡
     category: challenge
     rarity: legendary
@@ -2261,10 +2220,11 @@ definitions:
     conditions:
       - type: threshold
         event: task.complete
-        field: prompt_length
-        operator: <=
-        value: 50
+        field: step_count
+        per_event: true
         window: single_task
+        operator: <=
+        value: 3
   - id: speed_run_gold
     name: Speed Run (Gold)
     name_cn: 速通 (金牌)
@@ -2288,19 +2248,19 @@ definitions:
     set: speedrun
   - id: silent_partner_ii
     name: Guy in the Chair II
-    name_cn: 安静伙伴 II
-    description: 1 message, 3 tasks, one session. Pure efficiency.
-    description_cn: 一个 session 只说 1 句话，完成了 3 个 task。极致的效率。
+    name_cn: 幕后搭档 II
+    description: Agent edited files in 3 tasks, one session, zero interference from you. Autopilot engaged.
+    description_cn: 同一 session 中 agent 编辑了文件并完成了 3 个 task，你毫无干预。自动驾驶已激活。
     icon: 🪑
     category: challenge
     rarity: legendary
     hidden: false
     challenge: true
     conditions:
-      - type: threshold
-        event: conversation.message
+      - type: counter
+        event: file.edit
         window: single_session
-        operator: ==
+        operator: ">="
         value: 1
       - type: counter
         event: task.complete
@@ -2310,17 +2270,18 @@ definitions:
   - id: trophy_case
     name: Trophy Case
     name_cn: 奖杯柜
-    description: Showcase filled with 6 achievements.
-    description_cn: 展示柜放满了 6 个成就。
+    description: Unlocked 6 achievements. Your collection is growing.
+    description_cn: 解锁了 6 个成就。你的收藏正在增长。
     icon: 🖼️
     category: community
     rarity: common
     hidden: false
     conditions:
-      - type: threshold
-        metric: showcase_count
+      - type: counter
+        event: achievement.unlocked
         operator: ">="
         value: 6
+        window: all
   - id: completionist_bronze
     name: Completionist (Bronze)
     name_cn: 完美主义(铜牌)
@@ -2400,10 +2361,11 @@ definitions:
     hidden: false
     progress_trackable: true
     conditions:
-      - type: threshold
-        metric: total_achievements_unlocked
+      - type: counter
+        event: achievement.unlocked
         operator: ">="
         value: 20
+        window: all
   - id: pipemaster
     name: Pipemaster
     name_cn: 管道大师
@@ -2453,11 +2415,11 @@ definitions:
         value: 100
         window: all
   - id: cerberus
-    name: Cerberus
-    name_cn: 地狱三头犬
-    description: Agent wrote 3 piped commands. Three heads, one life, infinite output.
-    description_cn: agent 写出过 3 条带管道的命令。三个头，一条命，无限输出。
-    icon: 🐶
+    name: Super Mario Bros
+    name_cn: 超级马力欧兄弟
+    description: Agent wrote 2 commands containing pipes. It's-a me, pipe!
+    description_cn: agent 写出过 2 条带管道的命令。It's-a me, pipe!
+    icon: 🍄
     category: skill
     rarity: epic
     hidden: false
@@ -2466,7 +2428,7 @@ definitions:
         event: command.run
         filter: command contains '|'
         operator: ">="
-        value: 3
+        value: 2
   - id: fail_forward
     name: Fail Forward
     name_cn: 初尝失败
@@ -2514,8 +2476,8 @@ definitions:
   - id: phoenix
     name: Phoenix
     name_cn: 凤凰涅槃
-    description: Agent failed and immediately succeeded on the next try, 5 times in a row. Rise from the ashes.
-    description_cn: agent 失败后立即在下一次尝试中成功，反复 5 次。浴火重生。
+    description: Agent failed and immediately succeeded on the next try, 10 times. Rise from the ashes.
+    description_cn: agent 失败后立即在下一次尝试中成功，反复 10 次。浴火重生。
     icon: 🔥
     category: skill
     rarity: epic
@@ -2526,7 +2488,7 @@ definitions:
           - tool.failure
           - tool.complete
         operator: ">="
-        value: 5
+        value: 10
   - id: mcp_connoisseur
     name: MCP Connoisseur
     name_cn: MCP 品鉴师
@@ -2577,8 +2539,8 @@ definitions:
   - id: swat_team
     name: SWAT Team
     name_cn: 特种小队
-    description: Agent maintained 2-4 sub-agents working simultaneously. Small, precise tactical units.
-    description_cn: agent 同时保持 2-4 个子 agent 工作。小而精的战术单元。
+    description: Spawned exactly 4 sub-agents in a single session. Four-person tactical unit.
+    description_cn: 同一 session 中恰好 spawn 了 4 个子 agent。四人战术小组。
     icon: 🎯
     category: workflow
     rarity: uncommon
@@ -2587,12 +2549,7 @@ definitions:
       - type: counter
         event: agent.spawn
         window: single_session
-        operator: ">="
-        value: 2
-      - type: counter
-        event: agent.spawn
-        window: single_session
-        operator: <=
+        operator: ==
         value: 4
     set: agent_commander
 sets:
@@ -2706,7 +2663,6 @@ sets:
     achievements:
       - night_owl
       - weekend_warrior
-      - dark_city
       - silent_night
     reward:
       type: theme

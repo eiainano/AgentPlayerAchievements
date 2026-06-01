@@ -136,6 +136,8 @@ function buildCondition(type: ConditionType, cond: Record<string, unknown>): Con
     exclude_hidden: cond.exclude_hidden === true || undefined,
     max_per_day: typeof cond.max_per_day === 'number' ? cond.max_per_day as number : undefined,
     event_level: cond.event_level === true || undefined,
+    per_event: cond.per_event === true || undefined,
+    max_value: typeof cond.max_value === 'number' ? cond.max_value : undefined,
     unit: str(cond, 'unit'),
   } satisfies Condition;
 }

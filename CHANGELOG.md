@@ -2,6 +2,15 @@
 
 ## [0.1.6] — 2026-05-31
 
+### 统一 CLI + 安装体验重构 — 2026-06-02
+
+- **`agpa` 统一 CLI**（`src/cli/index.ts`）— 10 子命令路由，`--help`/`--version`。`package.json` 加 `bin`/`files`/`engines` 字段，`npm link` 即用。
+- **init 体验增强**（`src/cli/init.ts`）— Welcome banner + 自动检测可视化 + 配置进度输出 + 总结框含 3 步下一步指引 + 首成就预告。
+- **`agpa verify` 新命令**（`src/cli/verify.ts`）— 11 项健康检查（数据目录→state→YAML→引擎 dry-run→MCP 配置→指令文件），复用 doctor 逻辑 + engine 干跑测试。
+- **Dashboard 引导增强**（`app.js`/`index.html`/`styles.css`）— 首次访问 tip（1-5 成就时显示，可关闭），下一个推荐成就卡片（1-10 成就时显示，带进度条和 click-to-scroll）。
+- **文档同步**（`README.md`/`CLAUDE.md`/`docs/multi-tool-setup.md`）— 命令改为 `agpa` 方式，138→160 成就，`~/.agpa`→`~/.agent-achievements` 路径修正。
+- 用户完整旅程：`npm link` → `agpa init` → `agpa verify` → 日常使用 → 🏆 → `agpa dashboard`。
+
 ### 🎯 稀有度全量重平衡 — 2026-06-01
 
 160 项成就稀有度大调整（48 项变更），构建健康的金字塔分布：

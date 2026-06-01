@@ -2,6 +2,12 @@
 
 ## [0.1.6] — 2026-05-31
 
+### Steam 调研驱动新增 2 成就 + 文档同步 — 2026-06-01
+
+- **avengers_assemble（复仇者集结）** — `agent.spawn` distinct_count(`agent_type`) == 6。Spawn 过恰好 6 种不同类型 agent（致敬初代复仇者六人组）。Epic，set: agent_commander（5→7）。
+- **skill_adept（技多不压身）** — `skill.invoke` distinct_count(`skill_name`) >= 5。调用过 5 种以上不同 skill（全新事件 `skill.invoke` 首次使用）。Rare，set: creators_forge（5→6）。
+- 基于《12-Steam游戏成就设计调研》21 款游戏分析，从 25 个提案中筛选 2 个无重叠新增。
+
 ### Dashboard 新用户体验 + 配色升级 — 2026-06-01
 
 - **入门引导卡片** — 0 成就新用户自动展示 6 个一步可得的 onboarding 成就 + 如何获取的指引文字，中英双语。解锁任何成就后自动消失，reset 后重新出现。

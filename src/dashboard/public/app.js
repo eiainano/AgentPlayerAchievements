@@ -816,12 +816,11 @@ function openModal(ach) {
   backdrop.classList.remove('closing');
 
   const locked = !ach.unlocked;
+  const rarityColor = `var(--rarity-${ach.rarity})`;
 
-  // Name: pick current language, fallback to the other
   const name = currentLang === 'zh'
     ? (ach.name_cn || ach.name)
     : (ach.name || ach.name_cn || '');
-  // Description: pick current language, fallback
   const desc = currentLang === 'zh'
     ? (ach.description_cn || ach.description || t('modal_no_desc'))
     : (ach.description || ach.description_cn || t('modal_no_desc'));
@@ -853,7 +852,8 @@ function openModal(ach) {
       </div>`;
   }
 
-  const rarityColor = `var(--rarity-${ach.rarity})`;
+  // Build innerHTML and set card-color in one synchronous block,
+  // THEN restart the animation from a clean frame for both locked & unlocked.
   container.innerHTML = `
     <div class="modal-header">
       <span class="modal-icon-wrap">${iconHtml(locked && ach.hidden ? '\u{1F512}' : ach.icon, { size: 48, className: 'modal-icon' })}</span>
@@ -883,7 +883,8 @@ function openModal(ach) {
       ${bottomSections}
     </div>`;
 
-  // Apply rarity glow to container border
+  // Apply card-color for unlocked glow — after innerHTML so it never
+  // interferes with layout during the DOM swap.
   if (!locked) {
     container.style.setProperty('--card-color', rarityColor);
   } else {
@@ -891,6 +892,15 @@ function openModal(ach) {
   }
 
   backdrop.style.display = 'flex';
+
+  // Restart the pop-in animation on the next frame so it always starts
+  // from a clean state — identical timing for locked and unlocked cards.
+  container.style.animation = 'none';
+  requestAnimationFrame(() => {
+    // Force the browser to apply animation:none before re-enabling
+    container.offsetHeight;
+    container.style.animation = '';
+  });
 }
 
 function toggleHiddenDesc(e) {
@@ -917,11 +927,11 @@ function closeModal() {
   const backdrop = document.getElementById('modal-backdrop');
   if (!backdrop) return;
   backdrop.classList.add('closing');
-  // Match CSS exit animation duration (400ms)
+  // Match CSS exit animation duration (250ms)
   setTimeout(() => {
     backdrop.style.display = 'none';
     backdrop.classList.remove('closing');
-  }, 400);
+  }, 250);
 }
 
 // ── Sets ─────────────────────────────────────────────

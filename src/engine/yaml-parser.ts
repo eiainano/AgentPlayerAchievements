@@ -66,6 +66,7 @@ export function parseYAML(text: string): { definitions: AchievementDefinition[];
       sets.push({
         id,
         name: typeof entry.name === 'string' ? entry.name : id,
+        name_cn: typeof entry.name_cn === 'string' ? entry.name_cn : undefined,
         achievements: Array.isArray(entry.achievements) && entry.achievements.every((x: unknown) => typeof x === 'string')
           ? entry.achievements as string[] : [],
         reward: {

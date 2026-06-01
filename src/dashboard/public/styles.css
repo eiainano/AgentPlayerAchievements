@@ -1163,20 +1163,28 @@ body {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
   z-index: 300;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: modal-fade-in .2s ease;
   padding: 20px;
+  transition: background .35s ease, backdrop-filter .35s ease, -webkit-backdrop-filter .35s ease;
+}
+.modal-backdrop:not(.closing) {
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
-@keyframes modal-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+/* Exit: backdrop fades out */
+.modal-backdrop.closing {
+  background: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  transition: background .35s ease .05s, backdrop-filter .35s ease .05s, -webkit-backdrop-filter .35s ease .05s;
 }
 
 .modal-container {
@@ -1189,13 +1197,29 @@ body {
   max-height: 85vh;
   overflow-y: auto;
   position: relative;
-  animation: modal-slide-in .3s cubic-bezier(.4,0,.2,1);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  animation: modal-pop-in .5s cubic-bezier(.22,.61,.36,1);
+  transform-origin: center center;
 }
 
-@keyframes modal-slide-in {
-  from { transform: translateY(20px) scale(.96); opacity: 0; }
-  to { transform: translateY(0) scale(1); opacity: 1; }
+/* Rarity glow on unlocked modal cards */
+.modal-container[style*="--card-color"] {
+  box-shadow: 0 0 40px rgba(0,0,0,.5), 0 0 20px var(--card-color);
+}
+
+@keyframes modal-pop-in {
+  0%   { transform: scale(.65) translateY(40px); opacity: 0; filter: blur(12px); }
+  60%  { transform: scale(1.02) translateY(-2px); opacity: 1; filter: blur(0); }
+  100% { transform: scale(1) translateY(0); opacity: 1; filter: blur(0); }
+}
+
+/* Exit: shrink and fade */
+.modal-backdrop.closing .modal-container {
+  animation: modal-pop-out .35s cubic-bezier(.55,0,1,.45) forwards;
+}
+@keyframes modal-pop-out {
+  from { transform: scale(1); opacity: 1; filter: blur(0); }
+  to   { transform: scale(.85) translateY(20px); opacity: 0; filter: blur(6px); }
 }
 
 .modal-header {
@@ -1203,6 +1227,15 @@ body {
   align-items: flex-start;
   justify-content: space-between;
   padding: 28px 28px 0;
+}
+
+.modal-icon-wrap {
+  animation: icon-bounce-in .5s .12s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes icon-bounce-in {
+  0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+  70%  { transform: scale(1.15) rotate(3deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 
 .modal-icon {
@@ -1222,13 +1255,20 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all .2s ease;
+  transition: all .25s cubic-bezier(.34,1.56,.64,1);
   flex-shrink: 0;
+  animation: close-spin-in .4s .35s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes close-spin-in {
+  from { transform: rotate(-90deg) scale(0); opacity: 0; }
+  to   { transform: rotate(0deg) scale(1); opacity: 1; }
 }
 
 .modal-close:hover {
-  background: var(--border);
-  color: var(--text);
+  background: var(--rarity-mythic);
+  border-color: var(--rarity-mythic);
+  color: #fff;
+  transform: rotate(90deg) scale(1.15);
 }
 
 .modal-body {
@@ -1238,6 +1278,49 @@ body {
   gap: 14px;
 }
 
+/* ── Staggered content reveal ── */
+.modal-title-row { animation: modal-reveal .45s .2s ease both; }
+.modal-meta      { animation: modal-reveal .45s .25s ease both; }
+.modal-desc      { animation: modal-reveal .45s .3s ease both; }
+.modal-divider, .modal-progress-section, .modal-unlock-info {
+  animation: modal-reveal .45s .35s ease both;
+}
+@keyframes modal-reveal {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.modal-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.modal-title-row .modal-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.modal-status {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .3px;
+  padding: 3px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+.modal-status.locked {
+  color: var(--text-muted);
+  background: var(--bg-surface);
+}
+.modal-status.unlocked {
+  background: rgba(255,200,0,.08);
+  border-color: rgba(255,200,0,.2);
+  animation: name-glow 3s ease-in-out infinite;
+}
+
 .modal-title {
   font-size: 22px;
   font-weight: 700;
@@ -1245,10 +1328,9 @@ body {
   line-height: 1.3;
 }
 
-.modal-title-cn {
-  font-size: 15px;
-  color: var(--text-dim);
-  font-weight: 500;
+/* Glow only when unlocked (has --card-color) */
+.modal-title[style*="--card-color"] {
+  animation: name-glow 3s ease-in-out infinite;
 }
 
 .modal-meta {

@@ -164,6 +164,7 @@ export interface SetReward {
 export interface SetDefinition {
   id: string;
   name: string;
+  name_cn?: string;
   achievements: string[];
   reward: SetReward;
 }

@@ -806,6 +806,9 @@ function openModal(ach) {
   const container = document.getElementById('modal-container');
   if (!backdrop || !container) return;
 
+  // Remove any closing animation state
+  backdrop.classList.remove('closing');
+
   const locked = !ach.unlocked;
 
   // Name: pick current language, fallback to the other
@@ -847,12 +850,13 @@ function openModal(ach) {
   const rarityColor = `var(--rarity-${ach.rarity})`;
   container.innerHTML = `
     <div class="modal-header">
-      ${iconHtml(locked && ach.hidden ? '\u{1F512}' : ach.icon, { size: 48, className: 'modal-icon' })}
+      <span class="modal-icon-wrap">${iconHtml(locked && ach.hidden ? '\u{1F512}' : ach.icon, { size: 48, className: 'modal-icon' })}</span>
       <button class="modal-close" onclick="closeModal()" title="${t('modal_close')}">✕</button>
     </div>
     <div class="modal-body">
-      <div>
+      <div class="modal-title-row">
         <div class="modal-title"${locked ? '' : ` style="--card-color:${rarityColor}"`}>${escHtml(name)}</div>
+        ${locked ? `<span class="modal-status locked">${t('modal_locked')}</span>` : `<span class="modal-status unlocked" style="color:${rarityColor}">${t('modal_unlocked')}</span>`}
       </div>
       <div class="modal-meta">
         <span class="modal-badge rarity-${ach.rarity}">${displayRarity(ach.rarity)}</span>
@@ -862,13 +866,26 @@ function openModal(ach) {
       ${bottomSections}
     </div>`;
 
+  // Apply rarity glow to container border
+  if (!locked) {
+    container.style.setProperty('--card-color', rarityColor);
+  } else {
+    container.style.removeProperty('--card-color');
+  }
+
   backdrop.style.display = 'flex';
 }
 
 function closeModal() {
   isModalOpen = false;
   const backdrop = document.getElementById('modal-backdrop');
-  if (backdrop) backdrop.style.display = 'none';
+  if (!backdrop) return;
+  backdrop.classList.add('closing');
+  // Match CSS exit animation duration (400ms)
+  setTimeout(() => {
+    backdrop.style.display = 'none';
+    backdrop.classList.remove('closing');
+  }, 400);
 }
 
 // ── Sets ─────────────────────────────────────────────
@@ -901,7 +918,7 @@ function renderSets(data) {
     return `<div class="set-card ${complete ? 'complete' : ''}">
       <div class="set-header">
         ${iconHtml(set.achievements.find(a => a.unlocked)?.icon || '\u{1F4E6}', { size: 24 })}
-        <span class="set-name">${escHtml(set.name)}</span>
+        <span class="set-name">${escHtml(currentLang === 'zh' && set.name_cn ? set.name_cn : set.name)}</span>
       </div>
       <div class="set-count">${set.completed}/${set.total}</div>
       <div class="set-bar">

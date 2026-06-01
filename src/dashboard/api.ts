@@ -43,6 +43,7 @@ export interface SetAchievementMember {
 export interface SetItem {
   id: string;
   name: string;
+  name_cn?: string;
   achievements: SetAchievementMember[];
   completed: number;
   total: number;
@@ -130,6 +131,7 @@ export function buildSetsResponse(
     return {
       id: setId,
       name: setDef?.name || setId.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+      name_cn: setDef?.name_cn,
       achievements: members.map(m => ({
         id: m.id,
         name: m.name,

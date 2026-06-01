@@ -1,6 +1,6 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-01 | 总成就数: 138 | 条件类型: 11 | Tests: 109 ✅ | 5 Agent 全接入
+> 最后更新: 2026-06-01 | 总成就数: 160 | 条件类型: 11 | Tests: 110 ✅ | 5 Agent 全接入
 
 ---
 
@@ -36,9 +36,9 @@
 
 ## P3 — YAML 质量 / 资产
 
-- [ ] **Hidden 分类占 22%** — 26 个隐藏成就是最大分类，部分可重新归类到更合适的 category。
-- [ ] **像素画 icon 资产暂缺** — `iconHtml()` + `parseIconField({ src })` 已就绪，YAML 也支持 `icon: { src, alt }` 对象格式。但 138 个成就全部仍是 emoji 字符串，没有实际的像素画 PNG。需要逐成就设计/生成像素画图标（可渐进替换，emoji 和像素画共存）。
-- [ ] **Set 名称只有英文** — 9 个 set 定义无 `name_cn`，Dashboard 套装页切中文后仍显示英文名。
+- [x] **Hidden 分类占 22%** — 41→21（26%→13%）。25 个重新归类到 tool_mastery（+10）、milestones（+3）、style/workflow（各+2）等。剩余 21 个全是真彩蛋。
+- [ ] **像素画 icon 资产暂缺** — `iconHtml()` + `parseIconField({ src })` 已就绪，YAML 也支持 `icon: { src, alt }` 对象格式。但 160 个成就全部仍是 emoji 字符串，没有实际的像素画 PNG。需要逐成就设计/生成像素画图标（可渐进替换，emoji 和像素画共存）。
+- [x] **Set 名称只有英文** — 9→10 个 set，全部添加 `name_cn`，套装页中英双语切换。Set 系统重构：合并散装 set，扩充合理 set。`git_flow`（7→9）、`agent_commander`（5→6）、`polar_night`（2→4）。57/160 有归属。
 
 ---
 

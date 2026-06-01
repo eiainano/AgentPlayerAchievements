@@ -20,6 +20,15 @@
 - **matchFilter 上下文扩展** — 从 8 字段增至 11 字段（+model/+day_of_week/+duration_ms），解除 P1 遗留项。
 - **总成就数**：109→138→153→157→**160**（+51 from 5月30日至今），**测试 110 个** ✅
 
+### Set 系统重构 + Hidden 重组 + Modal 动画升级 — 2026-06-01
+
+- **Set 系统重构** — 9→10 个 set，全部添加 `name_cn`，套装页中英双语切换。`git_flow`（7→9）、`agent_commander`（5→6）、`polar_night`（2→4）扩充。`collectors_soul`/`devops_triad`/`night_shift` 解散，成员归入合理 set。57/160 有归属。
+- **Hidden 分类重组** — 41→21（26%→13%），25 个成就重新归类到 tool_mastery（+10）、milestones（+3）、style（+2）、workflow（+2）等。剩余 21 个全是真彩蛋。
+- **Modal 入场 5 层动画** — backdrop blur 淡入、container spring pop-in（scale+.blur）、icon 弹跳回旋、内容 staggered reveal、✕ 按钮旋转弹入。
+- **Modal 退场动画** — container shrink+blur out、backdrop 渐变消失，JS closeModal 400ms 延迟。
+- **Modal 状态标识** — 解锁卡片显示金色呼吸 "✓ 已解锁"，未解锁卡片显示灰色 "未解锁"，右对齐于成就名右侧。
+- **SetDefinition +name_cn** — types.ts、yaml-parser.ts、api.ts、app.js 全链路透传 set 中文名。
+
 ### 成就名称全面升级（Steam 化）
 
 通过 `/customize` 页面整体过了一遍 138 个成就的英文名、中文名和描述。

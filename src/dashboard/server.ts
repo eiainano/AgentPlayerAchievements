@@ -14,6 +14,14 @@ import {
   handleBatchUpdate,
   handleReload,
 } from './customize-api.js';
+import {
+  resolveProfileDir,
+  listProfiles,
+  createProfile,
+  validateProfileName,
+  DEFAULT_PROFILE,
+  MAX_PROFILES,
+} from '../utils/profile.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.resolve(__dirname, 'public');
@@ -109,9 +117,25 @@ function serveStatic(res: http.ServerResponse, urlPath: string): void {
   }
 }
 
-export function createServer(engine: AchievementEngine, port = 3867): http.Server {
+export function createServer(port: number, defaultProfile: string): http.Server {
+  // Cache engine instances per profile — shared across all requests
+  const engineCache = new Map<string, AchievementEngine>();
+
+  function getEngine(profileName: string): AchievementEngine {
+    let cached = engineCache.get(profileName);
+    if (cached) return cached;
+    const stateDir = resolveProfileDir(profileName);
+    const eng = new AchievementEngine({ stateDir });
+    eng.init();
+    engineCache.set(profileName, eng);
+    return eng;
+  }
+
   return http.createServer(async (req, res) => {
     const url = new URL(req.url || '/', `http://localhost:${port}`);
+    const profileParam = url.searchParams.get('profile');
+    const resolvedProfile = profileParam || defaultProfile;
+    const engine = getEngine(resolvedProfile);
 
     // ── GET /api/data ──────────────────────────────────────────────────
     if (url.pathname === '/api/data' && req.method === 'GET') {
@@ -120,8 +144,45 @@ export function createServer(engine: AchievementEngine, port = 3867): http.Serve
       engine.reloadDefinitions();
       const showcaseData = buildShowcaseResponse(engine);
       const data = buildApiResponse(engine.definitions, engine.state, engine.events, showcaseData, engine.stats(), engine.setDefinitions);
+      data.profile = resolvedProfile;
+      data.profiles = listProfiles();
+      data.max_profiles = MAX_PROFILES;
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(data));
+      return;
+    }
+
+    // ── GET /api/profiles ──────────────────────────────────────────────
+    if (url.pathname === '/api/profiles' && req.method === 'GET') {
+      const profiles = listProfiles();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        active: resolvedProfile,
+        profiles,
+        max: MAX_PROFILES,
+      }));
+      return;
+    }
+
+    // ── POST /api/profiles ─────────────────────────────────────────────
+    if (url.pathname === '/api/profiles' && req.method === 'POST') {
+      const body = await parseJsonBody<{ name: string }>(req);
+      const rawName = body?.name?.trim() || 'profile0';
+      try {
+        const stateDir = createProfile(rawName);
+        const name = rawName.toLowerCase();
+        // Warm the engine cache for the new profile
+        const eng = new AchievementEngine({ stateDir });
+        eng.init();
+        engineCache.set(name, eng);
+        const profiles = listProfiles();
+        res.writeHead(201, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ status: 'ok', name, profiles, max: MAX_PROFILES }));
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        res.writeHead(409);
+        res.end(JSON.stringify({ error: msg }));
+      }
       return;
     }
 
@@ -253,8 +314,13 @@ export function createServer(engine: AchievementEngine, port = 3867): http.Serve
       return;
     }
 
-    // ── POST /api/reset — dev: clear all achievements ──────────────
+    // ── POST /api/reset — dev: clear all achievements (default profile only) ──
     if (url.pathname === '/api/reset' && req.method === 'POST') {
+      if (resolvedProfile !== DEFAULT_PROFILE) {
+        res.writeHead(403);
+        res.end(JSON.stringify({ error: 'Reset is only available for the default profile.' }));
+        return;
+      }
       const csrfToken = req.headers['x-dev-token'];
       if (csrfToken !== devToken) {
         res.writeHead(403);
@@ -264,6 +330,9 @@ export function createServer(engine: AchievementEngine, port = 3867): http.Serve
       engine.resetState();
       engine.init();
       const data = buildApiResponse(engine.definitions, engine.state, engine.events, [], engine.stats(), engine.setDefinitions);
+      data.profile = resolvedProfile;
+      data.profiles = listProfiles();
+      data.max_profiles = MAX_PROFILES;
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ status: 'ok', data }));
       return;
@@ -279,13 +348,12 @@ export function createServer(engine: AchievementEngine, port = 3867): http.Serve
   });
 }
 
-export function startDashboard(port = 3867): http.Server {
-  const engine = new AchievementEngine();
-  engine.init();
+export function startDashboard(port = 3867, profile?: string): http.Server {
+  const defaultProfile = profile || process.env.AGPA_PROFILE || DEFAULT_PROFILE;
 
-  const server = createServer(engine, port);
+  const server = createServer(port, defaultProfile);
   server.listen(port, '127.0.0.1', () => {
-    process.stderr.write(`\n  🎮 AGPA Dashboard → http://localhost:${port}\n\n`);
+    process.stderr.write(`\n  🎮 AGPA Dashboard → http://localhost:${port}  (profile: ${defaultProfile})\n\n`);
   });
 
   return server;

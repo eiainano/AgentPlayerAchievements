@@ -102,6 +102,111 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ── Profile Selector ────────────────────────────── */
+.profile-selector {
+  position: relative;
+  margin-right: 12px;
+}
+
+.profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 12.5px;
+  font-family: var(--font);
+  transition: border-color .2s;
+  white-space: nowrap;
+}
+.profile-btn:hover { border-color: var(--gold); }
+
+.profile-icon { font-size: 13px; line-height: 1; }
+.profile-chevron { font-size: 9px; color: var(--text-dim); margin-left: 1px; }
+
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 200px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.profile-dropdown-header {
+  padding: 10px 14px;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+}
+
+.profile-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background .15s;
+}
+.profile-option:hover { background: var(--bg-card-hover); }
+.profile-option.active { color: var(--gold); font-weight: 600; }
+.profile-check { color: var(--gold); font-weight: 700; }
+
+.profile-dropdown-footer {
+  border-top: 1px solid var(--border);
+  padding: 8px;
+}
+
+.profile-create {
+  display: flex;
+  gap: 6px;
+}
+.profile-create input {
+  flex: 1;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 12px;
+  font-family: var(--font);
+  outline: none;
+  min-width: 0;
+}
+.profile-create input:focus { border-color: var(--gold); }
+.profile-create button {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 4px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background .15s;
+}
+.profile-create button:hover { background: var(--rarity-uncommon); }
+.profile-limit-hint {
+  padding: 8px 4px;
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: center;
+  font-style: italic;
+}
+
 /* ── Navigation ────────────────────────────────────── */
 #top-nav {
   position: sticky; top: 0; z-index: 100;

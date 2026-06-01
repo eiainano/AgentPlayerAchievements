@@ -13,12 +13,14 @@ export interface AppConfig {
   debug?: boolean;
   telemetry: boolean;
   telemetry_server: string;
+  active_profile: string;
 }
 
 const DEFAULTS: AppConfig = {
   lang: 'en',
   telemetry: false,
   telemetry_server: '',
+  active_profile: 'default',
 };
 
 /** Read config from file, then override with env vars */
@@ -34,6 +36,9 @@ export function loadConfig(): AppConfig {
   }
 
   // Environment variable overrides
+  if (process.env.AGPA_PROFILE) {
+    cfg.active_profile = process.env.AGPA_PROFILE;
+  }
   if (process.env.AGPA_LANG === 'zh' || process.env.AGPA_LANG === 'en') {
     cfg.lang = process.env.AGPA_LANG;
   }

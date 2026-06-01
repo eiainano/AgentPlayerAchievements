@@ -46,8 +46,11 @@ import { homedir } from 'os';
 import { AchievementEngine } from '../engine/engine.js';
 import { loadConfig } from '../config.js';
 import { sendNotification } from '../utils/notify.js';
+import { resolveProfileDir, DEFAULT_PROFILE } from '../utils/profile.js';
 
-const ENGINE = new AchievementEngine();
+const activeProfile = process.env.AGPA_PROFILE || loadConfig().active_profile || DEFAULT_PROFILE;
+const stateDir = resolveProfileDir(activeProfile);
+const ENGINE = new AchievementEngine({ stateDir });
 
 // ── stdin helpers ─────────────────────────────────────────────
 
@@ -238,7 +241,7 @@ function cmdPoll(): void {
     const icon = ach.icon || '🏆';
     const title = useZh ? (ach.name_cn || ach.name) : ach.name;
     const desc = useZh ? (ach.description_cn || ach.description) : ach.description;
-    sendNotification(`${icon} ${title}`, desc, ENGINE.stateDir);
+    sendNotification(`${icon} ${title}`, desc, ENGINE.stateDir, activeProfile);
   }
 
   process.stderr.write(`[AGPA] poll: ${newlyUnlocked.length} new achievement(s) unlocked!\n`);

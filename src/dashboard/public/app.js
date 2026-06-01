@@ -115,6 +115,10 @@ const I18N = {
     guide_empty_title: 'This page is empty for now.',
     guide_empty_text: 'Achievements unlock as your agent works. Give it a try!',
     no_timeline_guide: 'Achievements will appear here once unlocked.',
+    profile_switch: 'Switch Profile',
+    profile_create: '+',
+    profile_max: 'Max 3 profiles',
+    profile_name_placeholder: 'New profile...',
   },
   zh: {
     nav_profile: '个人主页',
@@ -173,6 +177,10 @@ const I18N = {
     guide_empty_title: '这里是空的。',
     guide_empty_text: '成就随着 agent 的工作逐步解锁，去试试吧！',
     no_timeline_guide: '成就解锁后会出现在这里。',
+    profile_switch: '切换档案',
+    profile_create: '+',
+    profile_max: '最多3个档案',
+    profile_name_placeholder: '新建档案...',
   },
 };
 
@@ -258,6 +266,17 @@ let lastUnlockedIds = new Set();
 let isModalOpen = false;
 let controlsSetup = false;
 
+// Current profile from URL or API response
+let currentProfile = 'default';
+
+/** Build API URL with current profile query param */
+function apiUrl(path) {
+  const sep = path.includes('?') ? '&' : '?';
+  return currentProfile && currentProfile !== 'default'
+    ? `${path}${sep}profile=${encodeURIComponent(currentProfile)}`
+    : path;
+}
+
 // ── Icon render helper ─────────────────────────────────
 
 /** Render achievement icon as emoji span or pixel-art img */
@@ -322,13 +341,19 @@ function setupGlobalHandlers() {
 (async function () {
   setupGlobalHandlers();
 
-  const res = await fetch('/api/data');
+  // Read profile from URL query param
+  const urlParams = new URLSearchParams(window.location.search);
+  currentProfile = urlParams.get('profile') || 'default';
+
+  const res = await fetch(apiUrl('/api/data'));
   if (!res.ok) {
     document.body.innerHTML = `<div style="padding:40px;color:#888;">${t('load_error', { status: res.status })}</div>`;
     return;
   }
   const data = await res.json();
   dashboardData = data;
+  // Sync profile from API response (authoritative)
+  if (data.profile) currentProfile = data.profile;
   initLang(data.config?.lang);
 
   // Track initial unlocked IDs
@@ -353,7 +378,7 @@ function setupGlobalHandlers() {
 function startAutoPoll() {
   setInterval(async () => {
     try {
-      const res = await fetch('/api/data');
+      const res = await fetch(apiUrl('/api/data'));
       if (!res.ok) return;
       const newData = await res.json();
 
@@ -402,6 +427,8 @@ function renderNav(data) {
   const navStats = document.getElementById('nav-stats');
   if (navStats) navStats.textContent = `${data.stats.unlocked}/${data.stats.total_achievements}`;
 
+  renderProfileSelector(data);
+
   const links = document.querySelectorAll('.nav-link');
   const sections = ['profile', 'achievements', 'sets', 'timeline'];
   const observer = new IntersectionObserver(entries => {
@@ -416,6 +443,90 @@ function renderNav(data) {
     if (el) observer.observe(el);
   });
 }
+
+// ── Profile Selector ─────────────────────────────────
+
+function renderProfileSelector(data) {
+  const display = document.getElementById('profile-name-display');
+  if (display) display.textContent = data.profile || currentProfile || 'default';
+
+  const list = document.getElementById('profile-list');
+  if (!list) return;
+
+  const profiles = data.profiles || ['default'];
+  const active = data.profile || currentProfile || 'default';
+  const maxProfiles = data.max_profiles || 3;
+
+  list.innerHTML = profiles.map(p => `
+    <div class="profile-option ${p === active ? 'active' : ''}"
+         onclick="switchProfile('${escAttr(p)}')">
+      <span>👤 ${escHtml(p)}</span>
+      ${p === active ? '<span class="profile-check">✓</span>' : ''}
+    </div>
+  `).join('');
+
+  // Show/hide create section based on limit (named profiles only, excluding default)
+  const createSection = document.getElementById('profile-create-section');
+  const limitHint = document.getElementById('profile-limit-hint');
+  if (createSection && limitHint) {
+    const atLimit = profiles.length - 1 >= maxProfiles;
+    createSection.style.display = atLimit ? 'none' : 'flex';
+    limitHint.style.display = atLimit ? 'block' : 'none';
+  }
+
+  // Dev reset only for default profile
+  const resetBtn = document.getElementById('dev-reset-btn');
+  if (resetBtn) {
+    resetBtn.style.display = active === 'default' ? '' : 'none';
+  }
+}
+
+function toggleProfileDropdown() {
+  const dropdown = document.getElementById('profile-dropdown');
+  if (!dropdown) return;
+  const visible = dropdown.style.display !== 'none';
+  dropdown.style.display = visible ? 'none' : 'block';
+}
+
+function switchProfile(profileName) {
+  const url = new URL(window.location);
+  url.searchParams.set('profile', profileName);
+  window.location = url.toString();
+}
+
+async function createProfile() {
+  const input = document.getElementById('new-profile-input');
+  const rawName = input?.value?.trim() || 'profile0';
+  try {
+    const res = await fetch('/api/profiles', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: rawName }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      switchProfile(data.name);
+    } else {
+      const err = await res.json();
+      alert(err.error || 'Failed to create profile');
+    }
+  } catch (e) {
+    alert('Failed to create profile');
+  }
+}
+
+function handleProfileInputKey(event) {
+  if (event.key === 'Enter') createProfile();
+}
+
+// Close profile dropdown on outside click
+document.addEventListener('click', (e) => {
+  const selector = document.querySelector('.profile-selector');
+  const dropdown = document.getElementById('profile-dropdown');
+  if (selector && dropdown && !selector.contains(e.target) && dropdown.style.display !== 'none') {
+    dropdown.style.display = 'none';
+  }
+});
 
 // ── Showcase management ──────────────────────────────
 
@@ -493,9 +604,10 @@ async function devReset() {
 }
 
 async function refreshData() {
-  const res = await fetch('/api/data');
+  const res = await fetch(apiUrl('/api/data'));
   if (!res.ok) return;
   dashboardData = await res.json();
+  if (dashboardData.profile) currentProfile = dashboardData.profile;
   lastUnlockedIds = new Set(dashboardData.achievements.filter(a => a.unlocked).map(a => a.id));
   renderAll(dashboardData);
 }

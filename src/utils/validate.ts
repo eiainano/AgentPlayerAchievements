@@ -29,6 +29,7 @@ export const appConfigSchema = z.object({
   debug: z.boolean().optional(),
   telemetry: z.boolean().default(false),
   telemetry_server: z.string().default(''),
+  active_profile: z.string().default('default'),
 });
 
 export function safeParse<T>(schema: z.ZodType<T>, data: unknown, fallback: T): T {

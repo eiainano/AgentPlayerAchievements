@@ -18,14 +18,17 @@ export function ensureIcon(stateDir: string): string | null {
   return null;
 }
 
-export function sendNotification(title: string, subtitle: string, stateDir: string): void {
+export function sendNotification(title: string, subtitle: string, stateDir: string, profile?: string): void {
   const icon = ensureIcon(stateDir);
+  const dashboardUrl = profile && profile !== 'default'
+    ? `${DASHBOARD_URL}?profile=${encodeURIComponent(profile)}`
+    : DASHBOARD_URL;
   const args = [
     '-title', title,
     '-message', subtitle,
     '-group', 'agpa.achievement',
     '-sound', 'default',
-    '-open', DASHBOARD_URL,
+    '-open', dashboardUrl,
   ];
   if (icon) args.push('-appIcon', icon);
 

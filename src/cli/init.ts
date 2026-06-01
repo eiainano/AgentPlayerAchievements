@@ -18,18 +18,16 @@ const AGPA_MAIN = path.resolve(import.meta.dirname, '../main.ts');
 const AGPA_HOOK = path.resolve(import.meta.dirname, 'hook.ts');
 const TSX_BIN = path.resolve(import.meta.dirname, '../../node_modules/.bin/tsx');
 
+/** Build hook command with optional profile env var */
+function hookCmd(toolSourceEnv: string, mode: string, profile: string | null): string {
+  const profileEnv = profile ? `AGPA_PROFILE=${profile} ` : '';
+  return `${profileEnv}${toolSourceEnv} ${TSX_BIN} ${AGPA_HOOK} ${mode}`;
+}
+
 const HOOK_ENV = 'AGPA_TOOL_SOURCE=claude-code';
-const HOOK_TRACK_START = `${HOOK_ENV} ${TSX_BIN} ${AGPA_HOOK} track session.start`;
-const HOOK_TRACK_END = `${HOOK_ENV} ${TSX_BIN} ${AGPA_HOOK} track session.end`;
-const HOOK_POLL = `${HOOK_ENV} ${TSX_BIN} ${AGPA_HOOK} poll`;
-const HOOK_AUTO = `${HOOK_ENV} ${TSX_BIN} ${AGPA_HOOK} auto`;
 const HOOK_HERMES_ENV = 'AGPA_TOOL_SOURCE=hermes';
-const HOOK_HERMES_AUTO = `${HOOK_HERMES_ENV} ${TSX_BIN} ${AGPA_HOOK} hermes-auto`;
-const HOOK_HERMES_TRACK_START = `${HOOK_HERMES_ENV} ${TSX_BIN} ${AGPA_HOOK} track session.start`;
-const HOOK_HERMES_TRACK_END = `${HOOK_HERMES_ENV} ${TSX_BIN} ${AGPA_HOOK} track session.end`;
 const HOOK_OPENCLAW_ENV = 'AGPA_TOOL_SOURCE=openclaw';
-const HOOK_OPENCLAW_AUTO = `${HOOK_OPENCLAW_ENV} ${TSX_BIN} ${AGPA_HOOK} openclaw-auto`;
-const HOOK_OPENCLAW_POLL = `${HOOK_OPENCLAW_ENV} ${TSX_BIN} ${AGPA_HOOK} poll`;
+// Profile-aware versions built dynamically in getHookKeys() and Hermes/OpenClaw init
 
 // ── Per-tool init data (mcpInject + instructionFiles) ──────────────────
 
@@ -357,7 +355,8 @@ function injectHermesHooks(filePath: string, hookCommands: {
 
 const OPENCLAW_PLUGIN_MARKER = '// agpa-openclaw-track';
 
-function generateOpenClawPlugin(): string {
+function generateOpenClawPlugin(profile: string | null): string {
+  const profileEnv = profile ? `AGPA_PROFILE: '${profile}', ` : '';
   return `${OPENCLAW_PLUGIN_MARKER}
 /**
  * AGPA Auto-Track plugin for OpenClaw
@@ -372,7 +371,7 @@ const HOOK_TS = '${AGPA_HOOK}';
 function track(hookName: string, payload: unknown) {
   const child = spawn(TSX_BIN, [HOOK_TS, 'openclaw-auto', hookName], {
     stdio: ['pipe', 'inherit', 'inherit'],
-    env: { ...process.env, AGPA_TOOL_SOURCE: 'openclaw' },
+    env: { ...process.env, ${profileEnv}AGPA_TOOL_SOURCE: 'openclaw' },
   });
   if (child.stdin) {
     const json = JSON.stringify(payload);
@@ -389,7 +388,7 @@ export function register(api: any) {
     // Also run poll at session end
     const pollChild = spawn(TSX_BIN, [HOOK_TS, 'poll'], {
       stdio: ['ignore', 'inherit', 'inherit'],
-      env: { ...process.env, AGPA_TOOL_SOURCE: 'openclaw' },
+      env: { ...process.env, ${profileEnv}AGPA_TOOL_SOURCE: 'openclaw' },
     });
     pollChild.unref();
   });
@@ -400,7 +399,7 @@ export function register(api: any) {
 `;
 }
 
-function injectOpenClawPlugin(): boolean {
+function injectOpenClawPlugin(profile: string | null): boolean {
   const extDir = path.join(homedir(), '.openclaw', 'extensions');
   const pluginPath = path.join(extDir, 'agpa-track.ts');
 
@@ -411,7 +410,7 @@ function injectOpenClawPlugin(): boolean {
   }
 
   fs.mkdirSync(extDir, { recursive: true });
-  fs.writeFileSync(pluginPath, generateOpenClawPlugin());
+  fs.writeFileSync(pluginPath, generateOpenClawPlugin(profile));
   return true;
 }
 
@@ -512,17 +511,19 @@ function injectHook(
 /**
  * All CC hook keys that AGPA needs, with their commands and settings.
  */
-const ALL_HOOK_KEYS: Array<{ key: string; command: string; async?: boolean; timeout?: number }> = [
-  { key: 'SessionStart',       command: HOOK_TRACK_START,                                          async: false },
-  { key: 'Stop',               command: `${HOOK_TRACK_END} && ${HOOK_POLL}`,                        async: true, timeout: 15 },
-  { key: 'PostToolUse',        command: HOOK_AUTO },
-  { key: 'PreToolUse',         command: HOOK_AUTO },
-  { key: 'PostToolUseFailure', command: HOOK_AUTO },
-  { key: 'TaskCompleted',      command: HOOK_AUTO },
-  { key: 'SubagentStart',      command: HOOK_AUTO },
-  { key: 'SubagentStop',       command: HOOK_AUTO },
-  { key: 'PostCompact',        command: HOOK_AUTO },
-];
+function getHookKeys(profile: string | null): Array<{ key: string; command: string; async?: boolean; timeout?: number }> {
+  return [
+    { key: 'SessionStart',       command: hookCmd(HOOK_ENV, 'track session.start', profile),               async: false },
+    { key: 'Stop',               command: `${hookCmd(HOOK_ENV, 'track session.end', profile)} && ${hookCmd(HOOK_ENV, 'poll', profile)}`, async: true, timeout: 15 },
+    { key: 'PostToolUse',        command: hookCmd(HOOK_ENV, 'auto', profile) },
+    { key: 'PreToolUse',         command: hookCmd(HOOK_ENV, 'auto', profile) },
+    { key: 'PostToolUseFailure', command: hookCmd(HOOK_ENV, 'auto', profile) },
+    { key: 'TaskCompleted',      command: hookCmd(HOOK_ENV, 'auto', profile) },
+    { key: 'SubagentStart',      command: hookCmd(HOOK_ENV, 'auto', profile) },
+    { key: 'SubagentStop',       command: hookCmd(HOOK_ENV, 'auto', profile) },
+    { key: 'PostCompact',        command: hookCmd(HOOK_ENV, 'auto', profile) },
+  ];
+}
 
 // ── Init a single tool ─────────────────────────────────────────────────
 
@@ -554,11 +555,13 @@ function initTool(
         fs.mkdirSync(dir, { recursive: true });
         fs.writeFileSync(toolDef.configPath, '');
       }
+      const mcpEnv: Record<string, string> = { AGPA_TOOL_SOURCE: toolDef.id };
+      if (profile) mcpEnv.AGPA_PROFILE = profile;
       const injected = injectYamlMCPBlock(toolDef.configPath, 'agent-achievements', {
         command: 'tsx',
         args: [AGPA_MAIN],
         enabled: true,
-        env: { AGPA_TOOL_SOURCE: toolDef.id },
+        env: mcpEnv,
       });
       if (injected) {
         console.log(`  \u{2705} MCP:       ${toolDef.configPath}`);
@@ -580,6 +583,15 @@ function initTool(
         config = {};
       }
       const updated = initData.mcpInject(config);
+      // Inject profile into MCP server env if set
+      if (profile) {
+        const mcps = (updated as Record<string, unknown>).mcpServers as Record<string, { env?: Record<string, string> }> | undefined;
+        const server = mcps?.['agent-achievements'];
+        if (server?.env) server.env.AGPA_PROFILE = profile;
+        const alts = (updated as Record<string, unknown>).servers as Record<string, { env?: Record<string, string> }> | undefined;
+        const altServer = alts?.['agent-achievements'];
+        if (altServer?.env) altServer.env.AGPA_PROFILE = profile;
+      }
       writeJSON(toolDef.configPath, updated);
       console.log(`  \u{2705} MCP:       ${toolDef.configPath}`);
     }
@@ -604,7 +616,7 @@ function initTool(
       const hooks = (hookCfg.hooks as Record<string, unknown>) || {};
       const injectedKeys: string[] = [];
 
-      for (const hk of ALL_HOOK_KEYS) {
+      for (const hk of getHookKeys(profile)) {
         const opts: HookEntry = { type: 'command', command: hk.command };
         if (hk.async !== undefined) opts.async = hk.async;
         if (hk.timeout !== undefined) opts.timeout = hk.timeout;
@@ -628,10 +640,10 @@ function initTool(
     const cfgPath = toolDef.configPath;
     if (fs.existsSync(cfgPath) && !fs.readFileSync(cfgPath, 'utf-8').includes('agpa-hermes-hook')) {
       const injected = injectHermesHooks(cfgPath, {
-        pre_tool_call:     HOOK_HERMES_AUTO,
-        post_tool_call:    HOOK_HERMES_AUTO,
-        on_session_start:  HOOK_HERMES_TRACK_START,
-        on_session_end:    `${HOOK_HERMES_TRACK_END} && ${HOOK_HERMES_ENV} ${TSX_BIN} ${AGPA_HOOK} poll`,
+        pre_tool_call:     hookCmd(HOOK_HERMES_ENV, 'hermes-auto', profile),
+        post_tool_call:    hookCmd(HOOK_HERMES_ENV, 'hermes-auto', profile),
+        on_session_start:  hookCmd(HOOK_HERMES_ENV, 'track session.start', profile),
+        on_session_end:    `${hookCmd(HOOK_HERMES_ENV, 'track session.end', profile)} && ${hookCmd(HOOK_HERMES_ENV, 'poll', profile)}`,
       });
       if (injected) {
         console.log(`  \u{2705} Hooks:     hermes shell hooks (4 events)`);
@@ -643,7 +655,7 @@ function initTool(
 
   // ── Inject OpenClaw TS plugin ──────────────────────────────────────
   if (toolDef.id === 'openclaw') {
-    const injected = injectOpenClawPlugin();
+    const injected = injectOpenClawPlugin(profile);
     if (injected) {
       console.log(`  ✅ Hooks:     OpenClaw TS plugin (extensions/agpa-track.ts)`);
     } else {

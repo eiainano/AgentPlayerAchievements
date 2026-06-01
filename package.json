@@ -16,6 +16,7 @@
 "hook-poll": "AGPA_TOOL_SOURCE=claude-code tsx src/cli/hook.ts poll",
 "hook-hermes-auto": "AGPA_TOOL_SOURCE=hermes tsx src/cli/hook.ts hermes-auto",
     "dashboard": "tsx src/cli/dashboard.ts",
+    "profile": "tsx src/cli/profile.ts",
     "mcp": "tsx src/main.ts",
     "stats-server": "tsx src/server/stats-server.ts",
     "test": "vitest run",

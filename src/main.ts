@@ -17,10 +17,14 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { AchievementEngine } from './engine/engine.js';
 import { registerAllTools } from './tools/index.js';
+import { resolveProfileDir, DEFAULT_PROFILE } from './utils/profile.js';
+import { loadConfig } from './config.js';
 
 // ── Engine ───────────────────────────────────────────────────────────
 
-const engine = new AchievementEngine();
+const activeProfile = process.env.AGPA_PROFILE || loadConfig().active_profile || DEFAULT_PROFILE;
+const stateDir = resolveProfileDir(activeProfile);
+const engine = new AchievementEngine({ stateDir });
 engine.init();
 
 // ── MCP Server ───────────────────────────────────────────────────────
@@ -51,7 +55,7 @@ async function main() {
   }
 
   process.stderr.write(
-    `AGPA MCP v0.1.6 · ${engine.definitions.length} achievements · ${engine.stateDir} · ${engine.toolSource}\n`,
+    `AGPA MCP v0.1.6 · ${engine.definitions.length} achievements · ${activeProfile} · ${engine.toolSource}\n`,
   );
 }
 

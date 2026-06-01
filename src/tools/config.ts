@@ -3,8 +3,9 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { AppConfig } from '../config.js';
 import { loadConfig, saveConfig } from '../config.js';
 import { formatMcpError, ErrorCodes } from '../utils/errors.js';
+import { validateProfileName, createProfile, profileExists, listProfiles, MAX_PROFILES } from '../utils/profile.js';
 
-const VALID_KEYS: (keyof AppConfig)[] = ['lang', 'telemetry', 'telemetry_server'];
+const VALID_KEYS: (keyof AppConfig)[] = ['lang', 'telemetry', 'telemetry_server', 'active_profile'];
 
 export function registerConfigTool(server: McpServer): void {
   server.tool(
@@ -40,6 +41,18 @@ export function registerConfigTool(server: McpServer): void {
             saveConfig({ telemetry: v === 'true' });
           } else if (k === 'telemetry_server') {
             saveConfig({ telemetry_server: v });
+          } else if (k === 'active_profile') {
+            const normalized = v.toLowerCase();
+            if (normalized === 'default') {
+              saveConfig({ active_profile: 'default' });
+            } else {
+              const err = validateProfileName(normalized);
+              if (err) return formatMcpError(ErrorCodes.INVALID_EVENT, err);
+              if (!profileExists(normalized)) {
+                return formatMcpError(ErrorCodes.NOT_FOUND, `profile "${normalized}" does not exist. Create it first via Dashboard or \`agpa profile create ${normalized}\`.`);
+              }
+              saveConfig({ active_profile: normalized });
+            }
           } else {
             saveConfig({ [k]: v } as Partial<AppConfig>);
           }

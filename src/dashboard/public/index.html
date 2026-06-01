@@ -12,6 +12,26 @@
   <nav id="top-nav">
     <div class="nav-inner">
       <span class="nav-brand">🎮 AGPA</span>
+      <!-- Profile selector -->
+      <div class="profile-selector">
+        <button class="profile-btn" id="profile-btn" onclick="toggleProfileDropdown()">
+          <span class="profile-icon">👤</span>
+          <span id="profile-name-display">default</span>
+          <span class="profile-chevron">▾</span>
+        </button>
+        <div class="profile-dropdown" id="profile-dropdown" style="display:none">
+          <div class="profile-dropdown-header" data-i18n="profile_switch">Switch Profile</div>
+          <div id="profile-list"></div>
+          <div class="profile-dropdown-footer">
+            <div class="profile-create" id="profile-create-section">
+              <input type="text" id="new-profile-input" data-i18n-placeholder="profile_name_placeholder" placeholder="New profile..."
+                     maxlength="32" onkeydown="handleProfileInputKey(event)">
+              <button onclick="createProfile()" id="create-profile-btn">+</button>
+            </div>
+            <div class="profile-limit-hint" id="profile-limit-hint" style="display:none" data-i18n="profile_max">Max 3 profiles</div>
+          </div>
+        </div>
+      </div>
       <div class="nav-links">
         <a href="#profile" class="nav-link active" data-section="profile" data-i18n="nav_profile">Profile</a>
         <a href="#achievements" class="nav-link" data-section="achievements" data-i18n="nav_achievements">Achievements</a>

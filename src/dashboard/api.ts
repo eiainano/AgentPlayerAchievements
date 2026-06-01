@@ -70,6 +70,9 @@ export interface DashboardData {
   timeline: Array<{ id: string; unlocked_at: string }>;
   sets: SetItem[];
   config: Pick<AppConfig, 'lang'>;
+  profile?: string;
+  profiles?: string[];
+  max_profiles?: number;
 }
 
 // ── Compute progress for a single achievement ─────────────────────────

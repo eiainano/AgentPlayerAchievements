@@ -849,7 +849,7 @@ function renderNextAchievement(data) {
   card.style.display = 'block';
   card.innerHTML = `
     <div class="next-ach-header">${t('next_ach_title')}</div>
-    <div class="next-ach-body" onclick="scrollToAchievement('${escHtml(best.id)}')" title="${t('click_to_pick')}">
+    <div class="next-ach-body" onclick="scrollToAchievement(${JSON.stringify(best.id)})" title="${t('click_to_pick')}">
       <span class="next-ach-icon">${iconHtml(best.icon, { size: 22 })}</span>
       <div class="next-ach-info">
         <span class="next-ach-name">${escHtml(name)}</span>

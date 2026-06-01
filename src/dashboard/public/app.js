@@ -849,7 +849,7 @@ function renderNextAchievement(data) {
   card.style.display = 'block';
   card.innerHTML = `
     <div class="next-ach-header">${t('next_ach_title')}</div>
-    <div class="next-ach-body" onclick="scrollToAchievement(${JSON.stringify(best.id)})" title="${t('click_to_pick')}">
+    <div class="next-ach-body" data-ach-id="${escHtml(best.id)}" title="${t('click_to_pick')}">
       <span class="next-ach-icon">${iconHtml(best.icon, { size: 22 })}</span>
       <div class="next-ach-info">
         <span class="next-ach-name">${escHtml(name)}</span>
@@ -860,6 +860,9 @@ function renderNextAchievement(data) {
       <span class="next-ach-rarity">${escHtml(best.rarity)}</span>
     </div>
   `;
+  card.querySelector('.next-ach-body')?.addEventListener('click', () => {
+    scrollToAchievement(best.id);
+  });
 }
 
 function scrollToAchievement(id) {

@@ -1,6 +1,6 @@
 # AGPA — 今日 TODO
 
-> 日期: 2026-06-01 | 当前版本: v0.1.6 | 成就: 160 | Tests: 110 ✅ | 条件类型: 11
+> 日期: 2026-06-02 | 当前版本: v0.1.6 | 成就: 160 | Tests: 110 ✅ | 条件类型: 11
 
 ---
 
@@ -77,7 +77,7 @@
 
 ### 7. ✅ YAML 质量提升
 - [x] `unit: day` / `unit: tokens` — Condition 接口 + parser 已支持 `unit` 字段（元数据标注，不影响评估逻辑）
-- [ ] Hidden 分类占 22%，考虑调整
+- [ ] Hidden 分类占 21%，考虑调整
 
 ### 8. ✅ 测试覆盖
 - [x] evaluator 函数单测 — metric filtering×3、single_task/same_task×2、empty conditions、streak window、streak same_target
@@ -126,7 +126,7 @@
 2. [x] v0.1.5 → v0.1.6 版本号一致化 + CHANGELOG 更新
 3. [x] 隐藏成就描述开关 — 默认隐藏，点击查看/隐藏描述
 4. [x] Modal 5 层入场/出场动画 + 锁定/解锁状态徽章
-5. [x] Set 系统重组 — 10 个 set + name_cn，hidden 分类 41→21
+5. [x] Set 系统重组 — 10 个 set + name_cn，hidden 分类 41→34
 6. [x] 42 项成就 bug 审计修复（descriptions、conditions、边界值）
 7. [x] 3 个重复成就删除（nothing_to_see/no_edit_challenge/blind_faith）
 8. [x] 10 个不可达成就条件修复（minimalist → changelog_keeper）

@@ -1,6 +1,6 @@
 # AGPA 开发进度
 
-> 最后更新: 2026-06-01
+> 最后更新: 2026-06-02
 
 ## 总体状态
 
@@ -72,7 +72,7 @@ v0.1.6 完成。大批量成就一致性审计修复 + 3 个 evaluator 功能新
 - [x] **路径遍历 guard**：拒绝 .. 和越界绝对路径读文件
 - [x] **P1 evaluator 4 项修复**：空 conditions guard、evalMode target、set_id 删除、evalStreak窗口/field/same_target
 - [x] **P2 数据一致性**：milestone 命名、set 成员补全、缺失 set 字段、im_sorry_dave 窗口
-- [x] **测试覆盖**：81 tests, 6 files（evaluator 43 + integration 4 + yaml-parser 6 + api 5 + xp 6 + hook 17）
+- [x] **测试覆盖**：110 tests, 6 files（evaluator 47 + integration 5 + yaml-parser 6 + api 5 + xp 6 + hook 36）
 
 ### 中优先级
 - [x] **用户审阅 160 成就清单**：已逐条 review，修复 30+ 个不一致，删除 3 个重复，新增 1 个
@@ -91,7 +91,7 @@ v0.1.6 完成。大批量成就一致性审计修复 + 3 个 evaluator 功能新
 - [ ] agpa export/import
 - [ ] 响应式布局（手机可看）
 - [ ] Legendary 呼吸光效 / Mythic 烟花动画
-- [ ] 多 profile 支持
+- [x] 多 profile 支持
 
 ---
 
@@ -101,7 +101,7 @@ v0.1.6 完成。大批量成就一致性审计修复 + 3 个 evaluator 功能新
 |------|-----------|---------|
 | 工具支持 | Claude Code 独占 | 5 工具 init 完成 |
 | 成就数量 | 30 个 | 160 个全部可达成 |
-| Evaluator | 3 种 | 12 种全部实现 |
+| Evaluator | 3 种 | 11 种全部实现 |
 | Dashboard | 基础网格 | 完整 4 section + 主题 + 双语 |
 | Event Capture | CC Hook | 9 hooks auto-track + 27 手动 track |
 | Init | 手动 --tool claude-code | `npm run init` 一键 5 工具 |

@@ -1,6 +1,6 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-01 | 总成就数: 160 | 条件类型: 11 | Tests: 110 ✅ | 5 Agent 全接入
+> 最后更新: 2026-06-02 | 总成就数: 160 | 条件类型: 11 | Tests: 110 ✅ | 5 Agent 全接入
 
 ---
 
@@ -43,11 +43,21 @@
 
 ## P3 — YAML 质量 / 资产
 
-- [x] **Hidden 分类占 22%** — 41→21（26%→13%）。25 个重新归类到 tool_mastery（+10）、milestones（+3）、style/workflow（各+2）等。剩余 21 个全是真彩蛋。
+- [x] **Hidden 分类** — 34/160 = 21%。41→21→34（经过一次重归类又部分回退）。剩余 34 个全是真彩蛋。
 - [ ] **像素画 icon 资产暂缺** — 下一步：选 The Beginning（14 个）做第一批试点。方案：AI 生成 32×32 pixel art PNG → `public/icons/` → YAML `icon: { src, alt }` → Dashboard `iconHtml()` 渲染。验证全链路后再铺开全量 160 个。emoji 和 pixel art 并存，渐进替换。
-- [x] **Set 名称只有英文** — 9→10 个 set，全部添加 `name_cn`，套装页中英双语切换。Set 系统重构：合并散装 set，扩充合理 set。`git_flow`（7→9）、`agent_commander`（5→7）、`creators_forge`（5→6）、`polar_night`（2→3）。61/160 有归属。
+- [x] **Set 名称只有英文** — 9→10 个 set，全部添加 `name_cn`，套装页中英双语切换。Set 系统重构：合并散装 set，扩充合理 set。`git_flow`（7→9）、`agent_commander`（5→7）、`creators_forge`（5→6）、`polar_night`（2→3）。57/160 有归属。
 
 ---
+
+## 今日新增 — 稀有度重平衡 + 多档案系统 + 修复（v0.1.6, 6/2）
+
+- [x] **稀有度全量重平衡** — 48 项变更，金字塔分布：Common 20→48, Uncommon 56→44, Rare 46→30, Epic 24→24, Legendary 12→9, Mythic 2→5。
+- [x] **多档案系统** — 1 default + 最多 3 命名 = 4 存档。每份独立 stateDir。Dashboard 下拉创建/切换 + CLI `npm run profile create` + MCP `achievement_config set active_profile`。Profile emoji 选择器。
+- [x] **档案切换全局同步** — Dashboard 切换 → 写 config.json → MCP server 下次调用自动切换 engine。`AGPA_PROFILE` env var 硬锁定可选。
+- [x] **Modal 动画 locked/unlocked 一致** — `animation:none` + `requestAnimationFrame` 重启动画，消除 unlocked 卡顿。
+- [x] **P0 model 追踪修复** — context.model 从硬编码 `'auto'` → 通过 model.switch 事件动态追踪，修复 3 个模型品牌成就。
+- [x] **路径穿越防护** — resolveProfileDir() 正则验证后 path.join()。
+- [x] **版本同步** — main.ts 0.1.5→0.1.6, CLAUDE.md 12→11 condition types, percentile 过时说明删除。
 
 ## 已完成 — Dashboard 新用户体验 + 配色升级（v0.1.6, 6/1）
 

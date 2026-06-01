@@ -3,11 +3,12 @@
 ## Commands
 
 ```
-npm run test       # vitest (109 tests, 6 files)
+npm run test       # vitest (110 tests, 6 files)
 npm run build      # tsc --noEmit
-npm run dashboard  # start on :3867, then open browser
+npm run dashboard  # start on :3867, then open browser (supports --profile <name>)
 npm run demo       # generate MVP data + stats
 npm run doctor     # diagnose system state
+npm run profile    # manage achievement profiles (create <name> | list)
 ```
 
 ## Architecture
@@ -78,6 +79,7 @@ If evaluator behavior seems wrong, check src/engine/evaluator.ts — each type h
 - `evalSequence` has two modes: standard (ordered match) and consecutive (longest run). The `consecutive` flag and `count` sub-object drive the switch.
 - `distinct_count` with `values:` whitelist filters candidates before counting.
 - Engine.stateDir defaults to `~/.agent-achievements/`. Tests use a temp dir.
+- **Multi-profile**: stateDir = `resolveProfileDir(name)`. "default" → `~/.agent-achievements/`, named → `~/.agent-achievements/profiles/<name>/`. Max 3 named + 1 default = 4 total. Profile management in `src/utils/profile.ts`.
 - Hook `auto` mode handles: PostToolUse, PreToolUse, PostToolUseFailure, TaskCompleted, PostCompact, SubagentStart, SubagentStop, SessionStart, SessionEnd. If CC adds new hook types, add cases to `mapEvents()`.
 
 ## Known Issues & TODOs

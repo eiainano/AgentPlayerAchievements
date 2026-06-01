@@ -243,7 +243,7 @@ npm run dashboard -- 8080  # 自定义端口
 
 AGPA 支持记录 `tool_source` 字段区分事件来源。`cross_agent` 成就要求在不同工具上都有记录，鼓励多工具使用。
 
-当前 `engine.ts` 中 `tool_source` 硬编码为 `"claude-code"`，多工具支持需要改为从 MCP 连接上下文动态获取。
+`tool_source` 通过 MCP clientInfo 动态检测（v0.1.5+），支持 claude-code / hermes / kilocode / opencode / openclaw。
 
 ## 七、环境变量
 

@@ -80,12 +80,13 @@ function sendLinuxNotification(title: string, body: string, stateDir: string): v
 
 function sendWindowsNotification(title: string, body: string): void {
   // PowerShell MessageBox — fire and forget (detached child, non-blocking).
-  // Double-quote escaping for PowerShell: "" inside double-quoted strings.
-  const escapedTitle = title.replace(/"/g, '""');
-  const escapedBody = body.replace(/"/g, '""');
+  // Use single-quoted strings to prevent $() subexpression injection.
+  // Escape embedded single quotes by doubling them (PowerShell convention).
+  const escapedTitle = title.replace(/'/g, "''");
+  const escapedBody = body.replace(/'/g, "''");
   const psScript =
     `Add-Type -AssemblyName System.Windows.Forms; ` +
-    `[System.Windows.Forms.MessageBox]::Show("${escapedBody}","${escapedTitle}","OK","Information")`;
+    `[System.Windows.Forms.MessageBox]::Show('${escapedBody}','${escapedTitle}','OK','Information')`;
 
   let child: ChildProcess | null = null;
   try {

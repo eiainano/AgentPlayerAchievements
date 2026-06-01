@@ -5,7 +5,7 @@ import { formatAchievement, RARITY_RANK, loadShowcase, saveShowcase } from '../h
 import type { ShowcaseData } from '../helpers.js';
 import { formatMcpError, ErrorCodes } from '../utils/errors.js';
 
-export function registerShowcaseTool(server: McpServer, engine: AchievementEngine): void {
+export function registerShowcaseTool(server: McpServer, getEngine: () => AchievementEngine): void {
   server.tool(
     'achievement.showcase',
     'Manage your achievement showcase (display cabinet). View current showcase, set specific slots, or auto-fill with rarest achievements.',
@@ -16,6 +16,7 @@ export function registerShowcaseTool(server: McpServer, engine: AchievementEngin
     },
     async ({ action, slot, achievement_id }) => {
       try {
+        const engine = getEngine();
         const act = action as string;
         const showcase = loadShowcase(engine.stateDir);
 

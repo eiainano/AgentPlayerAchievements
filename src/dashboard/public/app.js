@@ -493,7 +493,16 @@ function toggleProfileDropdown() {
   dropdown.style.display = visible ? 'none' : 'block';
 }
 
-function switchProfile(profileName) {
+async function switchProfile(profileName) {
+  // Persist choice to config.json so MCP server tracks to this profile
+  try {
+    await fetch('/api/profiles/active', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ profile: profileName }),
+    });
+  } catch { /* ignore, still navigate even if API fails */ }
+
   const url = new URL(window.location);
   url.searchParams.set('profile', profileName);
   window.location = url.toString();

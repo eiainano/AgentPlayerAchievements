@@ -22,7 +22,7 @@ function savePending(stateDir: string, pending: unknown[]): void {
   fs.writeFileSync(pendingPath, JSON.stringify(pending, null, 2));
 }
 
-export function registerPollTool(server: McpServer, engine: AchievementEngine): void {
+export function registerPollTool(server: McpServer, getEngine: () => AchievementEngine): void {
   server.tool(
     'achievement.poll',
     'Evaluate all achievement conditions against event history. Returns newly unlocked achievements (max 5 at a time). Call this after each agent turn.',
@@ -32,6 +32,7 @@ export function registerPollTool(server: McpServer, engine: AchievementEngine): 
     },
     { readOnlyHint: true, idempotentHint: true },
     async ({ acknowledged_ids, limit }) => {
+      const engine = getEngine();
       const ack: string[] = Array.isArray(acknowledged_ids) ? acknowledged_ids as string[] : [];
       const maxResults = (limit as number) || 5;
 

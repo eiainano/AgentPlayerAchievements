@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { AchievementEngine } from '../engine/engine.js';
+import { saveConfig } from '../config.js';
 import { formatAchievement, RARITY_RANK, loadShowcase, saveShowcase } from '../helpers.js';
 import type { ShowcaseData } from '../helpers.js';
 import { buildApiResponse } from './api.js';
@@ -160,6 +161,30 @@ export function createServer(port: number, defaultProfile: string): http.Server 
       data.max_profiles = MAX_PROFILES;
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(data));
+      return;
+    }
+
+    // ── POST /api/profiles/active — set active profile (also updates config.json) ──
+    if (url.pathname === '/api/profiles/active' && req.method === 'POST') {
+      const body = await parseJsonBody<{ profile: string }>(req);
+      const profile = body?.profile?.trim();
+      if (!profile) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'Missing profile name' }));
+        return;
+      }
+      try {
+        // Validate the profile name and check it exists
+        const engine = getEngine(profile); // throws if invalid
+        // Persist choice to config.json so MCP server can pick it up
+        saveConfig({ active_profile: profile });
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ status: 'ok', profile }));
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Invalid profile';
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: msg }));
+      }
       return;
     }
 

@@ -38,6 +38,16 @@ describe('evaluateCondition', () => {
     expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 2, target: 2 });
   });
 
+  it('counter: respects model filter (context.model)', () => {
+    const events = [
+      makeEvent('task.complete', { context: { session_id: 's1', model: 'claude-sonnet-4-6' } }),
+      makeEvent('task.complete', { context: { session_id: 's2', model: 'deepseek-v4' } }),
+      makeEvent('task.complete', { context: { session_id: 's3', model: 'claude-opus-4-8' } }),
+    ];
+    const cond: Condition = { type: 'counter', event: 'task.complete', filter: "model contains 'claude'", value: 2 };
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 2, target: 2 });
+  });
+
   it('threshold: counts events within time window', () => {
     const now = Date.now();
     const events = [

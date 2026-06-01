@@ -29,6 +29,7 @@ function matchFilter(event: TrackedEvent, filter: string): boolean {
     issues_found: event.payload?.issues_found || 0,
     day_of_week: event.payload?.day_of_week != null ? Number(event.payload.day_of_week) : -1,
     duration_ms: event.payload?.duration_ms != null ? Number(event.payload.duration_ms) : 0,
+    model: event.context?.model || '',
   };
   try {
     return evalFilter(filter, ctx);

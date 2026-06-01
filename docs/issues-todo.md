@@ -22,7 +22,7 @@
 
 - [x] sequence 忽略 window / evalThreshold metric 路径 / 空 conditions / evalMode target / evalStreak 事件连续 / set_id 死代码 — 全部修好
 - [x] **evalPercentile 硬编码回退阈值** — 整个 percentile 子系统已移除（v0.1.4）。Minimalist/Novelist 改为 `threshold` + `metric: "length"` + AGENTS.md 手动 track。stats-server.ts / telemetry.ts 删除。
-- [ ] **matchFilter 上下文只有 8 个字段** — HOLD。受影响成就已改为手动 track，无实际影响。
+- [x] **matchFilter 上下文只有 8 个字段** — 已扩展为 11 个字段（+model、+day_of_week、+duration_ms），model 字段用于按模型品牌筛选成就（鲸歌/DeepSeek、通信数学理论/Claude、Blossom/GPT）。
 
 ---
 

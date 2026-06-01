@@ -11,6 +11,15 @@
 - **稀有度配色全面换新** — Common 浅蓝、Uncommon 深蓝、Rare 金黄、Epic 橙、Legendary 紫、Mythic 红（不变）。cold→warm→hot 递进逻辑。
 - **Dashboard 版面紧凑化** — Hero/引导/Grid 各区段 padding & gap 收紧，减少不必要的 vertical 留白。
 
+### 成就扩展 +19（138→160）— 2026-06-01
+
+- **事件覆盖型 +15** — 覆盖 `automode.start`、`mcp.connect`、`task.create`、`task.update`、`error.occurred`、`file.delete`、`image.upload`、`deepseek.conversation` 等 10 个全新事件类型。新增 `dual_wielder`（单 task 多工具）、`token_1m`（百万 token）、`test_centurion`（100 测试通过）等。
+- **科幻片彩蛋 ×3** — 《Alien》异形（首次 spawn sub-agent）、发条橙（automode 3 次）、第五元素（单 task 5 种工具）。
+- **Skyrim 彩蛋 ×1** — 龙裔（阅读 337 个不同文件，致敬冬堡学院藏书）。使用 `distinct_count file.path` 新维度。
+- **模型品牌成就 ×3** — 鲸歌（DeepSeek）、通信的数学理论（Claude）、花朵（GPT），使用 `task.complete` + filter `model contains`，首次引入 `matchFilter` 的 `context.model` 字段。
+- **matchFilter 上下文扩展** — 从 8 字段增至 11 字段（+model/+day_of_week/+duration_ms），解除 P1 遗留项。
+- **总成就数**：109→138→153→157→**160**（+51 from 5月30日至今），**测试 110 个** ✅
+
 ### 成就名称全面升级（Steam 化）
 
 通过 `/customize` 页面整体过了一遍 138 个成就的英文名、中文名和描述。

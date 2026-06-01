@@ -202,6 +202,118 @@ definitions:
         operator: ">="
         value: 1
 
+  # ── 新 Onboarding: 自动化/连接发现 ──
+  - id: automode_first
+    name: Cruise Control
+    name_cn: 巡航模式
+    description: Activated automode for the first time. Let the agent steer.
+    description_cn: 首次激活 automode。让 agent 自己开一会儿。
+    icon: "⛵"
+    category: onboarding
+    rarity: common
+    hidden: false
+    set: the_beginning
+    future: true
+    conditions:
+      - type: counter
+        event: automode.start
+        operator: ">="
+        value: 1
+
+  - id: mcp_first_connect
+    name: Signal Established
+    name_cn: 信号接通
+    description: Connected to an MCP server for the first time.
+    description_cn: 首次连接到 MCP server。
+    icon: "📡"
+    category: onboarding
+    rarity: common
+    hidden: false
+    set: the_beginning
+    future: true
+    conditions:
+      - type: counter
+        event: mcp.connect
+        operator: ">="
+        value: 1
+
+  # ── 新 Tool Mastery ──
+  - id: task_creator
+    name: Task Manager
+    name_cn: 任务管理器
+    description: Manually created 5 tasks. Organization is a superpower.
+    description_cn: 手动创建了 5 个 task。规划是一种超能力。
+    icon: "📋"
+    category: tool_mastery
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: counter
+        event: task.create
+        operator: ">="
+        value: 5
+
+  - id: task_updater
+    name: Status Report
+    name_cn: 进度汇报
+    description: Updated task status 10 times. You track progress like a pro.
+    description_cn: 更新了 10 次 task 状态。项目管理，专业水准。
+    icon: "📊"
+    category: tool_mastery
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: counter
+        event: task.update
+        operator: ">="
+        value: 10
+
+  - id: error_resilient
+    name: Error Resilient
+    name_cn: 容错强者
+    description: Agent hit 5 errors and kept going. What doesn't kill you…
+    description_cn: agent 遭遇 5 次错误依然继续。杀不死你的只会让你更强。
+    icon: "🛡️"
+    category: tool_mastery
+    rarity: rare
+    hidden: false
+    conditions:
+      - type: counter
+        event: error.occurred
+        operator: ">="
+        value: 5
+
+  - id: file_purger
+    name: Spring Cleaning
+    name_cn: 大扫除
+    description: Deleted 10 files. Sometimes less is more.
+    description_cn: 删除了 10 个文件。少即是多。
+    icon: "🧹"
+    category: tool_mastery
+    rarity: rare
+    hidden: false
+    conditions:
+      - type: counter
+        event: file.delete
+        operator: ">="
+        value: 10
+
+  - id: dual_wielder
+    name: Dual Wielder
+    name_cn: 双持流
+    description: Used 3+ different tools in a single task. Versatility is key.
+    description_cn: 同一个 task 里用了 3 种以上不同工具。多面手。
+    icon: "⚔️"
+    category: tool_mastery
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: distinct_count
+        event: tool.complete
+        field: tool_name
+        operator: ">="
+        value: 3
+
   # ============================================================
   # Category: Milestones (里程碑)
   # ============================================================
@@ -390,6 +502,57 @@ definitions:
         operator: ">="
         value: 100
         window: all
+
+  # ── 新 Milestones ──
+  - id: token_1m
+    name: Token Millionaire
+    name_cn: 百万富翁
+    description: Consumed 1,000,000 tokens. That's a small novel.
+    description_cn: 累计消耗 1,000,000 token。够写一本中篇小说了。
+    icon: "💎"
+    category: milestones
+    rarity: rare
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: token.consumed
+        operator: ">="
+        value: 1000000
+        window: all
+
+  - id: test_centurion
+    name: Green Bar
+    name_cn: 全绿
+    description: 100 tests passed. All green, no red.
+    description_cn: 累计 100 个测试通过。满屏绿色，赏心悦目。
+    icon: "✅"
+    category: milestones
+    rarity: rare
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: test.pass
+        operator: ">="
+        value: 100
+        window: all
+
+  - id: multi_image_day
+    name: Photo Album
+    name_cn: 相册日
+    description: Uploaded 5+ images within 24 hours. Visual thinker.
+    description_cn: 24 小时内上传了 5 张以上图片。视觉系思考者。
+    icon: "🖼️"
+    category: milestones
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: threshold
+        event: image.upload
+        operator: ">="
+        value: 5
+        window: 24h
 
   # ============================================================
   # Category: Skill (技巧)
@@ -1912,6 +2075,171 @@ definitions:
         operator: ">="
         value: 50
 
+  # ── 新 Hidden ──
+  - id: oops_all_bash
+    name: Oops, All Bash!
+    name_cn: 全是命令行
+    description: Ran 50+ bash commands in a single session. Living in the terminal.
+    description_cn: 一个 session 里跑了 50+ 条命令行。住在终端里了。
+    icon: "💻"
+    category: hidden
+    rarity: epic
+    hidden: true
+    conditions:
+      - type: threshold
+        event: command.run
+        operator: ">="
+        value: 50
+        window: single_session
+
+  - id: deepseek_dabbler
+    name: Deep Diversified
+    name_cn: 深海探索者
+    description: Used a DeepSeek model at least once. Diving into new waters.
+    description_cn: 用过一次 DeepSeek 模型。潜入了新的海域。
+    icon: "🌊"
+    category: hidden
+    rarity: common
+    hidden: false
+    conditions:
+      - type: counter
+        event: deepseek.conversation
+        operator: ">="
+        value: 1
+
+  - id: file_type_sampler
+    name: Type Sampler
+    name_cn: 文件类型收集者
+    description: Created files of 5+ different types in one session.
+    description_cn: 同一个 session 创建了 5 种以上不同类型的文件。
+    icon: "🎨"
+    category: hidden
+    rarity: rare
+    hidden: true
+    conditions:
+      - type: distinct_count
+        event: file.create
+        field: file_type
+        operator: ">="
+        value: 5
+        window: single_session
+
+  # ── Sci-Fi Easter Eggs ──
+  - id: clockwork_orange
+    name: A Clockwork Orange
+    name_cn: 发条橙
+    description: Activated automode 3 times. Like Alex, your agent runs on clockwork now — a little ultraviolence, a little automation.
+    description_cn: 累计激活 automode 3 次。你的 agent 像发条一样自动运转——带着一点超暴力和一点机械感。
+    icon: "🍊"
+    category: hidden
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: counter
+        event: automode.start
+        operator: ">="
+        value: 3
+
+  # ── Model Brand Achievements ──
+  - id: whale_song
+    name: Whale Song
+    name_cn: 鲸歌
+    description: "Completed a task using a DeepSeek model. The deep sea hums — and you listened."
+    description_cn: "使用 DeepSeek 模型完成了一个 task。深海在低语——而你听见了。"
+    icon: "🐋"
+    category: hidden
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: counter
+        event: task.complete
+        filter: "model contains 'deepseek'"
+        operator: ">="
+        value: 1
+
+  - id: mathematical_theory_of_communication
+    name: A Mathematical Theory of Communication
+    name_cn: 通信的数学理论
+    description: "Completed a task using a Claude model. Shannon laid the foundation, Claude carries the signal."
+    description_cn: "使用 Claude 模型完成了一个 task。香农奠基，Claude传信。"
+    icon: "📡"
+    category: hidden
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: counter
+        event: task.complete
+        filter: "model contains 'claude'"
+        operator: ">="
+        value: 1
+
+  - id: blossom
+    name: Blossom
+    name_cn: 花朵
+    description: "Completed a task using a GPT model. Like a flower seeking sunlight, the model reached for the right answer."
+    description_cn: "使用 GPT 模型完成了一个 task。如花向阳光，模型向答案。"
+    icon: "🌸"
+    category: hidden
+    rarity: uncommon
+    hidden: false
+    conditions:
+      - type: counter
+        event: task.complete
+        filter: "model contains 'gpt'"
+        operator: ">="
+        value: 1
+
+  - id: alien
+    name: Alien
+    name_cn: 异形
+    description: "Your first sub-agent spawned. In space, no one can hear you scream… but the event log caught it."
+    description_cn: "你第一次 spawn 了 sub-agent。在太空中，没人听得到你的尖叫……但 event log 记下来了。"
+    icon: "👾"
+    category: hidden
+    rarity: common
+    hidden: false
+    conditions:
+      - type: counter
+        event: agent.spawn
+        operator: ">="
+        value: 1
+
+  - id: fifth_element
+    name: The Fifth Element
+    name_cn: 第五元素
+    description: "Used 5+ different tools in a single task. Earth, water, fire, air… and the fifth: you. All elements united."
+    description_cn: "同一个 task 里调用了 5 种以上不同的工具。地、水、火、风……第五元素就是你。五行齐聚，万物合一。"
+    icon: "💫"
+    category: hidden
+    rarity: rare
+    hidden: false
+    conditions:
+      - type: distinct_count
+        event: tool.complete
+        field: tool_name
+        operator: ">="
+        value: 5
+        window: single_task
+
+  # ── Steam Game Easter Eggs ──
+  - id: dragonborn
+    name: Dragonborn
+    name_cn: 龙裔
+    description: "Read 337 distinct files. You've read every book in the College of Winterhold. FUS RO DAH!"
+    description_cn: "累计阅读了 337 个不同的文件。冬堡学院的所有藏书你都翻遍了。伏斯洛达！"
+    icon: "🐉"
+    category: hidden
+    rarity: epic
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: distinct_count
+        event: file.read
+        field: file_path
+        operator: ">="
+        value: 337
+        window: all
+
   # ── End Steam-inspired ──
 
   # ============================================================
@@ -2075,6 +2403,50 @@ definitions:
         operator: "<="
         value: 50
         window: single_task
+
+  # ── 新 Challenge ──
+  - id: speed_run_gold
+    name: Speed Run (Gold)
+    name_cn: 速通 (金牌)
+    description: Completed a task within 30 seconds of session start. Blink and you'll miss it.
+    description_cn: 在 session 开启 30 秒内完成一个 task。还没暖身就结束了。
+    icon: "⚡"
+    category: challenge
+    rarity: legendary
+    hidden: false
+    challenge: true
+    conditions:
+      - type: threshold
+        event: task.complete
+        field: elapsed_ms
+        operator: "<="
+        value: 30000
+        window: single_task
+      - type: event
+        event: test.pass
+        window: same_task
+
+  - id: silent_partner_ii
+    name: Guy in the Chair II
+    name_cn: 安静伙伴 II
+    description: 1 message, 3 tasks, one session. Pure efficiency.
+    description_cn: "一个 session 只说 1 句话，完成了 3 个 task。极致的效率。"
+    icon: "🪑"
+    category: challenge
+    rarity: legendary
+    hidden: false
+    challenge: true
+    conditions:
+      - type: threshold
+        event: conversation.message
+        window: single_session
+        operator: "=="
+        value: 1
+      - type: counter
+        event: task.complete
+        window: same_session
+        operator: ">="
+        value: 3
 
   # ============================================================
   # Category: Community (社区)

@@ -140,6 +140,10 @@ export interface AchievementDefinition {
   progress_trackable?: boolean;
   set_id?: string;
   conditions: Condition[];
+  tip?: string;      // educational tip (English), shown after unlock
+  tip_cn?: string;   // educational tip (Chinese)
+  hint?: string;     // unlock clue for locked view (English), does NOT expose exact condition
+  hint_cn?: string;  // unlock clue for locked view (Chinese)
   pixel_art?: Record<string, unknown>;
   unlocked_at?: string;
   future?: boolean;  // pending event/hook support before reachable

@@ -50,6 +50,10 @@ export function parseYAML(text: string): { definitions: AchievementDefinition[];
       progress_trackable: entry.progress_trackable === true || undefined,
       set_id: typeof entry.set === 'string' ? entry.set : typeof entry.set_id === 'string' ? entry.set_id : undefined,
       conditions,
+      tip: typeof entry.tip === 'string' ? entry.tip : undefined,
+      tip_cn: typeof entry.tip_cn === 'string' ? entry.tip_cn : undefined,
+      hint: typeof entry.hint === 'string' ? entry.hint : undefined,
+      hint_cn: typeof entry.hint_cn === 'string' ? entry.hint_cn : undefined,
       future: entry.future === true || undefined,
       challenge: entry.challenge === true || undefined,
     });

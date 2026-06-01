@@ -12,10 +12,12 @@ import * as path from 'node:path';
 import { homedir } from 'node:os';
 import { TOOLS, findTool, INSTRUCTION_FILES } from '../tool-registry.js';
 import type { ToolDef } from '../tool-registry.js';
+import { parseYAML } from '../engine/yaml-parser.js';
 
 const AGPA_DIR = path.join(homedir(), '.agent-achievements');
 const AGPA_MAIN = path.resolve(import.meta.dirname, '../main.ts');
 const AGPA_HOOK = path.resolve(import.meta.dirname, 'hook.ts');
+const AGPA_ROOT = path.resolve(import.meta.dirname, '../..');
 const TSX_BIN = path.resolve(import.meta.dirname, '../../node_modules/.bin/tsx');
 
 /** Build hook command with optional profile env var */
@@ -678,6 +680,119 @@ function initTool(
   return toolDef.name;
 }
 
+// ── Achievement commands & JSON compilation ────────────────────────────
+
+/**
+ * Copy /achievements and /achievements-settings command files to
+ * ~/.claude/commands/ so they're available globally in Claude Code sessions.
+ */
+function installAchievementCommands(): boolean {
+  const srcDir = path.join(AGPA_ROOT, '.claude', 'commands');
+  const destDir = path.join(homedir(), '.claude', 'commands');
+  const files = ['achievements.md', 'achievements-settings.md'];
+
+  fs.mkdirSync(destDir, { recursive: true });
+
+  let installed = 0;
+  let alreadyPresent = 0;
+  for (const f of files) {
+    const src = path.join(srcDir, f);
+    const dest = path.join(destDir, f);
+    if (!fs.existsSync(src)) continue;
+    const srcContent = fs.readFileSync(src, 'utf-8');
+    // Skip if already installed and unchanged
+    if (fs.existsSync(dest)) {
+      const destContent = fs.readFileSync(dest, 'utf-8');
+      if (destContent === srcContent) { alreadyPresent++; continue; }
+    }
+    fs.writeFileSync(dest, srcContent);
+    installed++;
+  }
+
+  if (installed > 0) {
+    console.log(`  \u{2705} Commands:  /achievements, /achievements settings → ~/.claude/commands/`);
+  } else if (alreadyPresent > 0) {
+    console.log(`  \u{23ED}  Commands:  /achievements, /achievements settings (already present)`);
+  }
+
+  return installed > 0 || alreadyPresent > 0;
+}
+
+/**
+ * Compile YAML achievement definitions → JSON snapshot in the state dir.
+ * Claude command files read this JSON to know metadata (Claude can't parse YAML).
+ */
+function compileAchievementsJSON(dataDir: string): string | null {
+  const yamlPath = path.join(AGPA_ROOT, '04-成就定义清单.yaml');
+  if (!fs.existsSync(yamlPath)) return null;
+
+  const yamlText = fs.readFileSync(yamlPath, 'utf-8');
+  const { definitions, sets } = parseYAML(yamlText);
+
+  const CATEGORY_META: Record<string, { name: string; name_cn: string; order: number }> = {
+    onboarding: { name: 'Getting Started', name_cn: '入门', order: 1 },
+    tool_mastery: { name: 'Tool Mastery', name_cn: '工具精通', order: 2 },
+    workflow: { name: 'Workflow', name_cn: '工作流', order: 3 },
+    milestones: { name: 'Milestones', name_cn: '里程碑', order: 4 },
+    skill: { name: 'Skills', name_cn: '技能', order: 5 },
+    creator: { name: 'Creator', name_cn: '创造者', order: 6 },
+    challenge: { name: 'Challenge', name_cn: '挑战', order: 7 },
+    hidden: { name: 'Hidden', name_cn: '隐藏', order: 8 },
+    style: { name: 'Style', name_cn: '风格', order: 9 },
+    community: { name: 'Community', name_cn: '社区', order: 10 },
+  };
+
+  const byCategory: Record<string, number> = {};
+  const byRarity: Record<string, number> = {};
+  const bySet: Record<string, string[]> = {};
+  for (const d of definitions) {
+    byCategory[d.category] = (byCategory[d.category] || 0) + 1;
+    byRarity[d.rarity] = (byRarity[d.rarity] || 0) + 1;
+    if (d.set_id) {
+      bySet[d.set_id] = bySet[d.set_id] || [];
+      bySet[d.set_id]!.push(d.id);
+    }
+  }
+
+  const categories: Record<string, { name: string; name_cn?: string; order: number }> = {};
+  for (const cat of Object.keys(byCategory)) {
+    const meta = CATEGORY_META[cat];
+    categories[cat] = meta ? { ...meta } : { name: cat, order: 99 };
+  }
+
+  const output = {
+    total: definitions.length,
+    by_category: byCategory,
+    by_rarity: byRarity,
+    by_set: bySet,
+    categories,
+    sets: sets.map(s => ({ id: s.id, name: s.name, name_cn: s.name_cn, achievements: s.achievements })),
+    achievements: definitions.map(d => ({
+      id: d.id,
+      name: d.name,
+      name_cn: d.name_cn,
+      description: d.description,
+      description_cn: d.description_cn,
+      icon: d.icon,
+      category: d.category,
+      rarity: d.rarity,
+      hidden: d.hidden,
+      set_id: d.set_id,
+      tip: d.tip,
+      tip_cn: d.tip_cn,
+      hint: d.hint,
+      hint_cn: d.hint_cn,
+      future: d.future,
+      challenge: d.challenge,
+    })),
+  };
+
+  const outPath = path.join(dataDir, 'achievements.json');
+  fs.mkdirSync(dataDir, { recursive: true });
+  fs.writeFileSync(outPath, JSON.stringify(output, null, 2), 'utf-8');
+  return outPath;
+}
+
 // ── Welcome banner ─────────────────────────────────────────────────────
 
 function printWelcome(): void {
@@ -743,6 +858,12 @@ function main(): void {
     if (name) configuredTools.push(name);
   }
 
+  // ── Achievement commands & JSON ──
+  let commandsInstalled = false;
+  let jsonCompiled: string | null = null;
+  commandsInstalled = installAchievementCommands();
+  jsonCompiled = compileAchievementsJSON(dataDir);
+
   // ── Summary ──────────────────────────────────────────────────────────
   const toolList = configuredTools.join(', ');
   const toolCount = configuredTools.length;
@@ -769,6 +890,15 @@ function main(): void {
   console.log(`  \u{2502}  3\u{FE0F}\u{20E3}  Run:  agpa dashboard                          \u{2502}`);
   console.log(`  \u{2502}     Browse achievements at localhost:3867        \u{2502}`);
   console.log(`  \u{2502}                                                 \u{2502}`);
+  if (commandsInstalled) {
+    console.log(`  \u{2502}  4\u{FE0F}\u{20E3}  Type /achievements in Claude Code                \u{2502}`);
+    console.log(`  \u{2502}     View progress & unlock hints in chat          \u{2502}`);
+    console.log(`  \u{2502}                                                 \u{2502}`);
+  }
+  if (jsonCompiled) {
+    console.log(`  \u{2502}  \u{1F4E6} 160 achievements compiled — /achievements ready  \u{2502}`);
+    console.log(`  \u{2502}                                                 \u{2502}`);
+  }
   console.log(`  \u{2502}  \u{1F4A1} Your first achievement ("first_contact")  \u{2502}`);
   console.log(`  \u{2502}     unlocks the moment you send your first       \u{2502}`);
   console.log(`  \u{2502}     message to your AI tool!                    \u{2502}`);

@@ -2,6 +2,19 @@
 
 ## [0.1.6] — 2026-05-31
 
+### 跨平台桌面通知 — 2026-06-02
+
+`src/utils/notify.ts` 重写，自动检测 OS 并选择最佳通知机制：
+
+| 平台 | 机制 | 回退 |
+|------|------|------|
+| macOS | `terminal-notifier`（可点击跳转 Dashboard） | `osascript` |
+| Linux | `notify-send` + 自定义图标 (libnotify) | — |
+| Windows | PowerShell + `System.Windows.Forms.MessageBox` | — |
+| 全部 | 终端输出 ★ title + body | TTY/headless 永不落空 |
+
+`detectOS()` 自动从 `process.platform` 识别；解锁时同时弹系统通知 + 终端输出。
+
 ### CCA 调研 Phase 1 — /achievements 聊天命令 + tip/hint 系统 — 2026-06-02
 
 调研 [subinium/claude-code-achievements](https://github.com/subinium/claude-code-achievements)（29 成就 Bash 插件），借鉴其学习型成就设计哲学与聊天内查询能力，8 方向评估后采纳 4 项近期实施：

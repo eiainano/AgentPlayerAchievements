@@ -11,6 +11,8 @@ npm run doctor     # diagnose system state
 npm run profile    # manage achievement profiles (create <name> | list)
 ```
 
+Unified CLI via `bin` field (npm link to use): `agpa init | verify | doctor | dashboard | profile | demo | stats | progress | reset | mcp`
+
 ## Architecture
 
 Three layers, **two channels**:
@@ -90,4 +92,41 @@ If evaluator behavior seems wrong, check src/engine/evaluator.ts — each type h
 
 用户说"文档核查"或"根据代码核查文档"时执行此操作。
 
-`docs/issues-todo.md` tracks all known bugs, gaps, and data inconsistencies in the achievement system. 10 P0 bugs, ~20 P1 gaps, ~6 P2 data issues. Always read it before starting evaluator or YAML work.
+`docs/issues-todo.md` tracks all known bugs, gaps, and data inconsistencies in the achievement system. Always read it before starting evaluator or YAML work.
+
+## Documentation Index
+
+### Core tracking docs（日常维护，数字需与代码同步）
+
+| 文件 | 用途 |
+|------|------|
+| `docs/issues-todo.md` | 问题/功能/改进追踪，按 P0→P3 优先级组织。给 AI 看的，每次代码变更后同步 |
+| `docs/PROGRESS.md` | 高层开发进度总览 + 版本对比表。给人看的，了解项目整体状态 |
+| `docs/multi-tool-setup.md` | 5 工具 MCP 配置指南 + init 流程 + 环境变量说明 |
+| `docs/multi-tool-research.md` | Hermes/OpenClaw/KiloCode/OpenCode 的 hook API 调研（2026-05-31） |
+
+### Design docs（`docs/design/`，方案蓝图，不会随代码每版同步）
+
+| 文件 | 内容 |
+|------|------|
+| `01-成就分类体系.md` | 成就分类、命名规范、定义语言（YAML 字段说明） |
+| `02-系统机制.md` | XP/等级、稀有度、套装、展示柜机制设计 |
+| `03-技术架构.md` ⚠️ | 早期技术架构蓝图（与实际代码有差异） |
+| `05-核心引擎设计.md` ⚠️ | 事件流 → 评估 → 展示的引擎设计蓝图 |
+| `06-首次体验与安装流设计.md` ⚠️ | `init.ts` 安装流程设计 |
+| `07-各工具事件采集设计.md` | 5 个 Agent 工具的事件采集能力分析与方案 |
+| `08-EventCapture落地设计.md` | 从工具事件到 event.log 的完整链路设计 |
+| `09-开发调试与恢复设计.md` ⚠️ | 开发调试、数据恢复、reset 流程设计 |
+| `10-版本路线图.md` ⚠️ | MVP → v1.0 版本规划 |
+| `11-像素画方案设计.md` | 像素画 icon 存储/渲染方案（未实施） |
+| `12-Steam游戏成就设计调研.md` | 21 款 Steam 游戏成就系统调研（2026-05-31） |
+
+⚠️ = 早期设计蓝图，当前代码才是权威来源
+
+### External references（只读，不修改）
+
+| 文件 | 来源 |
+|------|------|
+| `docs/claude-code-best-practices.md` | Claude Code 官方文档 + 社区实践调研 |
+| `docs/superpowers/` | Superpowers 插件的归档 spec/plan（不再使用） |
+| `CHANGELOG.md` | 每次 commit+push 的变更记录（历史记录，不修改） |

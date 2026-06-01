@@ -1815,3 +1815,163 @@ body {
     width: 32px;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   First-visit tip banner (1-5 achievements)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.visit-tip-banner {
+  max-width: 720px;
+  margin: 0 auto 16px;
+  padding: 12px 16px 12px 20px;
+  background: linear-gradient(135deg, rgba(66, 133, 244, 0.08), rgba(66, 133, 244, 0.04));
+  border: 1px solid rgba(66, 133, 244, 0.2);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: banner-in .4s ease both;
+}
+
+@keyframes banner-in {
+  0% { opacity: 0; transform: translateY(-8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.visit-tip-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.visit-tip-text {
+  font-size: 13.5px;
+  color: var(--text-dim);
+  line-height: 1.45;
+  flex: 1;
+}
+
+.visit-tip-close {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  line-height: 1;
+  flex-shrink: 0;
+  opacity: .6;
+  transition: opacity .15s, background .15s;
+}
+
+.visit-tip-close:hover {
+  opacity: 1;
+  background: rgba(255,255,255,0.06);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Next achievement card (1-10 achievements)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.next-ach-card {
+  max-width: 720px;
+  margin: 16px auto 0;
+  padding: 14px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-base-shadow);
+  animation: card-in .4s ease both;
+}
+
+@keyframes card-in {
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.next-ach-header {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}
+
+.next-ach-body {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  padding: 6px;
+  margin: -6px;
+  border-radius: var(--radius-md);
+  transition: background .15s;
+}
+
+.next-ach-body:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+.next-ach-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.next-ach-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.next-ach-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.next-ach-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.next-ach-bar {
+  height: 5px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+.next-ach-bar-fill {
+  height: 100%;
+  background: var(--gold);
+  border-radius: 3px;
+  transition: width .3s ease;
+}
+
+.next-ach-pct {
+  font-size: 11px;
+  color: var(--gold);
+  font-weight: 500;
+}
+
+.next-ach-rarity {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  opacity: .6;
+  flex-shrink: 0;
+}
+
+/* pulse highlight animation for linked scroll */
+@keyframes pulse-highlight {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 200, 0, 0); }
+  50% { box-shadow: 0 0 0 4px rgba(255, 200, 0, 0.3); }
+}

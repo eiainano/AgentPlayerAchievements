@@ -115,6 +115,9 @@ const I18N = {
     guide_empty_title: 'This page is empty for now.',
     guide_empty_text: 'Achievements unlock as your agent works. Give it a try!',
     no_timeline_guide: 'Achievements will appear here once unlocked.',
+    first_visit_tip: '💡 Browse achievements below to see what you can unlock. Switch tabs to explore Sets and Timeline.',
+    next_ach_title: '🎯 Next to aim for',
+    next_ach_progress: '{current}/{target}',
     profile_switch: 'Switch Profile',
     profile_create: '+',
     profile_max: 'Max 3 profiles',
@@ -177,6 +180,9 @@ const I18N = {
     guide_empty_title: '这里是空的。',
     guide_empty_text: '成就随着 agent 的工作逐步解锁，去试试吧！',
     no_timeline_guide: '成就解锁后会出现在这里。',
+    first_visit_tip: '💡 浏览下方成就了解可以解锁什么。切换标签查看套装和时间线。',
+    next_ach_title: '🎯 下一个目标',
+    next_ach_progress: '{current}/{target}',
     profile_switch: '切换档案',
     profile_create: '+',
     profile_max: '最多3个档案',
@@ -299,6 +305,8 @@ function renderAll(data) {
   renderI18n();
   renderNav(data);
   renderProfile(data);
+  renderFirstVisitTip(data);
+  renderNextAchievement(data);
   renderOnboardingGuide(data);
   renderAchievements(data);
   renderSets(data);
@@ -776,6 +784,98 @@ function renderOnboardingGuide(data) {
       <span class="guide-item-arrow">→</span>
     </div>`;
   }).join('');
+}
+
+// ── First-visit tip (1-5 achievements) ──────────────
+
+function renderFirstVisitTip(data) {
+  const section = document.getElementById('first-visit-tip');
+  if (!section) return;
+
+  const unlocked = data.stats.unlocked;
+
+  // Show only when 1-5 achievements unlocked and not dismissed
+  if (unlocked < 1 || unlocked > 5 || localStorage.getItem('agpa-visit-tip-dismissed')) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = 'block';
+}
+
+// Exposed to HTML onclick
+function dismissVisitTip() {
+  localStorage.setItem('agpa-visit-tip-dismissed', '1');
+  const section = document.getElementById('first-visit-tip');
+  if (section) section.style.display = 'none';
+}
+
+// ── Next achievement recommendation (1-10 unlocked) ──
+
+function renderNextAchievement(data) {
+  const card = document.getElementById('next-ach-card');
+  if (!card) return;
+
+  const unlocked = data.stats.unlocked;
+  if (unlocked < 1 || unlocked > 10) {
+    card.style.display = 'none';
+    return;
+  }
+
+  // Find the locked achievement with highest progress ratio
+  let best = null, bestRatio = -1;
+  for (const ach of data.achievements) {
+    if (ach.unlocked) continue;
+    if (!ach.progress || ach.progress.target === 0) continue;
+    const ratio = ach.progress.current / ach.progress.target;
+    if (ratio > bestRatio) {
+      bestRatio = ratio;
+      best = ach;
+    }
+  }
+
+  if (!best || bestRatio <= 0) {
+    card.style.display = 'none';
+    return;
+  }
+
+  const name = displayName(best);
+  const desc = currentLang === 'zh' ? (best.description_cn || best.description) : (best.description || '');
+  const progressText = t('next_ach_progress', {
+    current: best.progress.current,
+    target: best.progress.target,
+  });
+
+  card.style.display = 'block';
+  card.innerHTML = `
+    <div class="next-ach-header">${t('next_ach_title')}</div>
+    <div class="next-ach-body" onclick="scrollToAchievement('${escHtml(best.id)}')" title="${t('click_to_pick')}">
+      <span class="next-ach-icon">${iconHtml(best.icon, { size: 22 })}</span>
+      <div class="next-ach-info">
+        <span class="next-ach-name">${escHtml(name)}</span>
+        <span class="next-ach-desc">${escHtml(desc)}</span>
+        <div class="next-ach-bar"><div class="next-ach-bar-fill" style="width:${Math.min(bestRatio * 100, 100)}%"></div></div>
+        <span class="next-ach-pct">${progressText}</span>
+      </div>
+      <span class="next-ach-rarity">${escHtml(best.rarity)}</span>
+    </div>
+  `;
+}
+
+function scrollToAchievement(id) {
+  // Switch to achievements tab if not active
+  const achSection = document.getElementById('achievements');
+  if (achSection) achSection.scrollIntoView({ behavior: 'smooth' });
+  // Find and highlight the card
+  setTimeout(() => {
+    const card = document.querySelector(`.ach-card[data-id="${CSS.escape(id)}"]`);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.style.animation = 'none';
+      card.offsetHeight; // trigger reflow
+      card.style.animation = 'pulse-highlight .8s ease 2';
+    }
+  }, 300);
 }
 
 // ── Achievement Grid ────────────────────────────────

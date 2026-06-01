@@ -438,19 +438,31 @@ function injectInstructions(filePath: string, marker: string): boolean {
  * and offer to configure all found tools.
  */
 function detectTools(): string[] {
-  console.log('\n\u{1F50D}  Auto-detecting AI coding tools...\n');
   const found: string[] = [];
+  const scanResults: Array<{ name: string; id: string; detected: boolean }> = [];
+
   for (const t of TOOLS) {
-    if (fs.existsSync(t.configPath)) {
-      found.push(t.id);
-      console.log(`  \u{2713}  Found: ${t.name}`);
+    const detected = fs.existsSync(t.configPath);
+    scanResults.push({ name: t.name, id: t.id, detected });
+    if (detected) found.push(t.id);
+  }
+
+  // Display scan results
+  console.log('');
+  for (const r of scanResults) {
+    if (r.detected) {
+      console.log(`  \u{2705} ${r.name.padEnd(18)} ${r.id}`);
+    } else {
+      console.log(`  \u{2014} ${r.name.padEnd(18)} not detected`);
     }
   }
+
   if (found.length === 0) {
-    console.log('  ℹ  No config files found. Defaulting to Claude Code.');
-    console.log('  ℹ  Use --tool <name> to configure a different tool.');
+    console.log('\n  \u{2139}\u{FE0F}  No config files found. Defaulting to Claude Code.');
+    console.log('  \u{2139}\u{FE0F}  Use --tool <name> to configure a different tool.');
     found.push('claude-code');
   }
+
   console.log('');
   return found;
 }
@@ -666,20 +678,48 @@ function initTool(
   return toolDef.name;
 }
 
+// ── Welcome banner ─────────────────────────────────────────────────────
+
+function printWelcome(): void {
+  let version = '0.1.x';
+  try {
+    const pkgPath = path.resolve(import.meta.dirname, '../../package.json');
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+    version = pkg.version;
+  } catch { /* use default */ }
+
+  console.log('');
+  console.log('  🏆  AGPA — Agent Player Achievements');
+  console.log(`  🎮  gamified achievement tracking for AI coding tools  v${version}`);
+  console.log('');
+}
+
 // ── Main ───────────────────────────────────────────────────────────────
 
 function main(): void {
   const { tool: toolArg, profile } = parseCliArgs();
 
+  printWelcome();
+
   // Determine which tools to configure
   const toolIds = toolArg ? [toolArg] : detectTools();
+
+  if (toolArg) {
+    const toolDef = findTool(toolArg);
+    if (toolDef) {
+      console.log(`  🎯 Configuring: ${toolDef.name}`);
+    }
+    console.log('');
+  }
 
   // Shared data directory
   const dataDir = profile
     ? path.join(AGPA_DIR, 'profiles', profile)
     : AGPA_DIR;
-  if (!toolArg) {
-    console.log(`  \u{1F4C1} Data:      ${dataDir}`);
+  if (profile) {
+    console.log(`  👤 Profile:   ${profile}`);
+    console.log(`  📂 Data:      ${dataDir}`);
+    console.log('');
   }
   ensureDataDir(dataDir);
   initEngineState();
@@ -709,16 +749,31 @@ function main(): void {
   const toolLine = toolCount > 1
     ? `${toolCount} tools configured`
     : `Tool:      ${configuredTools[0]!}`;
-  console.log(`\n  ┌─────────────────────────────────────────────────┐`);
-  console.log(`  │  Agent Player Achievements initialized!          │`);
-  console.log(`  │                                                 │`);
-  console.log(`  │  ${toolLine.padEnd(47)}│`);
-  console.log(`  │  Data:    ${dataDir.padEnd(37)}│`);
-  console.log(`  │                                                 │`);
-  console.log(`  │  Quick start:                                   │`);
-  console.log(`  │    npm run dashboard    # View your achievements │`);
-  console.log(`  │    npm run doctor       # Diagnose your setup    │`);
-  console.log(`  └─────────────────────────────────────────────────┘`);
+  const W = 51;
+
+  console.log(`\n  \u{250C}${'\u{2500}'.repeat(W)}\u{2510}`);
+  console.log(`  \u{2502}                                                 \u{2502}`);
+  console.log(`  \u{2502}  \u{1F389}  AGPA is ready!                              \u{2502}`);
+  console.log(`  \u{2502}                                                 \u{2502}`);
+  console.log(`  \u{2502}  ${toolLine.padEnd(47)}\u{2502}`);
+  console.log(`  \u{2502}  Data:    ${dataDir.padEnd(37)}\u{2502}`);
+  console.log(`  \u{2502}                                                 \u{2502}`);
+  console.log(`  \u{2502}  \u{2500}\u{2500}\u{2500} What\u{2019}s next \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500} \u{2502}`);
+  console.log(`  \u{2502}                                                 \u{2502}`);
+  console.log(`  \u{2502}  1\u{FE0F}\u{20E3}  Run:  agpa verify                              \u{2502}`);
+  console.log(`  \u{2502}     Confirm everything works (takes 2 seconds)  \u{2502}`);
+  console.log(`  \u{2502}                                                 \u{2502}`);
+  console.log(`  \u{2502}  2\u{FE0F}\u{20E3}  Start your AI tool and chat normally            \u{2502}`);
+  console.log(`  \u{2502}     Achievements unlock automatically            \u{2502}`);
+  console.log(`  \u{2502}                                                 \u{2502}`);
+  console.log(`  \u{2502}  3\u{FE0F}\u{20E3}  Run:  agpa dashboard                          \u{2502}`);
+  console.log(`  \u{2502}     Browse achievements at localhost:3867        \u{2502}`);
+  console.log(`  \u{2502}                                                 \u{2502}`);
+  console.log(`  \u{2502}  \u{1F4A1} Your first achievement ("first_contact")  \u{2502}`);
+  console.log(`  \u{2502}     unlocks the moment you send your first       \u{2502}`);
+  console.log(`  \u{2502}     message to your AI tool!                    \u{2502}`);
+  console.log(`  \u{2502}                                                 \u{2502}`);
+  console.log(`  \u{2514}${'\u{2500}'.repeat(W)}\u{2518}`);
 }
 
 main();

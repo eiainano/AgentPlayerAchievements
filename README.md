@@ -7,14 +7,17 @@
 ## 快速开始
 
 ```bash
-# 1. 安装依赖
-npm install
+# 1. 安装依赖并 link
+npm install && npm link
 
 # 2. 注册到你的 Agent 工具（自动检测并配置所有工具）
-npm run init
+agpa init
 
-# 3. 启动 Dashboard 看看
-npm run dashboard
+# 3. 验证安装
+agpa verify
+
+# 4. 启动 Dashboard
+agpa dashboard
 ```
 
 之后正常使用 Agent，hook 会自动记录事件，session 结束时自动评估成就。
@@ -44,9 +47,9 @@ Agent 运行
 展示成就进度、统计数据、XP/等级。
 
 ```bash
-npm run dashboard
+agpa dashboard
 # 或指定端口
-npx tsx src/cli/dashboard.ts 8080
+agpa dashboard 8080
 ```
 
 打开 http://localhost:3867
@@ -55,14 +58,15 @@ npx tsx src/cli/dashboard.ts 8080
 
 | 命令 | 用途 |
 |------|------|
-| `npm run init` | 自动检测并注册到 Agent 工具 |
-| `npm run doctor` | 诊断系统状态 |
-| `npm run dashboard` | 启动仪表盘 (localhost:3867) |
-| `npm run hook-auto` | stdin JSON → AGPA 事件（hook 自动调用） |
-| `npm run hook-track <event>` | 手动记录事件 |
-| `npm run hook-poll` | 评估成就条件 |
-| `npm run demo` | 生成 MVP 演示数据 |
-| `npm run stats` | 查看成就进度 |
+| `agpa init` | 自动检测并注册到 Agent 工具 |
+| `agpa verify` | 验证安装是否正确 |
+| `agpa doctor` | 诊断系统状态 |
+| `agpa dashboard` | 启动仪表盘 (localhost:3867) |
+| `agpa profile` | 管理成就档案 (create/list) |
+| `agpa demo` | 生成 MVP 演示数据 |
+| `agpa stats` | 查看成就进度 |
+| `agpa progress` | 列出所有成就 |
+| `agpa reset` | 重置所有数据 |
 
 ## macOS 通知
 
@@ -114,7 +118,7 @@ tools/                      # 像素画生成工具
 
 ## 成就定义
 
-所有成就定义在 `04-成就定义清单.yaml`，包含 10 个分类共 138 个成就。
+所有成就定义在 `04-成就定义清单.yaml`，包含 10 个分类共 160 个成就。
 
 每个成就包含：
 - id / name / description（中英文）

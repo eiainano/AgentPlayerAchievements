@@ -23,6 +23,18 @@
     "test:watch": "vitest",
     "build": "tsc --noEmit"
   },
+  "bin": {
+    "agpa": "./src/cli/index.ts"
+  },
+  "files": [
+    "src/",
+    "04-成就定义清单.yaml",
+    "AGENTS.md",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "tsx": "^4.19.0",

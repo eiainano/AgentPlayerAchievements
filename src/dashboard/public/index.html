@@ -76,6 +76,16 @@
         <button id="showcase-auto" class="showcase-auto-btn" onclick="autoFillShowcase()" title="Auto-fill with rarest">⚡ Auto</button>
       </div>
       <div class="stats-row" id="stats-row"></div>
+      <div id="next-ach-card" class="next-ach-card" style="display:none"></div>
+    </div>
+  </section>
+
+  <!-- First-visit tip (1-5 achievements) -->
+  <section id="first-visit-tip" class="section" style="display:none">
+    <div class="visit-tip-banner">
+      <span class="visit-tip-icon">💡</span>
+      <span class="visit-tip-text" data-i18n="first_visit_tip">Browse achievements below to see what you can unlock. Switch tabs to explore Sets and Timeline.</span>
+      <button class="visit-tip-close" onclick="dismissVisitTip()" aria-label="Dismiss">✕</button>
     </div>
   </section>
 

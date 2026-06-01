@@ -107,6 +107,9 @@ const I18N = {
     modal_progress: 'Progress',
     modal_no_desc: 'No description available.',
     search_empty: 'No achievements match your search.',
+    modal_hidden_desc: 'Achievement details are hidden.',
+    modal_hidden_reveal: 'Reveal',
+    modal_hidden_hide: 'Hide',
     guide_title: 'Getting Started',
     guide_subtitle: 'Try these easy achievements to get your first unlocks.',
     guide_empty_title: 'This page is empty for now.',
@@ -162,6 +165,9 @@ const I18N = {
     modal_progress: '进度',
     modal_no_desc: '暂无描述。',
     search_empty: '没有匹配的成就。',
+    modal_hidden_desc: '成就详情已隐藏。',
+    modal_hidden_reveal: '查看描述',
+    modal_hidden_hide: '隐藏描述',
     guide_title: '从这里开始',
     guide_subtitle: '尝试解锁这些简单成就，迈出第一步。',
     guide_empty_title: '这里是空的。',
@@ -862,7 +868,18 @@ function openModal(ach) {
         <span class="modal-badge rarity-${ach.rarity}">${displayRarity(ach.rarity)}</span>
         <span class="modal-badge category">${displayCategory(ach.category)}</span>
       </div>
+      ${locked && ach.hidden ? `
+      <div class="modal-hidden-section">
+        <div class="modal-hidden-placeholder">
+          <span class="modal-hidden-icon">🔒</span>
+          <p class="modal-hidden-text">${t('modal_hidden_desc')}</p>
+          <button class="modal-hidden-toggle" onclick="toggleHiddenDesc(event)" data-reveal="${t('modal_hidden_reveal')}" data-hide="${t('modal_hidden_hide')}">${t('modal_hidden_reveal')}</button>
+        </div>
+        <div class="modal-hidden-desc" style="display:none">${escHtml(desc)}</div>
+      </div>
+      ` : `
       <div class="modal-desc">${escHtml(desc)}</div>
+      `}
       ${bottomSections}
     </div>`;
 
@@ -874,6 +891,25 @@ function openModal(ach) {
   }
 
   backdrop.style.display = 'flex';
+}
+
+function toggleHiddenDesc(e) {
+  e.stopPropagation();
+  const btn = e.target.closest('.modal-hidden-toggle');
+  if (!btn) return;
+  const section = btn.closest('.modal-hidden-section');
+  const placeholder = section.querySelector('.modal-hidden-placeholder');
+  const desc = section.querySelector('.modal-hidden-desc');
+  const hidden = placeholder.style.display !== 'none';
+  if (hidden) {
+    placeholder.style.display = 'none';
+    desc.style.display = 'block';
+    btn.textContent = btn.dataset.hide;
+  } else {
+    placeholder.style.display = '';
+    desc.style.display = 'none';
+    btn.textContent = btn.dataset.reveal;
+  }
 }
 
 function closeModal() {

@@ -26,7 +26,7 @@
 - **Hidden 分类重组** — 41→21（26%→13%），25 个成就重新归类到 tool_mastery（+10）、milestones（+3）、style（+2）、workflow（+2）等。剩余 21 个全是真彩蛋。
 - **Modal 入场 5 层动画** — backdrop blur 淡入、container spring pop-in（scale+.blur）、icon 弹跳回旋、内容 staggered reveal、✕ 按钮旋转弹入。
 - **Modal 退场动画** — container shrink+blur out、backdrop 渐变消失，JS closeModal 400ms 延迟。
-- **Modal 状态标识** — 解锁卡片显示金色呼吸 "✓ 已解锁"，未解锁卡片显示灰色 "未解锁"，右对齐于成就名右侧。
+- **Modal 状态标识** — 解锁卡片显示金色呼吸 "✓ 已解锁"，未解锁卡片显示灰色 "未解锁"，右对齐于成就名右侧。隐藏成就详情默认隐藏，支持 "查看描述/隐藏描述" 按钮切换，中英双语。
 - **SetDefinition +name_cn** — types.ts、yaml-parser.ts、api.ts、app.js 全链路透传 set 中文名。
 
 ### 成就名称全面升级（Steam 化）

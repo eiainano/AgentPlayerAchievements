@@ -135,7 +135,16 @@ export function createServer(port: number, defaultProfile: string): http.Server 
     const url = new URL(req.url || '/', `http://localhost:${port}`);
     const profileParam = url.searchParams.get('profile');
     const resolvedProfile = profileParam || defaultProfile;
-    const engine = getEngine(resolvedProfile);
+
+    // Reject path traversal / invalid profile names early
+    let engine: AchievementEngine;
+    try {
+      engine = getEngine(resolvedProfile);
+    } catch {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Invalid profile name' }));
+      return;
+    }
 
     // ── GET /api/data ──────────────────────────────────────────────────
     if (url.pathname === '/api/data' && req.method === 'GET') {

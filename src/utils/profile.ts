@@ -34,6 +34,10 @@ function getProfilesBaseDir(): string {
 /** Resolve a profile name to its on-disk stateDir */
 export function resolveProfileDir(name: string): string {
   if (name === DEFAULT_PROFILE) return getLegacyDir();
+  // Reject traversal attempts and invalid names at the boundary
+  if (!PROFILE_NAME_RE.test(name)) {
+    throw new Error(`Invalid profile name: "${name}". Use lowercase letters, digits, dashes, underscores (1-32 chars).`);
+  }
   return path.join(getProfilesBaseDir(), name);
 }
 

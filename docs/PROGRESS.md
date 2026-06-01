@@ -1,10 +1,10 @@
 # AGPA 开发进度
 
-> 最后更新: 2026-05-31
+> 最后更新: 2026-06-01
 
 ## 总体状态
 
-v0.1.6 完成。大批量成就一致性审计修复 + 3 个 evaluator 功能新增。158 个成就全部可达成，110 个测试全绿。
+v0.1.6 完成。大批量成就一致性审计修复 + 3 个 evaluator 功能新增。160 个成就全部可达成，110 个测试全绿。
 
 ---
 
@@ -12,7 +12,7 @@ v0.1.6 完成。大批量成就一致性审计修复 + 3 个 evaluator 功能新
 
 ### 核心引擎
 - [x] 11 种 Condition Type：Counter、Threshold（含 field 求和 + metric 表达式）、Streak、Sequence（含 consecutive 模式）、DistinctCount（含 values 白名单）、Event、SetCompletion、Mode、SequenceCount、PatternMatch、Ratio（Percentile 已移除）
-- [x] YAML 解析器加载 158 个成就定义（含 12 个事件驱动型，异步发审计已全部修复）
+- [x] YAML 解析器加载 160 个成就定义（含 12 个事件驱动型，异步发审计已全部修复）
 - [x] PendingQueue 并发安全
 - [x] MCP Tools：`achievement_track`、`achievement_poll`、`achievement_stats`、`achievement_showcase`、`achievement_config`
 - [x] macOS Notification Center 弹窗（poll 时触发）
@@ -75,7 +75,7 @@ v0.1.6 完成。大批量成就一致性审计修复 + 3 个 evaluator 功能新
 - [x] **测试覆盖**：81 tests, 6 files（evaluator 43 + integration 4 + yaml-parser 6 + api 5 + xp 6 + hook 17）
 
 ### 中优先级
-- [x] **用户审阅 158 成就清单**：已逐条 review，修复 30+ 个不一致，删除 3 个重复，新增 1 个
+- [x] **用户审阅 160 成就清单**：已逐条 review，修复 30+ 个不一致，删除 3 个重复，新增 1 个
 - [ ] **其余 3 工具的 auto-track 策略落地**
 
 | 工具 | 策略 | 可靠性 |
@@ -100,7 +100,7 @@ v0.1.6 完成。大批量成就一致性审计修复 + 3 个 evaluator 功能新
 | 维度 | MVP 原计划 | 当前实际 |
 |------|-----------|---------|
 | 工具支持 | Claude Code 独占 | 5 工具 init 完成 |
-| 成就数量 | 30 个 | 158 个全部可达成 |
+| 成就数量 | 30 个 | 160 个全部可达成 |
 | Evaluator | 3 种 | 12 种全部实现 |
 | Dashboard | 基础网格 | 完整 4 section + 主题 + 双语 |
 | Event Capture | CC Hook | 9 hooks auto-track + 27 手动 track |

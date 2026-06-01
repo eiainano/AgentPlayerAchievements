@@ -1,6 +1,6 @@
 # AGPA — 今日 TODO
 
-> 日期: 2026-06-01 | 当前版本: v0.1.6 | 成就: 158 | Tests: 110 ✅ | 条件类型: 11
+> 日期: 2026-06-01 | 当前版本: v0.1.6 | 成就: 160 | Tests: 110 ✅ | 条件类型: 11
 
 ---
 
@@ -116,3 +116,19 @@
 ```
 
 > 关联文档: `docs/issues-todo.md`（Bug 追踪）、`docs/PROGRESS.md`（进度总览）
+
+---
+
+## ✅ 今日进展（6/1）
+
+```
+1. [x] 138 成就描述 EN 翻译 + 验证（name ↔ description_cn 全链路）
+2. [x] v0.1.5 → v0.1.6 版本号一致化 + CHANGELOG 更新
+3. [x] 隐藏成就描述开关 — 默认隐藏，点击查看/隐藏描述
+4. [x] Modal 5 层入场/出场动画 + 锁定/解锁状态徽章
+5. [x] Set 系统重组 — 10 个 set + name_cn，hidden 分类 41→21
+6. [x] 42 项成就 bug 审计修复（descriptions、conditions、边界值）
+7. [x] 3 个重复成就删除（nothing_to_see/no_edit_challenge/blind_faith）
+8. [x] 10 个不可达成就条件修复（minimalist → changelog_keeper）
+9. [x] +2 新成就 — avengers_assemble（agent_type distinct==6）+ skill_adept（skill.invoke distinct>=5）
+```

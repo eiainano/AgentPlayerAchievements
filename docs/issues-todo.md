@@ -1,6 +1,6 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-01 | 总成就数: 158 | 条件类型: 11 | Tests: 110 ✅ | 5 Agent 全接入
+> 最后更新: 2026-06-01 | 总成就数: 160 | 条件类型: 11 | Tests: 110 ✅ | 5 Agent 全接入
 
 ---
 
@@ -34,11 +34,18 @@
 
 ---
 
+## ✅ 今日新增 — 2 个成就（v0.1.6, 6/1）
+
+- [x] **avengers_assemble** — `agent.spawn` distinct_count(`agent_type`) == 6。需要 spawn 过恰好 6 种不同类型 agent。Epic，set: agent_commander。
+- [x] **skill_adept** — `skill.invoke` distinct_count(`skill_name`) >= 5。调用过 5 种以上不同 skill（全新事件）。Rare，set: creators_forge。
+
+---
+
 ## P3 — YAML 质量 / 资产
 
 - [x] **Hidden 分类占 22%** — 41→21（26%→13%）。25 个重新归类到 tool_mastery（+10）、milestones（+3）、style/workflow（各+2）等。剩余 21 个全是真彩蛋。
-- [ ] **像素画 icon 资产暂缺** — 下一步：选 The Beginning（14 个）做第一批试点。方案：AI 生成 32×32 pixel art PNG → `public/icons/` → YAML `icon: { src, alt }` → Dashboard `iconHtml()` 渲染。验证全链路后再铺开全量 158 个。emoji 和 pixel art 并存，渐进替换。
-- [x] **Set 名称只有英文** — 9→10 个 set，全部添加 `name_cn`，套装页中英双语切换。Set 系统重构：合并散装 set，扩充合理 set。`git_flow`（7→9）、`agent_commander`（5→6）、`polar_night`（2→3）。57/158 有归属。
+- [ ] **像素画 icon 资产暂缺** — 下一步：选 The Beginning（14 个）做第一批试点。方案：AI 生成 32×32 pixel art PNG → `public/icons/` → YAML `icon: { src, alt }` → Dashboard `iconHtml()` 渲染。验证全链路后再铺开全量 160 个。emoji 和 pixel art 并存，渐进替换。
+- [x] **Set 名称只有英文** — 9→10 个 set，全部添加 `name_cn`，套装页中英双语切换。Set 系统重构：合并散装 set，扩充合理 set。`git_flow`（7→9）、`agent_commander`（5→7）、`creators_forge`（5→6）、`polar_night`（2→3）。61/160 有归属。
 
 ---
 

@@ -1405,6 +1405,22 @@ definitions:
         event: skill.published
         operator: ">="
         value: 1
+  - id: skill_adept
+    name: Skill Adept
+    name_cn: 技多不压身
+    description: Invoked 5+ distinct skills. More skills, less worries — the master of all trades.
+    description_cn: 调用过 5 种以上不同的 skill。技多不压身。
+    icon: 🎓
+    category: skill
+    rarity: rare
+    hidden: false
+    conditions:
+      - type: distinct_count
+        event: skill.invoke
+        field: skill_name
+        operator: ">="
+        value: 5
+    set: creators_forge
   - id: agent_architect
     name: From the first stirrings of life
     name_cn: 从第一个生命的萌芽开始
@@ -2552,6 +2568,22 @@ definitions:
         operator: ==
         value: 4
     set: agent_commander
+  - id: avengers_assemble
+    name: Avengers Assemble
+    name_cn: 复仇者集结
+    description: Spawned 6 distinct agent types. Each hero brings a different power. Avengers, assemble!
+    description_cn: Spawn 过 6 种不同类型的 agent。每位英雄各怀绝技。复仇者，集结！
+    icon: 🛡️
+    category: workflow
+    rarity: epic
+    hidden: false
+    conditions:
+      - type: distinct_count
+        event: agent.spawn
+        field: agent_type
+        operator: ==
+        value: 6
+    set: agent_commander
 sets:
   the_beginning:
     name: The Beginning
@@ -2584,6 +2616,7 @@ sets:
       - surgeon
       - swat_team
       - delegator
+      - avengers_assemble
     reward:
       type: showcase_border
       value: gold
@@ -2628,6 +2661,7 @@ sets:
     name_cn: 创造工坊
     achievements:
       - skill_creator
+      - skill_adept
       - command_crafter
       - agent_architect
       - hooks_master

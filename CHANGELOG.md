@@ -2,6 +2,25 @@
 
 ## [0.1.6] — 2026-05-31
 
+### 🎯 稀有度全量重平衡 — 2026-06-01
+
+160 项成就稀有度大调整（48 项变更），构建健康的金字塔分布：
+
+| 稀有度 | 变前 | 变后 | Δ | 占比 |
+|--------|------|------|---|------|
+| Common | 20 | **48** | +28 | 30% |
+| Uncommon | 56 | **44** | -12 | 27.5% |
+| Rare | 46 | **30** | -16 | 18.8% |
+| Epic | 24 | **24** | 0 | 15% |
+| Legendary | 12 | **9** | -3 | 5.6% |
+| Mythic | 2 | **5** | +3 | 3.1% |
+
+**核心修复**：
+- **Uncommon 不再当垃圾场** — 28 个"一次性触发"成就从 Uncommon 降为 Common，与现有 Common（first_shot、tool_time 等）门槛对齐。覆盖：首次 permission 调整/MCP 连接/图片分享/Plan 模式/code review/PR/skill/hook/force push/kill -9 等。
+- **Rare 更 Rare** — 12 个中度门槛降为 Uncommon（error_resilient、file_purger、regex_sorcerer、hold_my_beer、ill_do_it_myself 等），2 个高门槛升为 Epic（token_titan 10M、session_centurion 300）。
+- **Epic 纠偏** — `cerberus`（2 条管道命令）Epic→Common，`minimalist`/`novelist`（短/长消息）Epic→Uncommon。这些是 Epic 中最名不副实的。
+- **Mythic 扩容** — `streak_100`（连续 100 天）、`cycle_master`（10 次全流程）、`failure_mother`（累计 100 次失败）从 Legendary 升为 Mythic——真正的"几乎不可能"。
+
 ### Steam 调研驱动新增 2 成就 + 文档同步 — 2026-06-01
 
 - **avengers_assemble（复仇者集结）** — `agent.spawn` distinct_count(`agent_type`) == 6。Spawn 过恰好 6 种不同类型 agent（致敬初代复仇者六人组）。Epic，set: agent_commander（5→7）。

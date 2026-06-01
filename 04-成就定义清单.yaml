@@ -52,7 +52,7 @@ definitions:
     description_cn: 手动调整过 agent 的权限模式。控制权，你说了算。
     icon: 🔐
     category: onboarding
-    rarity: uncommon
+    rarity: common
     hidden: false
     set: the_beginning
     conditions:
@@ -67,7 +67,7 @@ definitions:
     description_cn: 打开过 help 或文档。很少有人这么做。
     icon: 📖
     category: onboarding
-    rarity: uncommon
+    rarity: common
     hidden: false
     set: the_beginning
     conditions:
@@ -143,7 +143,7 @@ definitions:
     description_cn: 连接了第一个 MCP server。agent 的能力向外延伸了。
     icon: 🔌
     category: onboarding
-    rarity: uncommon
+    rarity: common
     hidden: false
     set: the_beginning
     conditions:
@@ -158,7 +158,7 @@ definitions:
     description_cn: agent 读取了你分享的图片。视觉上下文已解锁。
     icon: 🖼️
     category: onboarding
-    rarity: uncommon
+    rarity: common
     hidden: false
     set: the_beginning
     conditions:
@@ -220,7 +220,7 @@ definitions:
     description_cn: 手动创建了 5 个 task。规划是一种超能力。
     icon: 📋
     category: tool_mastery
-    rarity: uncommon
+    rarity: common
     hidden: false
     conditions:
       - type: counter
@@ -234,7 +234,7 @@ definitions:
     description_cn: 更新了 10 次 task 状态。项目管理，专业水准。
     icon: 📊
     category: tool_mastery
-    rarity: uncommon
+    rarity: common
     hidden: false
     conditions:
       - type: counter
@@ -248,7 +248,7 @@ definitions:
     description_cn: agent 遭遇 5 次错误依然继续。杀不死你的只会让你更强。
     icon: 🛡️
     category: tool_mastery
-    rarity: rare
+    rarity: uncommon
     hidden: false
     conditions:
       - type: counter
@@ -262,7 +262,7 @@ definitions:
     description_cn: 删除了 10 个文件。少即是多。
     icon: 🧹
     category: tool_mastery
-    rarity: rare
+    rarity: uncommon
     hidden: false
     conditions:
       - type: counter
@@ -272,11 +272,12 @@ definitions:
   - id: dual_wielder
     name: Three-Sword Style
     name_cn: 三刀流
-    description: Used 3+ different tools in a single task. Santoryu — three swords, one warrior.
+    description: Used 3+ different tools in a single task. Santoryu — three swords,
+      one warrior.
     description_cn: 同一个 task 里用了 3 种以上不同工具。三刀流——三把刀，一个剑士。
     icon: ⚔️
     category: tool_mastery
-    rarity: uncommon
+    rarity: common
     hidden: false
     conditions:
       - type: distinct_count
@@ -370,7 +371,8 @@ definitions:
   - id: streak_30
     name: Streak 30
     name_cn: 连续30天使用
-    description: 30 consecutive days of use. It's not just a tool anymore — it's a lifestyle.
+    description: 30 consecutive days of use. It's not just a tool anymore — it's a
+      lifestyle.
     description_cn: 连续 30 天使用。不仅是工具，是生活方式。
     icon: 📅
     category: milestones
@@ -391,7 +393,7 @@ definitions:
     description_cn: 连续 100 天使用。你确定自己不是在和Agent谈恋爱？
     icon: 🎬
     category: milestones
-    rarity: legendary
+    rarity: mythic
     hidden: false
     progress_trackable: true
     conditions:
@@ -505,7 +507,7 @@ definitions:
     description_cn: 24 小时内上传了 5 张以上图片。视觉系思考者。
     icon: 🖼️
     category: milestones
-    rarity: uncommon
+    rarity: common
     hidden: false
     conditions:
       - type: threshold
@@ -520,7 +522,7 @@ definitions:
     description_cn: 单次对话中 agent 完成 5 步以上 tool call。
     icon: ⛓️
     category: skill
-    rarity: uncommon
+    rarity: common
     hidden: false
     set: agent_commander
     conditions:
@@ -595,7 +597,7 @@ definitions:
     description_cn: 单 session 中搜索类 tool ≥ 10 次。
     icon: 🔍
     category: skill
-    rarity: uncommon
+    rarity: common
     hidden: false
     conditions:
       - type: counter
@@ -611,7 +613,7 @@ definitions:
     description_cn: 代码报错，你让agent自己修好了。
     icon: 🐛
     category: skill
-    rarity: uncommon
+    rarity: common
     hidden: false
     set: bug_catcher
     conditions:
@@ -666,11 +668,12 @@ definitions:
   - id: the_switch
     name: Shift Gears
     name_cn: 模式换档
-    description: Switched from Plan mode to non-Plan mode in the same task to complete implementation.
+    description: Switched from Plan mode to non-Plan mode in the same task to
+      complete implementation.
     description_cn: 同一次 task 中从 Plan 模式切换到非Plan模式，完成最终实现。
     icon: 🎭
     category: skill
-    rarity: uncommon
+    rarity: common
     hidden: false
     conditions:
       - type: sequence
@@ -686,7 +689,7 @@ definitions:
     description_cn: 完成一个 task，全程未使用搜索工具（WebSearch/WebFetch）。
     icon: 🏝️
     category: skill
-    rarity: rare
+    rarity: uncommon
     hidden: false
     conditions:
       - type: event
@@ -701,7 +704,8 @@ definitions:
   - id: first_try
     name: Smooth Criminal
     name_cn: 一次就过
-    description: Agent's first test run passed on the first try — zero failures, smooth as silk.
+    description: Agent's first test run passed on the first try — zero failures,
+      smooth as silk.
     description_cn: agent 写完代码后第一次测试就直接通过，中间无失败，非常丝滑。
     icon: 🐞
     category: skill
@@ -725,7 +729,8 @@ definitions:
   - id: terminal_only
     name: Terminal Only
     name_cn: 纯终端玩法
-    description: Completed a task using only terminal commands, zero file edits. Simple, old-school, effective.
+    description: Completed a task using only terminal commands, zero file edits.
+      Simple, old-school, effective.
     description_cn: 完成一个 task只用终端命令，零文件编辑。简单、老派，但有效。
     icon: 💻
     category: skill
@@ -754,7 +759,7 @@ definitions:
     description_cn: agent 某条消息长度 ≤ 80 字符，惜字如金。
     icon: 🪶
     category: style
-    rarity: epic
+    rarity: uncommon
     hidden: false
     conditions:
       - type: threshold
@@ -771,7 +776,7 @@ definitions:
     description_cn: agent 某条消息长度 ≥ 500 字符，你很细心！
     icon: 📝
     category: style
-    rarity: epic
+    rarity: uncommon
     hidden: false
     conditions:
       - type: threshold
@@ -816,7 +821,8 @@ definitions:
   - id: night_owl
     name: Night Owl
     name_cn: 夜猫子
-    description: Started a session in the wee hours (0:00-5:00). You're a creature of the night.
+    description: Started a session in the wee hours (0:00-5:00). You're a creature
+      of the night.
     description_cn: 某次在凌晨 (0:00-5:00) 启动了 session。你是夜行动物。
     icon: 🦉
     category: style
@@ -867,7 +873,7 @@ definitions:
     description_cn: 粘贴内容 / 总输入 > 50%。
     icon: 📋
     category: style
-    rarity: uncommon
+    rarity: common
     hidden: false
     conditions:
       - type: ratio
@@ -947,7 +953,8 @@ definitions:
   - id: parallel_universe
     name: Heart of the Swarm
     name_cn: 虫群之心
-    description: Spawned 10+ sub-agents in a single session. Parallel processing at its finest.
+    description: Spawned 10+ sub-agents in a single session. Parallel processing at
+      its finest.
     description_cn: 单 session 中 spawn 了 10+ 个子 agent。极致并行。
     icon: 🌌
     category: tool_mastery
@@ -1026,7 +1033,8 @@ definitions:
   - id: git_veteran
     name: Git Veteran
     name_cn: Git 老兵
-    description: Agent participated in 250 git commits. Your collaboration transcends code — it's trust.
+    description: Agent participated in 250 git commits. Your collaboration
+      transcends code — it's trust.
     description_cn: agent 参与了 250 次 git commit。你们的协作已经超越了代码——是信任。
     icon: 🎖️
     category: tool_mastery
@@ -1080,7 +1088,7 @@ definitions:
     description_cn: 让 agent 审查过代码，给出了有价值的建议。
     icon: 👁️
     category: workflow
-    rarity: uncommon
+    rarity: common
     hidden: false
     conditions:
       - type: counter
@@ -1110,7 +1118,7 @@ definitions:
     description_cn: 对复杂任务使用了 Plan 模式，三思而后 code。
     icon: 🧠
     category: workflow
-    rarity: uncommon
+    rarity: common
     hidden: false
     progress_trackable: true
     conditions:
@@ -1125,7 +1133,7 @@ definitions:
     description_cn: 累计使用 Plan 模式 25 次，你很喜欢画蓝图。
     icon: 📐
     category: workflow
-    rarity: rare
+    rarity: uncommon
     hidden: false
     progress_trackable: true
     conditions:
@@ -1168,7 +1176,8 @@ definitions:
   - id: context_conscious
     name: Context Anxiety
     name_cn: 上下文焦虑
-    description: Triggered 3+ auto-compactions in a single task. You're pushing your agent's memory limit.
+    description: Triggered 3+ auto-compactions in a single task. You're pushing your
+      agent's memory limit.
     description_cn: 单 task 中触发了 3 次以上自动压缩。你在挑战 agent 的记忆极限。
     icon: 🧩
     category: workflow
@@ -1203,7 +1212,7 @@ definitions:
     description_cn: 累计开启 300 个 session。
     icon: 📚
     category: workflow
-    rarity: rare
+    rarity: epic
     hidden: false
     progress_trackable: true
     conditions:
@@ -1219,7 +1228,7 @@ definitions:
     description_cn: 累计消耗 10M token。你是服务商最喜欢的用户。
     icon: 💎
     category: workflow
-    rarity: rare
+    rarity: epic
     hidden: false
     progress_trackable: true
     conditions:
@@ -1265,7 +1274,8 @@ definitions:
   - id: full_cycle
     name: Full Cycle
     name_cn: 全流程
-    description: "Agent independently completed the full cycle: code → commit → PR. You just watched the results."
+    description: "Agent independently completed the full cycle: code → commit → PR.
+      You just watched the results."
     description_cn: agent 独立完成了编码→commit→PR 全过程，你只是看了结果。
     icon: ♻️
     category: workflow
@@ -1281,11 +1291,12 @@ definitions:
   - id: cycle_master
     name: Ouroboros
     name_cn: 衔尾蛇
-    description: Completed 10 full cycles (code → commit → PR). You almost don't need to code anymore.
+    description: Completed 10 full cycles (code → commit → PR). You almost don't
+      need to code anymore.
     description_cn: 累计完成 10 次 Full Cycle（编码→commit→PR）。你几乎不需要写代码了。
     icon: 🔁
     category: workflow
-    rarity: legendary
+    rarity: mythic
     hidden: false
     progress_trackable: true
     conditions:
@@ -1352,7 +1363,7 @@ definitions:
     description_cn: 创建了你的第一个自定义 slash command。
     icon: ⚡
     category: creator
-    rarity: uncommon
+    rarity: common
     hidden: false
     conditions:
       - type: counter
@@ -1379,11 +1390,12 @@ definitions:
   - id: skill_creator
     name: Skill Creator
     name_cn: 技能创造者
-    description: Created your first custom skill. Your agent's capabilities are defined by you.
+    description: Created your first custom skill. Your agent's capabilities are
+      defined by you.
     description_cn: 创建了你的第一个自定义 skill。agent 的能力边界由你定义。
     icon: ✨
     category: creator
-    rarity: uncommon
+    rarity: common
     hidden: false
     conditions:
       - type: counter
@@ -1408,11 +1420,12 @@ definitions:
   - id: skill_adept
     name: Skill Adept
     name_cn: 技多不压身
-    description: Invoked 5+ distinct skills. More skills, less worries — the master of all trades.
+    description: Invoked 5+ distinct skills. More skills, less worries — the master
+      of all trades.
     description_cn: 调用过 5 种以上不同的 skill。技多不压身。
     icon: 🎓
     category: skill
-    rarity: rare
+    rarity: uncommon
     hidden: false
     conditions:
       - type: distinct_count
@@ -1443,7 +1456,7 @@ definitions:
     description_cn: 配置了 agent 自动化 hook。
     icon: 🪝
     category: creator
-    rarity: uncommon
+    rarity: common
     hidden: false
     set: creators_forge
     conditions:
@@ -1473,7 +1486,7 @@ definitions:
     description_cn: 创建超过1个模板。
     icon: 📐
     category: creator
-    rarity: uncommon
+    rarity: common
     hidden: false
     conditions:
       - type: counter
@@ -1503,7 +1516,7 @@ definitions:
     description_cn: 1 小时内拒绝了超过 10 次工具调用。
     icon: 😤
     category: tool_mastery
-    rarity: rare
+    rarity: uncommon
     hidden: true
     conditions:
       - type: counter
@@ -1575,7 +1588,8 @@ definitions:
   - id: daily_checkin
     name: Daily Check-In
     name_cn: 每日签到
-    description: Used daily for 15 days, but only sent one message each time. Just clocking in?
+    description: Used daily for 15 days, but only sent one message each time. Just
+      clocking in?
     description_cn: 连续 15 天每天使用但只发一条消息。你是来签到的吗？
     icon: ✅
     category: milestones
@@ -1612,7 +1626,7 @@ definitions:
     description_cn: 使用了 dangerously-skip-permissions。你知道自己在做什么，对吧？
     icon: 🍺
     category: hidden
-    rarity: rare
+    rarity: uncommon
     hidden: true
     conditions:
       - type: counter
@@ -1626,7 +1640,7 @@ definitions:
     description_cn: agent 执行了 kill -9。
     icon: 💀
     category: hidden
-    rarity: uncommon
+    rarity: common
     hidden: true
     conditions:
       - type: counter
@@ -1641,7 +1655,7 @@ definitions:
     description_cn: agent 执行了 git push --force。
     icon: ⏰
     category: hidden
-    rarity: uncommon
+    rarity: common
     hidden: true
     conditions:
       - type: counter
@@ -1735,7 +1749,8 @@ definitions:
   - id: true_vibe_coder
     name: True Vibe Coder
     name_cn: 真·Vibe Coder
-    description: Skip permissions + write code + commit + PR, all in one smooth flow. Complete trust, complete vibe.
+    description: Skip permissions + write code + commit + PR, all in one smooth
+      flow. Complete trust, complete vibe.
     description_cn: skip permissions + 写代码 + commit + PR，一气呵成。完全的信任，完全的 vibe。
     icon: 🌊
     category: hidden
@@ -1788,7 +1803,8 @@ definitions:
   - id: early_bird
     name: Early Bird
     name_cn: 早起的鸟儿有虫吃
-    description: Started a session in the early morning (6:00-9:00). The early bird gets the worm.
+    description: Started a session in the early morning (6:00-9:00). The early bird
+      gets the worm.
     description_cn: 某次在清晨 (6:00-9:00) 启动了 session。早起的鸟儿有虫吃。
     icon: 🐦
     category: style
@@ -1819,11 +1835,12 @@ definitions:
   - id: rubber_duck
     name: Rubber Duck
     name_cn: 橡皮小黄鸭
-    description: Agent sent 20+ messages in a single session. It's your chatty debugging buddy.
+    description: Agent sent 20+ messages in a single session. It's your chatty
+      debugging buddy.
     description_cn: 单 session 中 agent 发送了 20+ 条消息。它是个爱说话的 debugging 伙伴。
     icon: 🦆
     category: hidden
-    rarity: rare
+    rarity: uncommon
     hidden: true
     conditions:
       - type: counter
@@ -1835,7 +1852,8 @@ definitions:
   - id: the_negotiator
     name: The Negotiator
     name_cn: 谈判专家
-    description: Agent refused you at first, but accepted after you rephrased. Communication is an art.
+    description: Agent refused you at first, but accepted after you rephrased.
+      Communication is an art.
     description_cn: agent 第一次拒绝了你的请求，换个说法它就接受了。沟通是一门艺术。
     icon: 🤝
     category: skill
@@ -1851,7 +1869,8 @@ definitions:
   - id: u_turn
     name: Scorched Earth Redux
     name_cn: 推倒重来
-    description: Had your agent revert and start over in a new direction. Starting over takes courage — and knowing what you want.
+    description: Had your agent revert and start over in a new direction. Starting
+      over takes courage — and knowing what you want.
     description_cn: 主动让 agent revert 后换方向重新实现。推翻重来需要勇气，也说明你明确知道自己要什么。
     icon: ↩️
     category: workflow
@@ -1867,7 +1886,8 @@ definitions:
   - id: silent_partner
     name: Guy in the Chair
     name_cn: 幕后搭档
-    description: Agent edited files and completed a task — you just watched. Pure delegation.
+    description: Agent edited files and completed a task — you just watched. Pure
+      delegation.
     description_cn: agent 编辑了文件并完成了一个 task——你只是看着。纯粹的委派。
     icon: 🤐
     category: style
@@ -1885,7 +1905,8 @@ definitions:
   - id: time_traveler
     name: Time Traveler
     name_cn: 时间旅者
-    description: Agent successfully used git bisect to find a bug. Traversing git history to find the culprit.
+    description: Agent successfully used git bisect to find a bug. Traversing git
+      history to find the culprit.
     description_cn: agent 成功使用了 git bisect 定位 bug。穿越 git 历史，找出真凶。
     icon: ⏳
     category: workflow
@@ -1904,12 +1925,13 @@ definitions:
     description_cn: agent 写出了一条正则表达式命令。
     icon: 🧙‍♂️
     category: tool_mastery
-    rarity: rare
+    rarity: uncommon
     hidden: true
     conditions:
       - type: counter
         event: command.run
-        filter: command contains 'grep -E' || command contains 'sed -E' || command contains "grep -P"
+        filter: command contains 'grep -E' || command contains 'sed -E' || command
+          contains "grep -P"
         operator: ">="
         value: 1
   - id: friday_deploy
@@ -1919,7 +1941,7 @@ definitions:
     description_cn: 周五下午还在git  push。
     icon: 🍸
     category: milestones
-    rarity: rare
+    rarity: uncommon
     hidden: true
     conditions:
       - type: counter
@@ -1930,7 +1952,8 @@ definitions:
   - id: infinite_loop
     name: Infinite Loop
     name_cn: 无限循环
-    description: A command took over 60 seconds. Patience is a virtue... or an infinite loop.
+    description: A command took over 60 seconds. Patience is a virtue... or an
+      infinite loop.
     description_cn: 一个命令执行超过了 60 秒。耐心，是一种美德……也可能是死循环。
     icon: ♾️
     category: hidden
@@ -1995,7 +2018,7 @@ definitions:
     description_cn: 同一个 session 创建了 5 种以上不同类型的文件。
     icon: 🎨
     category: hidden
-    rarity: rare
+    rarity: uncommon
     hidden: true
     conditions:
       - type: distinct_count
@@ -2007,11 +2030,12 @@ definitions:
   - id: clockwork_orange
     name: A Clockwork Orange
     name_cn: 发条橙
-    description: Activated automode 3 times. Like Alex, your agent runs on clockwork now — a little ultraviolence, a little automation.
+    description: Activated automode 3 times. Like Alex, your agent runs on clockwork
+      now — a little ultraviolence, a little automation.
     description_cn: 累计激活 automode 3 次。你的 agent 像发条一样自动运转——带着一点超暴力和一点机械感。
     icon: 🍊
     category: hidden
-    rarity: uncommon
+    rarity: common
     hidden: false
     conditions:
       - type: counter
@@ -2021,11 +2045,12 @@ definitions:
   - id: whale_song
     name: Whale Song
     name_cn: 鲸歌
-    description: Completed a task using a DeepSeek model. The deep sea hums — and you listened.
+    description: Completed a task using a DeepSeek model. The deep sea hums — and
+      you listened.
     description_cn: 使用 DeepSeek 模型完成了一个 task。深海在低语——而你听见了。
     icon: 🐋
     category: hidden
-    rarity: uncommon
+    rarity: common
     hidden: false
     conditions:
       - type: counter
@@ -2036,11 +2061,12 @@ definitions:
   - id: mathematical_theory_of_communication
     name: A Mathematical Theory of Communication
     name_cn: 通信的数学理论
-    description: Completed a task using a Claude model. Shannon laid the foundation, Claude carries the signal.
+    description: Completed a task using a Claude model. Shannon laid the foundation,
+      Claude carries the signal.
     description_cn: 使用 Claude 模型完成了一个 task。香农奠基，Claude传信。
     icon: 📡
     category: hidden
-    rarity: uncommon
+    rarity: common
     hidden: false
     conditions:
       - type: counter
@@ -2051,11 +2077,12 @@ definitions:
   - id: blossom
     name: Blossom
     name_cn: 花朵
-    description: Completed a task using a GPT model. Like a flower seeking sunlight, the model reached for the right answer.
+    description: Completed a task using a GPT model. Like a flower seeking sunlight,
+      the model reached for the right answer.
     description_cn: 使用 GPT 模型完成了一个 task。如花向阳光，模型向答案。
     icon: 🌸
     category: hidden
-    rarity: uncommon
+    rarity: common
     hidden: false
     conditions:
       - type: counter
@@ -2066,7 +2093,8 @@ definitions:
   - id: alien
     name: Alien
     name_cn: 异形
-    description: Your first sub-agent spawned. In space, no one can hear you scream… but the event log caught it.
+    description: Your first sub-agent spawned. In space, no one can hear you scream…
+      but the event log caught it.
     description_cn: 你第一次 spawn 了 sub-agent。在太空中，没人听得到你的尖叫……但 event log 记下来了。
     icon: 👾
     category: hidden
@@ -2080,7 +2108,8 @@ definitions:
   - id: fifth_element
     name: The Fifth Element
     name_cn: 第五元素
-    description: "Used 5+ different tools in a single task. Earth, water, fire, air… and the fifth: you. All elements united."
+    description: "Used 5+ different tools in a single task. Earth, water, fire, air…
+      and the fifth: you. All elements united."
     description_cn: 同一个 task 里调用了 5 种以上不同的工具。地、水、火、风……第五元素就是你。五行齐聚，万物合一。
     icon: 💫
     category: hidden
@@ -2097,7 +2126,8 @@ definitions:
   - id: dragonborn
     name: Dragonborn
     name_cn: 龙裔
-    description: Read 337 distinct files. You've read every book in the College of Winterhold. FUS RO DAH!
+    description: Read 337 distinct files. You've read every book in the College of
+      Winterhold. FUS RO DAH!
     description_cn: 累计阅读了 337 个不同的文件。冬堡学院的所有藏书你都翻遍了。伏斯洛达！
     icon: 🐉
     category: hidden
@@ -2114,11 +2144,12 @@ definitions:
   - id: silent_night
     name: Silent Night
     name_cn: 静夜思
-    description: Completed a task in the wee hours (0:00-5:00). The best code is born in darkness.
+    description: Completed a task in the wee hours (0:00-5:00). The best code is
+      born in darkness.
     description_cn: 某次在凌晨（0:00-5:00）完成了一个 task。最好的代码诞生在黑暗中。
     icon: 🌙
     category: challenge
-    rarity: rare
+    rarity: uncommon
     hidden: false
     challenge: true
     conditions:
@@ -2138,7 +2169,7 @@ definitions:
     description_cn: 单个 task 中涉及了 3 种以上的编程语言。
     icon: 🗣️
     category: challenge
-    rarity: rare
+    rarity: uncommon
     hidden: false
     challenge: true
     conditions:
@@ -2191,7 +2222,8 @@ definitions:
   - id: ten_task_no_edit
     name: Ten-Task No Edit
     name_cn: 十连零编辑
-    description: 10 consecutive tasks with zero manual edits. You're a conductor, not an editor.
+    description: 10 consecutive tasks with zero manual edits. You're a conductor,
+      not an editor.
     description_cn: 连续 10 个 task 零手动编辑。你是 conductor，不是 editor。
     icon: 🎼
     category: challenge
@@ -2213,7 +2245,7 @@ definitions:
     description_cn: 24h 内使用 3 种不同模型。
     icon: 🎨
     category: challenge
-    rarity: uncommon
+    rarity: common
     hidden: false
     challenge: true
     conditions:
@@ -2244,7 +2276,8 @@ definitions:
   - id: speed_run_gold
     name: Speed Run (Gold)
     name_cn: 速通 (金牌)
-    description: Completed a task within 30 seconds of session start. Blink and you'll miss it.
+    description: Completed a task within 30 seconds of session start. Blink and
+      you'll miss it.
     description_cn: 在 session 开启 30 秒内完成一个 task。还没暖身就结束了。
     icon: ⚡
     category: challenge
@@ -2265,7 +2298,8 @@ definitions:
   - id: silent_partner_ii
     name: Guy in the Chair II
     name_cn: 幕后搭档 II
-    description: Agent edited files in 3 tasks, one session, zero interference from you. Autopilot engaged.
+    description: Agent edited files in 3 tasks, one session, zero interference from
+      you. Autopilot engaged.
     description_cn: 同一 session 中 agent 编辑了文件并完成了 3 个 task，你毫无干预。自动驾驶已激活。
     icon: 🪑
     category: challenge
@@ -2354,7 +2388,8 @@ definitions:
   - id: cross_agent
     name: Cross-Agent Collector
     name_cn: 跨Agent成就收藏家
-    description: Has achievement records on 2 different agent tools (e.g. Claude Code + OpenCode). Agent polyglot.
+    description: Has achievement records on 2 different agent tools (e.g. Claude
+      Code + OpenCode). Agent polyglot.
     description_cn: 在 2 个不同的 agent 工具上都有成就记录（如 Claude Code + OpenCode）。agent 多面手。
     icon: 🔗
     category: community
@@ -2369,7 +2404,8 @@ definitions:
   - id: casual_collector
     name: Casual Collector
     name_cn: 随缘收集
-    description: Unlocked 20 achievements. You're not hunting for completion — the good ones just come naturally.
+    description: Unlocked 20 achievements. You're not hunting for completion — the
+      good ones just come naturally.
     description_cn: 解锁了 20 个成就。你不追求全收集，好东西自然来。
     icon: 🍀
     category: community
@@ -2401,7 +2437,8 @@ definitions:
   - id: command_baby
     name: Command Baby
     name_cn: 命令宝宝
-    description: Agent tried 30 different shell commands. It's curious about everything on the terminal.
+    description: Agent tried 30 different shell commands. It's curious about
+      everything on the terminal.
     description_cn: agent 试过 30 种不同的 shell 命令。它对终端的一切都充满好奇。
     icon: 👶
     category: tool_mastery
@@ -2417,7 +2454,8 @@ definitions:
   - id: command_master
     name: Command Master
     name_cn: 命令大师
-    description: Agent used 100 different shell commands. Its terminal knowledge rivals yours.
+    description: Agent used 100 different shell commands. Its terminal knowledge
+      rivals yours.
     description_cn: agent 用过 100 种不同的 shell 命令。它的终端知识已经不在你之下了。
     icon: 🧙
     category: tool_mastery
@@ -2437,7 +2475,7 @@ definitions:
     description_cn: agent 写出过 2 条带管道的命令。It's-a me, pipe!
     icon: 🍄
     category: skill
-    rarity: epic
+    rarity: common
     hidden: false
     conditions:
       - type: counter
@@ -2481,7 +2519,7 @@ definitions:
     description_cn: agent 累计失败 100 次。它早已不是当初那个菜鸟了。
     icon: 🧘
     category: workflow
-    rarity: legendary
+    rarity: mythic
     hidden: false
     conditions:
       - type: counter
@@ -2492,7 +2530,8 @@ definitions:
   - id: phoenix
     name: Phoenix
     name_cn: 凤凰涅槃
-    description: Agent failed and immediately succeeded on the next try, 10 times. Rise from the ashes.
+    description: Agent failed and immediately succeeded on the next try, 10 times.
+      Rise from the ashes.
     description_cn: agent 失败后立即在下一次尝试中成功，反复 10 次。浴火重生。
     icon: 🔥
     category: skill
@@ -2524,7 +2563,8 @@ definitions:
   - id: mcp_collector
     name: MCP Collector
     name_cn: MCP 收藏家
-    description: Agent used 30 different MCP tools. It's not using tools — it's collecting them.
+    description: Agent used 30 different MCP tools. It's not using tools — it's
+      collecting them.
     description_cn: agent 用过 30 种不同的 MCP tool。它不是在用工具，是在收集工具。
     icon: 🏛️
     category: tool_mastery
@@ -2555,11 +2595,12 @@ definitions:
   - id: swat_team
     name: SWAT Team
     name_cn: 特种小队
-    description: Spawned exactly 4 sub-agents in a single session. Four-person tactical unit.
+    description: Spawned exactly 4 sub-agents in a single session. Four-person
+      tactical unit.
     description_cn: 同一 session 中恰好 spawn 了 4 个子 agent。四人战术小组。
     icon: 🎯
     category: workflow
-    rarity: uncommon
+    rarity: common
     hidden: false
     conditions:
       - type: counter
@@ -2571,7 +2612,8 @@ definitions:
   - id: avengers_assemble
     name: Avengers Assemble
     name_cn: 复仇者集结
-    description: Spawned 6 distinct agent types. Each hero brings a different power. Avengers, assemble!
+    description: Spawned 6 distinct agent types. Each hero brings a different power.
+      Avengers, assemble!
     description_cn: Spawn 过 6 种不同类型的 agent。每位英雄各怀绝技。复仇者，集结！
     icon: 🛡️
     category: workflow

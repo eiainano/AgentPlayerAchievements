@@ -2,6 +2,17 @@
 
 ## [0.1.6] — 2026-05-31
 
+### CCA 调研 Phase 1 — /achievements 聊天命令 + tip/hint 系统 — 2026-06-02
+
+调研 [subinium/claude-code-achievements](https://github.com/subinium/claude-code-achievements)（29 成就 Bash 插件），借鉴其学习型成就设计哲学与聊天内查询能力，8 方向评估后采纳 4 项近期实施：
+
+- **tip/hint 字段分离**（`04-成就定义清单.yaml` + `src/engine/types.ts` + `yaml-parser.ts`）— `tip`（教育提示，已解锁后教用户更好使用该功能）vs `hint`（解锁线索，给未解锁用户语义暗示但绝不暴露精确条件）。14 个 onboarding 成就全部含 tip+hint，73 个 Common/Uncommon 成就含 hint。Rare+ 保留神秘感。
+- **`/achievements` 聊天内命令**（`.claude/commands/achievements.md`）— 7 种视图模式：默认已解锁列表、locked（未解锁+hint）、all（分类分组）、stats（XP/等级/稀有度分布）、recent（最近 5 个）、按稀有度/set 过滤。20 格 `▰▱` 进度条 + 百分比。
+- **`/achievements settings` 设置命令**（`.claude/commands/achievements-settings.md`）— 聊天内切换语言（zh/en）、开关通知、重置进度（需二次确认）。
+- **init 一键安装命令**（`src/cli/init.ts`）— `agpa init` 自动编译 YAML→JSON（Claude 无法直接解析 YAML）+ 复制命令文件到 `~/.claude/commands/`，全局可用。Summary 框第 4 步增加 `/achievements` 指引。
+- **编译工具链**（`scripts/compile-achievements.ts` — YAML→stateDir/achievements.json，`scripts/add-tips-hints.ts` — 一次性 YAML 注入脚本）
+- **行动计划文档**（`docs/whatsmore.md`）— 8 条目状态追踪，Phase 1/2 路线图
+
 ### 统一 CLI + 安装体验重构 — 2026-06-02
 
 - **`agpa` 统一 CLI**（`src/cli/index.ts`）— 10 子命令路由，`--help`/`--version`。`package.json` 加 `bin`/`files`/`engines` 字段，`npm link` 即用。

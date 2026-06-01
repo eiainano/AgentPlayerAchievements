@@ -16,11 +16,12 @@ import {
 } from './customize-api.js';
 import {
   resolveProfileDir,
-  listProfiles,
+  listProfilesWithMeta,
   createProfile,
   validateProfileName,
   DEFAULT_PROFILE,
   MAX_PROFILES,
+  getProfileMeta,
 } from '../utils/profile.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -154,7 +155,8 @@ export function createServer(port: number, defaultProfile: string): http.Server 
       const showcaseData = buildShowcaseResponse(engine);
       const data = buildApiResponse(engine.definitions, engine.state, engine.events, showcaseData, engine.stats(), engine.setDefinitions);
       data.profile = resolvedProfile;
-      data.profiles = listProfiles();
+      data.profile_emoji = getProfileMeta(resolvedProfile).emoji;
+      data.profiles = listProfilesWithMeta().map(p => ({ name: p.name, emoji: p.emoji }));
       data.max_profiles = MAX_PROFILES;
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(data));
@@ -163,11 +165,12 @@ export function createServer(port: number, defaultProfile: string): http.Server 
 
     // ── GET /api/profiles ──────────────────────────────────────────────
     if (url.pathname === '/api/profiles' && req.method === 'GET') {
-      const profiles = listProfiles();
+      const profilesMeta = listProfilesWithMeta();
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({
         active: resolvedProfile,
-        profiles,
+        active_meta: getProfileMeta(resolvedProfile),
+        profiles: profilesMeta.map(p => ({ name: p.name, emoji: p.emoji })),
         max: MAX_PROFILES,
       }));
       return;
@@ -175,18 +178,25 @@ export function createServer(port: number, defaultProfile: string): http.Server 
 
     // ── POST /api/profiles ─────────────────────────────────────────────
     if (url.pathname === '/api/profiles' && req.method === 'POST') {
-      const body = await parseJsonBody<{ name: string }>(req);
+      const body = await parseJsonBody<{ name: string; emoji?: string }>(req);
       const rawName = body?.name?.trim() || 'profile0';
+      const emoji = body?.emoji?.trim() || undefined;
       try {
-        const stateDir = createProfile(rawName);
+        const stateDir = createProfile(rawName, emoji);
         const name = rawName.toLowerCase();
         // Warm the engine cache for the new profile
         const eng = new AchievementEngine({ stateDir });
         eng.init();
         engineCache.set(name, eng);
-        const profiles = listProfiles();
+        const profilesMeta = listProfilesWithMeta();
         res.writeHead(201, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ status: 'ok', name, profiles, max: MAX_PROFILES }));
+        res.end(JSON.stringify({
+          status: 'ok',
+          name,
+          emoji: emoji || '🎮',
+          profiles: profilesMeta.map(p => ({ name: p.name, emoji: p.emoji })),
+          max: MAX_PROFILES,
+        }));
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : 'Unknown error';
         res.writeHead(409);
@@ -340,7 +350,8 @@ export function createServer(port: number, defaultProfile: string): http.Server 
       engine.init();
       const data = buildApiResponse(engine.definitions, engine.state, engine.events, [], engine.stats(), engine.setDefinitions);
       data.profile = resolvedProfile;
-      data.profiles = listProfiles();
+      data.profile_emoji = getProfileMeta(resolvedProfile).emoji;
+      data.profiles = listProfilesWithMeta().map(p => ({ name: p.name, emoji: p.emoji }));
       data.max_profiles = MAX_PROFILES;
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ status: 'ok', data }));

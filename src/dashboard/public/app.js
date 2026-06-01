@@ -447,21 +447,26 @@ function renderNav(data) {
 // ── Profile Selector ─────────────────────────────────
 
 function renderProfileSelector(data) {
+  const profiles = data.profiles || [{ name: 'default', emoji: '📂' }];
+  const active = data.profile || currentProfile || 'default';
+  const activeMeta = profiles.find(p => p.name === active) || { name: active, emoji: active === 'default' ? '📂' : '👤' };
+  const maxProfiles = data.max_profiles || 3;
+
+  // Update nav button with profile emoji + name
   const display = document.getElementById('profile-name-display');
-  if (display) display.textContent = data.profile || currentProfile || 'default';
+  if (display) display.textContent = active;
+
+  const emojiEl = document.getElementById('profile-emoji');
+  if (emojiEl) emojiEl.textContent = activeMeta.emoji || '📂';
 
   const list = document.getElementById('profile-list');
   if (!list) return;
 
-  const profiles = data.profiles || ['default'];
-  const active = data.profile || currentProfile || 'default';
-  const maxProfiles = data.max_profiles || 3;
-
   list.innerHTML = profiles.map(p => `
-    <div class="profile-option ${p === active ? 'active' : ''}"
-         onclick="switchProfile('${escAttr(p)}')">
-      <span>👤 ${escHtml(p)}</span>
-      ${p === active ? '<span class="profile-check">✓</span>' : ''}
+    <div class="profile-option ${p.name === active ? 'active' : ''}"
+         onclick="switchProfile('${escAttr(p.name)}')">
+      <span>${escHtml(p.emoji || '👤')} ${escHtml(p.name)}</span>
+      ${p.name === active ? '<span class="profile-check">✓</span>' : ''}
     </div>
   `).join('');
 
@@ -494,29 +499,80 @@ function switchProfile(profileName) {
   window.location = url.toString();
 }
 
-async function createProfile() {
+// Profile-create emoji picker
+const PROFILE_EMOJIS = ['🎮', '🕹️', '🎯', '🎲', '🎸', '🎨', '📚', '💻', '🚀', '🌟',
+                        '🔥', '⚡', '🧠', '🛠️', '🏗️', '🔬', '🎭', '🗺️', '🌊', '🏆'];
+
+let pendingProfileName = '';
+
+function openProfileModal() {
   const input = document.getElementById('new-profile-input');
   const rawName = input?.value?.trim() || 'profile0';
+  pendingProfileName = rawName;
+
+  // Populate emoji grid
+  const grid = document.getElementById('profile-emoji-grid');
+  if (grid) {
+    grid.innerHTML = PROFILE_EMOJIS.map((e, i) =>
+      `<button class="profile-emoji-btn ${i === 0 ? 'selected' : ''}"
+               data-emoji="${e}" onclick="selectProfileEmoji(this)">${e}</button>`
+    ).join('');
+  }
+
+  // Set modal text
+  const desc = document.getElementById('profile-modal-desc');
+  if (desc) desc.textContent = `Create profile "${rawName}"? This action cannot be undone.`;
+
+  const backdrop = document.getElementById('profile-modal-backdrop');
+  if (backdrop) {
+    backdrop.classList.remove('closing');
+    backdrop.style.display = 'flex';
+  }
+}
+
+function closeProfileModal() {
+  const backdrop = document.getElementById('profile-modal-backdrop');
+  if (!backdrop) return;
+  backdrop.classList.add('closing');
+  setTimeout(() => {
+    backdrop.style.display = 'none';
+    backdrop.classList.remove('closing');
+  }, 200);
+}
+
+function selectProfileEmoji(btn) {
+  const grid = document.getElementById('profile-emoji-grid');
+  if (grid) grid.querySelectorAll('.profile-emoji-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+async function confirmCreateProfile() {
+  const selected = document.querySelector('#profile-emoji-grid .profile-emoji-btn.selected');
+  const emoji = selected?.dataset.emoji || '🎮';
+
   try {
     const res = await fetch('/api/profiles', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: rawName }),
+      body: JSON.stringify({ name: pendingProfileName, emoji }),
     });
     if (res.ok) {
       const data = await res.json();
+      closeProfileModal();
       switchProfile(data.name);
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to create profile');
+      closeProfileModal();
     }
   } catch (e) {
     alert('Failed to create profile');
+    closeProfileModal();
   }
 }
 
 function handleProfileInputKey(event) {
-  if (event.key === 'Enter') createProfile();
+  if (event.key === 'Enter') openProfileModal();
 }
 
 // Close profile dropdown on outside click

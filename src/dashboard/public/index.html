@@ -15,7 +15,7 @@
       <!-- Profile selector -->
       <div class="profile-selector">
         <button class="profile-btn" id="profile-btn" onclick="toggleProfileDropdown()">
-          <span class="profile-icon">👤</span>
+          <span class="profile-icon" id="profile-emoji">📂</span>
           <span id="profile-name-display">default</span>
           <span class="profile-chevron">▾</span>
         </button>
@@ -26,7 +26,7 @@
             <div class="profile-create" id="profile-create-section">
               <input type="text" id="new-profile-input" data-i18n-placeholder="profile_name_placeholder" placeholder="New profile..."
                      maxlength="32" onkeydown="handleProfileInputKey(event)">
-              <button onclick="createProfile()" id="create-profile-btn">+</button>
+              <button onclick="openProfileModal()" id="create-profile-btn">+</button>
             </div>
             <div class="profile-limit-hint" id="profile-limit-hint" style="display:none" data-i18n="profile_max">Max 3 profiles</div>
           </div>
@@ -133,6 +133,28 @@
   <!-- Achievement detail modal -->
   <div class="modal-backdrop" id="modal-backdrop" style="display:none">
     <div class="modal-container" id="modal-container"></div>
+  </div>
+
+  <!-- Profile create modal -->
+  <div class="modal-backdrop" id="profile-modal-backdrop" style="display:none">
+    <div class="modal-container profile-create-modal" id="profile-modal-container">
+      <div class="modal-header">
+        <span class="modal-icon-wrap">🏷️</span>
+        <button class="modal-close" onclick="closeProfileModal()" title="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-title-row">
+          <div class="modal-title" id="profile-modal-title">Create Profile</div>
+        </div>
+        <div class="modal-desc" id="profile-modal-desc"></div>
+        <div class="profile-emoji-picker-label">Choose an icon</div>
+        <div class="profile-emoji-grid" id="profile-emoji-grid"></div>
+        <div class="profile-modal-actions">
+          <button class="profile-modal-cancel" onclick="closeProfileModal()">Cancel</button>
+          <button class="profile-modal-confirm" id="profile-modal-confirm" onclick="confirmCreateProfile()">Create</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="/app.js"></script>

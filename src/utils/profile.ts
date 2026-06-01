@@ -47,6 +47,43 @@ export function profileExists(name: string): boolean {
   return fs.existsSync(path.join(getProfilesBaseDir(), name, 'state.json'));
 }
 
+export interface ProfileMeta {
+  name: string;
+  emoji: string;
+  created_at: string;
+}
+
+const DEFAULT_EMOJI = '📂';
+const NEW_PROFILE_DEFAULT_EMOJI = '🎮';
+
+/** Get profile metadata. Returns defaults if profile.json doesn't exist. */
+export function getProfileMeta(name: string): ProfileMeta {
+  if (name === DEFAULT_PROFILE) {
+    // Try reading legacy profile.json, fall back to default emoji
+    const metaPath = path.join(getLegacyDir(), 'profile.json');
+    try {
+      if (fs.existsSync(metaPath)) {
+        const raw = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
+        return { name: DEFAULT_PROFILE, emoji: raw.emoji || DEFAULT_EMOJI, created_at: raw.created_at || '', ...raw };
+      }
+    } catch { /* ignore corrupt meta */ }
+    return { name: DEFAULT_PROFILE, emoji: DEFAULT_EMOJI, created_at: new Date().toISOString() };
+  }
+  const metaPath = path.join(getProfilesBaseDir(), name, 'profile.json');
+  try {
+    if (fs.existsSync(metaPath)) {
+      return JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
+    }
+  } catch { /* ignore */ }
+  return { name, emoji: NEW_PROFILE_DEFAULT_EMOJI, created_at: '' };
+}
+
+/** List all profiles with metadata (emoji, created_at). */
+export function listProfilesWithMeta(): ProfileMeta[] {
+  const profiles = listProfiles();
+  return profiles.map(name => getProfileMeta(name));
+}
+
 /* Validate a profile name. Returns error string or null. */
 export function validateProfileName(name: string): string | null {
   if (!name || typeof name !== 'string') return 'Profile name is required';
@@ -85,7 +122,7 @@ export function listProfiles(): string[] {
  * Returns the stateDir path.
  * Throws on validation error, duplicate name, or max limit reached.
  */
-export function createProfile(name: string): string {
+export function createProfile(name: string, emoji = NEW_PROFILE_DEFAULT_EMOJI): string {
   const trimmed = name.trim().toLowerCase();
 
   // Validate name format
@@ -106,6 +143,14 @@ export function createProfile(name: string): string {
 
   const dir = resolveProfileDir(trimmed);
   fs.mkdirSync(dir, { recursive: true });
+
+  // Save profile metadata
+  const meta: ProfileMeta = {
+    name: trimmed,
+    emoji: emoji || NEW_PROFILE_DEFAULT_EMOJI,
+    created_at: new Date().toISOString(),
+  };
+  fs.writeFileSync(path.join(dir, 'profile.json'), JSON.stringify(meta, null, 2));
 
   // Bootstrap with empty state so it's recognized as a valid profile
   const emptyState = {

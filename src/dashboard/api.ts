@@ -71,7 +71,8 @@ export interface DashboardData {
   sets: SetItem[];
   config: Pick<AppConfig, 'lang'>;
   profile?: string;
-  profiles?: string[];
+  profile_emoji?: string;
+  profiles?: Array<{ name: string; emoji: string }>;
   max_profiles?: number;
 }
 

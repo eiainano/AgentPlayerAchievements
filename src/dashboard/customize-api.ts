@@ -473,7 +473,7 @@ function updateFieldInYamlText(text: string, id: string, field: string, value: s
   const safeValue = yamlQuote(value.trim());
 
   // Find the achievement block start
-  const blockStart = lines.findIndex(l => l.match(new RegExp(`^\\s*-\\s*id:\\s*"?${escapeRegex(id)}"?`)));
+  const blockStart = lines.findIndex(l => l.match(new RegExp(`^\\s*-\\s*id:\\s*"?${escapeRegex(id)}"?(?:\\s|$)`)));
   if (blockStart === -1) throw new Error(`Achievement "${id}" not found in YAML`);
 
   // Find the block end (next achievement start or next section header)

@@ -779,14 +779,22 @@ body {
   border: 1px solid var(--border-strong);
 }
 
-/* Legendary pulse */
+/* Legendary & Mythic breathing glow */
 .ach-card[data-rarity="legendary"]:not(.locked) {
   animation: card-in .4s ease both, legendary-pulse 3s ease-in-out infinite;
+  animation-delay: var(--delay, 0ms), 0ms;
+}
+.ach-card[data-rarity="mythic"]:not(.locked) {
+  animation: card-in .4s ease both, mythic-pulse 2.5s ease-in-out infinite;
   animation-delay: var(--delay, 0ms), 0ms;
 }
 @keyframes legendary-pulse {
   0%, 100% { box-shadow: 0 0 6px var(--glow-legendary); }
   50% { box-shadow: 0 0 16px var(--glow-legendary); }
+}
+@keyframes mythic-pulse {
+  0%, 100% { box-shadow: 0 0 8px var(--glow-mythic); }
+  50% { box-shadow: 0 0 24px var(--glow-mythic); }
 }
 
 /* ── Responsive grid ─────────────────────────────── */
@@ -1171,7 +1179,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  transition: background .35s ease, backdrop-filter .35s ease, -webkit-backdrop-filter .35s ease;
+  transition: background .25s ease, backdrop-filter .25s ease, -webkit-backdrop-filter .25s ease;
 }
 .modal-backdrop:not(.closing) {
   background: rgba(0, 0, 0, 0.55);
@@ -1184,7 +1192,7 @@ body {
   background: rgba(0, 0, 0, 0);
   backdrop-filter: blur(0px);
   -webkit-backdrop-filter: blur(0px);
-  transition: background .35s ease .05s, backdrop-filter .35s ease .05s, -webkit-backdrop-filter .35s ease .05s;
+  transition: background .25s ease .05s, backdrop-filter .25s ease .05s, -webkit-backdrop-filter .25s ease .05s;
 }
 
 .modal-container {
@@ -1198,7 +1206,7 @@ body {
   overflow-y: auto;
   position: relative;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
-  animation: modal-pop-in .5s cubic-bezier(.22,.61,.36,1);
+  animation: modal-pop-in .35s cubic-bezier(.22,.61,.36,1);
   transform-origin: center center;
 }
 
@@ -1215,7 +1223,7 @@ body {
 
 /* Exit: shrink and fade */
 .modal-backdrop.closing .modal-container {
-  animation: modal-pop-out .35s cubic-bezier(.55,0,1,.45) forwards;
+  animation: modal-pop-out .25s cubic-bezier(.55,0,1,.45) forwards;
 }
 @keyframes modal-pop-out {
   from { transform: scale(1); opacity: 1; filter: blur(0); }
@@ -1230,7 +1238,7 @@ body {
 }
 
 .modal-icon-wrap {
-  animation: icon-bounce-in .5s .12s cubic-bezier(.34,1.56,.64,1) both;
+  animation: icon-bounce-in .35s .08s cubic-bezier(.34,1.56,.64,1) both;
 }
 @keyframes icon-bounce-in {
   0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
@@ -1257,7 +1265,7 @@ body {
   justify-content: center;
   transition: all .25s cubic-bezier(.34,1.56,.64,1);
   flex-shrink: 0;
-  animation: close-spin-in .4s .35s cubic-bezier(.34,1.56,.64,1) both;
+  animation: close-spin-in .28s .24s cubic-bezier(.34,1.56,.64,1) both;
 }
 @keyframes close-spin-in {
   from { transform: rotate(-90deg) scale(0); opacity: 0; }
@@ -1279,11 +1287,11 @@ body {
 }
 
 /* ── Staggered content reveal ── */
-.modal-title-row { animation: modal-reveal .45s .2s ease both; }
-.modal-meta      { animation: modal-reveal .45s .25s ease both; }
-.modal-desc      { animation: modal-reveal .45s .3s ease both; }
+.modal-title-row { animation: modal-reveal .32s .14s ease both; }
+.modal-meta      { animation: modal-reveal .32s .18s ease both; }
+.modal-desc      { animation: modal-reveal .32s .21s ease both; }
 .modal-divider, .modal-progress-section, .modal-unlock-info {
-  animation: modal-reveal .45s .35s ease both;
+  animation: modal-reveal .32s .25s ease both;
 }
 @keyframes modal-reveal {
   from { opacity: 0; transform: translateY(12px); }
@@ -1368,7 +1376,7 @@ body {
 
 /* ── Hidden achievement reveal ── */
 .modal-hidden-section {
-  animation: modal-reveal .45s .3s ease both;
+  animation: modal-reveal .32s .21s ease both;
 }
 .modal-hidden-placeholder {
   display: flex;

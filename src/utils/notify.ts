@@ -32,6 +32,8 @@ export function sendNotification(title: string, subtitle: string, stateDir: stri
   execFile('terminal-notifier', args, (err) => {
     if (!err) return;
     const script = `display notification "${subtitle.replace(/"/g, '\\"')}" with title "${title.replace(/"/g, '\\"')}"`;
-    execFile('osascript', ['-e', script], () => {});
+    execFile('osascript', ['-e', script], (osErr) => {
+      if (osErr) process.stderr.write(`[AGPA] notify failed: ${osErr.message}\n`);
+    });
   });
 }

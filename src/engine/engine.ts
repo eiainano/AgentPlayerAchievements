@@ -36,6 +36,7 @@ export class AchievementEngine {
   unlockedThisPoll: AchievementDefinition[] = [];
   toolSource: string;
   sessionId: string;
+  currentModel: string;
   taskId: string | null = null;
   sessionStartTime: number | null = null;
 
@@ -48,6 +49,7 @@ export class AchievementEngine {
     this.enabledCategories = opts.enabledCategories;
     this.toolSource = opts.toolSource || process.env.AGPA_TOOL_SOURCE || 'unknown';
     this.sessionId = opts.sessionId || `agpa_${Date.now()}`;
+    this.currentModel = process.env.AGPA_MODEL || 'auto';
     this.store = new Store(this.stateDir);
   }
 
@@ -114,6 +116,10 @@ export class AchievementEngine {
     if (eventType === 'task.complete' && this.sessionStartTime != null) {
       enrichedPayload.elapsed_ms = Date.now() - this.sessionStartTime;
     }
+    // Auto-detect model from model.switch events so context.model stays accurate
+    if (eventType === 'model.switch' && typeof payload.to === 'string' && payload.to) {
+      this.currentModel = payload.to;
+    }
     const event: TrackedEvent = {
       protocol_version: '1.0',
       event_id: crypto.randomUUID
@@ -123,7 +129,7 @@ export class AchievementEngine {
       tool_source: this.toolSource,
       event_type: eventType,
       payload: enrichedPayload,
-      context: { session_id: this.sessionId, model: 'auto', ...(this.taskId ? { task_id: this.taskId } : {}) },
+      context: { session_id: this.sessionId, model: this.currentModel, ...(this.taskId ? { task_id: this.taskId } : {}) },
     };
 
     this.events.push(event);
@@ -203,6 +209,17 @@ export class AchievementEngine {
     const latest = this.store.load();
     this.state = latest.state;
     this.events = latest.events;
+  }
+
+  /** Reload YAML definitions from disk (for Dashboard hot-reload after YAML edits) */
+  reloadDefinitions(): void {
+    const yaml = fs.readFileSync(this.defsPath, 'utf-8');
+    const parsed = parseYAML(yaml);
+    if (parsed.definitions.length === 0) throw new Error('No achievement definitions loaded');
+    this.setDefinitions = parsed.sets;
+    this.definitions = this.enabledCategories
+      ? parsed.definitions.filter(d => this.enabledCategories!.includes(d.category))
+      : parsed.definitions;
   }
 
   resetState(): void {

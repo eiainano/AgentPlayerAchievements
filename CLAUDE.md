@@ -65,10 +65,10 @@ Useful for quick testing: `echo '{"hook_event_name":"PostToolUse","tool_name":"R
 - Notifications go through `src/utils/notify.ts` — not duplicated in hook.ts and poll.ts.
 - Hook stdin parsing happens exactly once (cached), then `mapEvents()` transforms.
 
-## The YAML Condition Types (all 12 implemented)
+## The YAML Condition Types (all 11 implemented)
 
 counter, threshold, streak, sequence, distinct_count, event, mode,
-sequence_count, pattern_match, ratio, percentile, set_completion
+sequence_count, pattern_match, ratio, set_completion
 
 If evaluator behavior seems wrong, check src/engine/evaluator.ts — each type has its own `eval*()` function now (no more fall-through hacks).
 
@@ -77,7 +77,6 @@ If evaluator behavior seems wrong, check src/engine/evaluator.ts — each type h
 - `evalThreshold` with `metric:` uses `evaluateMetric()` which splits on `/` for ratio expressions. If you add a metric format, update that parser.
 - `evalSequence` has two modes: standard (ordered match) and consecutive (longest run). The `consecutive` flag and `count` sub-object drive the switch.
 - `distinct_count` with `values:` whitelist filters candidates before counting.
-- `percentile` conditions need opt-in telemetry + stats-server running. Without it, falls back to hardcoded thresholds.
 - Engine.stateDir defaults to `~/.agent-achievements/`. Tests use a temp dir.
 - Hook `auto` mode handles: PostToolUse, PreToolUse, PostToolUseFailure, TaskCompleted, PostCompact, SubagentStart, SubagentStop, SessionStart, SessionEnd. If CC adds new hook types, add cases to `mapEvents()`.
 

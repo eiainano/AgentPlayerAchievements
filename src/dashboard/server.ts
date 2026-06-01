@@ -1,6 +1,7 @@
 import * as http from 'http';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { AchievementEngine } from '../engine/engine.js';
 import { formatAchievement, RARITY_RANK, loadShowcase, saveShowcase } from '../helpers.js';
@@ -16,6 +17,10 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.resolve(__dirname, 'public');
+
+// CSRF protection: random token generated once per server start,
+// injected into HTML pages and required as x-dev-token header on /api/reset.
+const devToken = crypto.randomBytes(16).toString('hex');
 
 const MIME_TYPES: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
@@ -34,15 +39,18 @@ interface ShowcaseSlot {
 
 function buildShowcaseResponse(engine: AchievementEngine): Array<{ slot: number; achievement: AchievementItem | null }> {
   const data = loadShowcase(engine.stateDir);
-  return data.slots.map((id, i) => ({
-    slot: i,
-    achievement: id
-      ? (() => {
-          const def = engine.definitions.find(d => d.id === id);
-          return def ? { ...formatAchievement(engine, def), unlocked: true as const } : null;
-        })()
-      : null,
-  }));
+  return data.slots.map((id, i) => {
+    if (!id) return { slot: i, achievement: null };
+    // Guard: only show if still unlocked (prevents stale showcase after reset)
+    const unlockedAt = engine.state.unlocked[id];
+    if (!unlockedAt) return { slot: i, achievement: null };
+    const def = engine.definitions.find(d => d.id === id);
+    if (!def) return { slot: i, achievement: null };
+    return {
+      slot: i,
+      achievement: { ...formatAchievement(engine, def), unlocked: true as const },
+    };
+  });
 }
 
 function parseJsonBody<T>(req: http.IncomingMessage): Promise<T | null> {
@@ -88,7 +96,11 @@ function serveStatic(res: http.ServerResponse, urlPath: string): void {
   const mime = MIME_TYPES[ext] || 'application/octet-stream';
 
   try {
-    const content = fs.readFileSync(filePath);
+    let content: Buffer | string = fs.readFileSync(filePath);
+    // Inject CSRF token into HTML files so the frontend can send it back
+    if (ext === '.html') {
+      content = content.toString().replace('__DEV_TOKEN__', devToken);
+    }
     res.writeHead(200, { 'Content-Type': mime });
     res.end(content);
   } catch {
@@ -237,6 +249,22 @@ export function createServer(engine: AchievementEngine, port = 3867): http.Serve
       const result = buildShowcaseResponse(engine);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ status: 'ok', showcase: result }));
+      return;
+    }
+
+    // ── POST /api/reset — dev: clear all achievements ──────────────
+    if (url.pathname === '/api/reset' && req.method === 'POST') {
+      const csrfToken = req.headers['x-dev-token'];
+      if (csrfToken !== devToken) {
+        res.writeHead(403);
+        res.end('Forbidden');
+        return;
+      }
+      engine.resetState();
+      engine.init();
+      const data = buildApiResponse(engine.definitions, engine.state, engine.events, [], engine.stats(), engine.setDefinitions);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ status: 'ok', data }));
       return;
     }
 

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="dev-token" content="__DEV_TOKEN__">
   <title>AGPA — Achievements Dashboard</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
@@ -30,6 +31,7 @@
           <span class="switch-track"><span class="switch-knob"></span></span>
           <span class="switch-label">🌙</span>
         </label>
+        <button id="dev-reset-btn" class="dev-reset-btn" title="Dev: clear all achievements" onclick="devReset()">🗑️</button>
         <span class="nav-stats" id="nav-stats">0/0</span>
       </div>
     </div>
@@ -54,6 +56,15 @@
         <button id="showcase-auto" class="showcase-auto-btn" onclick="autoFillShowcase()" title="Auto-fill with rarest">⚡ Auto</button>
       </div>
       <div class="stats-row" id="stats-row"></div>
+    </div>
+  </section>
+
+  <!-- Onboarding Guide (0 achievements) -->
+  <section id="onboarding-guide" class="section" style="display:none">
+    <div class="guide-card">
+      <h2 class="guide-title" id="guide-title">Getting Started</h2>
+      <p class="guide-subtitle" id="guide-subtitle">Try these easy achievements to get your first unlocks.</p>
+      <div class="guide-items" id="guide-items"></div>
     </div>
   </section>
 

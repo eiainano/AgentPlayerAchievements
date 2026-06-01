@@ -107,6 +107,11 @@ const I18N = {
     modal_progress: 'Progress',
     modal_no_desc: 'No description available.',
     search_empty: 'No achievements match your search.',
+    guide_title: 'Getting Started',
+    guide_subtitle: 'Try these easy achievements to get your first unlocks.',
+    guide_empty_title: 'This page is empty for now.',
+    guide_empty_text: 'Achievements unlock as your agent works. Give it a try!',
+    no_timeline_guide: 'Achievements will appear here once unlocked.',
   },
   zh: {
     nav_profile: '个人主页',
@@ -157,6 +162,11 @@ const I18N = {
     modal_progress: '进度',
     modal_no_desc: '暂无描述。',
     search_empty: '没有匹配的成就。',
+    guide_title: '从这里开始',
+    guide_subtitle: '尝试解锁这些简单成就，迈出第一步。',
+    guide_empty_title: '这里是空的。',
+    guide_empty_text: '成就随着 agent 的工作逐步解锁，去试试吧！',
+    no_timeline_guide: '成就解锁后会出现在这里。',
   },
 };
 
@@ -186,6 +196,16 @@ const CATEGORY_NAMES = {
     community: '社区',
   },
 };
+
+// Onboarding guide — easy entry-level achievements with how-to tips
+const GUIDE_ITEMS = [
+  { id: 'first_contact', tip_en: 'Just start chatting with your agent', tip_zh: '直接跟 agent 开始对话' },
+  { id: 'tool_time', tip_en: 'Ask your agent to read or write a file', tip_zh: '让 agent 读取或编辑一个文件' },
+  { id: 'first_shot', tip_en: 'Type a slash command like /help', tip_zh: '输入一个斜杠命令，比如 /help' },
+  { id: 'dashboard_visitor', tip_en: "You're already here — open the Dashboard!", tip_zh: '你已经在这里了！打开 Dashboard 即解锁' },
+  { id: 'model_hopper', tip_en: 'Switch models with /model', tip_zh: '用 /model 切换一次模型' },
+  { id: 'read_manual', tip_en: 'Type /help to read the manual', tip_zh: '输入 /help 阅读手册' },
+];
 
 function t(key, replacements = {}) {
   let str = (I18N[currentLang] || I18N.en)[key] || I18N.en[key] || key;
@@ -254,6 +274,7 @@ function renderAll(data) {
   renderI18n();
   renderNav(data);
   renderProfile(data);
+  renderOnboardingGuide(data);
   renderAchievements(data);
   renderSets(data);
   renderTimeline(data);
@@ -451,6 +472,20 @@ async function autoFillShowcase() {
   await refreshData();
 }
 
+async function devReset() {
+  const meta = document.querySelector('meta[name="dev-token"]');
+  const token = meta?.getAttribute('content') || '';
+  const res = await fetch('/api/reset', {
+    method: 'POST',
+    headers: { 'x-dev-token': token },
+  });
+  if (!res.ok) return;
+  const json = await res.json();
+  dashboardData = json.data;
+  lastUnlockedIds = new Set();
+  renderAll(dashboardData);
+}
+
 async function refreshData() {
   const res = await fetch('/api/data');
   if (!res.ok) return;
@@ -518,6 +553,46 @@ function renderProfile(data) {
 
   const banner = document.getElementById('pick-banner');
   if (banner && pickSlot === null) banner.style.display = 'none';
+}
+
+// ── Onboarding Guide ─────────────────────────────────
+
+function renderOnboardingGuide(data) {
+  const section = document.getElementById('onboarding-guide');
+  if (!section) return;
+
+  if (data.stats.unlocked > 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = 'block';
+  section.className = 'section onboarding-guide-section';
+
+  // Title & subtitle
+  const title = document.getElementById('guide-title');
+  const subtitle = document.getElementById('guide-subtitle');
+  if (title) title.textContent = t('guide_title');
+  if (subtitle) subtitle.textContent = t('guide_subtitle');
+
+  // Build guide items
+  const items = document.getElementById('guide-items');
+  if (!items) return;
+
+  items.innerHTML = GUIDE_ITEMS.map(g => {
+    const ach = data.achievements.find(a => a.id === g.id);
+    if (!ach) return '';
+    const name = displayName(ach);
+    const tip = currentLang === 'zh' ? g.tip_zh : g.tip_en;
+    return `<div class="guide-item">
+      <span class="guide-item-icon">${escHtml(ach.icon)}</span>
+      <div class="guide-item-body">
+        <div class="guide-item-name">${escHtml(name)}</div>
+        <div class="guide-item-tip">${escHtml(tip)}</div>
+      </div>
+      <span class="guide-item-arrow">→</span>
+    </div>`;
+  }).join('');
 }
 
 // ── Achievement Grid ────────────────────────────────
@@ -709,7 +784,8 @@ function renderGrid(data) {
     const pickableClass = inPickMode && !locked ? ' pickable' : '';
     const lockedClass = locked ? ' locked' : '';
 
-    return `<div class="ach-card${lockedClass}${pickableClass}" data-rarity="${a.rarity}" data-id="${escAttr(a.id)}" style="--delay:${idx * 30}ms">
+    const cardColor = locked ? '' : `--card-color:var(--rarity-${a.rarity});`;
+    return `<div class="ach-card${lockedClass}${pickableClass}" data-rarity="${a.rarity}" data-id="${escAttr(a.id)}" style="${cardColor}--delay:${idx * 30}ms">
       <div class="ach-stripe"></div>
       ${pinBtn}
       <div class="ach-icon-wrap">${iconHtml(showIcon)}</div>
@@ -731,13 +807,15 @@ function openModal(ach) {
   if (!backdrop || !container) return;
 
   const locked = !ach.unlocked;
-  const name = displayName(ach);
-  const hasNameCn = currentLang === 'zh'
-    ? !!(ach.name_cn && ach.name_cn !== ach.name)
-    : !!(ach.name_cn && ach.name_cn !== name);
-  const nameCn = ach.name_cn || '';
-  const desc = ach.description || t('modal_no_desc');
-  const descCn = ach.description_cn || '';
+
+  // Name: pick current language, fallback to the other
+  const name = currentLang === 'zh'
+    ? (ach.name_cn || ach.name)
+    : (ach.name || ach.name_cn || '');
+  // Description: pick current language, fallback
+  const desc = currentLang === 'zh'
+    ? (ach.description_cn || ach.description || t('modal_no_desc'))
+    : (ach.description || ach.description_cn || t('modal_no_desc'));
 
   let bottomSections = '';
   if (locked && ach.progress && ach.progress.target > 0) {
@@ -766,6 +844,7 @@ function openModal(ach) {
       </div>`;
   }
 
+  const rarityColor = `var(--rarity-${ach.rarity})`;
   container.innerHTML = `
     <div class="modal-header">
       ${iconHtml(locked && ach.hidden ? '\u{1F512}' : ach.icon, { size: 48, className: 'modal-icon' })}
@@ -773,15 +852,13 @@ function openModal(ach) {
     </div>
     <div class="modal-body">
       <div>
-        <div class="modal-title">${escHtml(name)}</div>
-        ${hasNameCn ? `<div class="modal-title-cn">${escHtml(nameCn)}</div>` : ''}
+        <div class="modal-title"${locked ? '' : ` style="--card-color:${rarityColor}"`}>${escHtml(name)}</div>
       </div>
       <div class="modal-meta">
         <span class="modal-badge rarity-${ach.rarity}">${displayRarity(ach.rarity)}</span>
         <span class="modal-badge category">${displayCategory(ach.category)}</span>
       </div>
       <div class="modal-desc">${escHtml(desc)}</div>
-      ${descCn ? `<div class="modal-desc-cn">${escHtml(descCn)}</div>` : ''}
       ${bottomSections}
     </div>`;
 

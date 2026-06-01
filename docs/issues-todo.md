@@ -29,7 +29,7 @@
 ## P2 — 数据与体验缺口
 
 - [x] **中文描述（`description_cn`）大面积缺失** — Dashboard 双语切换已就绪，但大多数成就只有英文。通过脚本逐条翻译并添加 138 条 description_cn，中文模式下完整显示中文描述。
-- [ ] **Dashboard 默认 0 成就解锁** — 新用户（或 `rm state.json` 后）Dashboard 全空。`npm run demo` 只生成 MVP 数据到 stateDir，Dashboard 不感知。考虑：Dashboard 加一个"加载 Demo 数据"按钮 or 首次访问时预设 6-10 个基础解锁。
+- [x] **Dashboard 默认 0 成就解锁** — 新用户（或 `rm state.json` 后）Dashboard 全空。解决方案：添加入门引导卡片（6 个 onboarding 成就 + 如何获取指引），解锁成就后自动消失。同时添加开发者一键重置按钮（CSRF 防护）方便测试。
 - [x] **issues-todo 上次更新 5/31，跟进 6 项 evaluator bugfix** — streak window/same_target/distinct_count op/ratio scope/Hermes session/nested Condition。+3 测试（106→109）。
 
 ---
@@ -41,6 +41,16 @@
 - [ ] **Set 名称只有英文** — 9 个 set 定义无 `name_cn`，Dashboard 套装页切中文后仍显示英文名。
 
 ---
+
+## 已完成 — Dashboard 新用户体验 + 配色升级（v0.1.6, 6/1）
+
+- [x] **入门引导卡片** — 0 成就时 Hero 下方展示 6 个 onboarding 成就 + 获取指引，中英双语。unlock>0 后自动消失。
+- [x] **开发者一键重置** — 🗑 按钮 POST `/api/reset` + CSRF token 防护（meta 注入 + x-dev-token header）。
+- [x] **Modal 单语言显示** — 修复双语泄漏，英文模式只显示英文，中文模式只显示中文。
+- [x] **解锁卡片名称发光** — `--card-color` + `@keyframes name-glow` 呼吸动画，按稀有度着色。
+- [x] **稀有度配色换新** — Common 浅蓝、Uncommon 深蓝、Rare 金黄、Epic 橙、Legendary 紫、Mythic 红。
+- [x] **Dashboard 版面紧凑化** — 各 section padding/gap 收紧，减少 vertical 留白。
+- [x] **Showcase 残留数据防御** — `store.reset()` 清理 showcase.json + `buildShowcaseResponse` 校验 unlocked。
 
 ## 已完成 — 自定义 + Steam 化命名（v0.1.6, 5/31）
 

@@ -2,6 +2,15 @@
 
 ## [0.1.6] — 2026-05-31
 
+### Dashboard 新用户体验 + 配色升级 — 2026-06-01
+
+- **入门引导卡片** — 0 成就新用户自动展示 6 个一步可得的 onboarding 成就 + 如何获取的指引文字，中英双语。解锁任何成就后自动消失，reset 后重新出现。
+- **一行代码一键重置成就** — Nav 栏 🗑 按钮，POST `/api/reset`，带 CSRF token（`crypto.randomBytes` + `<meta>` 注入 + `x-dev-token` header 校验）。Reset 同时清理 `showcase.json` + 防御 showcase 展示前 unlocked 校验。
+- **Modal 单语言显示** — 修复之前 modal 同时显示中英文的 bug，现在严格跟随当前语言模式，缺失时 fallback 到另一种语言。
+- **解锁卡片名称发光** — `--card-color` CSS 变量 + `@keyframes name-glow` 呼吸动画，按稀有度着色发光（锁定的卡片无效果）。
+- **稀有度配色全面换新** — Common 浅蓝、Uncommon 深蓝、Rare 金黄、Epic 橙、Legendary 紫、Mythic 红（不变）。cold→warm→hot 递进逻辑。
+- **Dashboard 版面紧凑化** — Hero/引导/Grid 各区段 padding & gap 收紧，减少不必要的 vertical 留白。
+
 ### 成就名称全面升级（Steam 化）
 
 通过 `/customize` 页面整体过了一遍 138 个成就的英文名、中文名和描述。

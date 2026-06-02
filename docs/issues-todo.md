@@ -44,7 +44,8 @@
 ## P3 — YAML 质量 / 资产
 
 - [x] **Hidden 分类** — 34/160 = 21%。41→21→34（经过一次重归类又部分回退）。剩余 34 个全是真彩蛋。
-- [ ] **像素画 icon 资产暂缺** — 下一步：选 The Beginning（14 个）做第一批试点。方案：AI 生成 32×32 pixel art PNG → `public/icons/` → YAML `icon: { src, alt }` → Dashboard `iconHtml()` 渲染。验证全链路后再铺开全量 160 个。emoji 和 pixel art 并存，渐进替换。
+- [ ] **手动 review 全部 160 条 pixelArtDesc** — `docs/pixel-art-ideas.md` 中每个成就的像素画描述，逐条审阅和修改。改完后重跑 `npx tsx scripts/generate-pixel-art.ts` 即可用最新描述生图。
+- [ ] **像素画 icon 资产暂缺** — `scripts/generate-pixel-art.ts` 已就绪（Gemini 3.1 Nano Banana 2），`docs/pixel-art-ideas.md` 已含 160 条描述。下一步：review 描述 → 生成全部 160 张 → 选 The Beginning（14 个）做 Dashboard icon 试点。方案：32×32 pixel art PNG → `public/icons/` → YAML `icon: { src, alt }` → Dashboard `iconHtml()` 渲染。emoji 和 pixel art 并存，渐进替换。
 - [x] **Set 名称只有英文** — 9→10 个 set，全部添加 `name_cn`，套装页中英双语切换。Set 系统重构：合并散装 set，扩充合理 set。`git_flow`（7→9）、`agent_commander`（5→7）、`creators_forge`（5→6）、`polar_night`（2→3）。57/160 有归属。
 
 ---

@@ -412,7 +412,7 @@ src/utils/notify.ts 的 sendNotification()
 
 **实现改动**：
 
-1. **音效文件**：6 个音频文件（`.mp3` 或 `.m4a`）打包在 `assets/sounds/` 下，与 `pixelart-shield-gold.png` 同级。命名：`common.mp3`、`uncommon.mp3` 等。
+1. **音效文件**：6 个音频文件（`.wav`）打包在 `assets/sounds/` 下，与 `pixelart-shield-gold.png` 同级。命名：`common.wav`、`uncommon.wav` 等。
 
 2. **`notify.ts` 新增 `playSound(rarity: RarityLevel)`**：自动检测 OS，选择对应播放器。不依赖任何外部程序——`afplay` 在 macOS 上自 PHP 7+ 就存在，`aplay` 在 Linux 发行版基本都有，PowerShell 在 Windows 上自带。
 
@@ -436,7 +436,7 @@ src/utils/notify.ts 的 sendNotification()
 
 | 文件 | 改动 |
 |------|------|
-| `assets/sounds/{common,uncommon,rare,epic,legendary,mythic}.mp3` | 新建：6 个音效文件 |
+| `assets/sounds/{common,uncommon,rare,epic,legendary,mythic}.wav` | 新建：6 个音效文件 |
 | `src/utils/notify.ts` | 新增 `playSound()` 函数，`sendNotification()` 调用它 |
 | `src/tools/poll.ts` | 无需改动（已有通知循环，`sendNotification` 内部已含音效） |
 | `src/cli/hook.ts` | 无需改动 |

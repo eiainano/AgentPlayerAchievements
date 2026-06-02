@@ -1,10 +1,10 @@
 # AGPA 开发进度
 
-> 最后更新: 2026-06-02
+> 最后更新: 2026-06-03
 
 ## 总体状态
 
-v0.1.6 完成。大批量成就一致性审计修复 + 3 个 evaluator 功能新增。160 个成就全部可达成，110 个测试全绿。
+v0.1.6 完成。大批量成就一致性审计修复 + 3 个 evaluator 功能新增 + 音效系统。160 个成就全部可达成，110 个测试全绿。
 
 ---
 
@@ -15,7 +15,8 @@ v0.1.6 完成。大批量成就一致性审计修复 + 3 个 evaluator 功能新
 - [x] YAML 解析器加载 160 个成就定义（含 12 个事件驱动型，异步发审计已全部修复）
 - [x] PendingQueue 并发安全
 - [x] MCP Tools：`achievement_track`、`achievement_poll`、`achievement_stats`、`achievement_showcase`、`achievement_config`
-- [x] macOS Notification Center 弹窗（poll 时触发）
+- [x] cross-platform Notification（macOS terminal-notifier/osascript、Linux notify-send、Windows PowerShell）
+- [x] 音效系统：6 级稀有度 8-bit WAV 音效 + `agpa sound on|off` CLI + Dashboard 🔊/🔇 开关
 - [x] state.json 持久化
 
 ### Dashboard (Web UI)
@@ -72,7 +73,7 @@ v0.1.6 完成。大批量成就一致性审计修复 + 3 个 evaluator 功能新
 - [x] **路径遍历 guard**：拒绝 .. 和越界绝对路径读文件
 - [x] **P1 evaluator 4 项修复**：空 conditions guard、evalMode target、set_id 删除、evalStreak窗口/field/same_target
 - [x] **P2 数据一致性**：milestone 命名、set 成员补全、缺失 set 字段、im_sorry_dave 窗口
-- [x] **测试覆盖**：110 tests, 6 files（evaluator 47 + integration 5 + yaml-parser 6 + api 5 + xp 6 + hook 36）
+- [x] 测试覆盖：110 tests, 6 files（evaluator 47 + integration 5 + yaml-parser 6 + api 5 + xp 6 + hook 36）
 
 ### 中优先级
 - [x] **用户审阅 160 成就清单**：已逐条 review，修复 30+ 个不一致，删除 3 个重复，新增 1 个

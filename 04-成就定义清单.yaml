@@ -2867,6 +2867,8 @@ sets:
       - pr_champion
       - cicd_pioneer
       - merge_tamer
+      - time_traveler
+      - u_turn
     reward:
       type: stat_counter
       value: commits

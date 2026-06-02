@@ -235,13 +235,24 @@ function cmdPoll(): void {
     return;
   }
 
+  // Compute highest rarity for sound dedup
+  const RARITY_RANK: Record<string, number> = {
+    common: 0, uncommon: 1, rare: 2, epic: 3, legendary: 4, mythic: 5,
+  };
+  let topRarity = 'common';
+  let topRank = -1;
+  for (const ach of newlyUnlocked) {
+    const rank = RARITY_RANK[ach.rarity] ?? 0;
+    if (rank > topRank) { topRank = rank; topRarity = ach.rarity; }
+  }
+
   const cfg = loadConfig();
   const useZh = cfg.lang === 'zh';
   for (const ach of newlyUnlocked) {
     const icon = ach.icon || '🏆';
     const title = useZh ? (ach.name_cn || ach.name) : ach.name;
     const desc = useZh ? (ach.description_cn || ach.description) : ach.description;
-    sendNotification(`${icon} ${title}`, desc, ENGINE.stateDir, activeProfile);
+    sendNotification(`${icon} ${title}`, desc, ENGINE.stateDir, activeProfile, topRarity);
   }
 
   process.stderr.write(`[AGPA] poll: ${newlyUnlocked.length} new achievement(s) unlocked!\n`);

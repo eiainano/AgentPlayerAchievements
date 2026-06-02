@@ -67,14 +67,25 @@ export function registerPollTool(server: McpServer, getEngine: () => Achievement
         };
       }
 
-      // Fire macOS notification
+      // Compute highest rarity for sound dedup (only play the rarest sound)
+      const RARITY_RANK: Record<string, number> = {
+        common: 0, uncommon: 1, rare: 2, epic: 3, legendary: 4, mythic: 5,
+      };
+      let topRarity = 'common';
+      let topRank = -1;
+      for (const ach of newlyUnlocked) {
+        const rank = RARITY_RANK[ach.rarity] ?? 0;
+        if (rank > topRank) { topRank = rank; topRarity = ach.rarity; }
+      }
+
+      // Fire desktop notification + sound
       const cfg = loadConfig();
       const useZh = cfg.lang === 'zh';
       for (const ach of newlyUnlocked) {
         const icon = ach.icon || '🏆';
         const title = useZh ? (ach.name_cn || ach.name) : ach.name;
         const desc = useZh ? (ach.description_cn || ach.description) : ach.description;
-        sendNotification(`${icon} ${title}`, desc, engine.stateDir);
+        sendNotification(`${icon} ${title}`, desc, engine.stateDir, undefined, topRarity);
       }
 
       const batch = newlyUnlocked.slice(0, maxResults);

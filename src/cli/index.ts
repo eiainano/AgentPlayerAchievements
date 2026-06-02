@@ -37,6 +37,7 @@ const COMMANDS: Subcommand[] = [
   { name: 'stats',      description: 'View achievement stats in terminal',                                 usage: 'agpa stats',                                module: './mvp.ts' },
   { name: 'progress',   description: 'List all achievements with unlock status',                           usage: 'agpa progress',                             module: './mvp.ts' },
   { name: 'reset',      description: 'Reset all achievement data',                                         usage: 'agpa reset',                                module: './mvp.ts' },
+  { name: 'sound',      description: 'Toggle achievement sound effects (on | off)',                       usage: 'agpa sound <on|off>',                       module: './sound.ts' },
   { name: 'mcp',        description: 'Start MCP server (stdio)',                                           usage: 'agpa mcp',                                  module: '../main.ts' },
 ];
 

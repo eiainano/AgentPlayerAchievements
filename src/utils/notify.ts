@@ -2,8 +2,17 @@ import { execFile } from 'child_process';
 import type { ChildProcess } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
+import { isSoundEnabled } from '../config.js';
 
 export const DASHBOARD_URL = 'http://localhost:3867';
+
+// ── Rarity ranking (for dedup: highest rarity in a poll round) ──────────
+
+type RarityLevel = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';
+
+const RARITY_RANK: Record<RarityLevel, number> = {
+  common: 0, uncommon: 1, rare: 2, epic: 3, legendary: 4, mythic: 5,
+};
 
 // ── OS detection ────────────────────────────────────────────────
 
@@ -109,6 +118,43 @@ function sendTerminalNotification(title: string, body: string): void {
   process.stdout.write(`\n★ ${title}\n  ${body}\n\n`);
 }
 
+// ── Sound effects ───────────────────────────────────────────────────
+
+/**
+ * Play the achievement sound for a given rarity level.
+ *
+ * Sound files are expected at `stateDir/sounds/{rarity}.wav`.
+ * Falls back silently if file is missing or sound is disabled.
+ */
+function playSound(rarity: string, stateDir: string): void {
+  if (!isSoundEnabled()) return;
+
+  const soundFile = path.join(stateDir, 'sounds', `${rarity}.wav`);
+  if (!fs.existsSync(soundFile)) return;
+
+  const os = detectOS();
+  let child: ChildProcess | null = null;
+
+  switch (os) {
+    case 'macos':
+      child = execFile('afplay', [soundFile]);
+      break;
+    case 'linux':
+      // paplay for PulseAudio, aplay for ALSA
+      child = execFile('paplay', [soundFile], (err) => {
+        if (err) execFile('aplay', [soundFile], () => {});
+      });
+      break;
+    case 'windows':
+      child = execFile('powershell', [
+        '-WindowStyle', 'Hidden', '-NoProfile', '-NonInteractive', '-Command',
+        `(New-Object Media.SoundPlayer '${soundFile.replace(/'/g, "''")}').PlaySync()`,
+      ]);
+      break;
+  }
+  if (child) child.unref(); // don't block parent
+}
+
 // ── Public API (backward-compatible signature) ──────────────────
 
 /**
@@ -116,10 +162,21 @@ function sendTerminalNotification(title: string, body: string): void {
  *
  * @param title   e.g. "👋 Hello World"
  * @param body    e.g. "开启你的第一次Agent对话。"
- * @param stateDir  Achievements state directory (for icon asset)
- * @param profile   Named profile (used for clickable dashboard URL on macOS)
+ * @param stateDir Achievements state directory (for icon asset)
+ * @param profile  Named profile (used for clickable dashboard URL on macOS)
+ * @param rarity   Achievement rarity — if provided, plays the corresponding sound
  */
-export function sendNotification(title: string, body: string, stateDir: string, profile?: string): void {
+export function sendNotification(
+  title: string,
+  body: string,
+  stateDir: string,
+  profile?: string,
+  rarity?: string,
+): void {
+  if (rarity) {
+    playSound(rarity, stateDir);
+  }
+
   const os = detectOS();
 
   switch (os) {

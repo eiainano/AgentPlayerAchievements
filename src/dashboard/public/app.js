@@ -24,6 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (themeToggle) themeToggle.addEventListener('change', toggleTheme);
   const langToggle = document.getElementById('lang-toggle');
   if (langToggle) langToggle.addEventListener('change', toggleLang);
+  const soundToggle = document.getElementById('sound-toggle');
+  if (soundToggle) {
+    soundToggle.addEventListener('change', toggleSound);
+    // Load initial state from server
+    loadSoundState(soundToggle);
+  }
 });
 
 // ── Language ────────────────────────────────────────────
@@ -43,6 +49,34 @@ function toggleLang() {
   currentLang = toggle.checked ? 'zh' : 'en';
   localStorage.setItem('agpa-lang', currentLang);
   if (dashboardData) renderAll(dashboardData);
+}
+
+// ── Sound Toggle ───────────────────────────────────────
+
+async function toggleSound() {
+  const toggle = document.getElementById('sound-toggle');
+  if (!toggle) return;
+  const enabled = toggle.checked;
+  try {
+    await fetch('/api/config/sound', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sound_enabled: enabled }),
+    });
+  } catch {
+    // Revert on failure
+    toggle.checked = !enabled;
+  }
+}
+
+async function loadSoundState(toggle) {
+  try {
+    const res = await fetch('/api/config/sound');
+    if (res.ok) {
+      const data = await res.json();
+      toggle.checked = data.sound_enabled;
+    }
+  } catch { /* use default (checked) */ }
 }
 
 function displayName(item) {

@@ -218,6 +218,32 @@ function ensureDataDir(baseDir: string): void {
   fs.mkdirSync(baseDir, { recursive: true });
 }
 
+/**
+ * Copy sound effect files from project assets to the state directory.
+ * This enables user-custom sounds later (just replace files in stateDir/sounds/).
+ */
+function copySounds(dataDir: string): void {
+  const srcDir = path.join(AGPA_ROOT, 'assets', 'sounds');
+  if (!fs.existsSync(srcDir)) return;
+  const destDir = path.join(dataDir, 'sounds');
+  fs.mkdirSync(destDir, { recursive: true });
+
+  const soundFiles = fs.readdirSync(srcDir).filter(f => f.endsWith('.wav'));
+  let copied = 0;
+  for (const f of soundFiles) {
+    const src = path.join(srcDir, f);
+    const dest = path.join(destDir, f);
+    // Only copy if newer (or destination missing)
+    if (!fs.existsSync(dest) || fs.statSync(src).mtimeMs > fs.statSync(dest).mtimeMs) {
+      fs.copyFileSync(src, dest);
+      copied++;
+    }
+  }
+  if (copied > 0) {
+    console.log(`  ✅ Sounds:    ${copied} file(s) copied → ${destDir}`);
+  }
+}
+
 function initEngineState(): void {
   const statePath = path.join(AGPA_DIR, 'state.json');
   if (!fs.existsSync(statePath)) {
@@ -838,6 +864,7 @@ function main(): void {
   }
   ensureDataDir(dataDir);
   initEngineState();
+  copySounds(dataDir);
 
   const configuredTools: string[] = [];
   const multiTool = toolIds.length > 1;

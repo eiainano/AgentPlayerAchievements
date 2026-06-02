@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { AchievementEngine } from '../engine/engine.js';
-import { saveConfig } from '../config.js';
+import { saveConfig, isSoundEnabled, setSoundEnabled } from '../config.js';
 import { formatAchievement, RARITY_RANK, loadShowcase, saveShowcase } from '../helpers.js';
 import type { ShowcaseData } from '../helpers.js';
 import { buildApiResponse } from './api.js';
@@ -380,6 +380,27 @@ export function createServer(port: number, defaultProfile: string): http.Server 
       data.max_profiles = MAX_PROFILES;
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ status: 'ok', data }));
+      return;
+    }
+
+    // ── GET /api/config/sound — read sound toggle state ────────────────
+    if (url.pathname === '/api/config/sound' && req.method === 'GET') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ sound_enabled: isSoundEnabled() }));
+      return;
+    }
+
+    // ── POST /api/config/sound — toggle sound on/off ───────────────────
+    if (url.pathname === '/api/config/sound' && req.method === 'POST') {
+      const body = await parseJsonBody<{ sound_enabled: boolean }>(req);
+      if (!body || typeof body.sound_enabled !== 'boolean') {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'Missing sound_enabled (boolean)' }));
+        return;
+      }
+      setSoundEnabled(body.sound_enabled);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ sound_enabled: body.sound_enabled }));
       return;
     }
 

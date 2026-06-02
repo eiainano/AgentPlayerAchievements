@@ -237,3 +237,527 @@ Phase 2 (后续)
 - `/achievements locked` 展示 hint，不暴露精确条件
 - `/achievements settings language zh` 正常切换
 - `npx tsx src/cli/hook.ts auto` 模拟事件，track 正常
+
+---
+
+# 第二轮调研：Claude Code 游戏化生态 Top 5（2026-06-03）
+
+通过 GitHub 搜索关键字 `achievement`、`gamification`、`quest`、`play`，按 stars 排序筛选出非教程类项目，取 top 5 克隆至 `research/` 目录深读。以下是各项目可借鉴点汇总。
+
+> **2026-06-03 补充**：Star 数来自调研当日。CCA 已在第一轮深度调研过，本轮新增其他 4 个项目的分析。
+
+---
+
+## Top 5 概览
+
+| # | 项目 | Stars | 类型 | 核心亮点 |
+|---|------|-------|------|---------|
+| 1 | [claude-code-guide](https://github.com/OriNachum/claude-code-guide) | 114 | 游戏化进度指南 | Fibonacci 间隔 nudging、腰带段位、特性依赖图 |
+| 2 | [claude-code-achievements](https://github.com/subinium/claude-code-achievements) | 84 | Steam 风格成就 | 第一轮已深入分析（CCA） |
+| 3 | [sc2-claude-hooks](https://github.com/samhayek-code/sc2-claude-hooks) | 26 | 音效反馈 | StarCraft 2 语音线、主题/阵营切换、智能冷却 |
+| 4 | [buddy-evolution](https://github.com/FrankFMY/buddy-evolution) | 5 | RPG 伴侣养成 | 34 成就触发函数、5 维属性递减增长、18 物种进化树、12 人格影响 Claude 行为 |
+| 5 | [claude-code-quest](https://github.com/ytrofr/claude-code-quest) | 1 | RPG 路线图 | plan 文件 checkbox 自动追踪进度、多项目、零依赖 Python |
+
+---
+
+## 各项目可借鉴点
+
+### 1. claude-code-guide（114⭐）— 游戏化进度指南
+
+**架构**：7 个 Skill + 3 个 Bash Hook → JSON 状态文件 → `/guide:game-mode` 和 `/guide:level-up` 两条 slash 命令。
+
+**值得借鉴**：
+
+| 特性 | 描述 | 对 AGPA 的启发 |
+|------|------|---------------|
+| **Fibonacci 间隔 Nudging** | 不是每 session 都提示，而是 session 1, 2, 3, 5, 8, 13, 21... 才弹出推荐。避免骚扰 | 📝 我们的通知节奏可以参照——不在每次 poll 都弹窗，而是按 Fibonacci 间隔 |
+| **腰带段位系统** | 16 个特性领域，每个独立跟踪使用次数，按 2^n 划分白→黄→橙→绿→蓝→棕→黑腰带，512+ 进段位 | 📝 可以给成就增加"熟练度"维度——已解锁 vs. 精通（累计触发 N 次） |
+| **特性依赖图** | agents 需要 skills+planning，worktrees 需要 agents。锁定特性显示 🔒 | 📝 我们的成就之间可以有"前置解锁"关系，在 Dashboard 展示路径 |
+| **评分公式** | `score = sqrt(raw_points)` + Beginner x1 / Intermediate x10 / Expert x100 三档权重 | 📝 我们的 XP 系统可以加 sqrt 压缩，防止数字膨胀 |
+| **数据迁移框架** | `migrate-data.sh` 每次 hook 调用前置执行——从缓存恢复 + 填充缺失字段 + 记录 migration 历史 | 🔜 **高价值**：我们的 YAML schema 一直在演进（刚加了 tip/hint），需要一个迁移系统 |
+| **Level-up 推荐算法** | 按腰带（低优先）→ 档位（高优先）→ 次数（少优先）排序，确保没用过的特性最先出现 | 📝 我们的 `/achievements unlocked` 可以加一个"recommended next"板块 |
+
+---
+
+### 2. claude-code-achievements（84⭐）— 第一轮已分析
+
+详见第一轮 CCA 调研。Phase 1 已完成：`/achievements` 命令、tip/hint 分离、init 集成编译。
+
+---
+
+### 3. sc2-claude-hooks（26⭐）— 音效反馈
+
+**架构**：Hook → Bash 脚本 → `afplay`（macOS）播放 faction 对应目录的随机 mp3。`active` 符号链接指向当前选择的阵营。
+
+**值得借鉴**：
+
+| 特性 | 描述 | 对 AGPA 的启发 |
+|------|------|---------------|
+| **成就解锁音效** | 不同的 Claude Code 事件映射到不同的音效分类 | 🔜 **高价值**：成就解锁时播放音效，极大增强"游戏手感"。当前只有文本通知和系统弹窗 |
+| **主题/阵营切换** | Terran / Protoss / Zerg 三套音效，通过符号链接切换 | 📝 可以做成"通知主题包"——用户选择 sci-fi / retro / minimal 风格 |
+| **智能冷却** | 15 秒 cooldown + 错误过滤（grep no-match 等无趣错误不触发），防止音效轰炸 | 📝 我们的通知也可以加冷却逻辑——短时间内多成就同时解锁时合并通知 |
+| **一键安装** | `install.sh` 搞定一切：复制文件、设置 faction、合并 hooks 到 settings.json（Python 脚本保留已有配置） | 我们的 `agpa init` 已经做到类似效果 ✅ |
+
+---
+
+### 4. buddy-evolution（5⭐）— RPG 伴侣养成
+
+**架构**：SessionStart/SessionEnd 两个 JS Hook → 17 步端到端管线 → `~/.buddy-evolution/soul.json` 持久化。
+
+**值得借鉴**：
+
+| 特性 | 描述 | 对 AGPA 的启发 |
+|------|------|---------------|
+| **成就触发函数（代码驱动）** | 34 成就每个都有 `trigger(session, soul) => boolean` 函数，而非 YAML 声明式条件。支持复杂逻辑（如 `hasHomecoming` 检查文件上次编辑距今 > 60 天） | 📝 我们的 11 种 condition type 覆盖了大部分场景，但极复杂逻辑（如"跨 session 文件回溯"）无法表达。可考虑加 `custom` condition type 支持脚本 |
+| **属性递减增长** | 5 维属性（debugging/patience/chaos/wisdom/snark），增长公式 `growth × 100/(100+current)`，渐进逼近 200 上限 | 📝 如果我们加"技能点"系统，递减增长比线性增长好——早期进步快，后期需要"大师级"成就 |
+| **Streak 乘法** | 连续天数 x1.0→x2.0（每天 +0.1，11 天封顶），断签重置。中等 session ~600 XP，约 14 次到 Level 5 | 📝 我们的 streak 成就只记录"是否达成"，没有乘法奖励。加 streak multiplier 能激励日常使用 |
+| **18 物种进化树** | 创建时随机分配物种，Level 5/10 各有二选一的分支进化，选择永久 | 📝 如果我们引入"伴侣系统"，进化树是一个强烈的留存机制 |
+| **人格注入 Claude 行为** | 12 种人格 + 7 种心情 → `generateCompanionContext()` 生成文本块注入 Claude system prompt，影响 Claude 的沟通风格 | 📝 成就可以解锁"人格特质"，允许用户选择 Claude 的交流风格（严谨/活泼/精简） |
+| **文件熟悉度跟踪** | 每个编辑过的文件跟踪 touches 次数，New → Familiar → Expert → Nostalgic 四阶 | 📝 可以解锁"文件羁绊"类成就——对同一个文件编辑 N 次 |
+| **17 步 Session 端管线的健壮性** | 转录解析 → 跳过空 session → 终身统计 → streak → 属性增量 → 熟悉度 → 成就 → XP → 项目 XP → 升级 → 进度 → 周报 → lastSession → 保存 → 日志 → 通知 | 我们的 `poll()` 相对简单。可以借鉴 buddy 的"session 结束总结"概念——完成 session 后生成迷你报告 |
+
+---
+
+### 5. claude-code-quest（1⭐）— RPG 路线图
+
+**架构**：PostToolUse Hook → 异步 fork `autosync.py` → 解析 Claude plan 文件 checkbox → 更新 `quests.json` → `render.py` → 静态 HTML 仪表盘（`:8770`）。
+
+**值得借鉴**：
+
+| 特性 | 描述 | 对 AGPA 的启发 |
+|------|------|---------------|
+| **Plan Checkbox → 进度自动同步** | Claude 的 plan 文件（`Section 13 -- Post-Validation`）中 `- [x]` 进度自动映射为 quest 进度 | 📝 我们可以跟踪用户的"项目完成度"——不只跟踪工具使用，还跟踪实际开发进度 |
+| **RPG 主题 Dashboard** | Pokemon 和 Storybook 两套视觉主题，手写模板引擎 `{{var}}`/`{{#each}}`/`{{>partial}}` | 📝 我们的 Dashboard 可以加主题系统——Sci-Fi / Fantasy / Minimal |
+| **多项目支持** | 每个项目独立 level/XP/quest 列表，通过路径映射自动关联 | 📝 我们已有 profile 系统（4 档位），但缺少"项目感知"——不同 repo 的成就独立追踪 |
+| **Claim/Bind 机制** | Session 与 quest 的关联——"这个 session 是在做哪个 quest" | 📝 可以加"任务系统"：用户声明一个目标，session 结束后评估完成度，解锁对应成就 |
+| **安全不变量文档化** | Plan 解析器从不自动 lock quest（`"current" is plural`），reset 需要显式 `--clean` 标志。不变量清晰记录在 SKILL.md 中 | 我们的 `safeParse` + `validate.ts` 已经有类似思路 ✅，但缺少显式不变量文档 |
+
+---
+
+## 新增行动项
+
+基于以上分析，以下新增行动项合并到现有路线图：
+
+```
+Phase 1+ (已有 + 新增建议)
+├── ✅ /achievements 聊天命令
+├── ✅ tip/hint 字段分离
+├── ✅ 跨平台通知
+└── 📝 数据迁移框架 — 来自 claude-code-guide
+
+Phase 2 (后续)
+├── 📝 成就解锁音效 — 来自 sc2-claude-hooks（"游戏手感"最大提升）
+├── 📝 Session 结束迷你报告 — 来自 buddy-evolution
+├── 📝 Streak 乘法奖励 — 来自 buddy-evolution
+├── 📝 Dashboard 主题系统 — 来自 claude-code-quest
+├── 📝 成就"熟练度"维度（腰带段位）— 来自 claude-code-guide
+├── 📝 发布间隔 Nudging — 来自 claude-code-guide
+├── 📝 成就难度分级（Tier 1-4）— 已有
+└── 📝 国际化扩展（繁中/日/韩）— 已有
+```
+
+## 已放弃/低 ROI
+
+以下特性在本次调研中评估过但不适合 AGPA 当前阶段：
+
+| 特性 | 来源 | 放弃原因 |
+|------|------|---------|
+| RPG 伴侣养成（物种/进化/人格注入） | buddy-evolution | 太大，需要全新的 Companion 子系统，偏离当前成就核心 |
+| Plan 文件 checkbox 自动同步 | claude-code-quest | 依赖 Claude 的 plan 格式，脆弱；AGPA 不是项目管理工具 |
+| 手写模板引擎 Dashboard | claude-code-quest | 我们的 Dashboard 已经是零框架 HTML/CSS/JS，不需要换 |
+| 代码驱动成就触发器 | buddy-evolution | 我们的 11 种 YAML condition type 已经很强大，加 custom type 值得但要谨慎 |
+
+---
+
+# 第二轮调研 · 三大特性详细设计方案
+
+> 来源：claude-code-guide、sc2-claude-hooks、buddy-evolution 深读分析
+> 状态：📐 方案设计阶段，暂不实施
+
+---
+
+## 📐 设计 1：成就解锁音效系统
+
+### 现状
+
+成就解锁时只有系统通知弹窗 + 终端文本输出。缺少"游戏手感"——玩家期待"叮"一声的音效反馈。
+
+### 目标
+
+不同稀有度的成就解锁时播放差异化的音效，让听觉成为一个独立的信息通道。
+
+### 音效分级
+
+| 稀有度 | 音效类型 | 示例 | 音色方向 |
+|--------|---------|------|---------|
+| Common | 轻柔提示音 | "叮" | 短促（<0.5s），高频铃音 |
+| Uncommon | 清晰成就音 | 单音阶梯 | 中高频，1-2 个音符上升 |
+| Rare | 饱满成就音 | 三和弦 | 有共鸣感，0.8-1.2s |
+| Epic | 史诗短乐句 | 小号 / 管弦升调 | 1-2s，有"重大成就"感 |
+| Legendary | 长乐句 | 全管弦乐 + 鼓点 | 2-3s，有"传奇"感 |
+| Mythic | 终极乐句 | 合唱 + 管弦 + 回响 | 3-5s，全系统最重的音效 |
+
+### 技术方案
+
+```
+src/utils/notify.ts 的 sendNotification()
+    │
+    ├── 现有：系统弹窗 + 终端输出
+    └── 新增：playSound(rarity)
+              │
+              ├── macOS:  afplay
+              ├── Linux:  paplay / aplay
+              └── Windows: PowerShell MediaPlayer
+```
+
+**实现改动**：
+
+1. **音效文件**：6 个音频文件（`.mp3` 或 `.m4a`）打包在 `assets/sounds/` 下，与 `pixelart-shield-gold.png` 同级。命名：`common.mp3`、`uncommon.mp3` 等。
+
+2. **`notify.ts` 新增 `playSound(rarity: RarityLevel)`**：自动检测 OS，选择对应播放器。不依赖任何外部程序——`afplay` 在 macOS 上自 PHP 7+ 就存在，`aplay` 在 Linux 发行版基本都有，PowerShell 在 Windows 上自带。
+
+3. **播放时机**：在 `poll.ts` 和 `hook.ts` 的解锁通知循环里，`sendNotification()` 之前调用 `playSound()`。音效先播（即时反馈），弹窗后出。
+
+4. **去重/冷却**：如果同一轮 poll 解锁多个成就，只播放**最高稀有度**的音效，避免音效轰炸。用 `Math.max(...newlyUnlocked.map(a => rarityRank[a.rarity]))` 取最高档。
+
+### 音效来源
+
+两种选择：
+
+| 方案 | 优点 | 缺点 |
+|------|------|------|
+| **自制**（SFXR/Chiptone） | 无版权、文件极小（<5KB each）、8-bit 风格独特 | 音色有限，不够"高级" |
+| **免版税素材库**（Mixkit、Freesound） | 音质好、可选风格多 | 需要筛选、文件较大 |
+| **Pixabay / ZapSplat** | 大量免版税短音效，CC0 | 需要手动试听筛选 |
+
+**建议**：先用 SFXR 生成 6 个 8-bit 风格音效做 PoC——文件极小、零版权问题、快速验证全链路。如果反馈音质不够好，再换免版税素材。
+
+### 涉及的代码改动
+
+| 文件 | 改动 |
+|------|------|
+| `assets/sounds/{common,uncommon,rare,epic,legendary,mythic}.mp3` | 新建：6 个音效文件 |
+| `src/utils/notify.ts` | 新增 `playSound()` 函数，`sendNotification()` 调用它 |
+| `src/tools/poll.ts` | 无需改动（已有通知循环，`sendNotification` 内部已含音效） |
+| `src/cli/hook.ts` | 无需改动 |
+| `src/engine/types.ts` | 新增 `RARITY_RANK` 常量（用于取最高稀有度） |
+
+### 未来扩展方向
+
+- 用户自定义音效主题包（与 sc2 的 faction 切换类似）
+- 连击音效（短时间内连续解锁多个成就时播特殊音效）
+- Dashboard 上手动触发试听按钮
+
+---
+
+## 📐 设计 2：数据迁移框架
+
+### 问题
+
+`04-成就定义清单.yaml` schema 持续演进（新增 `tip/tip_cn/hint/hint_cn`、`name_cn`、`description_cn`、`future`、`challenge` 等字段），但用户的 `state.json` 是旧格式。没有迁移机制 = 静默数据丢失或功能退化。
+
+### 目标
+
+每次 schema 变化时，用户的 `state.json`（及 `achievements.json` 编译快照）自动补全缺失字段，不丢数据、不破坏已有的解锁记录。用户无感知。
+
+### 设计方案
+
+参考 claude-code-guide 的 `migrate-data.sh` 模式——**在前置入口自动执行**，不依赖用户手动操作。
+
+**State.json 版本化**：
+
+```json
+{
+  "schema_version": 1,
+  "migrations": [
+    { "from": 1, "to": 2, "date": "2026-06-03T...", "description": "Added streak tracking" }
+  ],
+  "unlocked": { ... },
+  "stats": { ... }
+}
+```
+
+**迁移链**（增量，链式执行）：
+
+```
+v1 → v2: 添加 streak 字段
+v2 → v3: 添加 XP 字段
+v3 → v4: 添加文件熟悉度字段
+...
+```
+
+每个版本的迁移函数只负责从 `vN` 补到 `vN+1`，引擎启动时自动跑完整个迁移链。
+
+### 涉及的新文件
+
+`src/engine/migrate.ts`：
+
+```typescript
+// 核心函数
+export function migrateState(state: Record<string, unknown>): Record<string, unknown>;
+
+// 迁移链
+const MIGRATIONS: Array<(state: Record<string, unknown>) => Record<string, unknown>> = [
+  // v1 → v2: add streak
+  (s) => ({ ...s, schema_version: 2, streak: { currentDays: 0, longestDays: 0, lastSessionDate: null } }),
+  // v2 → v3: add XP accumulator
+  (s) => ({ ...s, schema_version: 3, xp: { total: 0, bySource: { achievements: 0, tasks: 0, streakBonus: 0 } } }),
+  // ... 未来版本在这里加
+];
+```
+
+**调用位置**：`src/engine/store.ts` 的 `loadState()` 函数——在读取 `state.json` 后、返回给调用方前，自动执行 `migrateState()`。
+
+**`achievements.json` 编译快照的迁移更简单**：不迁移旧数据，因为它是无状态派生数据——每次 `agpa init` 或 `compile-achievements.ts` 重新从 YAML 编译即可覆盖。init 每次都重新做，不需要增量迁移逻辑。
+
+### 迁移的安全约束
+
+- **只补字段，不删字段**：旧字段永远保留
+- **只设默认值，不改已有值**：用 `//=` 语义
+- **幂等**：重复执行同一个迁移不会产生副作用
+- **失败熔断**：任何迁移抛出异常 → 日志告警 + 返回原始 state（不破坏现有数据）
+
+### 涉及的代码改动
+
+| 文件 | 改动 |
+|------|------|
+| `src/engine/migrate.ts` | 新建：迁移引擎 + 迁移链 |
+| `src/engine/store.ts` | `loadState()` 调用 `migrateState()` |
+| `src/engine/types.ts` | 新增 `StateSchema` 类型（含 `schema_version`） |
+| `tests/engine/migrate.test.ts` | 新建：测试增量迁移正确性 |
+
+---
+
+## 📐 设计 3：Streak 乘法奖励
+
+### 现状
+
+我们有 streak 类成就（`streak_3`、`streak_7`、`streak_30`、`streak_100`），通过 `evalStreak` 条件评估 session.start 事件的连续天数。但：
+
+- **Streak 是"过去时"评估**——用户不知道自己当前连续了多少天
+- **Streak 没有激励机制**——只是二元标记（达成/未达成），没有"维持惯性"的动力
+- **Dashboard 不展示 streak**——用户不知道自己的活跃状态
+
+### 现有 XP 系统（对照用）
+
+```typescript
+// src/dashboard/xp.ts
+XP_PER_TASK = 10
+ACHIEVEMENT_XP = { common: 50, uncommon: 100, rare: 200, epic: 300, legendary: 500, mythic: 1000 }
+Level = floor(sqrt(totalXp / 100))
+// L1: 100 XP, L2: 400, L3: 900, L4: 1600, ..., L10: 10000
+```
+
+### 目标
+
+在现有 XP 系统上叠加 streak multiplier，形成"每天使用 → streak 增长 → XP 加速 → 升级更快"的正向循环。
+
+### 方案：Streak 乘法器 + Dashboard 可视化
+
+**核心机制**：
+
+```
+achievement_xp = base_xp * streak_multiplier
+
+streak_multiplier = min(2.0, 1.0 + (currentStreak - 1) × 0.1)
+```
+
+| 连续天数 | 乘数 | 示例：Uncommon 成就 XP |
+|---------|------|---------------------|
+| 1 | 1.0x | 100 XP |
+| 2 | 1.1x | 110 XP |
+| 3 | 1.2x | 120 XP |
+| 7 | 1.6x | 160 XP |
+| 11+ | **2.0x** | 200 XP（封顶）|
+
+**Streak 判定**（参照 buddy-evolution）：
+
+- 每天有一次 `session.start` 事件即视为"当天活跃"
+- 连续每天活跃 → `currentStreak += 1`
+- 同一天多次 session → 不累加
+- 中断 1 天以上 → `currentStreak = 1`
+- 同时记录 `longestStreak`（历史最高）
+
+**在 Dashboard 和 `/achievements` 命令中展示**：
+
+```
+🔥 连续 7 天  |  × 1.6 XP    ┌──────────────┐
+📅 最高纪录 14 天             │  Streak 进度  │
+                              │  7 → 8 明天   │
+                              └──────────────┘
+```
+
+**成就联动**：已有的 `streak_3`、`streak_7`、`streak_30`、`streak_100` 成就**照常工作**（通过 `evalStreak` 评估历史事件），新的 streak multiplier 是独立计算的——一个用来判定成就解锁（条件引擎），一个用来影响 XP（引擎层）。两者共享同一数据源（session.start 事件），但不互相依赖。
+
+### 涉及的代码改动
+
+| 文件 | 改动 |
+|------|------|
+| `src/engine/types.ts` | `AchievementState` 新增 `streak: { currentDays, longestDays, lastSessionDate }` |
+| `src/engine/engine.ts` | `poll()` 或 `track()` 新增 streak 更新逻辑 |
+| `src/engine/store.ts` | `loadState()` / `saveState()` 持久化 streak 字段 |
+| `src/dashboard/xp.ts` | `calcTotalXp()` 接受 `streakMultiplier` 参数 |
+| `src/dashboard/api.ts` | API 返回 streak 数据 |
+| `src/dashboard/public/app.js` | Dashboard 渲染 streak 卡片 |
+| `src/dashboard/public/styles.css` | Streak 卡片样式 |
+| `.claude/commands/achievements.md` | `/achievements stats` 输出 streak 信息 |
+
+### 可选的升级（不做现阶段）
+
+- **分阶段 streak 奖励**：每达到 7 的倍数（7/14/21/28 天）额外送一次性 XP bonus
+- **周末豁免**：周六日断签不算断
+- **断签保护**：允许 1 天缓冲（miss 1 day → streak 冻结而非归零）
+
+---
+
+## 三者关系 & 建议实施顺序
+
+```
+第 1 步：数据迁移框架
+    └── 不先做这个，后面加字段都在沙子上盖楼
+
+第 2 步：Streak 乘法奖励
+    └── 依赖 state.json schema 变更（加 streak 字段）
+    └── 迁移框架保证老用户数据不丢
+    └── 改动面最大（engine + dashboard + api + 命令文件）
+
+第 3 步：成就解锁音效
+    └── 独立模块，不涉及 schema 变更
+    └── 改动面最小（notify.ts + 6 个音频文件）
+    └── 可以独立开发测试，不耦合其他
+```
+
+实际上 2 和 3 可以并行开发（互不依赖），但在 1 完成后再做 2 更安全。
+
+---
+
+# 现有系统分析
+
+## XP 与等级系统现状
+
+> 2026-06-03 基准分析，为 streak multiplier 和后续数值调整提供参考
+
+### 架构位置
+
+XP/等级计算**不在引擎层**，而是在 Dashboard API 层（`src/dashboard/api.ts`）每次请求时即时计算。引擎层只管理成就状态和事件，不感知 XP。两个调用方都走同一路径：
+
+```
+engine.stats() → stats 数据
+definitions[]  → 成就数组
+events[]       → 全部历史事件
+    │
+    ▼
+buildApiResponse() in src/dashboard/api.ts
+    ├── taskCount  = events.filter('task.complete').length
+    ├── totalXp    = calcTotalXp(unlockedDefs by rarity, taskCount)
+    ├── level      = calcLevel(totalXp)
+    ├── xpProgress = calcLevelProgress(totalXp)
+    └── streak     = calcStreak(events)
+```
+
+**注意**：XP 不写入 `state.json`，纯粹是展示层派生数据。每次请求重新从成就列表 + 事件日志计算。
+
+### XP 来源
+
+只有两个来源，定义在 `src/dashboard/xp.ts`：
+
+```typescript
+XP_PER_TASK = 10
+
+ACHIEVEMENT_XP = {
+  common:    50,
+  uncommon:  100,
+  rare:      200,
+  epic:      300,
+  legendary: 500,
+  mythic:    1000,
+}
+
+calcTotalXp(unlockedAchievements, taskCount):
+  return sum(ACHIEVEMENT_XP[each.rarity]) + taskCount × XP_PER_TASK
+```
+
+**XP 不来自**：tool 调用次数、文件编辑、session 时长、token 消耗。只有两个来源。
+
+**taskCount 计算**：统计全部历史事件中 `event_type === 'task.complete'` 的次数。这是引擎自动 emit 的（`engine.ts` 中 `track('task.complete')` 发生在 `hook.ts` 的 `TaskCompleted` 处理中）。
+
+### 等级公式
+
+```typescript
+// Level: sqrt(totalXp / 100)，向下取整
+calcLevel(totalXp) → floor(sqrt(totalXp / 100))
+
+// Level N 需要的 XP: N² × 100
+calcXpForLevel(level) → level × level × 100
+
+// 等级进度条
+calcLevelProgress(totalXp):
+  current = totalXp - xpForLevel(currentLevel)
+  target  = xpForLevel(nextLevel) - xpForLevel(currentLevel)
+```
+
+**完整等级表**：
+
+| Level | XP 门槛 | 升到下一级需 | 累计 | 示例：怎样达成 |
+|-------|--------|------------|------|-------------|
+| **L1** | 0 | +100 | 100 | 2 个 Common 成就 |
+| **L2** | 100 | +300 | 400 | 8 个 Common 成就 |
+| **L3** | 400 | +500 | 900 | 14 Common + 2 Rare |
+| **L4** | 900 | +700 | 1,600 | 24 Common + 4 Rare |
+| **L5** | 1,600 | +900 | 2,500 | 10 Rare + 30 Common |
+| **L6** | 2,500 | +1,100 | 3,600 | 3 Epic + 10 Rare + 30 Common |
+| **L7** | 3,600 | +1,300 | 4,900 | 5 Epic + 10 Rare + 50 Common |
+| **L8** | 4,900 | +1,500 | 6,400 | 2 Legendary + 5 Epic + 20 Rare |
+| **L9** | 6,400 | +1,700 | 8,100 | 全部 160 成就 ≈ Level 11 |
+| **L10** | 8,100 | +1,900 | 10,000 | |
+
+### 当前数值问题诊断
+
+**问题 1：升级极度靠成就解锁，task 贡献微乎其微**
+
+一个 Common 成就 = 50 XP = 5 个 task 的价值。完成 100 个 task 才等于 1 个 Mythic 成就。task 在 XP 系统中几乎不可见——`XP_PER_TASK = 10` 对于 `N² × 100` 的等级曲线来说太边缘。
+
+**问题 2：升级曲线过于陡峭**
+
+`N² × 100` 意味着 Level 5 需要 2,500 XP（50 个 Common 成就），Level 10 需要 10,000 XP（200 个 Common，但只有 160 个成就）。用户解锁全部 160 个成就的理论最大 XP 约为 `48×50 + 44×100 + 30×200 + 24×300 + 9×500 + 5×1000 = 2,400 + 4,400 + 6,000 + 7,200 + 4,500 + 5,000 = 29,500`。加上 task 约几百。理论最高 Level ≈ `floor(sqrt(30000/100))` = **Level 17**。
+
+但这需要**全成就解锁**。实际上大多数用户在 24-50 成就区间（~1,200-5,000 XP），对应 **Level 3-7**。等级区分度不足——解锁 24 成就的人 Level 3，解锁 60 成就的人才 Level 7。
+
+**问题 3：Streak 只是 API 层的展示字段，不参与 XP 计算**
+
+`calcStreak()` 统计事件日志中连续出现的日期数，在 API 响应中作为 `stats.streak` 返回，Dashboard 不渲染它（没有 HTML 元素对应）。它**不是引擎状态的一部分**，不写入 `state.json`，不影响 XP，也不触发任何成就条件。它是一个"只读装饰"。
+
+**问题 4：MCP stats 工具不包含 XP/等级**
+
+`achievement_stats` 工具返回的是 `engine.stats()` 的数据（总数、完成率、分类/稀有度分布），不含 XP、等级、streak。这些只在 Dashboard HTTP API 中计算。用户通过 MCP 查不到 XP 进度。
+
+### 用户 24 成就的实际案例
+
+当前 state.json 有 24 个解锁，按实际稀有度分布估算 XP：
+
+```
+Legendary: 1 × 500 = 500
+Epic:      2 × 300 = 600
+Rare:      3 × 200 = 600
+Uncommon:  8 × 100 = 800
+Common:   10 × 50  = 500
+───────────────────────
+成就 XP: 3,000
+Task XP:  ~30 × 10 = 300
+───────────────────────
+Total XP: ~3,300 → Level 5 (门槛 2,500，进度 800/900)
+```
+
+一个真实用户 24 成就 = Level 5。如果达成 streak 1.6x multiplier，每次新解锁 Uncommon 成就从 100 XP 变 160 XP——仍需 4-6 个新成就才能感觉到等级变化。
+
+### 建议：与 streak multiplier 配套的数值微调
+
+| 调整项 | 当前值 | 建议值 | 理由 |
+|--------|--------|--------|------|
+| `XP_PER_TASK` | 10 | **25** | 完成 20 个 task = 1 个 Rare 成就，让 task 贡献可见 |
+| 等级缩放 | `N² × 100` | 保持 | 暂时不动，曲线本身还行 |
+| streak multiplier | 无 | 1.0x → 2.0x（每天 +0.1） | 叠加后 Level 5 用户每天的价值变高 |
+| MCP stats 加 XP | 不返回 | 加 `level`、`total_xp` 字段 | 与 Dashboard 对齐 |
+| Dashboard 显 streak | 不渲染 | Hero section 加 🔥 streak 卡片 | 可视化用户活跃状态 |
+
+这些微调可以在做 streak multiplier 时一起落地，改动面不大（`xp.ts` 改常量 + `api.ts` 加字段 + MCP stats 加数据）。

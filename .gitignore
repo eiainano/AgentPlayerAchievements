@@ -17,3 +17,6 @@ dashboard-*.png
 
 # Local test sandbox
 workspace/
+
+# Research (cloned third-party repos for analysis)
+research/

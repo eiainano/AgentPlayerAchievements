@@ -2,6 +2,24 @@
 
 ## [0.1.6] — 2026-05-31
 
+### 第二轮调研：Claude Code 游戏化生态 Top 5 + 三大特性详细设计 — 2026-06-03
+
+GitHub 搜索 `achievement`/`gamification`/`quest`/`play` 关键词，star 排序筛选 5 个项目克隆至 `research/`（已 gitignore），深读后产出分析报告写入 `docs/whatsmore.md`：
+
+- **claude-code-guide**（114⭐）— Fibonacci 间隔 nudging / 16 领域腰带段位 / 特性依赖图 / 数据迁移框架 / 评分公式
+- **sc2-claude-hooks**（26⭐）— StarCraft 2 阵营音效 / 15s 冷却 + 智能错误过滤 / 一键安装
+- **buddy-evolution**（5⭐）— 34 触发函数成就 / 5 维属性递减增长 / 18 物种进化树 / 12 人格
+- **claude-code-quest**（1⭐）— Plan checkbox → quest 进度 / 多项目 RPG Dashboard / 安全不变量
+- **claude-code-achievements**（84⭐）— 第一轮已分析
+
+新增三大特性详细设计方案（📐 方案设计阶段，暂不实施）：
+
+1. **成就解锁音效系统** — 6 级稀有度 6 种音效，SFXR PoC，`notify.ts` + `assets/sounds/`
+2. **数据迁移框架** — `schema_version` + 增量迁移链，`store.ts` 入口自动执行，幂等
+3. **Streak 乘法奖励** — `1.0x→2.0x`（每天 +0.1），叠加到现有 XP 系统
+
+新增**现有 XP 系统基准分析**：2 来源（成就 + task）、`N²×100` 等级曲线、4 问题诊断（task 贡献低 / 等级区分度不足 / streak 装饰 / MCP 缺失 XP）、数值微调建议。
+
 ### 像素画概念描述文档 — 2026-06-02
 
 `docs/pixel-art-ideas.md` — 为全部 160 个成就编写像素画描述，按 10 个分类组织表格。每项包含成就 ID、中文名、中文描述、像素画场景描述（前景/背景构成 + 调色板方向），与成就的中英文命名和描述一致，适当联想扩展。

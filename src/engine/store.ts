@@ -1,7 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import type { AchievementState, TrackedEvent } from './types.js';
-import { safeParse, achievementStateSchema, trackedEventSchema } from '../utils/validate.js';
+import type { AgentToolStats } from './stats.js';
+import { safeParse, achievementStateSchema, trackedEventSchema, agentToolStatsSchema } from '../utils/validate.js';
 
 export class Store {
   readonly stateDir: string;
@@ -65,6 +66,30 @@ export class Store {
     this.ensureDir();
     const logPath = path.join(this.stateDir, 'event.log');
     fs.appendFileSync(logPath, JSON.stringify(event) + '\n');
+  }
+
+  /** Atomic write of stats cache */
+  saveStats(stats: AgentToolStats): void {
+    this.ensureDir();
+    const target = path.join(this.stateDir, 'stats.json');
+    const tmp = target + '.tmp';
+    fs.writeFileSync(tmp, JSON.stringify(stats));
+    fs.renameSync(tmp, target);
+  }
+
+  /** Load stats cache from disk. Returns null if missing or corrupt. */
+  loadStats(): AgentToolStats | null {
+    this.ensureDir();
+    const statsPath = path.join(this.stateDir, 'stats.json');
+    try {
+      if (fs.existsSync(statsPath)) {
+        const raw = JSON.parse(fs.readFileSync(statsPath, 'utf-8'));
+        return safeParse(agentToolStatsSchema, raw, null);
+      }
+    } catch {
+      // stats stays null — caller falls back to computeStats
+    }
+    return null;
   }
 
   /** Full reset */

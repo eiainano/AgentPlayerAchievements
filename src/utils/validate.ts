@@ -23,6 +23,14 @@ export const showcaseDataSchema = z.object({
   slots: z.array(z.string().nullable()),
 });
 
+export const agentToolStatsSchema = z.object({
+  version: z.literal('1.0'),
+  last_updated: z.string(),
+  sessions: z.record(z.string(), z.number()),
+  user_messages: z.record(z.string(), z.number()),
+  usage_time_ms: z.record(z.string(), z.number()),
+});
+
 export const appConfigSchema = z.object({
   lang: z.enum(['en', 'zh']).default('en'),
   enabledCategories: z.array(z.string()).optional(),

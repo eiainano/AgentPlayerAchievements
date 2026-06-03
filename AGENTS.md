@@ -14,6 +14,7 @@ All tool calls, file operations, git commits/PRs, subagents, sessions, task comp
 | Trigger | Event to track | Payload |
 |---------|---------------|---------|
 | Read an image file (png/jpg/gif/svg) | `image.read` | (auto — hook detects file type) |
+| **Each time the user sends you a message** | `user.message` | (no payload needed) |
 | Send a prompt/message (track length for brevity) | `conversation.message` | `{ length }` (character count of your message) |
 | Create a file in a specific language | `file.language_used` | `{ language }` e.g. "typescript" |
 | Edit the same function repeatedly | `function.edited` | `{ function_name }` |

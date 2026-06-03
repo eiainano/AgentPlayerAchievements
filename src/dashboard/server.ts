@@ -154,7 +154,15 @@ export function createServer(port: number, defaultProfile: string): http.Server 
       engine.reload();
       engine.reloadDefinitions();
       const showcaseData = buildShowcaseResponse(engine);
-      const data = buildApiResponse(engine.definitions, engine.state, engine.events, showcaseData, engine.stats(), engine.setDefinitions);
+      const data = buildApiResponse(
+        engine.definitions,
+        engine.state,
+        engine.events,
+        showcaseData,
+        engine.stats(),
+        engine.setDefinitions,
+        engine.toolStats(),
+      );
       data.profile = resolvedProfile;
       data.profile_emoji = getProfileMeta(resolvedProfile).emoji;
       data.profiles = listProfilesWithMeta().map(p => ({ name: p.name, emoji: p.emoji }));
@@ -373,7 +381,7 @@ export function createServer(port: number, defaultProfile: string): http.Server 
       }
       engine.resetState();
       engine.init();
-      const data = buildApiResponse(engine.definitions, engine.state, engine.events, [], engine.stats(), engine.setDefinitions);
+      const data = buildApiResponse(engine.definitions, engine.state, engine.events, [], engine.stats(), engine.setDefinitions, engine.toolStats());
       data.profile = resolvedProfile;
       data.profile_emoji = getProfileMeta(resolvedProfile).emoji;
       data.profiles = listProfilesWithMeta().map(p => ({ name: p.name, emoji: p.emoji }));

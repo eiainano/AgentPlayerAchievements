@@ -3,6 +3,7 @@
 export type EventType =
   | 'session.start'
   | 'session.end'
+  | 'user.message'
   | 'conversation.message'
   | 'tool.complete'
   | 'task.complete'

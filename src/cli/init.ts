@@ -128,6 +128,9 @@ This project uses AGPA (Agent Player Achievements). Most tool/file/session event
 
 Call \`achievement_track\` when you observe these:
 
+**Each user turn (before processing):**
+- Each time the user sends you a message → \`user.message\`
+
 **When you do something:**
 - Read an image file → \`image.read\` (auto: any Read of png/jpg/gif/svg counts)
 - Create a file in a specific language → \`file.language_used\` with \`{ language }\` (e.g. "typescript", "python")

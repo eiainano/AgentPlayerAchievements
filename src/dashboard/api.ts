@@ -8,6 +8,7 @@ import type {
   SetDefinition,
   SetReward,
 } from '../engine/types.js';
+import type { AgentToolStats } from '../engine/stats.js';
 import { evaluateCondition } from '../engine/evaluator.js';
 import { calcTotalXp, calcLevel, calcLevelProgress } from './xp.js';
 import { buildTimeline } from './timeline.js';
@@ -62,6 +63,7 @@ export interface DashboardStats {
   xp_progress: { current: number; target: number };
   showcase: Array<{ slot: number; achievement: AchievementItem | null }>;
   streak: number;
+  tool_stats?: AgentToolStats;
 }
 
 export interface DashboardData {
@@ -174,6 +176,7 @@ export function buildApiResponse(
   showcaseData: Array<{ slot: number; achievement: AchievementItem | null }>,
   engineStats: { total_events: number; by_category: Record<string, { total: number; unlocked: number }>; by_rarity: Record<string, { total: number; unlocked: number }> },
   setDefinitions: SetDefinition[],
+  toolStats?: AgentToolStats,
 ): DashboardData {
   const taskCount = events.filter(e => e.event_type === 'task.complete').length;
   const achievements = buildAchievementsResponse(definitions, state, { events, taskCount });
@@ -198,6 +201,7 @@ export function buildApiResponse(
       xp_progress: calcLevelProgress(totalXp),
       showcase: showcaseData,
       streak: calcStreak(events),
+      tool_stats: toolStats,
     },
     timeline: buildTimeline(state.unlocked),
     sets: buildSetsResponse(definitions, state, setDefinitions),

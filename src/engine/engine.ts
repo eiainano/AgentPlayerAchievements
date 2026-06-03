@@ -4,6 +4,8 @@ import { fileURLToPath } from 'url';
 import { parseYAML } from './yaml-parser.js';
 import { evaluateAll } from './evaluator.js';
 import { Store } from './store.js';
+import { computeStats } from './stats.js';
+import type { AgentToolStats } from './stats.js';
 import type {
   TrackedEvent, EventType, EventPayload,
   AchievementDefinition, AchievementState, AchievementStats,
@@ -171,7 +173,25 @@ export class AchievementEngine {
     }
 
     this.unlockedThisPoll = newlyUnlocked;
+
+    // Compute + cache usage statistics after poll
+    try {
+      const stats = computeStats(this.events);
+      this.store.saveStats(stats);
+    } catch {
+      // stats computation should never block poll; drop silently
+    }
+
     return newlyUnlocked;
+  }
+
+  /** Load cached tool stats; if missing, compute from events */
+  toolStats(): AgentToolStats {
+    const cached = this.store.loadStats();
+    if (cached) return cached;
+    const stats = computeStats(this.events);
+    this.store.saveStats(stats);
+    return stats;
   }
 
   stats(): AchievementStats {

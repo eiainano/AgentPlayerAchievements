@@ -1,6 +1,19 @@
 # Changelog
 
-## [0.1.6] — 2026-05-31
+## [0.1.6] — 2026-06-04
+
+### Agent 工具使用统计系统 — 2026-06-04
+
+新增按 Agent 工具（CC/Hermes/OpenClaw 等）的 usage 统计数据，统一通过 MCP Channel B 采集：
+
+- **三种指标** — session 次数、用户发言次数 (`user.message`)、使用时长（同 session 首条→末条用户消息差值），均按 `tool_source` 分组
+- **`src/engine/stats.ts`** — `computeStats()` 使用 timestamp window 策略关联 session 与 user message（规避 MCP/Hook 跨进程 session_id 不一致问题），`AgentToolStats` 接口
+- **`user.message`** 事件类型 — Agent 在每个用户 turn 开始时通过 `achievement_track("user.message")` 自上报，所有工具统一
+- **`stats.json` 缓存** — `Store.saveStats()`/`loadStats()` 原子读写，poll() 完成后自动重算，Dashboard `/api/data` 直接读取
+- **DashboardStats 新增 `tool_stats` 字段** — 可选，向后兼容
+- **指令更新** — `AGENTS.md`、`~/.claude/CLAUDE.md`、`init.ts INSTRUCTION_BLOCK` 均新增 `user.message` 跟踪条目
+- **10 个测试用例** — 覆盖空事件、完整 session、多工具、缺失 end、0 message、单 message、背靠背 session、unknown tool_source
+- **设计文档** — `docs/superpowers/specs/2026-06-03-agent-tool-statistics-design.md`
 
 ### 第二轮调研：Claude Code 游戏化生态 Top 5 + 三大特性详细设计 — 2026-06-03
 

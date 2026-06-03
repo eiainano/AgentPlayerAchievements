@@ -12,6 +12,8 @@
  *   agpa stats      View achievement stats
  *   agpa progress   List all achievements
  *   agpa reset      Reset all data
+ *   agpa sound      Toggle sound effects
+ *   agpa activity   View streak & heatmap
  *   agpa mcp        Start MCP server
  */
 
@@ -38,6 +40,7 @@ const COMMANDS: Subcommand[] = [
   { name: 'progress',   description: 'List all achievements with unlock status',                           usage: 'agpa progress',                             module: './mvp.ts' },
   { name: 'reset',      description: 'Reset all achievement data',                                         usage: 'agpa reset',                                module: './mvp.ts' },
   { name: 'sound',      description: 'Toggle achievement sound effects (on | off)',                       usage: 'agpa sound <on|off>',                       module: './sound.ts' },
+  { name: 'activity',   description: 'View coding streak & activity heatmap in terminal',                  usage: 'agpa activity [--streak|--heatmap|--compact]', module: './activity.ts' },
   { name: 'mcp',        description: 'Start MCP server (stdio)',                                           usage: 'agpa mcp',                                  module: '../main.ts' },
 ];
 

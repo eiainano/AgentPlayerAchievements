@@ -57,6 +57,17 @@ export interface StreakData {
   today_active: boolean;
 }
 
+export interface DayActivity {
+  date: string;   // "2026-06-04"
+  count: number;  // sessions on that day
+  level: 0 | 1 | 2 | 3 | 4;
+}
+
+export interface HeatmapData {
+  days: DayActivity[];
+  quantiles: [number, number, number];
+}
+
 export interface DashboardStats {
   total_achievements: number;
   unlocked: number;
@@ -69,6 +80,7 @@ export interface DashboardStats {
   xp_progress: { current: number; target: number };
   showcase: Array<{ slot: number; achievement: AchievementItem | null }>;
   streak: StreakData;
+  heatmap: HeatmapData;
   tool_stats?: AgentToolStats;
 }
 
@@ -215,6 +227,52 @@ function calcStreak(events: TrackedEvent[]): StreakData {
   return { current, longest, today_active };
 }
 
+function computeHeatmap(events: TrackedEvent[]): HeatmapData {
+  const today = new Date();
+  const days = new Map<string, number>();
+
+  // 1. Generate all dates for past 4 months (~122 days)
+  for (let i = 121; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    days.set(d.toISOString().slice(0, 10), 0);
+  }
+
+  // 2. Count session.start per day
+  for (const e of events) {
+    if (e.event_type !== 'session.start') continue;
+    const key = e.timestamp.slice(0, 10);
+    if (days.has(key)) days.set(key, (days.get(key) || 0) + 1);
+  }
+
+  // 3. Compute quantile thresholds (exclude 0 values)
+  const nonZero = [...days.values()].filter(c => c > 0).sort((a, b) => a - b);
+  let q1 = 1, q2 = 2, q3 = 3; // fallback fixed thresholds
+  if (nonZero.length >= 4) {
+    q1 = nonZero[Math.floor(nonZero.length * 0.25)]!;
+    q2 = nonZero[Math.floor(nonZero.length * 0.50)]!;
+    q3 = nonZero[Math.floor(nonZero.length * 0.75)]!;
+    // Ensure thresholds are distinct
+    if (q2 <= q1) q2 = q1 + 1;
+    if (q3 <= q2) q3 = q2 + 1;
+  }
+
+  // 4. Assign levels (0 is always a separate bucket)
+  const result: DayActivity[] = [];
+  for (const [date, count] of days) {
+    let level: DayActivity['level'] = 0;
+    if (count > 0) {
+      if (count <= q1) level = 1;
+      else if (count <= q2) level = 2;
+      else if (count <= q3) level = 3;
+      else level = 4;
+    }
+    result.push({ date, count, level });
+  }
+
+  return { days: result.sort((a, b) => a.date.localeCompare(b.date)), quantiles: [q1, q2, q3] };
+}
+
 export function buildApiResponse(
   definitions: AchievementDefinition[],
   state: AchievementState,
@@ -247,6 +305,7 @@ export function buildApiResponse(
       xp_progress: calcLevelProgress(totalXp),
       showcase: showcaseData,
       streak: calcStreak(events),
+      heatmap: computeHeatmap(events),
       tool_stats: toolStats,
     },
     timeline: buildTimeline(state.unlocked),

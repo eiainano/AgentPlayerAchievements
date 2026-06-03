@@ -111,6 +111,10 @@ const I18N = {
     stat_events: 'Events',
     stat_streak: 'Day Streak',
     stat_complete: 'Complete',
+    heatmap_title: 'Activity',
+    heatmap_less: 'Less',
+    heatmap_more: 'More',
+    stat_complete: 'Complete',
     filter_all: 'All',
     filter_unlocked: 'Unlocked',
     filter_locked: 'Locked',
@@ -181,6 +185,9 @@ const I18N = {
     stat_events: '事件',
     stat_streak: '连续天数',
     stat_complete: '完成度',
+    heatmap_title: '活动热力图',
+    heatmap_less: '少',
+    heatmap_more: '多',
     filter_all: '全部',
     filter_unlocked: '已解锁',
     filter_locked: '未解锁',
@@ -759,10 +766,85 @@ function renderStreakCard(streak) {
   }
 }
 
+function renderHeatmap(heatmap) {
+  const card = document.getElementById('heatmap-card');
+  const grid = document.getElementById('heatmap-grid');
+  const colLabels = document.getElementById('heatmap-col-labels');
+  const rowLabels = document.getElementById('heatmap-row-labels');
+  if (!card || !grid || !heatmap || !heatmap.days || heatmap.days.length === 0) {
+    if (card) card.style.display = 'none';
+    return;
+  }
+  card.style.display = '';
+
+  const days = heatmap.days;
+  // Find the first Monday in the data to pad front with empty cells
+  const firstDate = new Date(days[0].date);
+  const startDow = firstDate.getDay(); // 0=Sun, 1=Mon...
+  // Pad so grid starts on Monday (day=1); if first day is Sunday(0), pad 6; Monday(1), pad 0
+  const frontPad = startDow === 0 ? 6 : startDow - 1;
+
+  // Row labels: show Mon/Wed/Fri
+  const ROW_LABELS = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
+  rowLabels.innerHTML = ROW_LABELS.map(l => `<span>${l}</span>`).join('');
+
+  // Build column labels (month names at first column of each month)
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const colLabelSpans = [];
+  // Collect week boundaries
+  const weeks = [];
+  let weekStart = frontPad > 0 ? -frontPad : 0;
+  for (let i = 0; i < days.length; i++) {
+    const d = new Date(days[i].date);
+    const dow = d.getDay(); // 0=Sun
+    if (dow === 1 || i === 0) {
+      // Start of week (Monday) — record month
+      colLabelSpans.push({ idx: weeks.length, month: months[d.getMonth()], label: months[d.getMonth()] });
+    }
+    if (dow === 0) {
+      weeks.push(i - weekStart + 1);
+      weekStart = i + 1;
+    }
+  }
+
+  // Deduplicate adjacent month labels
+  const deduped = [];
+  for (const cl of colLabelSpans) {
+    const last = deduped[deduped.length - 1];
+    if (!last || last.month !== cl.month) deduped.push(cl);
+  }
+
+  const totalColumns = Math.ceil((frontPad + days.length) / 7);
+  colLabels.innerHTML = Array.from({ length: totalColumns }, (_, i) => {
+    const match = deduped.find(cl => cl.idx === i);
+    return `<span class="heatmap-col-label">${match ? match.label : ''}</span>`;
+  }).join('');
+
+  // Build cells
+  const cells = [];
+  // Front pad empty cells
+  for (let i = 0; i < frontPad; i++) {
+    cells.push('<div class="heatmap-cell" data-level="0"></div>');
+  }
+  // Date cells
+  for (const d of days) {
+    const dStr = d.date.slice(5); // "06-04"
+    const tooltip = `${dStr} · ${d.count} session${d.count !== 1 ? 's' : ''}`;
+    cells.push(`<div class="heatmap-cell" data-level="${d.level}" data-tooltip="${escHtml(tooltip)}"></div>`);
+  }
+  grid.style.gridTemplateColumns = `repeat(${totalColumns}, 14px)`;
+  grid.innerHTML = cells.join('');
+
+  // Scroll to right edge (most recent)
+  const scrollEl = card.querySelector('.heatmap-scroll');
+  if (scrollEl) scrollEl.scrollLeft = scrollEl.scrollWidth;
+}
+
 function renderProfile(data) {
   const { stats } = data;
 
   renderStreakCard(stats.streak);
+  renderHeatmap(stats.heatmap);
 
   const fill = document.getElementById('xp-bar-fill');
   const label = document.getElementById('xp-label');

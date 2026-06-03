@@ -4,7 +4,7 @@
 
 ## 总体状态
 
-v0.1.6 完成。大批量成就一致性审计修复 + 3 个 evaluator 功能新增 + 音效系统。160 个成就全部可达成，110 个测试全绿。
+v0.1.6 完成。大批量成就一致性审计修复 + 3 个 evaluator 功能新增 + 音效系统 + Agent 工具使用统计。160 个成就（其中 2 个 future 不可达成），120 个测试全绿。
 
 ---
 
@@ -73,7 +73,7 @@ v0.1.6 完成。大批量成就一致性审计修复 + 3 个 evaluator 功能新
 - [x] **路径遍历 guard**：拒绝 .. 和越界绝对路径读文件
 - [x] **P1 evaluator 4 项修复**：空 conditions guard、evalMode target、set_id 删除、evalStreak窗口/field/same_target
 - [x] **P2 数据一致性**：milestone 命名、set 成员补全、缺失 set 字段、im_sorry_dave 窗口
-- [x] 测试覆盖：110 tests, 6 files（evaluator 47 + integration 5 + yaml-parser 6 + api 5 + xp 6 + hook 36）
+- [x] 测试覆盖：120 tests, 7 files（evaluator 47 + integration 5 + yaml-parser 6 + api 5 + xp 6 + hook 36 + stats 10）
 
 ### 中优先级
 - [x] **用户审阅 160 成就清单**：已逐条 review，修复 30+ 个不一致，删除 3 个重复，新增 1 个

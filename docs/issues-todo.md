@@ -1,6 +1,6 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-04 | 总成就数: 160 | 条件类型: 11 | Tests: 120 ✅ | 5 Agent 全接入 | user.message 事件新增
+> 最后更新: 2026-06-04 | 总成就数: 160 | 条件类型: 11 | Tests: 120 ✅ | 5 Agent 全接入 | Dashboard 活动面板（streak+heatmap）
 
 ---
 

@@ -15,6 +15,20 @@
 - **10 个测试用例** — 覆盖空事件、完整 session、多工具、缺失 end、0 message、单 message、背靠背 session、unknown tool_source
 - **设计文档** — `docs/superpowers/specs/2026-06-03-agent-tool-statistics-design.md`
 
+### Dashboard 活动面板：Streak 卡片 + 热力图 — 2026-06-04
+
+基于 Duolingo + GitHub 两轮调研，在 Hero section 新增两个可视化组件：
+
+- **🔥 Streak 卡片**（XP bar 下方）— `StreakData { current, longest, today_active }` 替换原有的 `number` 类型，显示当前连续天数 + 历史最高 + 今天活跃状态（绿勾/灰提示）
+- **📊 活动热力图**（Streak 卡片下方）— GitHub 风格 4 个月贡献图，18 列 × 7 行 CSS Grid，5 级绿色阶（0 独立桶 + 分位桶自适应染色，新用户回退固定阈值），hover tooltip
+- **数据源** — `session.start` 事件按日聚合，`computeHeatmap()` / `calcStreak()` 都在 `api.ts` 层计算，不修改引擎
+- **设计文档** — `docs/superpowers/specs/2026-06-04-dashboard-streak-visualization-design.md` / `2026-06-04-activity-heatmap-design.md`
+
+### 第三、四轮调研 — 2026-06-04
+
+- **Duolingo** — 分析 12 大游戏化机制与 7 种心理学钩子，最终仅采纳 Dashboard streak 可视化（其余因多用户需求、定位冲突、ROI 不明等原因放弃，详见 `docs/whatsmore.md` 结论）
+- **GitHub 贡献图** — 解剖 53×7 热力图的设计细节（分位桶、SVG/CSS Grid、滚动窗口），映射为 AGPA 的 4 个月版本
+
 ### 第二轮调研：Claude Code 游戏化生态 Top 5 + 三大特性详细设计 — 2026-06-03
 
 GitHub 搜索 `achievement`/`gamification`/`quest`/`play` 关键词，star 排序筛选 5 个项目克隆至 `research/`（已 gitignore），深读后产出分析报告写入 `docs/whatsmore.md`：

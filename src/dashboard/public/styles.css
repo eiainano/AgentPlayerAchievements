@@ -529,6 +529,101 @@ body {
   letter-spacing: .2px;
 }
 
+/* ── Streak Card ──────────────────────────────────── */
+
+.streak-card {
+  background: var(--stat-card-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+  transition: border-color .2s;
+}
+
+.streak-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.streak-icon { font-size: 18px; }
+
+.streak-today {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 6px;
+  transition: background .25s, color .25s;
+}
+.streak-today.active {
+  color: #4bbf69;
+  background: rgba(75, 191, 105, 0.12);
+}
+.streak-today.idle {
+  color: var(--text-muted);
+  background: rgba(128, 128, 144, 0.08);
+}
+
+.streak-body {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.streak-main {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.streak-count {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.streak-unit {
+  font-size: 15px;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.streak-divider {
+  width: 1px;
+  height: 42px;
+  background: var(--border-strong);
+  flex-shrink: 0;
+}
+
+.streak-record {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.streak-record-icon { font-size: 16px; line-height: 1; }
+
+.streak-record-value {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.streak-record-label {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
 /* ── Showcase ──────────────────────────────────────── */
 .showcase {
   display: flex;

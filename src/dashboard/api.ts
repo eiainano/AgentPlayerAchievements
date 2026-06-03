@@ -51,6 +51,12 @@ export interface SetItem {
   reward: SetReward;
 }
 
+export interface StreakData {
+  current: number;
+  longest: number;
+  today_active: boolean;
+}
+
 export interface DashboardStats {
   total_achievements: number;
   unlocked: number;
@@ -62,7 +68,7 @@ export interface DashboardStats {
   total_xp: number;
   xp_progress: { current: number; target: number };
   showcase: Array<{ slot: number; achievement: AchievementItem | null }>;
-  streak: number;
+  streak: StreakData;
   tool_stats?: AgentToolStats;
 }
 
@@ -152,21 +158,61 @@ export function buildSetsResponse(
   });
 }
 
-function calcStreak(events: TrackedEvent[]): number {
+function calcStreak(events: TrackedEvent[]): StreakData {
   const days = new Set<string>();
   for (const e of events) {
     days.add(e.timestamp.slice(0, 10));
   }
-  const sorted = [...days].sort().reverse();
-  if (sorted.length === 0) return 0;
-  let streak = 1;
-  for (let i = 0; i < sorted.length - 1; i++) {
+  const sorted = [...days].sort(); // ascending order
+  if (sorted.length === 0) return { current: 0, longest: 0, today_active: false };
+
+  const today = new Date().toISOString().slice(0, 10);
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+
+  // Current streak: count consecutive days backward from today (or yesterday if today not active)
+  const lastDay = sorted[sorted.length - 1]!;
+  const today_active = lastDay === today;
+
+  // If last active day is older than yesterday, streak is broken
+  if (lastDay < yesterday) {
+    // Find longest streak separately
+    let longest = 1, run = 1;
+    for (let i = 1; i < sorted.length; i++) {
+      const d1 = new Date(sorted[i]!);
+      const d2 = new Date(sorted[i - 1]!);
+      if ((d1.getTime() - d2.getTime()) / 86400000 <= 1) {
+        run++;
+        if (run > longest) longest = run;
+      } else {
+        run = 1;
+      }
+    }
+    return { current: 0, longest, today_active: false };
+  }
+
+  // Count current streak from end
+  let current = 1;
+  for (let i = sorted.length - 1; i > 0; i--) {
     const d1 = new Date(sorted[i]!);
-    const d2 = new Date(sorted[i + 1]!);
-    if ((d1.getTime() - d2.getTime()) / 86400000 <= 1) streak++;
+    const d2 = new Date(sorted[i - 1]!);
+    if ((d1.getTime() - d2.getTime()) / 86400000 <= 1) current++;
     else break;
   }
-  return streak;
+
+  // Find longest streak across all history
+  let longest = current, run = 1;
+  for (let i = 1; i < sorted.length; i++) {
+    const d1 = new Date(sorted[i]!);
+    const d2 = new Date(sorted[i - 1]!);
+    if ((d1.getTime() - d2.getTime()) / 86400000 <= 1) {
+      run++;
+      if (run > longest) longest = run;
+    } else {
+      run = 1;
+    }
+  }
+
+  return { current, longest, today_active };
 }
 
 export function buildApiResponse(

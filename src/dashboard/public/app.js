@@ -102,6 +102,11 @@ const I18N = {
     section_timeline: 'Timeline',
     hero_title: 'Agent Achievements',
     xp_label: '{xp} XP • Level {level}',
+    streak_title: 'Coding Streak',
+    streak_days: 'days',
+    streak_best: 'Best',
+    streak_today_done: 'Coded today ✓',
+    streak_today_pending: 'Not yet today',
     stat_unlocked: 'Unlocked',
     stat_events: 'Events',
     stat_streak: 'Day Streak',
@@ -167,6 +172,11 @@ const I18N = {
     section_timeline: '时间线',
     hero_title: 'Agent 成就系统',
     xp_label: '{xp} XP • {level} 级',
+    streak_title: '编码连胜',
+    streak_days: '天',
+    streak_best: '最高纪录',
+    streak_today_done: '今天已编码 ✓',
+    streak_today_pending: '今天还没写代码',
     stat_unlocked: '已解锁',
     stat_events: '事件',
     stat_streak: '连续天数',
@@ -721,8 +731,38 @@ async function refreshData() {
 
 // ── Profile Hero ─────────────────────────────────────
 
+function renderStreakCard(streak) {
+  const card = document.getElementById('streak-card');
+  if (!card) return;
+
+  const currentEl = document.getElementById('streak-current');
+  const longestEl = document.getElementById('streak-longest');
+  const todayEl = document.getElementById('streak-today');
+
+  if (!streak || (streak.current === 0 && !streak.today_active)) {
+    card.style.display = 'none';
+    return;
+  }
+
+  card.style.display = '';
+  if (currentEl) currentEl.textContent = streak.current;
+  if (longestEl) longestEl.textContent = streak.longest;
+
+  if (todayEl) {
+    if (streak.today_active) {
+      todayEl.textContent = t('streak_today_done');
+      todayEl.className = 'streak-today active';
+    } else {
+      todayEl.textContent = t('streak_today_pending');
+      todayEl.className = 'streak-today idle';
+    }
+  }
+}
+
 function renderProfile(data) {
   const { stats } = data;
+
+  renderStreakCard(stats.streak);
 
   const fill = document.getElementById('xp-bar-fill');
   const label = document.getElementById('xp-label');
@@ -765,7 +805,6 @@ function renderProfile(data) {
     const statItems = [
       { value: unlockedCount.toLocaleString(), label: t('stat_unlocked') },
       { value: stats.total_events.toLocaleString(), label: t('stat_events') },
-      { value: String(stats.streak), label: t('stat_streak') },
       { value: `${stats.completion_pct}%`, label: t('stat_complete') },
     ];
     row.innerHTML = statItems.map(s => `

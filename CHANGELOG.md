@@ -1,6 +1,17 @@
 # Changelog
 
-## [0.1.6] — 2026-06-04
+## [0.1.6] — 2026-06-05
+
+### P1-1~P1-4 设计文档 — 2026-06-05
+
+基于 Round 3 竞品调研 + Gap Analysis 的 6 条建议，完成 4 篇 P1 优先级设计文档：
+
+- **P1-2: UserPromptSubmit Hook** (`2026-06-05-user-prompt-submit-hook-design.md`) — CC hook `UserPromptSubmit` → `user.prompt` 事件（char_count/word_count/prefix_hash 隐私保护），`user.message` 双通道（hook auto + MCP track）共存去重。~1 天工作量。
+- **P1-1: Usage-based XP** (`2026-06-05-usage-based-xp-design.md`) — 成就 XP + 活动 XP 双轨。`calcUsageXP()` = sqrt(toolCalls + sessions×10 + messages×5 + tokens/1000×0.5 + uniqueTools×20)，Level 合并计算，sqrt 防通胀。~1-2 天工作量。
+- **P1-3: 日聚合缓存表** (`2026-06-05-daily-aggregation-cache-design.md`) — stats.json 新增 daily buckets，增量更新（last_aggregated_line），Dashboard 热力图零扫描。~2-3 天工作量。
+- **P1-4: 数据导出/导入** (`2026-06-05-data-export-import-design.md`) — `agpa export/import` CLI + Dashboard 按钮 + merge/replace 冲突解决 + `.agpa-export.json` 格式。~1-2 天工作量。
+
+Specs 目录当前共 7 篇设计文档。
 
 ### Agent 工具使用统计系统 — 2026-06-04
 

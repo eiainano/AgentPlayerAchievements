@@ -102,7 +102,8 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
   if (typeof ti.file_path === 'string') base.file_path = ti.file_path;
   if (typeof ti.command === 'string') base.command = ti.command;
   if (typeof ti.description === 'string') base.description = ti.description;
-  if (typeof ti.prompt_text === 'string') base.prompt_text = ti.prompt_text;
+  // prompt_text is intentionally NOT added to base — the UserPromptSubmit case
+  // reads it directly and only stores metadata (hash, counts), never the full text.
 
   const results: Array<{ event_type: string; payload: Record<string, unknown> }> = [];
 

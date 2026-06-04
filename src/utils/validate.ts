@@ -23,12 +23,25 @@ export const showcaseDataSchema = z.object({
   slots: z.array(z.string().nullable()),
 });
 
+// P1-3: Daily aggregation bucket schema
+export const dailyBucketSchema = z.object({
+  tool_calls: z.number().default(0),
+  sessions: z.number().default(0),
+  user_msgs: z.number().default(0),
+  tokens: z.number().default(0),
+  unique_tools: z.number().default(0),
+  duration_secs: z.number().default(0),
+  tools_used: z.array(z.string()).default([]),
+});
+
 export const agentToolStatsSchema = z.object({
-  version: z.literal('1.0'),
+  version: z.enum(['1.0', '2.0']).default('2.0'),
   last_updated: z.string(),
   sessions: z.record(z.string(), z.number()),
   user_messages: z.record(z.string(), z.number()),
   usage_time_ms: z.record(z.string(), z.number()),
+  last_aggregated_line: z.number().optional(),
+  daily: z.record(z.string(), dailyBucketSchema).optional(),
 });
 
 export const appConfigSchema = z.object({

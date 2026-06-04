@@ -1,6 +1,20 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-04 | 总成就数: 160 | 条件类型: 11 | Tests: 120 ✅ | 5 Agent 全接入 | Dashboard 活动面板（streak+heatmap）
+> 最后更新: 2026-06-05 | 总成就数: 160 | 条件类型: 11 | Tests: 150 ✅ | 5 Agent 全接入 | P0-1+P1-1~P1-4 全部实施
+
+---
+
+## 🎉 今日实施 — P0-P1 全线落地 (v0.1.6, 6/5)
+
+Phase 1-3 全线实施完毕，基于 Round 3 竞品调研的 6 条建议全部落地：
+
+- [x] **P0-1: JSONL 解析** — `parseTranscriptJsonl()` 在 Stop hook `session.end` 时解析 CC JSONL transcript → `token.consumed` + `user.message.batch` + `session.stats` 事件。复活 3 个 token 成就。
+- [x] **P1-2: UserPromptSubmit Hook** — CC hook → `user.prompt` 事件（char_count/word_count/prefix_hash/has_code_block 隐私保护）+ `user.message`（source: hook_auto）。init.ts 新增 hook key。
+- [x] **P1-1: Usage-based XP** — `calcUsageXP()` / `calcUsageBreakdown()` sqrt 双轨公式。Level = achievement + task + usage XP。api.ts 集成，DashboardStats 新增 `usage_xp` + `usage_breakdown` 字段。
+- [x] **P1-4: 数据导出/导入** — `agpa export` / `agpa import` CLI + Dashboard `/api/export` 端点 + merge/replace 冲突解决。engine 新增 `saveState()`/`saveStats()`/`appendEvents()` 公共方法。
+- [x] **P1-3: 日聚合缓存** — stats.json v2.0 + `DailyBucket` + `aggregateDaily()` + `mergeDaily()` + `computeStats()` 增量模式（last_aggregated_line）。`computeHeatmapFromDaily()` / `calcStreakFromDaily()` 零扫描 Dashboard 热力图。
+
+**新增测试:** +30 tests（stats.test.ts: +11, xp.test.ts: +9, hook.test.ts: +10）→ 150/150 ✅
 
 ---
 

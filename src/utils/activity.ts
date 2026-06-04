@@ -128,3 +128,102 @@ export function computeHeatmap(events: TrackedEvent[]): HeatmapData {
 
   return { days: result.sort((a, b) => a.date.localeCompare(b.date)), quantiles: [q1, q2, q3] };
 }
+
+// ── P1-3: Heatmap from daily cache (zero event scan) ─────────────────────
+
+export function computeHeatmapFromDaily(
+  daily: Record<string, { sessions: number }>,
+): HeatmapData {
+  const today = new Date();
+  const days = new Map<string, number>();
+
+  for (let i = 121; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    days.set(d.toISOString().slice(0, 10), 0);
+  }
+
+  for (const [date, bucket] of Object.entries(daily)) {
+    if (days.has(date)) {
+      days.set(date, bucket.sessions);
+    }
+  }
+
+  const nonZero = [...days.values()].filter(c => c > 0).sort((a, b) => a - b);
+  let q1 = 1, q2 = 2, q3 = 3;
+  if (nonZero.length >= 4) {
+    q1 = nonZero[Math.floor(nonZero.length * 0.25)]!;
+    q2 = nonZero[Math.floor(nonZero.length * 0.50)]!;
+    q3 = nonZero[Math.floor(nonZero.length * 0.75)]!;
+    if (q2 <= q1) q2 = q1 + 1;
+    if (q3 <= q2) q3 = q2 + 1;
+  }
+
+  const result: DayActivity[] = [];
+  for (const [date, count] of days) {
+    let level: DayActivity['level'] = 0;
+    if (count > 0) {
+      if (count <= q1) level = 1;
+      else if (count <= q2) level = 2;
+      else if (count <= q3) level = 3;
+      else level = 4;
+    }
+    result.push({ date, count, level });
+  }
+
+  return { days: result.sort((a, b) => a.date.localeCompare(b.date)), quantiles: [q1, q2, q3] };
+}
+
+export function calcStreakFromDaily(
+  daily: Record<string, { sessions: number }>,
+): StreakData {
+  const activeDays = Object.entries(daily)
+    .filter(([, b]) => b.sessions > 0)
+    .map(([date]) => date)
+    .sort();
+
+  if (activeDays.length === 0) return { current: 0, longest: 0, today_active: false };
+
+  const today = new Date().toISOString().slice(0, 10);
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+
+  const lastDay = activeDays[activeDays.length - 1]!;
+  const today_active = lastDay === today;
+
+  if (lastDay < yesterday) {
+    let longest = 1, run = 1;
+    for (let i = 1; i < activeDays.length; i++) {
+      const d1 = new Date(activeDays[i]!);
+      const d2 = new Date(activeDays[i - 1]!);
+      if ((d1.getTime() - d2.getTime()) / 86400000 <= 1) {
+        run++;
+        if (run > longest) longest = run;
+      } else {
+        run = 1;
+      }
+    }
+    return { current: 0, longest, today_active: false };
+  }
+
+  let current = 1;
+  for (let i = activeDays.length - 1; i > 0; i--) {
+    const d1 = new Date(activeDays[i]!);
+    const d2 = new Date(activeDays[i - 1]!);
+    if ((d1.getTime() - d2.getTime()) / 86400000 <= 1) current++;
+    else break;
+  }
+
+  let longest = current, run = 1;
+  for (let i = 1; i < activeDays.length; i++) {
+    const d1 = new Date(activeDays[i]!);
+    const d2 = new Date(activeDays[i - 1]!);
+    if ((d1.getTime() - d2.getTime()) / 86400000 <= 1) {
+      run++;
+      if (run > longest) longest = run;
+    } else {
+      run = 1;
+    }
+  }
+
+  return { current, longest, today_active };
+}

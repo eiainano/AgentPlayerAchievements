@@ -10,12 +10,13 @@ import type {
 } from '../engine/types.js';
 import type { AgentToolStats } from '../engine/stats.js';
 import { evaluateCondition } from '../engine/evaluator.js';
-import { calcTotalXp, calcLevel, calcLevelProgress } from './xp.js';
+import { calcTotalXp, calcLevel, calcLevelProgress, calcUsageBreakdown } from './xp.js';
+import type { UsageBreakdown } from './xp.js';
 import { buildTimeline } from './timeline.js';
 import { loadConfig } from '../config.js';
 import type { AppConfig } from '../config.js';
 import type { StreakData, HeatmapData, DayActivity } from '../utils/activity.js';
-import { calcStreak, computeHeatmap } from '../utils/activity.js';
+import { calcStreak, computeHeatmap, computeHeatmapFromDaily, calcStreakFromDaily } from '../utils/activity.js';
 
 // ── Response types ────────────────────────────────────────────────────
 
@@ -69,6 +70,8 @@ export interface DashboardStats {
   streak: StreakData;
   heatmap: HeatmapData;
   tool_stats?: AgentToolStats;
+  usage_xp: number;
+  usage_breakdown?: UsageBreakdown;
 }
 
 export interface DashboardData {
@@ -170,9 +173,11 @@ export function buildApiResponse(
   const achievements = buildAchievementsResponse(definitions, state, { events, taskCount });
 
   const unlockedDefs = definitions.filter(d => state.unlocked[d.id]);
+  const usageBreakdown = calcUsageBreakdown(events);
   const totalXp = calcTotalXp(
     unlockedDefs.map(d => ({ rarity: d.rarity })),
     taskCount,
+    usageBreakdown.usage_xp,
   );
 
   return {
@@ -188,9 +193,15 @@ export function buildApiResponse(
       total_xp: totalXp,
       xp_progress: calcLevelProgress(totalXp),
       showcase: showcaseData,
-      streak: calcStreak(events),
-      heatmap: computeHeatmap(events),
+      streak: toolStats?.daily
+        ? calcStreakFromDaily(toolStats.daily as Record<string, { sessions: number }>)
+        : calcStreak(events),
+      heatmap: toolStats?.daily
+        ? computeHeatmapFromDaily(toolStats.daily as Record<string, { sessions: number }>)
+        : computeHeatmap(events),
       tool_stats: toolStats,
+      usage_xp: usageBreakdown.usage_xp,
+      usage_breakdown: usageBreakdown,
     },
     timeline: buildTimeline(state.unlocked),
     sets: buildSetsResponse(definitions, state, setDefinitions),

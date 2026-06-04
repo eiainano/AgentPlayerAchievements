@@ -2,6 +2,46 @@
 
 ## [0.1.6] — 2026-06-05
 
+### P0-P1 全线实施 — 2026-06-05
+
+基于 Round 3 竞品调研（12 项目 × 40+ 维度）的 Gap Analysis 全部 6 条建议（P0-1, P1-1~P1-4）完整落地：
+
+**P0-1: JSONL 解析 (Stop hook session.end)**
+- `src/cli/hook.ts` — `parseTranscriptJsonl()` 纯函数，逐行解析 CC JSONL transcript
+- `cmdTrack()` session.end 分支 — 自动读取 `$CLAUDE_TRANSCRIPT_PATH`，写入 `token.consumed` + `user.message.batch` + `session.stats` 事件
+- 新增事件类型：`token.consumed`, `user.message.batch`, `session.stats`
+- 复活 3 个 dead achievements: `token_1m`, `token_titan`, `token_legend`
+
+**P1-2: UserPromptSubmit Hook (CC hook → user.prompt)**
+- `mapEvents()` 新增 `UserPromptSubmit` case → 生成 `user.prompt`（char_count/word_count/prefix_hash/has_code_block）+ `user.message`（source: hook_auto）
+- `computePromptPayload()` — SHA-256 前 20 字符 hash，隐私保护，不存原文
+- `HookStdin` 新增 `prompt_text` 字段
+- `init.ts` `getHookKeys()` 新增 `UserPromptSubmit` hook key（async: false，高频同步）
+- 新增事件类型：`user.prompt`
+
+**P1-1: Usage-based XP (成就 + 活动双轨)**
+- `src/dashboard/xp.ts` — `calcUsageXP()` / `calcUsageBreakdown()` 5 维 sqrt 公式
+- Level = achievement XP + task XP + usage XP（sqrt 防通胀：10000 调用 → 100 XP）
+- `api.ts` 集成，`DashboardStats` 新增 `usage_xp` + `usage_breakdown` 字段
+
+**P1-4: 数据导出/导入**
+- `src/cli/export.ts` — `agpa export [profile] [--full] [--migrate] [--output <path>]`
+- `src/cli/import.ts` — `agpa import <file> [--dry-run] [--force]` + merge/replace 冲突解决
+- `src/cli/types.ts` — `ExportPayload` 共享类型（format_version 1.0）
+- `src/dashboard/server.ts` — `GET /api/export` 端点（Content-Disposition attachment）
+- `src/cli/index.ts` — 注册 `export` / `import` 两个子命令
+- `src/engine/engine.ts` — 新增 `saveState()` / `saveStats()` / `appendEvents()` 公共方法
+
+**P1-3: 日聚合缓存 (增量更新 + 零扫描热力图)**
+- `src/engine/stats.ts` — `DailyBucket` 接口 + `aggregateDaily()` + `mergeDaily()` + `computeStats()` 增量模式（`last_aggregated_line`）
+- stats.json v2.0 — `daily` 字段 + 向后兼容 v1.0 schema
+- `src/utils/activity.ts` — `computeHeatmapFromDaily()` / `calcStreakFromDaily()` 从 daily cache 零扫描
+- `src/dashboard/api.ts` — 优先使用 daily cache，fallback 事件扫描
+- `src/engine/engine.ts` — `poll()` 传入 existing stats 做增量
+- `src/utils/validate.ts` — `dailyBucketSchema` + agentToolStatsSchema 升级为 v2.0 union
+
+**测试:** +30 tests → 150/150 ✅ (stats: +11, xp: +9, hook: +10)
+
 ### P1-1~P1-4 设计文档 — 2026-06-05
 
 基于 Round 3 竞品调研 + Gap Analysis 的 6 条建议，完成 4 篇 P1 优先级设计文档：

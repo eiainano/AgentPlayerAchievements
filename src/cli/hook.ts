@@ -42,6 +42,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { createHash } from 'crypto';
 import { homedir } from 'os';
 import { AchievementEngine } from '../engine/engine.js';
 import { loadConfig } from '../config.js';
@@ -66,6 +67,7 @@ interface HookStdin {
   agent_type?: string;
   source?: string;
   cwd?: string;
+  prompt_text?: string;
 }
 
 let stdinCache: string | null = null;
@@ -100,6 +102,7 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
   if (typeof ti.file_path === 'string') base.file_path = ti.file_path;
   if (typeof ti.command === 'string') base.command = ti.command;
   if (typeof ti.description === 'string') base.description = ti.description;
+  if (typeof ti.prompt_text === 'string') base.prompt_text = ti.prompt_text;
 
   const results: Array<{ event_type: string; payload: Record<string, unknown> }> = [];
 
@@ -171,6 +174,25 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
     case 'PostToolUseFailure':
       results.push({ event_type: 'tool.failure', payload: { ...base } });
       break;
+    case 'UserPromptSubmit': {
+      const promptText = (ti.prompt_text as string) || (data.prompt_text as string) || '';
+      if (promptText) {
+        const pp = computePromptPayload(promptText);
+        results.push({
+          event_type: 'user.prompt',
+          payload: { ...base, ...pp },
+        });
+        results.push({
+          event_type: 'user.message',
+          payload: {
+            char_count: pp.char_count,
+            word_count: pp.word_count,
+            source: 'hook_auto',
+          },
+        });
+      }
+      break;
+    }
     case 'PreToolUse':
       results.push({ event_type: 'tool.requested', payload: { tool_name: data.tool_name } });
       break;
@@ -203,6 +225,95 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
   return results;
 }
 
+// ── P1-2: Prompt payload computation ──────────────────────────
+
+interface PromptPayload {
+  char_count: number;
+  word_count: number;
+  prefix_hash: string;
+  has_code_block: boolean;
+}
+
+export function computePromptPayload(promptText: string): PromptPayload {
+  const prefix = promptText.slice(0, 20);
+  const hash = createHash('sha256').update(prefix).digest('hex').slice(0, 8);
+
+  return {
+    char_count: promptText.length,
+    word_count: promptText.split(/\s+/).filter(Boolean).length,
+    prefix_hash: hash,
+    has_code_block: promptText.includes('```'),
+  };
+}
+
+// ── P0-1: JSONL transcript parsing ────────────────────────────
+
+interface TranscriptStats {
+  user_message_count: number;
+  total_input_tokens: number;
+  total_output_tokens: number;
+  total_cache_read_tokens: number;
+  total_cache_creation_tokens: number;
+  session_started_at: string;
+  session_ended_at: string;
+  session_duration_ms: number;
+}
+
+export function parseTranscriptJsonl(filePath: string): TranscriptStats | null {
+  try {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const lines = content.split('\n').filter(Boolean);
+
+    let userMsgCount = 0;
+    let inputTokens = 0;
+    let outputTokens = 0;
+    let cacheReadTokens = 0;
+    let cacheCreationTokens = 0;
+    let firstTimestamp = '';
+    let lastTimestamp = '';
+
+    for (const line of lines) {
+      try {
+        const entry = JSON.parse(line);
+
+        if (!firstTimestamp) firstTimestamp = entry.timestamp;
+        lastTimestamp = entry.timestamp;
+
+        if (entry.type === 'user') userMsgCount++;
+
+        if (entry.usage) {
+          inputTokens += entry.usage.input_tokens || 0;
+          outputTokens += entry.usage.output_tokens || 0;
+          cacheReadTokens += entry.usage.cache_read_input_tokens || 0;
+          cacheCreationTokens += entry.usage.cache_creation_input_tokens || 0;
+        }
+      } catch {
+        // Skip malformed lines
+      }
+    }
+
+    const totalTokens = inputTokens + outputTokens + cacheReadTokens + cacheCreationTokens;
+    if (totalTokens === 0 && userMsgCount === 0) return null;
+
+    const durationMs = firstTimestamp && lastTimestamp
+      ? new Date(lastTimestamp).getTime() - new Date(firstTimestamp).getTime()
+      : 0;
+
+    return {
+      user_message_count: userMsgCount,
+      total_input_tokens: inputTokens,
+      total_output_tokens: outputTokens,
+      total_cache_read_tokens: cacheReadTokens,
+      total_cache_creation_tokens: cacheCreationTokens,
+      session_started_at: firstTimestamp,
+      session_ended_at: lastTimestamp,
+      session_duration_ms: durationMs,
+    };
+  } catch {
+    return null;
+  }
+}
+
 // ── Commands ──────────────────────────────────────────────────
 
 function cmdTrack(): void {
@@ -223,6 +334,48 @@ function cmdTrack(): void {
   ENGINE.init();
   const event = ENGINE.track(eventType, payload);
   process.stderr.write(`[AGPA] track ${eventType} → ${event.event_id}\n`);
+
+  // P0-1: Parse JSONL transcript for precise session stats (CC only)
+  if (eventType === 'session.end') {
+    const transcriptPath = process.env.CLAUDE_TRANSCRIPT_PATH
+                        || (payload.transcript_path as string)
+                        || process.argv.slice(4).find(a => a.endsWith('.jsonl'));
+
+    if (transcriptPath) {
+      const stats = parseTranscriptJsonl(transcriptPath);
+      if (stats) {
+        const totalTokens = stats.total_input_tokens + stats.total_output_tokens
+                          + stats.total_cache_read_tokens + stats.total_cache_creation_tokens;
+        ENGINE.track('token.consumed', {
+          amount: totalTokens,
+          input_tokens: stats.total_input_tokens,
+          output_tokens: stats.total_output_tokens,
+          cache_read_tokens: stats.total_cache_read_tokens,
+          cache_creation_tokens: stats.total_cache_creation_tokens,
+          source: 'jsonl_parsed',
+        });
+
+        if (stats.user_message_count > 0) {
+          ENGINE.track('user.message.batch', {
+            count: stats.user_message_count,
+            source: 'jsonl_parsed',
+          });
+        }
+
+        ENGINE.track('session.stats', {
+          user_message_count: stats.user_message_count,
+          total_input_tokens: stats.total_input_tokens,
+          total_output_tokens: stats.total_output_tokens,
+          total_cache_read_tokens: stats.total_cache_read_tokens,
+          total_cache_creation_tokens: stats.total_cache_creation_tokens,
+          session_started_at: stats.session_started_at,
+          session_ended_at: stats.session_ended_at,
+          session_duration_ms: stats.session_duration_ms,
+          source: 'jsonl_parsed',
+        });
+      }
+    }
+  }
 }
 
 function cmdPoll(): void {

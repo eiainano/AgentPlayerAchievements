@@ -1,10 +1,17 @@
 # AGPA 开发进度
 
-> 最后更新: 2026-06-04
+> 最后更新: 2026-06-05
 
 ## 总体状态
 
-v0.1.6 完成。大批量成就一致性审计修复 + 3 个 evaluator 功能新增 + 音效系统 + Agent 工具使用统计 + Dashboard 活动面板（streak 卡片 + 热力图）。160 个成就（其中 2 个 future 不可达成），120 个测试全绿。
+v0.1.6 完成。Round 3 竞品调研（12 项目 × 40+ 维度）→ 6 条建议全部实施。160 个成就，150 个测试全绿。
+
+**本次新增 (2026-06-05):**
+- P0-1: JSONL 解析（CC transcript → token/user message/session 精确数据）
+- P1-1: Usage-based XP（成就 + 活动双轨 Level）
+- P1-2: UserPromptSubmit Hook（CC hook → user.prompt + user.message）
+- P1-3: 日聚合缓存（stats.json v2.0 + 增量更新 + 零扫描热力图）
+- P1-4: 数据导出/导入（CLI + Dashboard API）
 
 ---
 

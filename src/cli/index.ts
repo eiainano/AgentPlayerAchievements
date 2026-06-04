@@ -41,6 +41,8 @@ const COMMANDS: Subcommand[] = [
   { name: 'reset',      description: 'Reset all achievement data',                                         usage: 'agpa reset',                                module: './mvp.ts' },
   { name: 'sound',      description: 'Toggle achievement sound effects (on | off)',                       usage: 'agpa sound <on|off>',                       module: './sound.ts' },
   { name: 'activity',   description: 'View coding streak & activity heatmap in terminal',                  usage: 'agpa activity [--streak|--heatmap|--compact]', module: './activity.ts' },
+  { name: 'export',     description: 'Export achievement data to a portable JSON file',                     usage: 'agpa export [profile] [--output <path>] [--full] [--migrate]', module: './export.ts' },
+  { name: 'import',     description: 'Import achievement data from a backup file',                          usage: 'agpa import <file> [--profile <name>] [--dry-run] [--force]', module: './import.ts' },
   { name: 'mcp',        description: 'Start MCP server (stdio)',                                           usage: 'agpa mcp',                                  module: '../main.ts' },
 ];
 

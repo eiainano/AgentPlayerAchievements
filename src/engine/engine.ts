@@ -174,9 +174,10 @@ export class AchievementEngine {
 
     this.unlockedThisPoll = newlyUnlocked;
 
-    // Compute + cache usage statistics after poll
+    // Compute + cache usage statistics after poll (P1-3: incremental mode)
     try {
-      const stats = computeStats(this.events);
+      const existingStats = this.store.loadStats();
+      const stats = computeStats(this.events, existingStats);
       this.store.saveStats(stats);
     } catch {
       // stats computation should never block poll; drop silently
@@ -246,5 +247,24 @@ export class AchievementEngine {
     this.state = { unlocked: {}, stats: { total_unlocked: 0 } };
     this.events = [];
     this.store.reset();
+  }
+
+  /** Import: save state (used by import.ts) */
+  saveState(state: AchievementState): void {
+    this.store.saveState(state);
+    this.state = state;
+  }
+
+  /** Import: save stats (used by import.ts) */
+  saveStats(stats: AgentToolStats): void {
+    this.store.saveStats(stats);
+  }
+
+  /** Import: append a batch of events (used by import.ts) */
+  appendEvents(events: TrackedEvent[]): void {
+    for (const e of events) {
+      this.store.appendEvent(e);
+    }
+    this.events = this.events.concat(events);
   }
 }

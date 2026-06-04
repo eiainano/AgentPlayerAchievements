@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { AchievementEngine } from '../engine/engine.js';
-import { saveConfig, isSoundEnabled, setSoundEnabled } from '../config.js';
+import { saveConfig, loadConfig, isSoundEnabled, setSoundEnabled } from '../config.js';
 import { formatAchievement, RARITY_RANK, loadShowcase, saveShowcase } from '../helpers.js';
 import type { ShowcaseData } from '../helpers.js';
 import { buildApiResponse } from './api.js';
@@ -282,6 +282,39 @@ export function createServer(port: number, defaultProfile: string): http.Server 
       saveShowcase(engine.stateDir, sc);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ status: 'ok', slot: body.slot }));
+      return;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // P1-4: Export / Import API
+    // ═══════════════════════════════════════════════════════════════════
+
+    // GET /api/export — export achievement data as JSON download
+    if (url.pathname === '/api/export' && req.method === 'GET') {
+      const full = url.searchParams.get('full') === 'true';
+      try {
+        const meta = getProfileMeta(resolvedProfile);
+        const payload: Record<string, unknown> = {
+          format_version: '1.0',
+          exported_at: new Date().toISOString(),
+          source: { tool: 'agpa', version: '0.1.6', profile: resolvedProfile, profile_emoji: meta.emoji },
+          state: engine.state,
+          stats: engine.toolStats(),
+          showcase: loadShowcase(engine.stateDir),
+        };
+        if (full) {
+          payload.events = engine.events;
+        }
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Content-Disposition': `attachment; filename="agpa-${resolvedProfile}-${new Date().toISOString().slice(0, 10)}.json"`,
+        });
+        res.end(JSON.stringify(payload, null, 2));
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Export failed';
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: msg }));
+      }
       return;
     }
 

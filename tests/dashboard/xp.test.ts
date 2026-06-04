@@ -4,9 +4,28 @@ import {
   calcXpForLevel,
   calcLevelProgress,
   calcTotalXp,
+  calcUsageXP,
+  calcUsageBreakdown,
   ACHIEVEMENT_XP,
   XP_PER_TASK,
 } from '../../src/dashboard/xp.js';
+import type { TrackedEvent } from '../../src/engine/types.js';
+
+function makeEvent(
+  event_type: string,
+  overrides: Partial<TrackedEvent> = {},
+): TrackedEvent {
+  return {
+    protocol_version: '1.0',
+    event_id: crypto.randomUUID ? crypto.randomUUID() : 'test-id',
+    timestamp: new Date().toISOString(),
+    tool_source: 'claude-code',
+    event_type,
+    payload: {},
+    context: { session_id: 'test', model: 'auto' },
+    ...overrides,
+  };
+}
 
 describe('xp', () => {
   it('calcLevel returns correct level', () => {
@@ -51,5 +70,87 @@ describe('xp', () => {
       { rarity: 'uncommon' as const },
     ];
     expect(calcTotalXp(achievements, 10)).toBe(50 + 1000 + 100 + 10 * 10);
+  });
+
+  it('calcTotalXp includes optional usageXP', () => {
+    const achievements = [{ rarity: 'common' as const }];
+    expect(calcTotalXp(achievements, 0, 100)).toBe(50 + 100);
+    expect(calcTotalXp(achievements, 0)).toBe(50); // backward compatible
+  });
+});
+
+describe('usage-based XP', () => {
+  it('calcUsageXP returns 0 for empty events', () => {
+    expect(calcUsageXP([])).toBe(0);
+  });
+
+  it('calcUsageBreakdown counts tool.complete events', () => {
+    const events: TrackedEvent[] = [
+      makeEvent('tool.complete', { payload: { tool_name: 'Read' } }),
+      makeEvent('tool.complete', { payload: { tool_name: 'Write' } }),
+      makeEvent('tool.complete', { payload: { tool_name: 'Read' } }), // duplicate tool
+    ];
+
+    const b = calcUsageBreakdown(events);
+    expect(b.tool_calls).toBe(3);
+    expect(b.unique_tools).toBe(2);
+  });
+
+  it('calcUsageBreakdown counts sessions', () => {
+    const events: TrackedEvent[] = [
+      makeEvent('session.start'),
+      makeEvent('session.start'),
+    ];
+
+    const b = calcUsageBreakdown(events);
+    expect(b.sessions).toBe(2);
+  });
+
+  it('calcUsageBreakdown counts user messages', () => {
+    const events: TrackedEvent[] = [
+      makeEvent('user.message'),
+      makeEvent('user.message'),
+      makeEvent('user.message'),
+    ];
+
+    const b = calcUsageBreakdown(events);
+    expect(b.messages).toBe(3);
+  });
+
+  it('calcUsageBreakdown accumulates token.consumed amounts', () => {
+    const events: TrackedEvent[] = [
+      makeEvent('token.consumed', { payload: { amount: 100000 } }),
+      makeEvent('token.consumed', { payload: { amount: 50000 } }),
+    ];
+
+    const b = calcUsageBreakdown(events);
+    expect(b.total_tokens).toBe(150000);
+  });
+
+  it('calcUsageXP is deterministic', () => {
+    const events: TrackedEvent[] = [
+      makeEvent('tool.complete', { payload: { tool_name: 'Read' } }),
+      makeEvent('session.start'),
+      makeEvent('user.message'),
+    ];
+
+    const xp1 = calcUsageXP(events);
+    const xp2 = calcUsageXP(events);
+    expect(xp1).toBe(xp2);
+    expect(xp1).toBeGreaterThan(0);
+  });
+
+  it('calcUsageXP grows sub-linearly with usage (sqrt effect)', () => {
+    const manyEvents: TrackedEvent[] = Array.from({ length: 100 }, () =>
+      makeEvent('tool.complete', { payload: { tool_name: 'Read' } })
+    );
+    const fewEvents: TrackedEvent[] = Array.from({ length: 10 }, () =>
+      makeEvent('tool.complete', { payload: { tool_name: 'Read' } })
+    );
+
+    const manyXp = calcUsageXP(manyEvents);
+    const fewXp = calcUsageXP(fewEvents);
+    // 10x events should give less than 10x XP (sqrt effect)
+    expect(manyXp).toBeLessThan(fewXp * 10);
   });
 });

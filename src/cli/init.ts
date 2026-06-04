@@ -557,6 +557,7 @@ function injectHook(
 function getHookKeys(profile: string | null): Array<{ key: string; command: string; async?: boolean; timeout?: number }> {
   return [
     { key: 'SessionStart',       command: hookCmd(HOOK_ENV, 'track session.start', profile),               async: false },
+    { key: 'UserPromptSubmit',   command: hookCmd(HOOK_ENV, 'auto', profile),                               async: false },
     { key: 'Stop',               command: `${hookCmd(HOOK_ENV, 'track session.end', profile)} && ${hookCmd(HOOK_ENV, 'poll', profile)}`, async: true, timeout: 15 },
     { key: 'PostToolUse',        command: hookCmd(HOOK_ENV, 'auto', profile) },
     { key: 'PreToolUse',         command: hookCmd(HOOK_ENV, 'auto', profile) },

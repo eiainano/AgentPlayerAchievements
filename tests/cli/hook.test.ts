@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mapEvents, normalizeOpenClawStdin, OPENCLAW_EVENT_MAP, OPENCLAW_TOOL_MAP } from '../../src/cli/hook.js';
+import { mapEvents, computePromptPayload, parseTranscriptJsonl, normalizeOpenClawStdin, OPENCLAW_EVENT_MAP, OPENCLAW_TOOL_MAP } from '../../src/cli/hook.js';
 
 describe('mapEvents', () => {
   describe('PostToolUse', () => {
@@ -385,5 +385,105 @@ describe('normalizeOpenClawStdin', () => {
       });
       expect(result.hook_event_name).toBe('some_unknown_hook');
     });
+  });
+});
+
+// ── P1-2: computePromptPayload ─────────────────────────────────────────
+
+describe('computePromptPayload', () => {
+  it('computes char_count and word_count', () => {
+    const pp = computePromptPayload('hello world');
+    expect(pp.char_count).toBe(11);
+    expect(pp.word_count).toBe(2);
+  });
+
+  it('computes prefix_hash deterministically', () => {
+    const pp1 = computePromptPayload('hello world this is a test');
+    const pp2 = computePromptPayload('hello world this is a test');
+    expect(pp1.prefix_hash).toBe(pp2.prefix_hash);
+    expect(pp1.prefix_hash).toHaveLength(8);
+  });
+
+  it('detects code blocks', () => {
+    const pp = computePromptPayload('```\ncode here\n```');
+    expect(pp.has_code_block).toBe(true);
+  });
+
+  it('no code block for plain text', () => {
+    const pp = computePromptPayload('just plain text');
+    expect(pp.has_code_block).toBe(false);
+  });
+
+  it('handles Chinese text word count', () => {
+    const pp = computePromptPayload('你好世界');
+    expect(pp.char_count).toBe(4);
+  });
+
+  it('handles empty string', () => {
+    const pp = computePromptPayload('');
+    expect(pp.char_count).toBe(0);
+    expect(pp.word_count).toBe(0);
+  });
+});
+
+// ── P1-2: UserPromptSubmit mapEvents ────────────────────────────────────
+
+describe('mapEvents UserPromptSubmit', () => {
+  it('emits user.prompt + user.message events', () => {
+    const data = {
+      hook_event_name: 'UserPromptSubmit',
+      prompt_text: 'hello world',
+      tool_input: { prompt_text: 'hello world' },
+    };
+    const results = mapEvents('UserPromptSubmit', data);
+    const types = results.map(r => r.event_type);
+    expect(types).toContain('user.prompt');
+    expect(types).toContain('user.message');
+
+    const promptEvent = results.find(r => r.event_type === 'user.prompt');
+    expect(promptEvent!.payload.char_count).toBe(11);
+    expect(promptEvent!.payload.word_count).toBe(2);
+    expect(promptEvent!.payload.has_code_block).toBe(false);
+
+    const msgEvent = results.find(r => r.event_type === 'user.message');
+    expect(msgEvent!.payload.source).toBe('hook_auto');
+  });
+
+  it('does not emit events for empty prompt', () => {
+    const data = {
+      hook_event_name: 'UserPromptSubmit',
+      prompt_text: '',
+    };
+    const results = mapEvents('UserPromptSubmit', data);
+    expect(results.length).toBe(0);
+  });
+
+  it('reads prompt_text from tool_input fallback', () => {
+    const data = {
+      hook_event_name: 'UserPromptSubmit',
+      tool_input: { prompt_text: 'from tool input' },
+    };
+    const results = mapEvents('UserPromptSubmit', data);
+    expect(results.length).toBeGreaterThan(0);
+    const promptEvent = results.find(r => r.event_type === 'user.prompt');
+    expect(promptEvent!.payload.char_count).toBe(15);
+  });
+});
+
+// ── P0-1: parseTranscriptJsonl ─────────────────────────────────────────
+
+describe('parseTranscriptJsonl', () => {
+  it('returns null for non-existent file', () => {
+    const result = parseTranscriptJsonl('/tmp/agpa-nonexistent-file-12345.jsonl');
+    expect(result).toBeNull();
+  });
+
+  it('returns null for empty content', () => {
+    const tmp = require('fs').mkdtempSync('/tmp/agpa-test-');
+    const filePath = require('path').join(tmp, 'empty.jsonl');
+    require('fs').writeFileSync(filePath, '');
+    const result = parseTranscriptJsonl(filePath);
+    require('fs').rmSync(tmp, { recursive: true, force: true });
+    expect(result).toBeNull();
   });
 });

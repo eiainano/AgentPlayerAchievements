@@ -72,7 +72,7 @@
 | 能力 | AGPA | cc-lens | bashstats | cc-prof | guide | CCA | history-viewer | quest | level-up | @levelup-log | codex-mcp |
 |------|------|---------|-----------|---------|-------|-----|---------------|-------|---------|-------------|----------|
 | **一次性成就** | ✅ 160 | ❌ | ✅ 124 badges | ✅ 18 | ❌ | ✅ 29 | ❌ | ❌(quest-based) | ✅ 54 | ✅ 15类 | ❌ |
-| **Tiered 成就(铜→银→金)** | ❌ | ❌ | ✅(5 tiers/badge) | ❌(仅18个) | ❌(段位带) | ❌ | ❌ | ❌(quest级别) | ⚠️(段位系统) | ⚠️(15 titles) | ❌ |
+| **Tiered 成就(铜→银→金)** | ⚠️(counter/threshold可模拟) | ❌ | ✅(5 tiers/badge) | ❌(仅18个) | ❌(段位带) | ❌ | ❌ | ❌(quest级别) | ⚠️(段位系统) | ⚠️(15 titles) | ❌ |
 | **段位/段位带** | ❌ | ❌ | ❌(rank≠belt) | ❌ | ✅(7 belts) | ❌ | ❌ | ❌ | ✅(6段位) | ❌ | ❌ |
 | **Level 系统** | ✅(sqrt XP) | ❌ | ✅(500 ranks) | ❌(仅score) | ✅(5 levels) | ❌ | ❌ | ✅(per-project) | ✅(30+ 轨道) | ✅(age=level) | ✅(simple XP) |
 | **XP 系统** | ⚠️(仅成就XP) | ❌ | ✅(成就+活动) | ❌ | ❌(score≠XP) | ❌ | ❌ | ✅(25XP/quest) | ✅(complex公式) | ✅(5-500XP) | ✅(25+bonus) |
@@ -91,7 +91,7 @@
 | **主题切换** | ✅(dark/light) | ✅(dark/light) | ❌ | ❌(SVG theme) | ❌ | ❌ | ❌ | ✅(pokemon/storybook...) | ❌ | ❌ | ✅(narrator) |
 
 **AGPA 优势:** 成就系统最丰富——160 个 vs 最接近的 bashstats 124 个；套装系统独一无二；隐藏成就 + 音效是情绪化设计的标杆。
-**AGPA 劣势:** Tiered 成就缺失——bashstats 的 124×5=620 个解锁点远优于 160 个一次性成就；无 usage-based XP；无反刷分机制。
+**AGPA 劣势:** 无 usage-based XP——Level 只在成就解锁时增长；无反刷分机制；Tiered 成就语法糖暂不需要（counter/threshold 已覆盖层级进展需求）。
 
 ### 1.4 Dashboard 与 UI 层
 
@@ -176,32 +176,7 @@
 
 ### 🟡 P1 — 显著提升游戏深度
 
-#### P1-1: Tiered 成就——从 160→500+ 个解锁点
-
-**差距:** AGPA 的 160 个成就全是一次性解锁。bashstats 的 124 个 badge × 5 tiers = 620 个解锁点提供了 4 倍的持续激励密度。
-
-**方案:**
-- 对可计数的成就添加 `tiers` 字段（不替代现有的一次性成就，而是互补）
-- 格式：
-```yaml
-- id: tool_master_read
-  tiers:
-    - { name: "阅读新手", value: 100,  rarity: common, points: 10 }
-    - { name: "阅读熟手", value: 500,  rarity: uncommon, points: 25 }
-    - { name: "阅读专家", value: 2000, rarity: rare, points: 50 }
-    - { name: "阅读大师", value: 5000, rarity: epic, points: 100 }
-    - { name: "阅读之神", value: 10000, rarity: legendary, points: 200 }
-```
-- 新 condition type `tiered` — 自动给定员生成多个内部条件，分别评估
-- Dashboard 中，tiered 成就显示"N/5"进度而非 "✓/✗"
-- 先试点 10-20 个成就（Read/Write/Edit/Bash 等高频工具），观察效果
-
-**参考:** bashstats `src/achievements/compute.ts::generateTiers(base, exponent)`
-**工作量:** 4-5天
-
----
-
-#### P1-2: Usage-based XP — 成就XP + 活动XP 双轨
+#### P1-1: Usage-based XP — 成就XP + 活动XP 双轨
 
 **差距:** AGPA 的 XP 只来自成就解锁。bashstats、level-up、claude-quest 都用 activity XP 作为持续增长来源。guide 的 `sqrt(count×multiplier)` 提供了优雅的公式。
 
@@ -227,7 +202,7 @@ totalLevel = calcLevel(achievementXP + usageXP)
 
 ---
 
-#### P1-3: UserPromptSubmit Hook 补充
+#### P1-2: UserPromptSubmit Hook 补充
 
 **差距:** bashstats 和 guide 订阅了 `UserPromptSubmit` hook——这是唯一能获取用户消息内容和字数的 hook 事件。AGPA 没有这个 hook。
 
@@ -242,7 +217,7 @@ totalLevel = calcLevel(achievementXP + usageXP)
 
 ---
 
-#### P1-4: 日聚合缓存表
+#### P1-3: 日聚合缓存表
 
 **差距:** 当前 `poll()` 全量扫描 event.log。5228 个事件还好，但到 50000+ 会有性能问题。bashstats 的 `daily_activity` SQLite 表是最佳实践。
 
@@ -365,6 +340,18 @@ interface Progress { met: boolean; current: number; target: number; }
 
 ### ⚪ P3 — 可选增强，长期
 
+#### P3-0: Tiered 成就语法糖（⬇️ 从 P1 降级）
+
+**降级原因 (2026-06-05):**
+bashstats 需要 tiered 系统是因为它的成就定义是硬编码 JS 函数，无法声明式扩展。AGPA 的 `counter` + `threshold` 条件类型**已经是声明式 progression 系统**——想加 500 个解锁点，直接在 YAML 里写 500 条成就即可，不需要任何代码改动。Tiered 本质是 YAML 语法糖：把 5 个独立成就压缩成 1 个 `tiers:` 块。但代价是新增 condition type + YAML 解析器改造 + Dashboard 特殊显示逻辑，4-5 天工作量 vs 纯语法糖收益，不成比例。
+
+如果未来成就数量涨到 500+ 且 YAML 维护成本成为瓶颈，届时再考虑。当前 160 个成就通过 `counter` + `threshold` 已能实现层级进展。
+
+**参考:** bashstats `src/achievements/compute.ts::generateTiers()`
+**工作量:** 4-5天（暂缓）
+
+---
+
 #### P3-1: 特征依赖图——成就前置条件
 
 **差距:** guide 的特征依赖图确保了正确的学习路径。AGPA 没有成就解锁前置条件。
@@ -439,14 +426,12 @@ interface Progress { met: boolean; current: number; target: number; }
 
 ```
 Phase 1 (1-2 周) — P0 补齐核心数据缺口
-├─ JSONL 解析 → 精确 user message 计数 + session 时长
-├─ Token 统计 + 成本估算
-└─ UserPromptSubmit hook
+├─ JSONL 解析 → 精确 user message 计数 + session 时长 + token 统计
+└─ UserPromptSubmit hook → 用户 prompt 字数追踪
 
-Phase 2 (2-3 周) — P1 游戏深度提升
-├─ Tiered 成就（10-20 个试点）
-├─ Usage-based XP（双轨）
-└─ 日聚合缓存表
+Phase 2 (1-2 周) — P1 游戏深度提升
+├─ Usage-based XP（双轨：成就XP + 活动XP）
+└─ 日聚合缓存表 → Dashboard 性能
 
 Phase 3 (2-3 周) — P2 质量与体验
 ├─ 反刷分机制
@@ -458,7 +443,9 @@ Phase 4 (future) — P3 可选增强
 ├─ 特征依赖图
 ├─ Share card
 ├─ Session 回放
-└─ 反模式检测
+├─ 反模式检测
+├─ 叙事者角色
+└─ Tiered 成就语法糖（如需要）
 ```
 
 ---
@@ -492,7 +479,7 @@ Phase 4 (future) — P3 可选增强
 
 **AGPA 的定位:** 在统计分析和 RPG 游戏化之间找到了最佳平衡点——比纯统计类项目多了完整的成就系统，比纯 RPG 类多了真实的数据分析价值。唯一在两条轴上都有深度的项目。
 
-**下一步最优路径:** 在统计轴上补齐 JSONL 解析 → 在游戏化轴上增加 tiered 成就 → 两条腿同时走强。
+**下一步最优路径:** 在统计轴上补齐 JSONL 解析 + Token 追踪 → 在游戏化轴上增加 Usage-based XP + 日聚合 → 两条腿同时走强。
 
 ---
 
@@ -510,6 +497,6 @@ Phase 4 (future) — P3 可选增强
 
 1. **无 JSONL 解析** — 无法精确获取 user message、token、时长等核心数据。导致统计层完全依赖不可靠的 Agent 自上报。
 
-2. **无 Tiered 成就** — 160 个一次性成就 vs bashstats 的 620 个分层解锁点。成就系统的"重玩价值"和持续激励密度远低于 bashstats。
+2. **无 Usage-based XP** — XP 只来自成就解锁，不来自日常使用。导致空窗期（没有成就解锁时）Level 完全不增长。
 
-3. **无 Usage-based XP** — XP 只来自成就解锁，不来自日常使用。导致空窗期（没有成就解锁时）Level 完全不增长。
+3. **统计层薄弱** — 无 token 使用追踪、无工具使用排行、无日聚合缓存。Dashboard 虽功能密度最高，但底层数据采集精度和性能均有缺口。

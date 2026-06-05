@@ -77,8 +77,9 @@
       <button id="share-btn" class="share-btn" onclick="generateCard()" data-i18n="share_card">📸 Share</button>
       <!-- Tracked Tools Badges -->
       <div class="tracked-tools-bar" id="tracked-tools-bar"></div>
-      <!-- Streak + Heatmap row -->
+      <!-- Stats + Streak + Heatmap row -->
       <div class="hero-cards-row">
+        <div class="stats-row" id="stats-row"></div>
         <div class="streak-card" id="streak-card">
           <div class="streak-header">
             <span class="streak-icon">🔥</span>
@@ -121,19 +122,16 @@
           </div>
         </div>
       </div>
-      <!-- Showcase + Stats row -->
-      <div class="hero-bottom-row">
-        <div class="hero-bottom-left">
-          <div class="showcase" id="showcase"></div>
-          <div class="showcase-actions">
-            <span id="pick-banner" class="pick-banner" style="display:none">
-              <span class="pick-banner-text"></span>
-              <button class="pick-cancel-btn" onclick="cancelPick()" data-i18n="pick_cancel">✕ Cancel</button>
-            </span>
-            <button id="showcase-auto" class="showcase-auto-btn" onclick="autoFillShowcase()" title="Auto-fill with rarest">⚡ Auto</button>
-          </div>
+      <!-- Showcase row -->
+      <div class="hero-showcase-row">
+        <div class="showcase" id="showcase"></div>
+        <div class="showcase-actions">
+          <span id="pick-banner" class="pick-banner" style="display:none">
+            <span class="pick-banner-text"></span>
+            <button class="pick-cancel-btn" onclick="cancelPick()" data-i18n="pick_cancel">✕ Cancel</button>
+          </span>
+          <button id="showcase-auto" class="showcase-auto-btn" onclick="autoFillShowcase()" title="Auto-fill with rarest">⚡ Auto</button>
         </div>
-        <div class="stats-row" id="stats-row"></div>
       </div>
       <div id="next-ach-card" class="next-ach-card" style="display:none"></div>
     </div>

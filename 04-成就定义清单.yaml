@@ -1104,6 +1104,7 @@ definitions:
     conditions:
       - type: distinct_count
         event: mcp.server_used
+        field: server_name
         operator: ">="
         value: 5
   - id: image_whisperer

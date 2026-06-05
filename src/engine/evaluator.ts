@@ -555,23 +555,24 @@ const RARITY_ORDER = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'mythic
 
 function evalSetCompletion(
   cond: Condition,
-  definitions: Array<{ id: string; rarity: string; hidden?: boolean }>,
+  definitions: Array<{ id: string; rarity: string; hidden?: boolean; future?: boolean }>,
   unlocked: Record<string, string>,
   selfId: string,
 ): EvaluationResult {
-  let eligible: Array<{ id: string; rarity: string; hidden?: boolean }>;
+  let eligible: Array<{ id: string; rarity: string; hidden?: boolean; future?: boolean }>;
 
+  // Exclude self and future achievements from set completion targets
   if (cond.all) {
     // All achievements, including hidden
-    eligible = definitions.filter(d => d.id !== selfId);
+    eligible = definitions.filter(d => d.id !== selfId && !d.future);
   } else if (cond.exclude_hidden) {
     // All non-hidden achievements
-    eligible = definitions.filter(d => d.id !== selfId && !d.hidden);
+    eligible = definitions.filter(d => d.id !== selfId && !d.hidden && !d.future);
   } else {
     const targetRarity = cond.rarity || 'common';
     const startIdx = RARITY_ORDER.indexOf(targetRarity);
     eligible = definitions.filter(d => {
-      if (d.id === selfId) return false;
+      if (d.id === selfId || d.future) return false;
       if (!cond.include_above) return d.rarity === targetRarity;
       return RARITY_ORDER.indexOf(d.rarity) >= startIdx;
     });
@@ -740,7 +741,7 @@ export function evaluateAll(
 
     const allMet = def.conditions.every(c => {
       if (c.type === 'set_completion') {
-        return evalSetCompletion(c, definitions as Array<{ id: string; rarity: string; hidden?: boolean }>, unlocked, def.id).met;
+        return evalSetCompletion(c, definitions as Array<{ id: string; rarity: string; hidden?: boolean; future?: boolean }>, unlocked, def.id).met;
       }
       return evaluateCondition(c, events).met;
     });

@@ -380,7 +380,9 @@ function preUnlockSet(def: AchievementDefinition): Record<string, string> {
     const eligible = ALL_DEFS.filter(d => {
       if (d.id === def.id || d.future) return false;
       if (c.all) return true;
-      if (c.exclude_hidden && d.hidden) return false;
+      if (c.exclude_hidden) {
+        return !d.hidden;
+      }
       if (!targetRarity) return d.category === def.category;
       const dIdx = RARITY_ORDER.indexOf(d.rarity || 'common');
       return includeAbove ? dIdx >= startIdx : d.rarity === targetRarity;
@@ -403,15 +405,7 @@ describe('every achievement: minimal trigger unlocks it', () => {
     if (def.future) toSkip.add(def.id);
     if (!def.conditions || def.conditions.length === 0) toSkip.add(def.id);
   }
-  // Known YAML issues (separate from the trigger logic):
-  // - mcp_explorer: distinct_count with no field — evaluator can't distinguish events
-  // - completionist_*: set_completion doesn't exclude future achievements,
-  //   so pre-unlock can't reach 100% completion. Fix: add future filter to evalSetCompletion.
-  toSkip.add('mcp_explorer');
-  toSkip.add('completionist_bronze');
-  toSkip.add('completionist_silver');
-  toSkip.add('completionist_gold');
-  toSkip.add('mythic_completionist');
+  // No known unreachable structural issues remain (all fixed).
 
   if (toSkip.size > 0) {
     console.log(`\n  Skipping ${toSkip.size}: ${[...toSkip].join(', ')}`);
@@ -422,14 +416,17 @@ describe('every achievement: minimal trigger unlocks it', () => {
   it.each(testable.map(d => [d.id, d] as [string, AchievementDefinition]))(
     '%s',
     (id, def) => {
-      const engine = new AchievementEngine({ stateDir: TEMP_DIR });
+      // Unique state dir per test to prevent cross-test pollution
+      const stateDir = path.join(TEMP_DIR, id);
+      const engine = new AchievementEngine({ stateDir });
       engine.resetState();
       engine.init();
 
-      // Pre-unlock for set_completion
+      // Pre-unlock for set_completion: persist to disk BEFORE reload
       const setPre = preUnlockSet(def);
       if (Object.keys(setPre).length > 0) {
         engine.state.unlocked = { ...engine.state.unlocked, ...setPre };
+        engine.store.saveState(engine.state);
       }
 
       // Generate and track events
@@ -438,13 +435,8 @@ describe('every achievement: minimal trigger unlocks it', () => {
         engine.store.appendEvent(e);
       }
 
-      // Reload and poll
+      // Reload so poll picks up saved state + events
       engine.reload();
-      // For set_completion: persist pre-unlocked state to disk before reload
-      if (Object.keys(setPre).length > 0) {
-        engine.store.saveState(engine.state);
-      }
-
       const unlocked = engine.poll().map(a => a.id);
 
       // Debug: show what DID unlock if target isn't there

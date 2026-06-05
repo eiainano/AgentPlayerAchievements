@@ -548,37 +548,13 @@ function renderProfileSelector(data) {
 
 // ── Tracked Tools Badges ─────────────────────────────
 
-// Inline SVG icons (14×14, optimized for badge display) — brand-derived minimal marks
-const TOOL_SVG = {
-  'claude-code': `<svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-    <rect x="2.5" y="4.5" width="9" height="7" rx="1.5" stroke="#f0a860" stroke-width="1.2"/>
-    <path d="M5 7.5l1.5 2L9 6" stroke="#f0a860" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>`,
-  'kilo-code': `<svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-    <polyline points="4,3 11,7 4,11" stroke="#93c5fd" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-    <line x1="7" y1="3" x2="7" y2="11" stroke="#93c5fd" stroke-width="1.1" stroke-linecap="round"/>
-  </svg>`,
-  'hermes': `<svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-    <path d="M3 10 L7 4 L11 10" stroke="#6ee7b7" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="rgba(52,211,153,.15)"/>
-    <line x1="4.5" y1="10" x2="9.5" y2="10" stroke="#6ee7b7" stroke-width="1" stroke-linecap="round"/>
-  </svg>`,
-  'opencode': `<svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-    <circle cx="7" cy="6.5" r="3" stroke="#a5b4fc" stroke-width="1.2"/>
-    <rect x="5" y="6" width="4" height="3.5" rx=".8" stroke="#a5b4fc" stroke-width="1.1"/>
-    <circle cx="7" cy="7" r=".8" fill="#a5b4fc"/>
-  </svg>`,
-  'openclaw': `<svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-    <path d="M3 6 Q3 2 7 2 Q11 2 11 6 Q11 10 10 11" stroke="#fca5a5" stroke-width="1.2" stroke-linecap="round" fill="rgba(248,113,113,.15)"/>
-    <path d="M5.5 8L4 11M8.5 8L10 11M7 8.5V12" stroke="#fca5a5" stroke-width=".9" stroke-linecap="round"/>
-  </svg>`,
-};
-
+// Official logos served from /tool-logos/
 const TOOL_META = {
-  'claude-code': { class: 'tool-claude-code' },
-  'kilo-code':   { class: 'tool-kilo-code' },
-  'hermes':      { class: 'tool-hermes' },
-  'opencode':    { class: 'tool-opencode' },
-  'openclaw':    { class: 'tool-openclaw' },
+  'claude-code': { logo: '/tool-logos/claude-code.png', class: 'tool-claude-code' },
+  'kilo-code':   { logo: '/tool-logos/kilocode.png',    class: 'tool-kilo-code' },
+  'hermes':      { logo: '/tool-logos/hermes.png',      class: 'tool-hermes' },
+  'opencode':    { logo: '/tool-logos/opencode.png',    class: 'tool-opencode' },
+  'openclaw':    { logo: '/tool-logos/openclaw.svg',    class: 'tool-openclaw' },
 };
 
 function renderTrackedTools(data) {
@@ -609,12 +585,13 @@ function renderTrackedTools(data) {
   bar.style.display = '';
   bar.innerHTML = allTracked.map(id => {
     const meta = TOOL_META[id];
-    const svg = TOOL_SVG[id];
     const name = toolNames[id] || id;
-    if (!meta || !svg) return '';
+    if (!meta) return '';
+    const imgTag = meta.logo.endsWith('.svg')
+      ? `<img src="${meta.logo}" alt="${name}" class="tool-logo-svg" loading="lazy">`
+      : `<img src="${meta.logo}" alt="${name}" class="tool-logo-png" loading="lazy">`;
     return `<span class="tracked-tool-badge ${meta.class}" title="${name}">
-      <span class="tool-icon">${svg}</span>
-      <span class="tool-name">${escHtml(name)}</span>
+      <span class="tool-icon">${imgTag}</span>
     </span>`;
   }).join('');
 }

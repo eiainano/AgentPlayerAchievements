@@ -2345,12 +2345,17 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 14px; height: 14px;
   flex-shrink: 0;
+  width: 20px; height: 20px;
 }
-.tracked-tool-badge .tool-icon svg {
+.tracked-tool-badge .tool-logo-png {
+  width: 20px; height: 20px;
   display: block;
-  width: 14px; height: 14px;
+  image-rendering: auto;
+}
+.tracked-tool-badge .tool-logo-svg {
+  width: 20px; height: 20px;
+  display: block;
 }
 .tracked-tool-badge .tool-name { letter-spacing: .2px; }
 

@@ -2,6 +2,16 @@
 
 ## [0.1.6] — 2026-06-05
 
+### Dashboard 分享成就卡片 — 2026-06-05
+
+- `src/dashboard/api.ts` — 新增 `buildCardResponse()`，聚合 stats + 展示柜成就 + 热力图 + 里程碑 → CardData JSON
+- `src/dashboard/server.ts` — 注册 `GET /api/card` 路由
+- `src/dashboard/public/index.html` — 新增 📸 Share 按钮 + 隐藏卡片 DOM + html2canvas CDN
+- `src/dashboard/public/styles.css` — 新增卡片预览样式（Steam 深色主题，420px 宽 layout）
+- `src/dashboard/public/app.js` — 新增 `generateCard()` + `buildCardHTML()`，html2canvas 截图 + 下载 PNG（840px @2x）
+- 支持中英双语、进行中成就补位、稀有度分布、里程碑时间线
+- 新增 6 个 API 测试，全量 484 ✅
+
 ### 终端 ANSI 弹窗 + 进度感知 — 2026-06-05
 
 - `src/utils/ansi-popup.ts` — ANSI 256 色成就解锁弹窗渲染器（Unicode 框线 + 6 级稀有度着色 + 进度条）

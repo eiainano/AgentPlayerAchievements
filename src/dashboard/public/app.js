@@ -108,7 +108,7 @@ const I18N = {
     streak_today_done: 'Coded today ✓',
     streak_today_pending: 'Not yet today',
     stat_unlocked: 'Unlocked',
-    stat_events: 'Events',
+
     stat_streak: 'Day Streak',
     stat_complete: 'Complete',
     heatmap_title: 'Activity',
@@ -182,7 +182,7 @@ const I18N = {
     streak_today_done: '今天已编码 ✓',
     streak_today_pending: '今天还没写代码',
     stat_unlocked: '已解锁',
-    stat_events: '事件',
+
     stat_streak: '连续天数',
     stat_complete: '完成度',
     heatmap_title: '活动热力图',
@@ -938,7 +938,6 @@ function renderProfile(data) {
     const unlockedCount = data.achievements.filter(a => a.unlocked).length;
     const statItems = [
       { value: unlockedCount.toLocaleString(), label: t('stat_unlocked') },
-      { value: stats.total_events.toLocaleString(), label: t('stat_events') },
       { value: `${stats.completion_pct}%`, label: t('stat_complete') },
     ];
     row.innerHTML = statItems.map(s => `

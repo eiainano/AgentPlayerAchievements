@@ -456,6 +456,8 @@ body {
   text-align: center;
   padding: 24px 28px 36px;
   position: relative;
+  max-width: 960px;
+  margin: 0 auto;
 }
 
 .hero-inner {
@@ -463,6 +465,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 16px;
+  width: 100%;
 }
 
 .hero-title {
@@ -539,7 +542,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-bottom: 12px;
   transition: border-color .2s;
 }
 
@@ -631,7 +633,6 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 14px 20px;
-  margin-bottom: 12px;
 }
 
 .heatmap-header {
@@ -859,6 +860,8 @@ body {
   gap: 12px;
   justify-content: center;
   flex-wrap: wrap;
+  flex: 1;
+  align-items: stretch;
 }
 
 .stat-card {
@@ -2189,6 +2192,10 @@ body {
 /* ── Shareable Card Preview ───────────────────────────────────── */
 
 .share-btn {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  z-index: 2;
   padding: 6px 14px;
   background: rgba(102, 192, 244, 0.12);
   border: 1px solid rgba(102, 192, 244, 0.25);
@@ -2322,6 +2329,43 @@ body {
   margin-top: 10px;
   padding: 6px 0;
 }
+
+/* ── Hero layout rows ────────────────────────────── */
+
+.hero-cards-row {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.hero-cards-row .streak-card {
+  flex: 1 1 240px;
+  margin-bottom: 0;
+}
+
+.hero-cards-row .heatmap-card {
+  flex: 1 1 320px;
+  margin-bottom: 0;
+}
+
+.hero-bottom-row {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.hero-bottom-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ── Tracked tool badges ──────────────────────────── */
 
 .tracked-tool-badge {
   display: inline-flex;

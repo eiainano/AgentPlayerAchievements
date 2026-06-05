@@ -77,58 +77,64 @@
       <button id="share-btn" class="share-btn" onclick="generateCard()" data-i18n="share_card">📸 Share</button>
       <!-- Tracked Tools Badges -->
       <div class="tracked-tools-bar" id="tracked-tools-bar"></div>
-      <!-- Streak Card -->
-      <div class="streak-card" id="streak-card">
-        <div class="streak-header">
-          <span class="streak-icon">🔥</span>
-          <span class="streak-title" data-i18n="streak_title">Coding Streak</span>
-          <span class="streak-today" id="streak-today"></span>
-        </div>
-        <div class="streak-body">
-          <div class="streak-main">
-            <span class="streak-count" id="streak-current">0</span>
-            <span class="streak-unit" data-i18n="streak_days">days</span>
+      <!-- Streak + Heatmap row -->
+      <div class="hero-cards-row">
+        <div class="streak-card" id="streak-card">
+          <div class="streak-header">
+            <span class="streak-icon">🔥</span>
+            <span class="streak-title" data-i18n="streak_title">Coding Streak</span>
+            <span class="streak-today" id="streak-today"></span>
           </div>
-          <div class="streak-divider"></div>
-          <div class="streak-record">
-            <span class="streak-record-icon">📅</span>
-            <span class="streak-record-value" id="streak-longest">0</span>
-            <span class="streak-record-label" data-i18n="streak_best">Best</span>
+          <div class="streak-body">
+            <div class="streak-main">
+              <span class="streak-count" id="streak-current">0</span>
+              <span class="streak-unit" data-i18n="streak_days">days</span>
+            </div>
+            <div class="streak-divider"></div>
+            <div class="streak-record">
+              <span class="streak-record-icon">📅</span>
+              <span class="streak-record-value" id="streak-longest">0</span>
+              <span class="streak-record-label" data-i18n="streak_best">Best</span>
+            </div>
+          </div>
+        </div>
+        <div class="heatmap-card" id="heatmap-card">
+          <div class="heatmap-header">
+            <span class="heatmap-icon">📊</span>
+            <span class="heatmap-title" data-i18n="heatmap_title">Activity</span>
+          </div>
+          <div class="heatmap-grid-wrapper">
+            <div class="heatmap-row-labels" id="heatmap-row-labels"></div>
+            <div class="heatmap-scroll">
+              <div class="heatmap-col-labels" id="heatmap-col-labels"></div>
+              <div class="heatmap-grid" id="heatmap-grid"></div>
+            </div>
+          </div>
+          <div class="heatmap-legend">
+            <span class="heatmap-legend-label" data-i18n="heatmap_less">Less</span>
+            <span class="heatmap-legend-cell" data-level="0"></span>
+            <span class="heatmap-legend-cell" data-level="1"></span>
+            <span class="heatmap-legend-cell" data-level="2"></span>
+            <span class="heatmap-legend-cell" data-level="3"></span>
+            <span class="heatmap-legend-cell" data-level="4"></span>
+            <span class="heatmap-legend-label" data-i18n="heatmap_more">More</span>
           </div>
         </div>
       </div>
-      <!-- Activity Heatmap -->
-      <div class="heatmap-card" id="heatmap-card">
-        <div class="heatmap-header">
-          <span class="heatmap-icon">📊</span>
-          <span class="heatmap-title" data-i18n="heatmap_title">Activity</span>
-        </div>
-        <div class="heatmap-grid-wrapper">
-          <div class="heatmap-row-labels" id="heatmap-row-labels"></div>
-          <div class="heatmap-scroll">
-            <div class="heatmap-col-labels" id="heatmap-col-labels"></div>
-            <div class="heatmap-grid" id="heatmap-grid"></div>
+      <!-- Showcase + Stats row -->
+      <div class="hero-bottom-row">
+        <div class="hero-bottom-left">
+          <div class="showcase" id="showcase"></div>
+          <div class="showcase-actions">
+            <span id="pick-banner" class="pick-banner" style="display:none">
+              <span class="pick-banner-text"></span>
+              <button class="pick-cancel-btn" onclick="cancelPick()" data-i18n="pick_cancel">✕ Cancel</button>
+            </span>
+            <button id="showcase-auto" class="showcase-auto-btn" onclick="autoFillShowcase()" title="Auto-fill with rarest">⚡ Auto</button>
           </div>
         </div>
-        <div class="heatmap-legend">
-          <span class="heatmap-legend-label" data-i18n="heatmap_less">Less</span>
-          <span class="heatmap-legend-cell" data-level="0"></span>
-          <span class="heatmap-legend-cell" data-level="1"></span>
-          <span class="heatmap-legend-cell" data-level="2"></span>
-          <span class="heatmap-legend-cell" data-level="3"></span>
-          <span class="heatmap-legend-cell" data-level="4"></span>
-          <span class="heatmap-legend-label" data-i18n="heatmap_more">More</span>
-        </div>
+        <div class="stats-row" id="stats-row"></div>
       </div>
-      <div class="showcase" id="showcase"></div>
-      <div class="showcase-actions">
-        <span id="pick-banner" class="pick-banner" style="display:none">
-          <span class="pick-banner-text"></span>
-          <button class="pick-cancel-btn" onclick="cancelPick()" data-i18n="pick_cancel">✕ Cancel</button>
-        </span>
-        <button id="showcase-auto" class="showcase-auto-btn" onclick="autoFillShowcase()" title="Auto-fill with rarest">⚡ Auto</button>
-      </div>
-      <div class="stats-row" id="stats-row"></div>
       <div id="next-ach-card" class="next-ach-card" style="display:none"></div>
     </div>
   </section>

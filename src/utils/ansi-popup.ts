@@ -93,7 +93,7 @@ function bottomBorder(rarityCode: string): string {
 
 function contentRow(text: string, ansi?: string): string {
   const coloredText = ansi ? colorize(text, ansi) : text;
-  return colorize(BOX.vt, GRAY) + '  ' + padRight(coloredText, CARD_WIDTH - 2) + ' ' + colorize(BOX.vt, GRAY);
+  return '  ' + colorize(BOX.vt, GRAY) + ' ' + padRight(coloredText, CARD_WIDTH - 2) + ' ' + colorize(BOX.vt, GRAY);
 }
 
 function emptyRow(): string {

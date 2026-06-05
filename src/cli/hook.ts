@@ -48,6 +48,8 @@ import { AchievementEngine } from '../engine/engine.js';
 import { loadConfig } from '../config.js';
 import { sendNotification } from '../utils/notify.js';
 import { resolveProfileDir, DEFAULT_PROFILE } from '../utils/profile.js';
+import { renderPopup, type PopupAchievement } from '../utils/ansi-popup.js';
+import { findNearUnlocks } from '../utils/progress-nudge.js';
 
 const activeProfile = process.env.AGPA_PROFILE || loadConfig().active_profile || DEFAULT_PROFILE;
 const stateDir = resolveProfileDir(activeProfile);
@@ -409,6 +411,35 @@ function cmdPoll(): void {
     const title = useZh ? (ach.name_cn || ach.name) : ach.name;
     const desc = useZh ? (ach.description_cn || ach.description) : ach.description;
     sendNotification(`${icon} ${title}`, desc, ENGINE.stateDir, activeProfile, topRarity);
+  }
+
+  // ── ANSI popup (TTY only) ─────────────────────────────────────
+  const popupData: PopupAchievement[] = newlyUnlocked.map(ach => ({
+    icon: ach.icon || '🏆',
+    name: useZh ? (ach.name_cn || ach.name) : ach.name,
+    description: useZh ? (ach.description_cn || ach.description) : ach.description,
+    rarity: ach.rarity,
+    category: ach.category,
+    set_name: undefined,
+    set_progress: undefined,
+    progress: ach.progress_trackable
+      ? { current: (ach as any).current ?? 0, max: (ach as any).target ?? 1 }
+      : undefined,
+  }));
+  const popup = renderPopup(popupData);
+  if (popup) process.stdout.write(popup + '\n');
+
+  // ── Progress nudge (TTY only) ─────────────────────────────────
+  if (process.stdout.isTTY) {
+    const near = findNearUnlocks(ENGINE.definitions, ENGINE.events, ENGINE.state);
+    if (near.length > 0) {
+      const lines: string[] = ['  \x1b[33m⚡ Getting close:\x1b[0m'];
+      for (const n of near) {
+        const pct = Math.round((n.current / n.target) * 100);
+        lines.push(`   ◦ \x1b[37m${n.icon}  ${n.name} — ${n.current}/${n.target} ${n.unit_label} (${pct}%)\x1b[0m`);
+      }
+      process.stdout.write('\n' + lines.join('\n') + '\n');
+    }
   }
 
   process.stderr.write(`[AGPA] poll: ${newlyUnlocked.length} new achievement(s) unlocked!\n`);

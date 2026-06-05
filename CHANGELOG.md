@@ -2,14 +2,14 @@
 
 ## [0.1.6] — 2026-06-05
 
-### 终端 UX 增强设计文档 — 2026-06-05
+### 终端 ANSI 弹窗 + 进度感知 — 2026-06-05
 
-- `docs/superpowers/specs/2026-06-05-terminal-ux-enhancement-design.md` — 方案 B 设计文档
-- 新增 `src/utils/ansi-popup.ts` — ANSI 彩色成就弹窗渲染器（Unicode 框线 + 稀有度着色）
-- 新增 `src/utils/progress-nudge.ts` — 近锁成就计算器（counter/threshold/streak/distinct_count/set_completion 进度）
-- 修改 `src/cli/hook.ts` `cmdPoll()` — 在 OS 通知后插入 ANSI popup + progress nudge 输出
-- 修改 `src/engine/evaluator.ts` — `evaluateMetric` 改为 export
+- `src/utils/ansi-popup.ts` — ANSI 256 色成就解锁弹窗渲染器（Unicode 框线 + 6 级稀有度着色 + 进度条）
+- `src/utils/progress-nudge.ts` — 近锁成就计算器，支持 counter/threshold/streak/distinct_count/sequence_count 5 种条件类型，过滤 hidden/future/已解锁，按完成度排序取 top 3
+- `src/cli/hook.ts` `cmdPoll()` — 集成 ANSI popup + progress nudge 输出（Stop hook 触发时）
+- `src/engine/evaluator.ts` — `evaluateMetric` 改为 export 供 progress-nudge 复用
 - Non-TTY fallback：管道/CI 环境自动跳过 ANSI 渲染，保持纯文本
+- 新增 26 个测试（ansi-popup: 12, progress-nudge: 14），全量 478 ✅
 
 ### Init 体验优化 — 2026-06-05
 

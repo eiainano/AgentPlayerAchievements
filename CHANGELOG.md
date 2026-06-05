@@ -61,6 +61,17 @@
 - `tests/utils/profile.test.ts`（16）— `validateProfileName` 12 场景（合法/空/大写/数字开头/特殊字符/超长/保留名）、`resolveProfileDir` 穿越防御
 - `tests/tools/registry.test.ts`（7）— `findTool` 按 id/别名/未知查找、TOOLS 结构完整性
 
+### 场景矩阵集成测试 + streak 窗口 bugfix — 2026-06-05
+
+- **YAML Bugfix**: `streak_3`/`streak_7`/`streak_30` 缺少 `window: all`。默认 24h 窗口使这些每日连续成就永不可达（单个 24h 时间窗口最多容纳 2 个日历日）。修复：追加 `window: all`。（6/5 fix）
+- **Approach A — 6 个标准使用场景** (`tests/engine/integration.test.ts` 全面重写)：
+  - S1 newbie: 最小 session → first_contact + tool_time；验证三公司/链式反应不触发
+  - S2 power user: 3 session × 2 task × 3 tool → dual_wielder + three_company
+  - S3 daily driver: store.appendEvent 14 连续天 → streak_3 + streak_7，不触发 streak_30
+  - S4 commander: MCP/agent spawn/plan mode/git/命令/插件 → 8 个对应成就
+  - S5 error recovery: 3 轮 fail→fix→pass → the_debugger + triple_debugger
+  - S6 baseline: 最小触发（单消息+单工具）验证引擎能解锁
+
 ### P1-1~P1-4 设计文档 — 2026-06-05
 
 基于 Round 3 竞品调研 + Gap Analysis 的 6 条建议，完成 4 篇 P1 优先级设计文档：

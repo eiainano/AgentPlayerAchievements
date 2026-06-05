@@ -457,6 +457,7 @@ definitions:
       - type: streak
         event: session.start
         unit: day
+        window: all
         operator: ">="
         value: 7
     set: endurance
@@ -475,6 +476,7 @@ definitions:
       - type: streak
         event: session.start
         unit: day
+        window: all
         operator: ">="
         value: 30
     set: endurance
@@ -544,6 +546,7 @@ definitions:
       - type: streak
         event: session.start
         unit: day
+        window: all
         operator: ">="
         value: 3
     set: endurance

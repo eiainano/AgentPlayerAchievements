@@ -1547,7 +1547,7 @@ function generateCard() {
         requestAnimationFrame(function() {
           html2canvas(preview, {
             scale: 2,
-            backgroundColor: '#171a21',
+            backgroundColor: '#14151f',
             useCORS: true,
             logging: false
           }).then(function(canvas) {
@@ -1588,119 +1588,111 @@ function buildCardHTML(data) {
   function esc(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
+  function hmClr(l) { var c=['#1e2529','#0e4429','#006d32','#26a641','#39d353']; return c[l]||c[0]; }
+  var isZh = (data.lang || 'en') === 'zh';
+  var L = function(en, zh) { return isZh ? zh : en; };
 
-  function hmColor(level) {
-    var colors = ['#1e2529', '#0e4429', '#006d32', '#26a641', '#39d353'];
-    return colors[level] || colors[0];
-  }
-
-  var html = '';
-
-  // Header
-  html += '<div class="card-header">';
-  html += '<div class="card-avatar">' + esc(data.profile_emoji) + '</div>';
-  html += '<div>';
-  html += '<div class="card-profile-name">' + esc(data.profile) + '</div>';
-  html += '<div class="card-level">Agent Level ' + esc(data.level) + ' · ' + esc((data.total_xp || 0).toLocaleString()) + ' XP</div>';
-  html += '</div>';
-  html += '<div class="card-unlocked-stat">';
-  html += '<div class="card-unlocked-num">' + esc(data.unlocked) + '</div>';
-  html += '<div class="card-unlocked-label">/ ' + esc(data.total) + ' unlocked</div>';
-  html += '</div></div>';
-
-  // Stats grid
-  html += '<div class="card-stats-grid">';
-  html += '<div class="card-stat"><div class="card-stat-val">' + esc(data.stats.streak_days) + '</div><div class="card-stat-label">🔥 streak</div></div>';
-  html += '<div class="card-stat"><div class="card-stat-val">' + esc((data.stats.total_tasks || 0).toLocaleString()) + '</div><div class="card-stat-label">📋 tasks</div></div>';
-  html += '<div class="card-stat"><div class="card-stat-val">' + esc((data.stats.total_tool_uses || 0).toLocaleString()) + '</div><div class="card-stat-label">🔧 tools</div></div>';
-  html += '<div class="card-stat"><div class="card-stat-val">' + esc((data.stats.total_sessions || 0).toLocaleString()) + '</div><div class="card-stat-label">💻 sessions</div></div>';
-  html += '</div>';
-
-  // XP bar
+  var unlockPct = data.total > 0 ? Math.round((data.unlocked / data.total) * 100) : 0;
   var xpPct = data.xp_target > 0 ? Math.round((data.xp_current / data.xp_target) * 100) : 0;
-  html += '<div class="card-xp-bar">';
-  html += '<div class="card-xp-header"><span>Level ' + esc(data.level) + '</span><span>' + esc((data.xp_current || 0).toLocaleString()) + ' / ' + esc((data.xp_target || 1).toLocaleString()) + ' XP</span></div>';
-  html += '<div class="card-xp-track"><div class="card-xp-fill" style="width:' + xpPct + '%"></div></div>';
-  html += '</div>';
+  var h = '';
 
-  html += '<div class="card-divider"></div>';
+  // ═══ TOP BANNER ═══
+  h += '<div class="card-top">';
+  h += '<div class="card-avatar-row">';
+  h += '<div class="card-avatar">' + esc(data.profile_emoji) + '</div>';
+  h += '<div>';
+  h += '<div class="card-profile-name">' + esc(data.profile) + '</div>';
+  h += '<div class="card-subtitle">Lv.' + esc(data.level) + ' · ' + esc((data.total_xp || 0).toLocaleString()) + ' XP</div>';
+  h += '</div>';
+  h += '<div class="card-unlocked-stat">';
+  h += '<div class="card-unlocked-ring" style="--unlock-pct:' + (unlockPct * 3.6) + 'deg">';
+  h += '<div class="card-unlocked-num">' + esc(data.unlocked) + '</div>';
+  h += '</div>';
+  h += '<div class="card-unlocked-label">/ ' + esc(data.total) + ' ' + L('UNLOCKED', '已解锁') + '</div>';
+  h += '</div></div></div>';
 
-  // Achievements
-  html += '<div class="card-section-title">🏆 ' + (data.achievements.length > 0 ? 'Showcase' : 'Start your journey →') + '</div>';
-  html += '<div class="card-ach-list">';
+  // ═══ STATS ═══
+  h += '<div class="card-stats-row">';
+  h += '<div class="card-stat-box"><div class="card-stat-icon">🔥</div><div class="card-stat-val">' + esc(data.stats.streak_days) + '</div><div class="card-stat-label">' + L('Streak', '连续天数') + '</div></div>';
+  h += '<div class="card-stat-box"><div class="card-stat-icon">📋</div><div class="card-stat-val">' + esc((data.stats.total_tasks || 0).toLocaleString()) + '</div><div class="card-stat-label">' + L('Tasks', '任务') + '</div></div>';
+  h += '<div class="card-stat-box"><div class="card-stat-icon">🔧</div><div class="card-stat-val">' + esc((data.stats.total_tool_uses || 0).toLocaleString()) + '</div><div class="card-stat-label">' + L('Tools', '工具调用') + '</div></div>';
+  h += '<div class="card-stat-box"><div class="card-stat-icon">💻</div><div class="card-stat-val">' + esc((data.stats.total_sessions || 0).toLocaleString()) + '</div><div class="card-stat-label">' + L('Sessions', '会话') + '</div></div>';
+  h += '</div>';
 
+  // ═══ BODY ═══
+  h += '<div class="card-body">';
+
+  // XP progress (class-based for theme support)
+  h += '<div class="card-xp-wrap">';
+  h += '<div class="card-xp-label-row"><span>' + L('LEVEL PROGRESS', '等级进度') + '</span><span>' + esc((data.xp_current || 0).toLocaleString()) + ' / ' + esc((data.xp_target || 1).toLocaleString()) + '</span></div>';
+  h += '<div class="card-xp-track"><div class="card-xp-fill" style="width:' + xpPct + '%"></div></div></div>';
+
+  // Showcase
+  h += '<div class="card-section-head">🏆 ' + L('SHOWCASE', '展示柜') + '</div>';
   for (var i = 0; i < data.achievements.length; i++) {
-    var ach = data.achievements[i];
-    html += '<div class="card-ach-row">';
-    html += '<div class="card-ach-left" style="background:' + esc(ach.rarity_color) + ';min-height:auto"></div>';
-    html += '<div class="card-ach-icon">' + esc(ach.icon) + '</div>';
-    html += '<div class="card-ach-info">';
-    html += '<div class="card-ach-name-row">';
-    html += '<span class="card-ach-name" style="color:' + esc(ach.rarity_color) + '">' + esc(ach.name) + '</span>';
-    html += '<span class="card-ach-tag" style="color:' + esc(ach.rarity_color) + ';background:' + esc(ach.rarity_color) + '22">' + esc(ach.rarity_label) + '</span>';
-    html += '</div>';
-    html += '<div class="card-ach-desc">' + esc(ach.description) + '</div>';
-
-    if (ach.in_progress) {
-      html += '<div class="card-ach-meta" style="margin-bottom:4px">';
-      html += '<div class="card-progress-bar" style="flex:1"><div style="height:100%;width:' + (ach.progress_pct || 0) + '%;background:' + esc(ach.rarity_color) + ';border-radius:2px"></div></div>';
-      html += '<span style="font-size:9px;color:' + esc(ach.rarity_color) + '">' + esc(ach.progress_text || '') + '</span>';
-      html += '</div>';
-      html += '<div class="card-ach-meta"><span>In Progress</span></div>';
-    } else {
-      html += '<div class="card-ach-meta">';
-      html += '<span>📅 ' + (ach.unlocked_at ? ach.unlocked_at.slice(0, 10) : '') + '</span>';
-      if (ach.set_name) html += '<span>Set: ' + esc(ach.set_name) + (ach.set_progress ? ' (' + esc(ach.set_progress) + ')' : '') + '</span>';
-      html += '</div>';
+    var a = data.achievements[i];
+    h += '<div class="card-ach-item">';
+    h += '<div class="card-ach-rarity-strip" style="background:' + esc(a.rarity_color) + '"></div>';
+    h += '<div class="card-ach-icon">' + esc(a.icon) + '</div>';
+    h += '<div class="card-ach-body">';
+    h += '<div class="card-ach-name-row"><span class="card-ach-name" style="color:' + esc(a.rarity_color) + '">' + esc(a.name) + '</span><span class="card-ach-badge" style="color:' + esc(a.rarity_color) + ';background:' + esc(a.rarity_color) + '22">' + esc(a.rarity_label) + '</span></div>';
+    h += '<div class="card-ach-desc">' + esc(a.description) + '</div>';
+    if (a.in_progress) {
+      h += '<div class="card-ach-progress">';
+      h += '<div class="card-ach-progress-bar"><div style="height:100%;width:' + (a.progress_pct||0) + '%;background:' + esc(a.rarity_color) + ';border-radius:2px"></div></div>';
+      h += '<span class="card-ach-progress-text" style="color:' + esc(a.rarity_color) + '">' + esc(a.progress_text||'') + '</span></div>';
     }
-
-    html += '</div></div>';
+    h += '<div class="card-ach-meta">';
+    if (a.in_progress) { h += '<span>🔷 ' + L('In Progress', '进行中') + '</span>'; }
+    else {
+      h += '<span>📅 ' + (a.unlocked_at ? a.unlocked_at.slice(0,10) : '') + '</span>';
+      if (a.set_name) h += '<span>📦 ' + esc(a.set_name) + (a.set_progress ? ' (' + esc(a.set_progress) + ')' : '') + '</span>';
+    }
+    h += '</div></div></div>';
   }
-  html += '</div>';
 
   // Heatmap
   if (data.heatmap && data.heatmap.length > 0) {
-    html += '<div class="card-heatmap-box">';
-    html += '<div class="card-heatmap-title">📊 Activity · last 4 months</div>';
-    html += '<div class="card-heatmap-grid">';
+    h += '<div class="card-heatmap-wrap">';
+    h += '<div class="card-hm-title">📊 ' + L('Activity · Last 4 Months', '活跃度 · 近4个月') + '</div>';
+    h += '<div class="card-hm-grid">';
     for (var j = 0; j < data.heatmap.length; j++) {
-      var d = data.heatmap[j];
-      html += '<div class="card-hm-cell" style="background:' + hmColor(d.count) + '"></div>';
+      var dt = data.heatmap[j];
+      h += '<div class="card-hm-cell" style="background:' + hmClr(dt.count) + '"></div>';
     }
-    html += '</div>';
-    html += '<div class="card-heatmap-legend"><span>Less</span>';
-    html += '<div class="card-hm-cell" style="background:#1e2529"></div><div class="card-hm-cell" style="background:#0e4429"></div><div class="card-hm-cell" style="background:#006d32"></div><div class="card-hm-cell" style="background:#26a641"></div><div class="card-hm-cell" style="background:#39d353"></div>';
-    html += '<span>More</span></div>';
-    html += '</div>';
+    h += '</div>';
+    h += '<div class="card-hm-legend"><span>' + L('Less', '少') + '</span><div class="card-hm-cell" style="background:#1e2529"></div><div class="card-hm-cell" style="background:#0e4429"></div><div class="card-hm-cell" style="background:#006d32"></div><div class="card-hm-cell" style="background:#26a641"></div><div class="card-hm-cell" style="background:#39d353"></div><span>' + L('More', '多') + '</span></div>';
+    h += '</div>';
   }
 
   // Rarity breakdown
-  html += '<div class="card-rarity-grid">';
+  h += '<div class="card-rarity-strip">';
   for (var k = 0; k < data.rarity_breakdown.length; k++) {
     var rb = data.rarity_breakdown[k];
-    html += '<div class="card-rarity-item"><div class="card-rarity-label" style="color:' + esc(rb.color) + '">' + esc(rb.rarity) + '</div><div class="card-rarity-count" style="color:' + esc(rb.color) + '">' + esc(rb.count) + '</div></div>';
+    h += '<div class="card-rarity-chip"><span class="rarity-name" style="color:' + esc(rb.color) + '">' + esc(rb.rarity) + '</span><span class="rarity-count" style="color:' + esc(rb.color) + '">' + esc(rb.count) + '</span></div>';
   }
-  html += '</div>';
+  h += '</div>';
 
   // Milestones
   if (data.milestones && data.milestones.length > 0) {
-    html += '<div class="card-milestone-box">';
-    html += '<div class="card-milestone-title">📌 Milestones</div>';
-    html += '<div class="card-milestone-list">';
+    h += '<div class="card-section-head">📌 ' + L('MILESTONES', '里程碑') + '</div>';
+    h += '<div class="card-ms-wrap"><div class="card-ms-list">';
     for (var m = 0; m < data.milestones.length; m++) {
       var ms = data.milestones[m];
-      html += '<div class="card-milestone-row">';
-      html += '<span class="card-milestone-bullet">✦</span>';
-      html += '<span class="card-milestone-date">' + esc(ms.unlocked_at ? ms.unlocked_at.slice(0, 10) : '') + '</span>';
-      html += '<span class="card-milestone-name">' + esc(ms.name) + '</span>';
-      html += '<span class="card-milestone-rarity" style="color:' + esc(ms.rarity_color) + '">' + esc(ms.rarity) + '</span>';
-      html += '</div>';
+      h += '<div class="card-ms-row">';
+      h += '<span class="card-ms-bullet">✦</span>';
+      h += '<span class="card-ms-date">' + esc(ms.unlocked_at ? ms.unlocked_at.slice(0,10) : '') + '</span>';
+      h += '<span class="card-ms-name">' + esc(ms.name) + '</span>';
+      h += '<span class="card-ms-rarity" style="color:' + esc(ms.rarity_color) + '">' + esc(ms.rarity) + '</span>';
+      h += '</div>';
     }
-    html += '</div></div>';
+    h += '</div></div>';
   }
 
-  // Footer
-  html += '<div class="card-footer">🎮 Generated by AGPA · agpa v0.1.6 · ' + new Date().toISOString().slice(0, 10) + '</div>';
+  h += '</div>'; // card-body
 
-  return html;
+  // ═══ FOOTER ═══
+  h += '<div class="card-footer-wrap">🎮 ' + L('Generated by AGPA', '由 AGPA 生成') + ' · v0.1.6 · ' + new Date().toISOString().slice(0, 10) + '</div>';
+
+  return h;
 }

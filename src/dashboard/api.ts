@@ -146,6 +146,7 @@ export interface CardMilestone {
 export interface CardData {
   profile: string;
   profile_emoji: string;
+  lang: string;
   level: number;
   total_xp: number;
   xp_current: number;
@@ -334,6 +335,7 @@ export function buildCardResponse(
   return {
     profile,
     profile_emoji: profileEmoji,
+    lang: config.lang || 'en',
     level,
     total_xp: totalXp,
     xp_current: xpProgress.current,

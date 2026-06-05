@@ -2,15 +2,13 @@ import { describe, it, expect, afterEach, beforeEach } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { loadConfig, isSoundEnabled, getConfig } from '../src/config.js';
+import { loadConfig, isSoundEnabled, getConfig, setConfigDir } from '../src/config.js';
 
-// loadConfig() reads from ~/.agent-achievements/config.json (real user file).
-// We test the env var override layer which is the main risk surface.
-// isSoundEnabled() only reads env vars + config — we test both paths.
-// saveConfig/setSoundEnabled write to the real config — tested indirectly.
+// Use a temp dir to isolate tests from the real ~/.agent-achievements/config.json
 
 describe('loadConfig', () => {
   const PREV: Record<string, string | undefined> = {};
+  let tempDir: string;
 
   beforeEach(() => {
     // Save current env state
@@ -18,6 +16,9 @@ describe('loadConfig', () => {
       PREV[key] = process.env[key];
       delete process.env[key];
     }
+    // Point config to a temp dir that has no config.json
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agpa-config-test-'));
+    setConfigDir(tempDir);
   });
 
   afterEach(() => {
@@ -26,6 +27,10 @@ describe('loadConfig', () => {
       if (val === undefined) delete process.env[key];
       else process.env[key] = val;
     }
+    // Clean up temp dir
+    fs.rmSync(tempDir, { recursive: true, force: true });
+    // Reset to default config dir
+    setConfigDir(undefined);
   });
 
   it('returns defaults when no config file and no env vars', () => {

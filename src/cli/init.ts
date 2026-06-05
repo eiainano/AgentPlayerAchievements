@@ -30,6 +30,7 @@ function hookCmd(toolSourceEnv: string, mode: string, profile: string | null): s
 const HOOK_ENV = 'AGPA_TOOL_SOURCE=claude-code';
 const HOOK_HERMES_ENV = 'AGPA_TOOL_SOURCE=hermes';
 const HOOK_OPENCLAW_ENV = 'AGPA_TOOL_SOURCE=openclaw';
+const HOOK_KILOCODE_ENV = 'AGPA_TOOL_SOURCE=kilocode';
 // Profile-aware versions built dynamically in getHookKeys() and Hermes/OpenClaw init
 
 // ── Per-tool init data (mcpInject + instructionFiles) ──────────────────
@@ -394,10 +395,12 @@ function generateOpenClawPlugin(profile: string | null): string {
   return `${OPENCLAW_PLUGIN_MARKER}
 /**
  * AGPA Auto-Track plugin for OpenClaw
- * Registers 5 hooks → spawns hook.ts via stdin pipe → event.log
+ * Registers 5 lifecycle hooks → spawns hook.ts via stdin pipe → event.log
+ *
+ * Compatible with OpenClaw >= 2026.3.22 (definePluginEntry API).
  */
 import { spawn } from 'node:child_process';
-import { createRequire } from 'node:module';
+import { definePluginEntry } from 'openclaw/plugin-sdk/plugin-entry';
 
 const TSX_BIN = '${TSX_BIN}';
 const HOOK_TS = '${AGPA_HOOK}';
@@ -415,21 +418,26 @@ function track(hookName: string, payload: unknown) {
   child.unref();
 }
 
-export function register(api: any) {
-  api.on('session_start', (payload: unknown) => track('session_start', payload));
-  api.on('session_end', (payload: unknown) => {
-    track('session_end', payload);
-    // Also run poll at session end
-    const pollChild = spawn(TSX_BIN, [HOOK_TS, 'poll'], {
-      stdio: ['ignore', 'inherit', 'inherit'],
-      env: { ...process.env, ${profileEnv}AGPA_TOOL_SOURCE: 'openclaw' },
+export default definePluginEntry({
+  id: 'agpa-track',
+  name: 'AGPA Achievement Tracking',
+  kind: 'general',
+  register(api: any) {
+    api.on('session_start', (payload: unknown) => track('session_start', payload));
+    api.on('session_end', (payload: unknown) => {
+      track('session_end', payload);
+      // Also run poll at session end
+      const pollChild = spawn(TSX_BIN, [HOOK_TS, 'poll'], {
+        stdio: ['ignore', 'inherit', 'inherit'],
+        env: { ...process.env, ${profileEnv}AGPA_TOOL_SOURCE: 'openclaw' },
+      });
+      pollChild.unref();
     });
-    pollChild.unref();
-  });
-  api.on('before_tool_call', (payload: unknown) => track('before_tool_call', payload));
-  api.on('after_tool_call', (payload: unknown) => track('after_tool_call', payload));
-  api.on('agent_end', (payload: unknown) => track('agent_end', payload));
-}
+    api.on('before_tool_call', (payload: unknown) => track('before_tool_call', payload));
+    api.on('after_tool_call', (payload: unknown) => track('after_tool_call', payload));
+    api.on('agent_end', (payload: unknown) => track('agent_end', payload));
+  }
+});
 `;
 }
 
@@ -445,6 +453,107 @@ function injectOpenClawPlugin(profile: string | null): boolean {
 
   fs.mkdirSync(extDir, { recursive: true });
   fs.writeFileSync(pluginPath, generateOpenClawPlugin(profile));
+  return true;
+}
+
+// ── Kilo Code / OpenCode TS plugin injection ────────────────────────────
+// Both products share the same plugin API (only config directories differ).
+// Kilo Code: ~/.config/kilo/plugins/, OpenCode: ~/.config/opencode/plugins/
+
+const KILOCODE_PLUGIN_MARKER = '// agpa-kilocode-track';
+
+function generateKiloCodePlugin(profile: string | null, toolSource: 'kilocode' | 'opencode'): string {
+  const profileEnv = profile ? `AGPA_PROFILE: '${profile}', ` : '';
+  return `${KILOCODE_PLUGIN_MARKER}
+/**
+ * AGPA Auto-Track plugin for ${toolSource === 'kilocode' ? 'Kilo Code' : 'OpenCode'}
+ *
+ * Hooks tool.execute.* and session.* lifecycle events,
+ * spawns hook.ts via Bun.spawn stdin pipe → event.log.
+ *
+ * Compatible with Kilo Code >= v7.2 and OpenCode >= v1.15.
+ */
+const TSX_BIN = '${TSX_BIN}';
+const HOOK_TS = '${AGPA_HOOK}';
+
+function track(hookName: string, payload: Record<string, unknown>) {
+  const proc = Bun.spawn([TSX_BIN, HOOK_TS, 'kilocode-auto', hookName], {
+    stdin: 'pipe',
+    stdout: 'inherit',
+    stderr: 'inherit',
+    env: { ...process.env, ${profileEnv}AGPA_TOOL_SOURCE: '${toolSource}' },
+  });
+  if (proc.stdin) {
+    proc.stdin.write(JSON.stringify(payload));
+    proc.stdin.end();
+  }
+  proc.unref();
+}
+
+export default async (_ctx: Record<string, unknown>) => {
+  return {
+    'tool.execute.before': async (input: Record<string, unknown>) => {
+      track('tool.execute.before', {
+        hook_event_name: 'tool.execute.before',
+        toolName: input.tool,
+        params: input.args,
+        sessionId: input.sessionID,
+      });
+    },
+    'tool.execute.after': async (input: Record<string, unknown>) => {
+      track('tool.execute.after', {
+        hook_event_name: 'tool.execute.after',
+        toolName: input.tool,
+        params: input.args,
+        sessionId: input.sessionID,
+        durationMs: input.duration,
+        error: input.error,
+        success: input.success,
+      });
+    },
+    event: async ({ event }: { event: Record<string, unknown> }) => {
+      if (event.type === 'session.created') {
+        track('session.created', {
+          hook_event_name: 'session.created',
+          sessionId: (event.data as Record<string, unknown>)?.sessionKey,
+        });
+      }
+      if (event.type === 'session.idle') {
+        track('session.idle', {
+          hook_event_name: 'session.idle',
+          sessionId: (event.data as Record<string, unknown>)?.sessionKey,
+        });
+        // Also run poll at session end
+        const pollProc = Bun.spawn([TSX_BIN, HOOK_TS, 'poll'], {
+          stdin: 'ignore',
+          stdout: 'inherit',
+          stderr: 'inherit',
+          env: { ...process.env, ${profileEnv}AGPA_TOOL_SOURCE: '${toolSource}' },
+        });
+        pollProc.unref();
+      }
+    },
+  };
+};
+`;
+}
+
+function injectKiloCodePlugin(toolId: string, profile: string | null): boolean {
+  const source = toolId === 'kilocode' ? 'kilocode' as const : 'opencode' as const;
+  const configDir = toolId === 'kilocode'
+    ? path.join(homedir(), '.config', 'kilo')
+    : path.join(homedir(), '.config', 'opencode');
+  const pluginDir = path.join(configDir, 'plugins');
+  const pluginPath = path.join(pluginDir, 'agpa-track.ts');
+
+  // Idempotency: check if already injected
+  if (fs.existsSync(pluginPath)) {
+    const existing = fs.readFileSync(pluginPath, 'utf-8');
+    if (existing.includes(KILOCODE_PLUGIN_MARKER)) return false;
+  }
+
+  fs.mkdirSync(pluginDir, { recursive: true });
+  fs.writeFileSync(pluginPath, generateKiloCodePlugin(profile, source));
   return true;
 }
 
@@ -713,6 +822,16 @@ function initTool(
   // ── Inject OpenClaw TS plugin ──────────────────────────────────────
   if (toolDef.id === 'openclaw') {
     const injected = injectOpenClawPlugin(profile);
+    if (injected) {
+      console.log(`  ✅ Auto-track (TS plugin)`);
+    } else {
+      console.log(`  ⏭  Auto-track (plugin already present)`);
+    }
+  }
+
+  // ── Inject Kilo Code / OpenCode TS plugin ──────────────────────────
+  if (toolDef.id === 'kilo-code' || toolDef.id === 'opencode') {
+    const injected = injectKiloCodePlugin(toolDef.id, profile);
     if (injected) {
       console.log(`  ✅ Auto-track (TS plugin)`);
     } else {

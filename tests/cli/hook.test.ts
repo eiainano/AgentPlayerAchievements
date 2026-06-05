@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mapEvents, computePromptPayload, parseTranscriptJsonl, normalizeOpenClawStdin, OPENCLAW_EVENT_MAP, OPENCLAW_TOOL_MAP } from '../../src/cli/hook.js';
+import { mapEvents, computePromptPayload, parseTranscriptJsonl, normalizeOpenClawStdin, OPENCLAW_EVENT_MAP, OPENCLAW_TOOL_MAP, normalizeKilocodeStdin, KILOCODE_EVENT_MAP, KILOCODE_TOOL_MAP } from '../../src/cli/hook.js';
 
 describe('mapEvents', () => {
   describe('PostToolUse', () => {
@@ -384,6 +384,277 @@ describe('normalizeOpenClawStdin', () => {
         hook_event_name: 'some_unknown_hook' as any,
       });
       expect(result.hook_event_name).toBe('some_unknown_hook');
+    });
+  });
+});
+
+// ── KiloCode / OpenCode normalization ──────────────────────────────
+
+describe('normalizeKilocodeStdin', () => {
+  describe('event name mapping', () => {
+    it('maps tool.execute.after → PostToolUse', () => {
+      const result = normalizeKilocodeStdin({
+        hook_event_name: 'tool.execute.after',
+        toolName: 'read',
+        params: { filePath: '/tmp/a.ts' },
+        sessionId: 'sess-001',
+        durationMs: 150,
+      });
+      expect(result.hook_event_name).toBe('PostToolUse');
+      expect(result.tool_name).toBe('Read');
+      expect(result.tool_input).toBeDefined();
+      expect(result.tool_input!.file_path).toBe('/tmp/a.ts');
+      expect(result.session_id).toBe('sess-001');
+      expect(result.duration_ms).toBe(150);
+      expect(result.source).toBe('kilocode');
+    });
+
+    it('maps tool.execute.before → PreToolUse', () => {
+      const result = normalizeKilocodeStdin({
+        hook_event_name: 'tool.execute.before',
+        toolName: 'bash',
+        params: {},
+        sessionId: 'sess-002',
+      });
+      expect(result.hook_event_name).toBe('PreToolUse');
+      expect(result.tool_name).toBe('Bash');
+      expect(result.session_id).toBe('sess-002');
+    });
+
+    it('maps session.created → SessionStart', () => {
+      const result = normalizeKilocodeStdin({
+        hook_event_name: 'session.created',
+        sessionId: 'sess-003',
+      });
+      expect(result.hook_event_name).toBe('SessionStart');
+      expect(result.session_id).toBe('sess-003');
+    });
+
+    it('maps session.idle → SessionEnd', () => {
+      const result = normalizeKilocodeStdin({
+        hook_event_name: 'session.idle',
+        sessionId: 'sess-004',
+      });
+      expect(result.hook_event_name).toBe('SessionEnd');
+      expect(result.session_id).toBe('sess-004');
+    });
+  });
+
+  describe('tool name mapping', () => {
+    it('maps read → Read', () => {
+      expect(normalizeKilocodeStdin({ hook_event_name: 'tool.execute.after', toolName: 'read' }).tool_name).toBe('Read');
+    });
+    it('maps write → Write', () => {
+      expect(normalizeKilocodeStdin({ hook_event_name: 'tool.execute.after', toolName: 'write' }).tool_name).toBe('Write');
+    });
+    it('maps edit → Edit', () => {
+      expect(normalizeKilocodeStdin({ hook_event_name: 'tool.execute.after', toolName: 'edit' }).tool_name).toBe('Edit');
+    });
+    it('maps bash → Bash', () => {
+      expect(normalizeKilocodeStdin({ hook_event_name: 'tool.execute.after', toolName: 'bash' }).tool_name).toBe('Bash');
+    });
+    it('maps glob → Glob', () => {
+      expect(normalizeKilocodeStdin({ hook_event_name: 'tool.execute.after', toolName: 'glob' }).tool_name).toBe('Glob');
+    });
+    it('maps grep → Grep', () => {
+      expect(normalizeKilocodeStdin({ hook_event_name: 'tool.execute.after', toolName: 'grep' }).tool_name).toBe('Grep');
+    });
+    it('preserves mcp__ prefixed tools unchanged', () => {
+      const result = normalizeKilocodeStdin({ hook_event_name: 'tool.execute.after', toolName: 'mcp__my_server__my_tool' });
+      expect(result.tool_name).toBe('mcp__my_server__my_tool');
+    });
+    it('passes through unknown tool names', () => {
+      const result = normalizeKilocodeStdin({ hook_event_name: 'tool.execute.after', toolName: 'unknown_tool' });
+      expect(result.tool_name).toBe('unknown_tool');
+    });
+  });
+
+  describe('params field mapping (camelCase → snake_case)', () => {
+    it('maps params.filePath → tool_input.file_path', () => {
+      const result = normalizeKilocodeStdin({
+        hook_event_name: 'tool.execute.after',
+        toolName: 'read',
+        params: { filePath: '/tmp/foo.ts' },
+      });
+      expect(result.tool_input!.file_path).toBe('/tmp/foo.ts');
+    });
+
+    it('maps params.command → tool_input.command', () => {
+      const result = normalizeKilocodeStdin({
+        hook_event_name: 'tool.execute.after',
+        toolName: 'bash',
+        params: { command: 'npm test' },
+      });
+      expect(result.tool_input!.command).toBe('npm test');
+    });
+
+    it('maps params.old_string → tool_input.old_string (snake_case pass-through)', () => {
+      const result = normalizeKilocodeStdin({
+        hook_event_name: 'tool.execute.after',
+        toolName: 'edit',
+        params: { old_string: 'line1\nline2' },
+      });
+      expect(result.tool_input!.old_string).toBe('line1\nline2');
+    });
+
+    it('maps params.oldString → tool_input.old_string (camelCase variant)', () => {
+      const result = normalizeKilocodeStdin({
+        hook_event_name: 'tool.execute.after',
+        toolName: 'edit',
+        params: { oldString: 'camelStyle' },
+      });
+      expect(result.tool_input!.old_string).toBe('camelStyle');
+    });
+
+    it('maps params.content → tool_input.content', () => {
+      const result = normalizeKilocodeStdin({
+        hook_event_name: 'tool.execute.after',
+        toolName: 'write',
+        params: { content: 'hello world' },
+      });
+      expect(result.tool_input!.content).toBe('hello world');
+    });
+
+    it('captures error for tool.failure detection', () => {
+      const result = normalizeKilocodeStdin({
+        hook_event_name: 'tool.execute.after',
+        toolName: 'bash',
+        params: { command: 'bad' },
+        error: 'command not found',
+      });
+      expect(result.tool_input!.error).toBe('command not found');
+    });
+
+    it('snake_case file_path passes through untouched', () => {
+      const result = normalizeKilocodeStdin({
+        hook_event_name: 'tool.execute.after',
+        toolName: 'read',
+        params: { file_path: '/tmp/snake.ts' },
+      });
+      expect(result.tool_input!.file_path).toBe('/tmp/snake.ts');
+    });
+  });
+
+  describe('combined event routing via mapEvents', () => {
+    it('tool.execute.after with read → file.read event', () => {
+      const raw = normalizeKilocodeStdin({
+        hook_event_name: 'tool.execute.after',
+        toolName: 'read',
+        params: { filePath: '/tmp/x.ts' },
+        sessionId: 'sess-x',
+      });
+      const events = mapEvents(raw.hook_event_name!, raw);
+      const fileRead = events.find(e => e.event_type === 'file.read');
+      expect(fileRead).toBeDefined();
+      expect(fileRead!.payload.file_path).toBe('/tmp/x.ts');
+    });
+
+    it('tool.execute.after with bash → command.run event', () => {
+      const raw = normalizeKilocodeStdin({
+        hook_event_name: 'tool.execute.after',
+        toolName: 'bash',
+        params: { command: 'git status' },
+        sessionId: 'sess-y',
+      });
+      const events = mapEvents(raw.hook_event_name!, raw);
+      const cmdRun = events.find(e => e.event_type === 'command.run');
+      expect(cmdRun).toBeDefined();
+      expect(cmdRun!.payload.command).toBe('git status');
+    });
+
+    it('tool.execute.after with edit → file.edit event', () => {
+      const raw = normalizeKilocodeStdin({
+        hook_event_name: 'tool.execute.after',
+        toolName: 'edit',
+        params: { filePath: '/tmp/z.ts', old_string: 'a\nb' },
+        sessionId: 'sess-z',
+      });
+      const events = mapEvents(raw.hook_event_name!, raw);
+      const fileEdit = events.find(e => e.event_type === 'file.edit');
+      expect(fileEdit).toBeDefined();
+      expect(fileEdit!.payload.edit_lines).toBe(2);
+    });
+
+    it('tool.execute.before → tool.requested event', () => {
+      const raw = normalizeKilocodeStdin({
+        hook_event_name: 'tool.execute.before',
+        toolName: 'bash',
+        params: { command: 'echo hi' },
+        sessionId: 'sess-w',
+      });
+      const events = mapEvents(raw.hook_event_name!, raw);
+      const requested = events.find(e => e.event_type === 'tool.requested');
+      expect(requested).toBeDefined();
+      expect(requested!.payload.tool_name).toBe('Bash');
+    });
+
+    it('session.created → session.start event', () => {
+      const raw = normalizeKilocodeStdin({
+        hook_event_name: 'session.created',
+        sessionId: 'sess-v',
+      });
+      const events = mapEvents(raw.hook_event_name!, raw);
+      const sessStart = events.find(e => e.event_type === 'session.start');
+      expect(sessStart).toBeDefined();
+    });
+
+    it('session.idle → session.end event', () => {
+      const raw = normalizeKilocodeStdin({
+        hook_event_name: 'session.idle',
+        sessionId: 'sess-u',
+      });
+      const events = mapEvents(raw.hook_event_name!, raw);
+      const sessEnd = events.find(e => e.event_type === 'session.end');
+      expect(sessEnd).toBeDefined();
+    });
+
+    it('tool.execute.after with mcp__ tool → mcp.tool_call event', () => {
+      const raw = normalizeKilocodeStdin({
+        hook_event_name: 'tool.execute.after',
+        toolName: 'mcp__my_server__my_tool',
+        params: { query: 'test' },
+        sessionId: 'sess-t',
+      });
+      const events = mapEvents(raw.hook_event_name!, raw);
+      const mcpEvent = events.find(e => e.event_type === 'mcp.tool_call');
+      expect(mcpEvent).toBeDefined();
+      expect(mcpEvent!.payload.tool_name).toBe('mcp__my_server__my_tool');
+    });
+  });
+
+  describe('edge cases', () => {
+    it('handles missing params gracefully', () => {
+      const result = normalizeKilocodeStdin({
+        hook_event_name: 'tool.execute.after',
+        toolName: 'read',
+        sessionId: 'sess-edge',
+      });
+      expect(result.tool_input).toBeUndefined();
+      expect(result.tool_name).toBe('Read');
+      expect(result.session_id).toBe('sess-edge');
+    });
+
+    it('handles empty sessionId', () => {
+      const result = normalizeKilocodeStdin({
+        hook_event_name: 'session.created',
+      });
+      expect(result.session_id).toBe('');
+    });
+
+    it('passes through unknown hook_event_name', () => {
+      const result = normalizeKilocodeStdin({
+        hook_event_name: 'some_future_event' as any,
+      });
+      expect(result.hook_event_name).toBe('some_future_event');
+    });
+
+    it('returns undefined tool_input for empty params', () => {
+      const result = normalizeKilocodeStdin({
+        hook_event_name: 'tool.execute.after',
+        toolName: 'read',
+        params: {},
+      });
+      expect(result.tool_input).toBeUndefined();
     });
   });
 });

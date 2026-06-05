@@ -11,6 +11,7 @@
  *   auto                                — read CC hook stdin JSON, auto-map to AGPA event
  *   hermes-auto                         — read Hermes hook stdin JSON, translate → CC format → AGPA event
  *   openclaw-auto                       — read OpenClaw hook stdin JSON, translate → CC format → AGPA event
+ *   kilocode-auto                       — read Kilo Code / OpenCode plugin stdin JSON, translate → CC format → AGPA event
  *
  * CC Hook events → AGPA event mapping:
  *   PostToolUse        → tool.complete   { tool_name, tool_input, duration_ms }
@@ -580,6 +581,115 @@ export function normalizeOpenClawStdin(raw: OpenClawStdin): HookStdin {
   };
 }
 
+// ── Kilo Code / OpenCode → CC stdin translation ──────────────────
+
+/**
+ * Kilo Code / OpenCode event names → CC hook event names.
+ * Both products share the same plugin API (only npm package name differs).
+ */
+export const KILOCODE_EVENT_MAP: Record<string, string> = {
+  'tool.execute.after':  'PostToolUse',
+  'tool.execute.before': 'PreToolUse',
+  'session.created':     'SessionStart',
+  'session.idle':        'SessionEnd',
+};
+
+/**
+ * Kilo Code / OpenCode tool names → CC tool names.
+ */
+export const KILOCODE_TOOL_MAP: Record<string, string> = {
+  'read':   'Read',
+  'write':  'Write',
+  'edit':   'Edit',
+  'bash':   'Bash',
+  'glob':   'Glob',
+  'grep':   'Grep',
+  'task':   'Task',
+  'ask':    'Ask',
+};
+
+interface KilocodeStdin {
+  hook_event_name: string;
+  toolName?: string;
+  params?: Record<string, unknown>;
+  sessionId?: string;
+  durationMs?: number;
+  error?: string;
+  success?: boolean;
+  output?: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Normalize Kilo Code / OpenCode stdin to CC-compatible HookStdin.
+ *
+ * Key field mappings:
+ *   tool.execute.*  → PostToolUse / PreToolUse
+ *   session.*       → SessionStart / SessionEnd
+ *   toolName        → tool_name
+ *   params.filePath → tool_input.file_path (camelCase → snake_case)
+ *   sessionId       → session_id
+ *   durationMs      → duration_ms
+ *   error           → tool_input.error
+ */
+export function normalizeKilocodeStdin(raw: KilocodeStdin): HookStdin {
+  const event = KILOCODE_EVENT_MAP[raw.hook_event_name] || raw.hook_event_name;
+
+  let toolName = (raw.toolName || '') as string;
+  // Map known tool aliases, leave MCP tools (mcp__*) unchanged
+  toolName = KILOCODE_TOOL_MAP[toolName] || toolName;
+
+  const params = raw.params || {};
+  const ti: Record<string, unknown> = {};
+  // CamelCase params → snake_case (Kilo/OpenCode tools use camelCase internally)
+  if (typeof params.filePath === 'string') ti.file_path = params.filePath;
+  if (typeof params.command === 'string') ti.command = params.command;
+  if (typeof params.content === 'string') ti.content = params.content;
+  if (typeof params.old_string === 'string') ti.old_string = params.old_string;
+  if (typeof params.oldString === 'string') ti.old_string = params.oldString;
+  if (typeof params.new_string === 'string') ti.new_string = params.new_string;
+  if (typeof params.newString === 'string') ti.new_string = params.newString;
+  if (typeof params.description === 'string') ti.description = params.description;
+  // Pass through snake_case params directly (belt-and-suspenders)
+  if (typeof params.file_path === 'string' && !ti.file_path) ti.file_path = params.file_path;
+  // Capture error for tool.failure detection
+  if (typeof raw.error === 'string' && raw.error) ti.error = raw.error;
+
+  return {
+    hook_event_name: event,
+    tool_name: toolName,
+    tool_input: Object.keys(ti).length > 0 ? ti : undefined,
+    session_id: (raw.sessionId as string) || '',
+    duration_ms: typeof raw.durationMs === 'number' ? raw.durationMs : undefined,
+    source: 'kilocode',
+  };
+}
+
+function cmdKilocodeAuto(): void {
+  const raw = parseStdin() as Record<string, unknown> | null;
+  if (!raw?.hook_event_name) {
+    process.exit(0);
+  }
+
+  const hookName = process.argv[3] || (raw.hook_event_name as string);
+  const data = normalizeKilocodeStdin(raw as KilocodeStdin);
+
+  const events = mapEvents(data.hook_event_name!, data);
+  if (events.length === 0) {
+    process.exit(0);
+  }
+
+  if (data.session_id) ENGINE.sessionId = data.session_id;
+  if (data.task_id) ENGINE.taskId = data.task_id;
+  ENGINE.init();
+  for (const { event_type, payload } of events) {
+    const event = ENGINE.track(event_type, payload);
+    process.stderr.write(`[AGPA:KiloCode] ${hookName} → ${event_type} (${event.event_id})\n`);
+  }
+}
+
+// ── Commands ──────────────────────────────────────────────────
+
 function cmdAuto(): void {
   const data = parseStdin();
   if (!data?.hook_event_name) {
@@ -690,8 +800,11 @@ switch (cmd) {
   case 'openclaw-auto':
     cmdOpenClawAuto();
     break;
+  case 'kilocode-auto':
+    cmdKilocodeAuto();
+    break;
   default:
-    process.stderr.write('Usage: hook.ts <track|poll|auto|hermes-auto|openclaw-auto> [args...]\n');
+    process.stderr.write('Usage: hook.ts <track|poll|auto|hermes-auto|openclaw-auto|kilocode-auto> [args...]\n');
     process.exit(1);
 }
 } // isMain

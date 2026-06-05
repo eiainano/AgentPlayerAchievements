@@ -2,8 +2,15 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { safeParse, appConfigSchema } from './utils/validate.js';
 
-const CONFIG_DIR = path.join(process.env.HOME || '~', '.agent-achievements');
-const CONFIG_PATH = path.join(CONFIG_DIR, 'config.json');
+const DEFAULT_CONFIG_DIR = path.join(process.env.HOME || '~', '.agent-achievements');
+let CONFIG_DIR = DEFAULT_CONFIG_DIR;
+let CONFIG_PATH = path.join(CONFIG_DIR, 'config.json');
+
+/** Override config directory for testing. Pass no args to reset to default. */
+export function setConfigDir(dir?: string): void {
+  CONFIG_DIR = dir ?? DEFAULT_CONFIG_DIR;
+  CONFIG_PATH = path.join(CONFIG_DIR, 'config.json');
+}
 
 export type Lang = 'en' | 'zh';
 

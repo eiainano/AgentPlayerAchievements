@@ -7,7 +7,7 @@ import { AchievementEngine } from '../engine/engine.js';
 import { saveConfig, loadConfig, isSoundEnabled, setSoundEnabled } from '../config.js';
 import { formatAchievement, RARITY_RANK, loadShowcase, saveShowcase } from '../helpers.js';
 import type { ShowcaseData } from '../helpers.js';
-import { buildApiResponse } from './api.js';
+import { buildApiResponse, buildCardResponse } from './api.js';
 import type { AchievementItem } from './api.js';
 import {
   handleGetAchievements,
@@ -448,6 +448,31 @@ export function createServer(port: number, defaultProfile: string): http.Server 
     // ── Self-Customize page ─────────────────────────────────────────
     if (url.pathname === '/customize' && req.method === 'GET') {
       serveStaticFile(res, path.join(PUBLIC_DIR, 'customize.html'));
+      return;
+    }
+
+    // ── GET /api/card — shareable achievement card data ──────────────
+    if (url.pathname === '/api/card' && req.method === 'GET') {
+      try {
+        const cfg = loadConfig();
+        const meta = getProfileMeta(resolvedProfile);
+        const cardData = buildCardResponse(
+          engine.definitions,
+          engine.state,
+          engine.events,
+          engine.setDefinitions,
+          cfg,
+          resolvedProfile,
+          meta.emoji,
+          engine.toolStats(),
+        );
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(cardData));
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Card generation failed';
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: msg }));
+      }
       return;
     }
 

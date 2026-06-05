@@ -4,9 +4,11 @@
 
 ## 总体状态
 
-v0.1.6 完成。Round 3 竞品调研（12 项目 × 40+ 维度）→ 6 条建议全部实施。160 个成就，203 个测试全绿（11 文件）。
+v0.1.6 完成。Round 3 竞品调研（12 项目 × 40+ 维度）→ 6 条建议全部实施。160 个成就，446 个测试全绿（18 文件）。
 
 **本次新增 (2026-06-05):**
+- 不可达成就清零：修复 YAML 6 个（streak 系列缺 window:all、mcp_explorer 缺 field）+ evaluator 4 个（set_completion future 过滤）+ 手动 track 2 个（automode/mcp connect）
+- 测试大幅扩展：+296 tests → 446 tests / 18 文件（Phase 1 纯函数 + Approach A 场景矩阵 + Approach B 逐成就触发测试）
 - P0-1: JSONL 解析（CC transcript → token/user message/session 精确数据）
 - P1-1: Usage-based XP（成就 + 活动双轨 Level）
 - P1-2: UserPromptSubmit Hook（CC hook → user.prompt + user.message）
@@ -82,7 +84,7 @@ v0.1.6 完成。Round 3 竞品调研（12 项目 × 40+ 维度）→ 6 条建议
 - [x] **路径遍历 guard**：拒绝 .. 和越界绝对路径读文件
 - [x] **P1 evaluator 4 项修复**：空 conditions guard、evalMode target、set_id 删除、evalStreak窗口/field/same_target
 - [x] **P2 数据一致性**：milestone 命名、set 成员补全、缺失 set 字段、im_sorry_dave 窗口
-- [x] 测试覆盖：203 tests, 11 files（evaluator 50 + integration 5 + yaml-parser 20 + api 10 + xp 15 + hook 30 + stats 21 + store 12 + activity 15 + profile 16 + registry 7）
+- [x] 测试覆盖：446 tests, 18 files（Phase 1: evalCounter/Streak/Threshold/DistinctCount/SetCompletion + config/helpers/engine/errors/validate/timeline + Approach A + Approach B）
 
 ### 中优先级
 - [x] **用户审阅 160 成就清单**：已逐条 review，修复 30+ 个不一致，删除 3 个重复，新增 1 个
@@ -113,6 +115,6 @@ v0.1.6 完成。Round 3 竞品调研（12 项目 × 40+ 维度）→ 6 条建议
 | 成就数量 | 30 个 | 160 个全部可达成 |
 | Evaluator | 3 种 | 11 种全部实现 |
 | Dashboard | 基础网格 | 完整 4 section + 主题 + 双语 |
-| Event Capture | CC Hook | 9 hooks auto-track + 27 手动 track |
+| Event Capture | CC Hook | 10 hooks auto-track + 27 手动 track |
 | Init | 手动 --tool claude-code | `npm run init` 一键 5 工具 |
 | single_task 窗口 | — | task.complete 边界推断 |

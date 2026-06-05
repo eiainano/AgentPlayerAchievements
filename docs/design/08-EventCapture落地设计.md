@@ -177,15 +177,16 @@ hooks:
   PreToolUse:         agpa track tool.call
   PostToolUse:        agpa track tool.complete
   PostToolUseFailure: agpa track tool.fail
+  UserPromptSubmit:   agpa track user.prompt
   PostCompact:        agpa track context.compact
 ```
 
-共 9 个 Hook。command 极简——`agpa track` 内部自动读取 `$CLAUDE_*` 环境变量补充参数。
+共 10 个 Hook。command 极简——`agpa track` 内部自动读取 `$CLAUDE_*` 环境变量补充参数。
 
 **init 行为**：
 - 解析 settings.json（JSON parse）
 - 追加 `mcpServers.agent-achievements`（已存在则跳过）
-- 追加 9 个 Hook（每个合并到已有数组尾部，不覆盖已有 Hook）
+- 追加 10 个 Hook（每个合并到已有数组尾部，不覆盖已有 Hook）
 - 写回 settings.json（保留原格式、缩进、注释）
 
 **异常处理**：

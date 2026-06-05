@@ -6,8 +6,8 @@
 
 ## Claude Code ✅
 
-- **接入方式**：9 个 hooks in `~/.claude/settings.json`
-- **事件**：`SessionStart/Stop`, `PostToolUse/PreToolUse/PostToolUseFailure`, `TaskCompleted`, `SubagentStart/Stop`, `PostCompact`
+- **接入方式**：10 个 hooks in `~/.claude/settings.json`
+- **事件**：`SessionStart/Stop`, `PostToolUse/PreToolUse/PostToolUseFailure`, `UserPromptSubmit`, `TaskCompleted`, `SubagentStart/Stop`, `PostCompact`
 - **stdin 协议**：`{hook_event_name, tool_name, tool_input: {file_path, command, old_string, ...}, session_id, ...}`
 
 ---

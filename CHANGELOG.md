@@ -2,6 +2,16 @@
 
 ## [0.1.6] — 2026-06-06
 
+### CLI 扩展：6 新命令 — 2026-06-06
+
+- `agpa config` — 通用配置中心：查看/修改 lang、sound、profile、debug 等设置
+- `agpa profile switch <name>` — 命令行切换活跃 profile（不需进 Dashboard）
+- `agpa showcase` — 展示柜管理：`list`、`pin <id> [slot]`、`unpin <slot>`、`auto-fill`
+- `agpa search [query]` — 终端搜索成就：关键词 + `--rarity`、`--category`、`--unlocked/--locked`
+- `agpa suggest` — "下一步做什么"：展示最近解锁成就进度 + 进度条，支持 `--N`、`--all`、`--hidden`
+- `agpa web` — `dashboard` 别名，更直觉
+- CLI 从 16 命令扩展至 19 命令，5 个新模块（config.ts/search.ts/showcase.ts/suggest.ts + profile switch），tsc 零错误，514 测试全绿
+
 ### Kilo Code / OpenCode 双通道 + 交互式安装 — 2026-06-06
 
 - Kilo Code / OpenCode auto-track：`hook.ts` 新增 `kilocode-auto` 模式、`KILOCODE_EVENT_MAP`、`KILOCODE_TOOL_MAP`、`normalizeKilocodeStdin()`，`init.ts` 生成 `Bun.spawn` TS 插件，监听 32+ 事件

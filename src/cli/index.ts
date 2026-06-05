@@ -6,14 +6,21 @@
  *   agpa init       Auto-detect & configure AI tools
  *   agpa verify     Verify setup health
  *   agpa doctor     Diagnose system state
+ *   agpa config     View/change settings
  *   agpa dashboard  Start web dashboard
+ *   agpa web        Alias for dashboard
  *   agpa profile    Manage achievement profiles
+ *   agpa showcase   Manage achievement showcase
  *   agpa demo       Generate MVP demo data
  *   agpa stats      View achievement stats
  *   agpa progress   List all achievements
- *   agpa reset      Reset all data
- *   agpa sound      Toggle sound effects
+ *   agpa search     Search achievements
+ *   agpa suggest    Show nearest unlocks
  *   agpa activity   View streak & heatmap
+ *   agpa sound      Toggle sound effects
+ *   agpa export     Export achievement data
+ *   agpa import     Import achievement data
+ *   agpa reset      Reset all data
  *   agpa mcp        Start MCP server
  */
 
@@ -33,12 +40,17 @@ const COMMANDS: Subcommand[] = [
   { name: 'init',       description: 'Auto-detect & configure AI coding tools for achievement tracking', usage: 'agpa init [--tool <name>] [--profile <name>]', module: './init.ts' },
   { name: 'verify',     description: 'Verify AGPA setup — 7 health checks',                               usage: 'agpa verify',                               module: './verify.ts' },
   { name: 'doctor',     description: 'Full system diagnosis',                                              usage: 'agpa doctor [--check <id>] [--json]',       module: './doctor.ts' },
+  { name: 'config',     description: 'View or change AGPA settings',                                      usage: 'agpa config [key] [value]',                 module: './config.ts' },
   { name: 'dashboard',  description: 'Start achievement dashboard (default :3867)',                        usage: 'agpa dashboard [port] [--profile <name>]',   module: './dashboard.ts' },
-  { name: 'profile',    description: 'Manage achievement profiles (create | list)',                        usage: 'agpa profile <create|list> [name]',          module: './profile.ts' },
+  { name: 'web',        description: 'Alias for dashboard',                                                usage: 'agpa web [port] [--profile <name>]',         module: './dashboard.ts' },
+  { name: 'profile',    description: 'Manage achievement profiles (create | list | switch)',               usage: 'agpa profile <create|list|switch> [name]',   module: './profile.ts' },
+  { name: 'showcase',   description: 'Manage achievement showcase',                                        usage: 'agpa showcase <list|pin|unpin|auto-fill>',   module: './showcase.ts' },
   { name: 'demo',       description: 'Generate MVP demo data',                                             usage: 'agpa demo',                                 module: './mvp.ts' },
   { name: 'stats',      description: 'View achievement stats in terminal',                                 usage: 'agpa stats',                                module: './mvp.ts' },
   { name: 'progress',   description: 'List all achievements with unlock status',                           usage: 'agpa progress',                             module: './mvp.ts' },
   { name: 'reset',      description: 'Reset all achievement data',                                         usage: 'agpa reset',                                module: './mvp.ts' },
+  { name: 'search',     description: 'Search achievements by keyword, rarity, or category',                usage: 'agpa search [query] [--rarity] [--category] [--unlocked]', module: './search.ts' },
+  { name: 'suggest',    description: 'Show nearest unlockable achievements',                               usage: 'agpa suggest [--N <n>] [--all] [--hidden]', module: './suggest.ts' },
   { name: 'sound',      description: 'Toggle achievement sound effects (on | off)',                       usage: 'agpa sound <on|off>',                       module: './sound.ts' },
   { name: 'activity',   description: 'View coding streak & activity heatmap in terminal',                  usage: 'agpa activity [--streak|--heatmap|--compact]', module: './activity.ts' },
   { name: 'export',     description: 'Export achievement data to a portable JSON file',                     usage: 'agpa export [profile] [--output <path>] [--full] [--migrate]', module: './export.ts' },

@@ -10,6 +10,7 @@
 import * as readline from 'node:readline';
 import { homedir } from 'node:os';
 import { createProfile, listProfiles, listProfilesWithMeta, getProfileMeta, setTrackedTools, validateProfileName, profileExists, DEFAULT_PROFILE, MAX_PROFILES } from '../utils/profile.js';
+import { saveConfig } from '../config.js';
 import { TOOLS, scanTools } from '../tool-registry.js';
 
 const args = process.argv.slice(2);
@@ -21,6 +22,7 @@ function printHelp() {
   console.log('Usage:');
   console.log('  npx tsx src/cli/profile.ts create [name]  Create a new profile (default: profile0)');
   console.log('  npx tsx src/cli/profile.ts list            List all profiles');
+  console.log('  npx tsx src/cli/profile.ts switch <name>   Switch active profile');
   console.log('  npx tsx src/cli/profile.ts tools [name]    Manage tracked tools for a profile');
   console.log('');
   console.log(`Max ${MAX_PROFILES} named profiles + 1 default = ${MAX_PROFILES + 1} total.`);
@@ -168,6 +170,23 @@ switch (command) {
       console.log(`     Tools: ${tools}`);
       console.log('');
     }
+    break;
+  }
+
+  case 'switch': {
+    const targetName = args[1]?.trim();
+    if (!targetName) {
+      console.error('Usage: agpa profile switch <name>');
+      process.exit(1);
+    }
+    if (!profileExists(targetName)) {
+      console.error(`Profile "${targetName}" does not exist.`);
+      console.error(`  Existing: ${listProfiles().join(', ')}`);
+      console.error(`  Create:   agpa profile create ${targetName}`);
+      process.exit(1);
+    }
+    saveConfig({ active_profile: targetName });
+    console.log(`✅ Switched to profile "${targetName}"`);
     break;
   }
 

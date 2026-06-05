@@ -67,9 +67,7 @@ function scopedEvents(events: TrackedEvent[], cond: Condition): TrackedEvent[] {
   const scoped = windowFilter(events, cond);
   return scoped.filter(e => {
     if (cond.event && e.event_type !== cond.event) return false;
-    if (cond.filter) {
-      try { return matchFilter(e, cond.filter); } catch { return true; }
-    }
+    if (cond.filter) return matchFilter(e, cond.filter);
     return true;
   });
 }

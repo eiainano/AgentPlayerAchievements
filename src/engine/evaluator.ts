@@ -38,7 +38,7 @@ export function matchFilter(event: TrackedEvent, filter: string): boolean {
   try {
     return evalFilter(filter, ctx);
   } catch {
-    return true; // unparseable filters pass (graceful fallback)
+    return false; // unparseable filters exclude the event (fail-closed)
   }
 }
 

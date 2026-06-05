@@ -31,6 +31,9 @@ function matchFilter(event: TrackedEvent, filter: string): boolean {
     duration_ms: event.payload?.duration_ms != null ? Number(event.payload.duration_ms) : 0,
     hour: event.payload?.hour != null ? Number(event.payload.hour) : -1,
     model: event.context?.model || '',
+    word_count: event.payload?.word_count != null ? Number(event.payload.word_count) : 0,
+    has_code_block: event.payload?.has_code_block === true || event.payload?.has_code_block === 'true',
+    has_question_mark: event.payload?.has_question_mark === true || event.payload?.has_question_mark === 'true',
   };
   try {
     return evalFilter(filter, ctx);
@@ -107,6 +110,24 @@ function evalPredicate(expr: string, ctx: Record<string, string | boolean | numb
   // field matches 'glob'
   m = expr.match(/^(\w+)\s+matches\s+'(.+)'$/);
   if (m) return globMatch(m[2]!, String(ctxValue(ctx, m[1]!)));
+
+  // field < value  (numeric)
+  m = expr.match(/^(\w+)\s+<\s+(.+)$/);
+  if (m) {
+    const fieldVal = Number(ctxValue(ctx, m[1]!));
+    const rhs = Number(parseRhs(m[2]!));
+    if (!isNaN(fieldVal) && !isNaN(rhs)) return fieldVal < rhs;
+    return true; // non-numeric → pass
+  }
+
+  // field > value  (numeric)
+  m = expr.match(/^(\w+)\s+>\s+(.+)$/);
+  if (m) {
+    const fieldVal = Number(ctxValue(ctx, m[1]!));
+    const rhs = Number(parseRhs(m[2]!));
+    if (!isNaN(fieldVal) && !isNaN(rhs)) return fieldVal > rhs;
+    return true; // non-numeric → pass
+  }
 
   // field contains 'substring'
   m = expr.match(/^(\w+)\s+contains\s+'(.+)'$/);

@@ -1,6 +1,6 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-05 | 总成就数: 160 | 条件类型: 11 | Tests: 446 ✅ | 0 不可达 ✅ | 5 Agent 全接入 | P0-1+P1-1~P1-4 全部实施
+> 最后更新: 2026-06-05 | 总成就数: 166 | 条件类型: 11 | Tests: 452 ✅ | 0 不可达 ✅ | 6 事件填空型新成就 | Evaluator +2 操作符
 
 ---
 
@@ -25,6 +25,29 @@ Phase 1-3 全线实施完毕后，集中扫清 11 个不可达成就并大幅扩
 - **Approach B** — `every-achievement.test.ts` 每个成就自动生成最小触发事件验证解锁，160/160 全可达
 - **Phase 1 纯函数覆盖** — 6 新文件（config/helpers/engine/errors/validate/timeline）+81 tests
 - **测试总量**: 150 → 446 (18 文件, 全绿)
+
+---
+
+## 🆕 本次新增 — 6 事件填空型新成就 (v0.1.6, 6/5)
+
+基于事件利用率分析，针对 `user.prompt` 和 `agent.self_fix` 两个缺口填充：
+
+**user.prompt 系列（5 个，hook auto-track）**
+- `brevity_scout` — 5 次 prompt < 10 词，Common style
+- `executive_summary` — 25 次 prompt > 100 词，Uncommon style
+- `code_talker` — 10 次含代码块，Uncommon style
+- `no_questions_asked` — 3 次无问号，Uncommon hidden
+- `infinite_details` — 累计 50,000 字符，Rare style progress_trackable
+
+**agent.self_fix 系列（1 个，manual track）**
+- `self_aware` — 首次自修复，Common skill，set: bug_catcher
+
+**Evaluator 扩展**
+- `evalPredicate` 新增 `<` 和 `>` 数值比较操作符
+- `matchFilter` ctx 新增 `word_count` / `has_code_block` / `has_question_mark`
+- `computePromptPayload` 新增 `has_question_mark` 字段
+
+**测试**: 446 → 452 (6 新成就全部 Approach B 验证可达)
 
 ---
 

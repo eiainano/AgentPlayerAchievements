@@ -233,6 +233,7 @@ interface PromptPayload {
   word_count: number;
   prefix_hash: string;
   has_code_block: boolean;
+  has_question_mark: boolean;
 }
 
 export function computePromptPayload(promptText: string): PromptPayload {
@@ -244,6 +245,7 @@ export function computePromptPayload(promptText: string): PromptPayload {
     word_count: promptText.split(/\s+/).filter(Boolean).length,
     prefix_hash: hash,
     has_code_block: promptText.includes('```'),
+    has_question_mark: promptText.includes('?'),
   };
 }
 

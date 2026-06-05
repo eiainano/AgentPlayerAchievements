@@ -712,6 +712,21 @@ definitions:
         window: single_session
         operator: ">="
         value: 10
+  - id: self_aware
+    name: Self-Aware
+    name_cn: 自知之明
+    description: Agent triggered a self-fix for the first time. Acknowledged the mistake, fixed it.
+    description_cn: agent 首次触发自修复。我犯错了，我修好了。
+    icon: 🤖💡
+    category: skill
+    rarity: common
+    hidden: false
+    hint: Let the agent fix its own mistakes
+    hint_cn: 让 agent 自己修 bug
+    set: bug_catcher
+    conditions:
+      - type: event
+        event: agent.self_fix
   - id: the_debugger
     name: The Debugger
     name_cn: 捉虫行动
@@ -999,6 +1014,97 @@ definitions:
         denominator: total_input_chars
         operator: ">"
         value: 0.5
+  - id: brevity_scout
+    name: Brevity Scout
+    name_cn: 简洁侦察兵
+    description: 5 prompts under 10 words. Say more with less.
+    description_cn: 累计 5 次 prompt 少于 10 个词。字少事大。
+    icon: ✂️
+    category: style
+    rarity: common
+    hidden: false
+    hint: Keep your prompts short and sharp
+    hint_cn: 把你的 prompt 写得简短精准
+    conditions:
+      - type: counter
+        event: user.prompt
+        filter: word_count < 10
+        operator: ">="
+        value: 5
+        window: all
+  - id: executive_summary
+    name: Executive Summary
+    name_cn: 执行摘要
+    description: 25 prompts over 100 words. You leave nothing unsaid.
+    description_cn: 累计 25 次 prompt 超过 100 个词。事无巨细，一次说清。
+    icon: 📝
+    category: style
+    rarity: uncommon
+    hidden: false
+    hint: Write detailed, thorough prompts
+    hint_cn: 写详细、饱满的 prompt
+    conditions:
+      - type: counter
+        event: user.prompt
+        filter: word_count > 99
+        operator: ">="
+        value: 25
+        window: all
+  - id: code_talker
+    name: Code Talker
+    name_cn: 代码语者
+    description: 10 prompts contained code blocks. You speak fluent code.
+    description_cn: 累计 10 次 prompt 中包含代码块。你直接用代码思考。
+    icon: 💻
+    category: style
+    rarity: uncommon
+    hidden: false
+    hint: Include code snippets in your prompts
+    hint_cn: 在 prompt 里直接贴代码片段
+    conditions:
+      - type: counter
+        event: user.prompt
+        filter: has_code_block == true
+        operator: ">="
+        value: 10
+        window: all
+  - id: no_questions_asked
+    name: No Questions Asked
+    name_cn: 不问问题
+    description: 3 prompts without a single question mark. You don't ask — you command.
+    description_cn: 累计 3 次 prompt 中没有问号。你不是来提问的，是来下指令的。
+    icon: ❓
+    category: hidden
+    rarity: uncommon
+    hidden: true
+    hint: Try giving a direct command instead of asking a question
+    hint_cn: 试试直接下指令而不是提问
+    conditions:
+      - type: counter
+        event: user.prompt
+        filter: has_question_mark == false
+        operator: ">="
+        value: 3
+        window: all
+  - id: infinite_details
+    name: Infinite Details
+    name_cn: 话痨
+    description: 50,000 characters of prompts sent cumulatively. You've written a novella.
+    description_cn: 累计输入 50,000 字符的 prompt。你写的字够出一本书了。
+    icon: 📚
+    category: style
+    rarity: rare
+    hidden: false
+    progress_trackable: true
+    hint: The more context you give, the better the output
+    hint_cn: 给的上下文越多，输出质量越高
+    conditions:
+      - type: threshold
+        event: user.prompt
+        field: char_count
+        operator: ">="
+        value: 50000
+        window: all
   - id: file_whisperer
     name: File Shepherd
     name_cn: 文件牧羊人

@@ -4,9 +4,11 @@
 
 ## 总体状态
 
-v0.1.6 完成。Round 3 竞品调研（12 项目 × 40+ 维度）→ 6 条建议全部实施。160 个成就，446 个测试全绿（18 文件）。
+v0.1.6 完成。Round 3 竞品调研（12 项目 × 40+ 维度）→ 6 条建议全部实施。166 个成就，452 个测试全绿（18 文件）。
 
 **本次新增 (2026-06-05):**
+- 6 事件填空型新成就：brevity_scout / executive_summary / code_talker / no_questions_asked / infinite_details / self_aware
+- Evaluator 扩展：evalPredicate 新增 `<` `>` 操作符，matchFilter ctx 新增 word_count/has_code_block/has_question_mark
 - 不可达成就清零：修复 YAML 6 个（streak 系列缺 window:all、mcp_explorer 缺 field）+ evaluator 4 个（set_completion future 过滤）+ 手动 track 2 个（automode/mcp connect）
 - 测试大幅扩展：+296 tests → 446 tests / 18 文件（Phase 1 纯函数 + Approach A 场景矩阵 + Approach B 逐成就触发测试）
 - P0-1: JSONL 解析（CC transcript → token/user message/session 精确数据）

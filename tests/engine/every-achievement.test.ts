@@ -108,6 +108,14 @@ function applyPredicate(expr: string, req: FilterReqs): void {
   // bare contains 'X'
   m = expr.match(/^contains\s+'([^']+)'$/);
   if (m) { req.payload.event_type = m[1]!; return; }
+
+  // field > value (numeric) — set field just above threshold
+  m = expr.match(/(\w+)\s+>\s*(\d+)/);
+  if (m) { req.payload[m[1]!] = Number(m[2]) + 1; return; }
+
+  // field < value (numeric) — set field just below threshold
+  m = expr.match(/(\w+)\s+<\s*(\d+)/);
+  if (m) { req.payload[m[1]!] = Math.max(0, Number(m[2]) - 1); return; }
 }
 
 // ── Generate events for each condition type ───────────────────────

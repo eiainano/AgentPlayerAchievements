@@ -1,20 +1,30 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-05 | 总成就数: 160 | 条件类型: 11 | Tests: 203 ✅ | 5 Agent 全接入 | P0-1+P1-1~P1-4 全部实施 | 2 bugfixes + 53 tests added
+> 最后更新: 2026-06-05 | 总成就数: 160 | 条件类型: 11 | Tests: 446 ✅ | 0 不可达 ✅ | 5 Agent 全接入 | P0-1+P1-1~P1-4 全部实施
 
 ---
 
-## 🎉 今日实施 — P0-P1 全线落地 (v0.1.6, 6/5)
+## 🎉 本次实施 — 不可达成就全面清零 + 测试覆盖 446 (v0.1.6, 6/5)
 
-Phase 1-3 全线实施完毕，基于 Round 3 竞品调研的 6 条建议全部落地：
+Phase 1-3 全线实施完毕后，集中扫清 11 个不可达成就并大幅扩展测试：
 
-- [x] **P0-1: JSONL 解析** — `parseTranscriptJsonl()` 在 Stop hook `session.end` 时解析 CC JSONL transcript → `token.consumed` + `user.message.batch` + `session.stats` 事件。复活 3 个 token 成就。
-- [x] **P1-2: UserPromptSubmit Hook** — CC hook → `user.prompt` 事件（char_count/word_count/prefix_hash/has_code_block 隐私保护）+ `user.message`（source: hook_auto）。init.ts 新增 hook key。
-- [x] **P1-1: Usage-based XP** — `calcUsageXP()` / `calcUsageBreakdown()` sqrt 双轨公式。Level = achievement + task + usage XP。api.ts 集成，DashboardStats 新增 `usage_xp` + `usage_breakdown` 字段。
-- [x] **P1-4: 数据导出/导入** — `agpa export` / `agpa import` CLI + Dashboard `/api/export` 端点 + merge/replace 冲突解决。engine 新增 `saveState()`/`saveStats()`/`appendEvents()` 公共方法。
-- [x] **P1-3: 日聚合缓存** — stats.json v2.0 + `DailyBucket` + `aggregateDaily()` + `mergeDaily()` + `computeStats()` 增量模式（last_aggregated_line）。`computeHeatmapFromDaily()` / `calcStreakFromDaily()` 零扫描 Dashboard 热力图。
+### 不可达成就修复（11 个 → 0）
 
-**新增测试:** +30 tests（stats.test.ts: +11, xp.test.ts: +9, hook.test.ts: +10）→ 150/150 ✅, +53 tests（store: 12, activity: 15, profile: 16, registry: 7, evaluator: +3）→ 203/203 ✅
+**YAML Bug（6 个）**
+- `streak_3/7/30/100` + `daily_checkin` — 缺 `window: all`，默认 24h 窗口下日历连续天成就永不可达。补上 `window: all`。
+- `mcp_explorer` — `distinct_count` 缺 `field: server_name`，无法区分不同事件。
+
+**Evaluator Bug（4 个）**
+- `completionist_bronze/silver/gold/mythic_completionist` — `evalSetCompletion` 不排除 `future: true` 成就，永远缺 2 个不可达成就导致完成不了。
+
+**手动 track 补全（2 个）**
+- `automode_first` / `mcp_first_connect` — 去掉 `future: true`，AGENTS.md + init.ts 新增 `automode.start` / `mcp.connect` 手动 track 指令。
+
+**新增场景矩阵 + 逐成就触发测试（+296 tests）**
+- **Approach A** — `integration.test.ts` 全面重写，6 个真实 Agent 使用场景回归保护
+- **Approach B** — `every-achievement.test.ts` 每个成就自动生成最小触发事件验证解锁，160/160 全可达
+- **Phase 1 纯函数覆盖** — 6 新文件（config/helpers/engine/errors/validate/timeline）+81 tests
+- **测试总量**: 150 → 446 (18 文件, 全绿)
 
 ---
 

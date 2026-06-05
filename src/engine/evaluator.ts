@@ -169,10 +169,31 @@ function scopeEvents(events: TrackedEvent[], cond: Condition): TrackedEvent[] {
     for (let i = 0; i < events.length; i++) {
       if (events[i]!.event_type === 'task.complete') boundaries.push(i);
     }
-    if (boundaries.length === 0) return events; // no task boundary yet
+    if (boundaries.length === 0) {
+      // No completed task yet — scope to current session to prevent
+      // events from previous sessions leaking into the evaluation
+      const sid = latestSessionId(events);
+      if (!sid) return [];
+      return events.filter(e => e.context?.session_id === sid);
+    }
     const lastIdx = boundaries[boundaries.length - 1]!;
-    const prevIdx = boundaries.length >= 2 ? boundaries[boundaries.length - 2]! : -1;
-    return events.slice(prevIdx + 1, lastIdx + 1);
+    if (boundaries.length >= 2) {
+      const prevIdx = boundaries[boundaries.length - 2]!;
+      return events.slice(prevIdx + 1, lastIdx + 1);
+    }
+    // Only one completed task. The previous boundary approach used
+    // slice(0, lastIdx+1) which included ALL events from index 0,
+    // leaking events from prior sessions into the first task scope.
+    // Fix: find the nearest session.start before the task.complete
+    // to establish a meaningful task boundary.
+    let startIdx = 0;
+    for (let i = lastIdx - 1; i >= 0; i--) {
+      if (events[i]!.event_type === 'session.start') {
+        startIdx = i;
+        break;
+      }
+    }
+    return events.slice(startIdx, lastIdx + 1);
   }
   if (isSessionWindow(cond)) {
     const sid = latestSessionId(events);

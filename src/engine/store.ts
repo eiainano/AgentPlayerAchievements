@@ -97,9 +97,11 @@ export class Store {
     const statePath = path.join(this.stateDir, 'state.json');
     const logPath = path.join(this.stateDir, 'event.log');
     const showcasePath = path.join(this.stateDir, 'showcase.json');
+    const statsPath = path.join(this.stateDir, 'stats.json');
     try { if (fs.existsSync(statePath)) fs.unlinkSync(statePath); } catch {}
     try { if (fs.existsSync(logPath)) fs.unlinkSync(logPath); } catch {}
     try { if (fs.existsSync(showcasePath)) fs.unlinkSync(showcasePath); } catch {}
+    try { if (fs.existsSync(statsPath)) fs.unlinkSync(statsPath); } catch {}
     this.ensureDir();
   }
 }

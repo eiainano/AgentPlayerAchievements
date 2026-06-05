@@ -862,6 +862,7 @@ body {
   flex-wrap: wrap;
   flex: 1;
   align-items: center;
+  align-self: center;
 }
 
 .stat-big {

@@ -858,16 +858,17 @@ body {
 /* ── Stats Row ─────────────────────────────────────── */
 .stats-row {
   display: flex;
-  gap: 20px;
-  flex-shrink: 0;
-  align-items: baseline;
+  gap: 28px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 4px 0 10px;
 }
 
 .stat-big {
-  text-align: left;
+  text-align: center;
 }
 .stat-big-value {
-  font-size: 36px; font-weight: 800;
+  font-size: 40px; font-weight: 800;
   color: var(--gold);
   font-family: var(--font-mono);
   letter-spacing: -2px;
@@ -2526,14 +2527,14 @@ body {
   display: flex;
   gap: 16px;
   width: 100%;
-  align-items: center;
+  align-items: stretch;
   flex-wrap: wrap;
 }
 
 .hero-cards-row .streak-card {
   flex: 0 0 auto;
-  min-width: 200px;
-  max-width: 240px;
+  min-width: 180px;
+  max-width: 210px;
   margin-bottom: 0;
 }
 

@@ -352,7 +352,7 @@ function evalThreshold(events: TrackedEvent[], cond: Condition): EvaluationResul
   return { met: evalOp(op, sum, target), progress: Math.round(sum), target };
 }
 
-function evaluateMetric(expr: string, events: TrackedEvent[]): number | null {
+export function evaluateMetric(expr: string, events: TrackedEvent[]): number | null {
   // Support simple expressions like "edit_lines / total_file_lines"
   const parts = expr.split('/');
   if (parts.length === 2) {

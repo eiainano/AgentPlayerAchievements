@@ -1250,7 +1250,19 @@ async function main(): Promise<void> {
   const lang = await promptLanguage();
 
   // If --profile was passed on CLI, use it. Otherwise prompt interactively.
-  const profile: string = cliProfile || (await promptProfileName(lang));
+  let profile: string;
+  if (cliProfile) {
+    const error = validateProfileName(cliProfile);
+    if (error) {
+      console.log(`  \x1b[33m⚠ ${error}\x1b[0m`);
+      console.log(lang === 'zh' ? '  ✅ 回退到 default profile' : '  ✅ Falling back to default profile');
+      profile = DEFAULT_PROFILE;
+    } else {
+      profile = cliProfile;
+    }
+  } else {
+    profile = await promptProfileName(lang);
+  }
 
   // Determine which tools to configure
   let toolIds: string[];

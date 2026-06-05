@@ -203,7 +203,7 @@ export function createServer(port: number, defaultProfile: string): http.Server 
       res.end(JSON.stringify({
         active: resolvedProfile,
         active_meta: getProfileMeta(resolvedProfile),
-        profiles: profilesMeta.map(p => ({ name: p.name, emoji: p.emoji })),
+        profiles: profilesMeta.map(p => ({ name: p.name, emoji: p.emoji, tracked_tools: p.tracked_tools })),
         max: MAX_PROFILES,
       }));
       return;
@@ -227,7 +227,7 @@ export function createServer(port: number, defaultProfile: string): http.Server 
           status: 'ok',
           name,
           emoji: emoji || '🎮',
-          profiles: profilesMeta.map(p => ({ name: p.name, emoji: p.emoji })),
+          profiles: profilesMeta.map(p => ({ name: p.name, emoji: p.emoji, tracked_tools: p.tracked_tools })),
           max: MAX_PROFILES,
         }));
       } catch (err: unknown) {

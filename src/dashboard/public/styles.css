@@ -2311,3 +2311,103 @@ body {
 .card-milestone-rarity { margin-left: auto; font-size: 9px; }
 
 .card-footer { text-align: center; font-size: 10px; color: #555; margin-top: 8px; }
+
+/* ── Tracked Tools Bar ─────────────────────────────────── */
+.tracked-tools-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  padding: 6px 0;
+}
+
+.tracked-tool-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 600;
+  transition: transform .15s, box-shadow .15s;
+  cursor: default;
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+.tracked-tool-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+
+.tracked-tool-badge .tool-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px; height: 14px;
+  flex-shrink: 0;
+}
+.tracked-tool-badge .tool-icon svg {
+  display: block;
+  width: 14px; height: 14px;
+}
+.tracked-tool-badge .tool-name { letter-spacing: .2px; }
+
+/* Claude Code */
+.tracked-tool-badge.tool-claude-code {
+  background: rgba(212, 119, 56, .18);
+  border-color: rgba(212, 119, 56, .35);
+  color: #f0a860;
+}
+/* Kilo Code */
+.tracked-tool-badge.tool-kilo-code {
+  background: rgba(96, 165, 250, .18);
+  border-color: rgba(96, 165, 250, .35);
+  color: #93c5fd;
+}
+/* Hermes Agent */
+.tracked-tool-badge.tool-hermes {
+  background: rgba(52, 211, 153, .18);
+  border-color: rgba(52, 211, 153, .35);
+  color: #6ee7b7;
+}
+/* OpenCode */
+.tracked-tool-badge.tool-opencode {
+  background: rgba(129, 140, 248, .18);
+  border-color: rgba(129, 140, 248, .35);
+  color: #a5b4fc;
+}
+/* OpenClaw */
+.tracked-tool-badge.tool-openclaw {
+  background: rgba(248, 113, 113, .18);
+  border-color: rgba(248, 113, 113, .35);
+  color: #fca5a5;
+}
+
+/* Light theme overrides */
+[data-theme="light"] .tracked-tool-badge.tool-claude-code {
+  background: rgba(180, 83, 9, .12);
+  border-color: rgba(180, 83, 9, .3);
+  color: #92400e;
+}
+[data-theme="light"] .tracked-tool-badge.tool-kilo-code {
+  background: rgba(37, 99, 235, .12);
+  border-color: rgba(37, 99, 235, .3);
+  color: #1e40af;
+}
+[data-theme="light"] .tracked-tool-badge.tool-hermes {
+  background: rgba(4, 120, 87, .12);
+  border-color: rgba(4, 120, 87, .3);
+  color: #065f46;
+}
+[data-theme="light"] .tracked-tool-badge.tool-opencode {
+  background: rgba(79, 70, 229, .12);
+  border-color: rgba(79, 70, 229, .3);
+  color: #4338ca;
+}
+[data-theme="light"] .tracked-tool-badge.tool-openclaw {
+  background: rgba(185, 28, 28, .12);
+  border-color: rgba(185, 28, 28, .3);
+  color: #991b1b;
+}

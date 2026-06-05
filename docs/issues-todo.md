@@ -1,8 +1,20 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-05 | 总成就数: 166 | 条件类型: 11 | Tests: 484 ✅ | 0 不可达 ✅ | 终端 ANSI 弹窗 + 进度感知 + 分享卡片已上线
+> 最后更新: 2026-06-06 | 总成就数: 166 | 条件类型: 11 | Tests: 514 ✅ | 0 不可达 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | 终端 ANSI 弹窗 + 进度感知 + 分享卡片 + 交互式安装
 
 ---
+
+## 🆕 本次新增 — Kilo Code / OpenCode 双通道 + 交互式安装流程 (v0.1.6, 6/6)
+
+5 个工具全部实现 MCP + auto-track 双通道覆盖：
+
+- **Kilo Code / OpenCode auto-track** — `hook.ts` 新增 `kilocode-auto` 模式（`KILOCODE_EVENT_MAP` + `KILOCODE_TOOL_MAP` + `normalizeKilocodeStdin()`），init.ts 生成 `Bun.spawn` 驱动的 TS 插件，通过 `tool.execute.before/after` + `event` hook 监听工具调用、会话生命周期等 32+ 事件
+- **交互式安装** — `agpa init` 流程升级：语言选择 → 可选创建 profile → 多选要 track 的工具（↑↓ Space Enter），非 TTY 自动回退全选
+- **Profile-tracked_tools** — `profile.json` 记录 `tracked_tools: ["claude-code", ...]`，每个 profile 独立管理跟踪的工具集合
+- **Dashboard 工具徽章** — Hero 区域显示当前 profile 跟踪的工具，使用官方 logo（Claude/Kilo/Nous Research/OpenCode/OpenClaw），暗亮双主题
+- **Hero 布局重构** — Streak + 热力图同行，展示柜 + 统计数字同行，Share 按钮右上角
+- **安全修复** — `--profile` CLI 参数走 `validateProfileName()`，`config.ts` 新增 `setConfigDir()` 测试隔离，XSS defense-in-depth
+- 测试 484→514（+30 KiloCode 翻译测试），23 文件
 
 ## 🎉 本次实施 — 不可达成就全面清零 + 测试覆盖 446 (v0.1.6, 6/5)
 

@@ -1,23 +1,25 @@
 # AGPA 开发进度
 
-> 最后更新: 2026-06-05
+> 最后更新: 2026-06-06
 
 ## 总体状态
 
-v0.1.6 完成。Round 3 竞品调研（12 项目 × 40+ 维度）→ 6 条建议全部实施。166 个成就，484 个测试全绿（21 文件）。
+v0.1.6 完成。5 个 Agent 软件全部实现 MCP + auto-track 双通道覆盖。166 个成就，514 个测试全绿（23 文件）。
 
-**本次新增 (2026-06-05):**
-- Dashboard 分享卡片：`buildCardResponse()` API + 📸 Share 按钮 + html2canvas 截图 + PNG 下载（Steam 深色风格，840px @2x）
-- 终端 ANSI 弹窗 + 进度感知：`ansi-popup.ts`（Unicode 框线 + 6 级稀有度着色）+ `progress-nudge.ts`（5 种条件类型近锁计算），`cmdPoll()` 集成，Non-TTY fallback
-- 6 事件填空型新成就：brevity_scout / executive_summary / code_talker / no_questions_asked / infinite_details / self_aware
-- Evaluator 扩展：evalPredicate 新增 `<` `>` 操作符，matchFilter ctx 新增 word_count/has_code_block/has_question_mark
-- 不可达成就清零：修复 YAML 6 个（streak 系列缺 window:all、mcp_explorer 缺 field）+ evaluator 4 个（set_completion future 过滤）+ 手动 track 2 个（automode/mcp connect）
-- 测试大幅扩展：+296 tests → 446 tests / 18 文件（Phase 1 纯函数 + Approach A 场景矩阵 + Approach B 逐成就触发测试）
-- P0-1: JSONL 解析（CC transcript → token/user message/session 精确数据）
-- P1-1: Usage-based XP（成就 + 活动双轨 Level）
-- P1-2: UserPromptSubmit Hook（CC hook → user.prompt + user.message）
-- P1-3: 日聚合缓存（stats.json v2.0 + 增量更新 + 零扫描热力图）
-- P1-4: 数据导出/导入（CLI + Dashboard API）
+**本次新增 (2026-06-06):**
+- Kilo Code / OpenCode auto-track：`hook.ts` 新增 `kilocode-auto` 模式 + `normalizeKilocodeStdin()` 翻译层，`init.ts` 生成 `Bun.spawn` TS 插件，监听 `tool.execute.*` + `event` 等 32+ 事件
+- 交互式安装流程：语言 → profile → 多选工具（↑↓ Space Enter），非 TTY 自动回退
+- Profile-tracked_tools：`profile.json` 记录每个 profile 跟踪的工具集合，Dashboard 显示为官方 logo 徽章
+- Dashboard Hero 布局重构：Streak + 热力图同行，展示柜 + 统计同行，Share 右上角
+- 安全修复：`--profile` 参数走 `validateProfileName()`，config 测试隔离 `setConfigDir()`
+- 测试 484→514（+30 KiloCode 翻译测试），23 文件
+
+**之前新增 (2026-06-05):**
+- Dashboard 分享卡片：`buildCardResponse()` API + 📸 Share 按钮 + html2canvas 截图 + PNG 下载
+- 终端 ANSI 弹窗 + 进度感知：`ansi-popup.ts` × `progress-nudge.ts`
+- 6 事件填空型新成就：brevity_scout 等
+- 不可达成就清零：YAML 6 + evaluator 4 + 手动 track 2
+- P0-1 JSONL 解析 / P1-1 Usage XP / P1-2 UserPromptSubmit / P1-3 日聚合 / P1-4 数据导出
 
 ---
 
@@ -54,7 +56,9 @@ v0.1.6 完成。Round 3 竞品调研（12 项目 × 40+ 维度）→ 6 条建议
 | Kilo Code | JSON (`~/.config/kilo/config.jsonc`) | ✅ |
 | Hermes Agent | YAML (`~/.hermes/config.yaml`) | ✅ |
 | OpenCode | JSON (`~/.config/opencode/opencode.json`) | ✅ |
-| OpenClaw | JSON (`~/.openclaw/openclaw.json`) | ✅ |
+| OpenClaw | JSON (`~/.openclaw/openclaw.json`) | ✅ MCP + TS 插件 |
+| Kilo Code | JSON (`~/.config/kilo/config.jsonc`) | ✅ MCP + TS 插件 |
+| OpenCode | JSON (`~/.config/opencode/opencode.json`) | ✅ MCP + TS 插件 |
 
 - [x] MCP server 配置注入（JSON parse-modify-write / YAML 文本注入）
 - [x] 指令文件注入（CLAUDE.md / AGENTS.md / TOOLS.md）
@@ -80,7 +84,7 @@ v0.1.6 完成。Round 3 竞品调研（12 项目 × 40+ 维度）→ 6 条建议
 - [x] **agpa doctor 命令**：诊断数据目录、event.log、state.json、成就定义、MCP 配置、指令文件
 - [x] **Claude Code Hook 自动 track**：`src/cli/hook.ts` 提供 `track`/`poll`/`auto` 命令，`init.ts` 注入 10 个 hooks（含 SessionStart/UserPromptSubmit/Stop/PostToolUse 等）到 `~/.claude/settings.json`，支持与已有 hooks 合并
 - [x] **真实环境测试**：event.log 验证 hooks 正常写入，session_id 正确传递，5 工具 MCP + 指令全绿
-- [x] **`npm run init` 无参模式**：自动检测 5 工具配置文件，一键配置全部
+- [x] **交互式安装**：`agpa init` 无参模式扫描工具 → 多选 → profile 创建，非 TTY 自动回退全选
 - [x] **evaluator single_task 窗口**：用 task.complete 事件边界推断，不依赖 task_id
 - [x] **evalThreshold metric 路径过滤**：now respects cond.event/filter/role/window
 - [x] **computeMetric 扩展**：showcase_count + concurrent_sessions 分支 → 已改为 counter 可测量事件
@@ -92,15 +96,15 @@ v0.1.6 完成。Round 3 竞品调研（12 项目 × 40+ 维度）→ 6 条建议
 
 ### 中优先级
 - [x] **用户审阅 160 成就清单**：已逐条 review，修复 30+ 个不一致，删除 3 个重复，新增 1 个
-- [ ] **其余 3 工具的 auto-track 策略落地**
+- [x] **其余 3 工具的 auto-track 策略落地**
 
 | 工具 | 策略 | 可靠性 |
 |------|------|--------|
 | Claude Code | Hook `SessionStart` | ⭐⭐⭐⭐⭐ |
 | Hermes Agent | Shell hooks (4 events) | ⭐⭐⭐⭐⭐ |
 | OpenClaw | TS 插件 (36 hooks) | ⭐⭐⭐⭐⭐ | ✅ v0.1.4 完成 |
-| OpenCode | TS 插件 (event bus) | ⭐⭐⭐ | ⏸ 待调研 |
-| Kilo Code | TS 插件 (hook不可调MCP) | ⭐⭐ | ⏸ 待调研 |
+| Kilo Code | TS 插件 (32+ events, Bun.spawn) | ⭐⭐⭐⭐ | ✅ v0.1.6 完成 |
+| OpenCode | 同 Kilo Code（共用 API） | ⭐⭐⭐⭐ | ✅ v0.1.6 完成 |
 
 ### 低优先级（v1.0）
 - [ ] 全球统计 opt-in + 稀有度动态计算

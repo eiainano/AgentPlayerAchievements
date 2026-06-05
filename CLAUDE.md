@@ -103,7 +103,7 @@ If evaluator behavior seems wrong, check src/engine/evaluator.ts — each type h
 | `docs/issues-todo.md` | 问题/功能/改进追踪，按 P0→P3 优先级组织。给 AI 看的，每次代码变更后同步 |
 | `docs/PROGRESS.md` | 高层开发进度总览 + 版本对比表。给人看的，了解项目整体状态 |
 | `docs/multi-tool-setup.md` | 5 工具 MCP 配置指南 + init 流程 + 环境变量说明 |
-| `docs/multi-tool-research.md` | Hermes/OpenClaw/KiloCode/OpenCode 的 hook API 调研（2026-05-31） |
+| `docs/multi-tool-research.md` | Hermes/OpenClaw/KiloCode/OpenCode 的 hook API 调研（2026-06-06，Kilo/OpenCode auto-track 已实施） |
 
 ### Design docs（`docs/design/`，方案蓝图，不会随代码每版同步）
 

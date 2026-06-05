@@ -1,6 +1,15 @@
 # Changelog
 
-## [0.1.6] — 2026-06-05
+## [0.1.6] — 2026-06-06
+
+### Kilo Code / OpenCode 双通道 + 交互式安装 — 2026-06-06
+
+- Kilo Code / OpenCode auto-track：`hook.ts` 新增 `kilocode-auto` 模式、`KILOCODE_EVENT_MAP`、`KILOCODE_TOOL_MAP`、`normalizeKilocodeStdin()`，`init.ts` 生成 `Bun.spawn` TS 插件，监听 32+ 事件
+- 交互式安装：语言 → profile 创建 → 多选工具（↑↓ Space Enter），非 TTY 自动全选
+- Profile-tracked_tools：`profile.json` 记录跟踪工具，Dashboard 官方 logo 徽章展示
+- Dashboard Hero 布局重构：Streak + 热力图同行，展示柜 + 统计同行，Share 右上角
+- 安全：`--profile` CLI 验证、config 测试隔离 `setConfigDir()`、XSS defense-in-depth
+- 测试：484→514（+30），23 文件全绿
 
 ### Dashboard 分享成就卡片 — 2026-06-05
 

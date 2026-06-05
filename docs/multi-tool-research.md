@@ -75,7 +75,7 @@ OpenClaw 进程
 
 ---
 
-## Kilo Code / OpenCode 🔍 （调研完成，暂不做）
+## Kilo Code / OpenCode 🔍 （调研完成，v0.1.6 已实施 ✅）
 
 ### 关系
 
@@ -125,7 +125,7 @@ OpenClaw 进程
 
 ### 结论
 
-Kilo Code 和 OpenCode 是同一产品的两个发行版本。TS 插件方式能做但限制多：无 session 生命周期 hook + 无 MCP 访问。**优先级最低**——等 CC + Hermes + OpenClaw 稳了再说。
+Kilo Code 和 OpenCode 是同一产品的两个发行版本（共享插件 API，仅 npm 包名不同）。**v0.1.6 已完成 auto-track 实施**——通过 `Bun.spawn` 驱动 `hook.ts kilocode-auto`，监听 `tool.execute.before/after` + `event` (session.created/idle 等 32+ 事件) → stdin pipe → ENGINE.track()。5 个工具全部双通道覆盖。
 
 ---
 
@@ -135,5 +135,7 @@ Kilo Code 和 OpenCode 是同一产品的两个发行版本。TS 插件方式能
 |------|-----------------|---------|---------|
 | Claude Code | ✅ | 低 | ✅ 已支持 |
 | Hermes Agent | ✅ | 低 | ✅ 已支持 |
-| OpenClaw | ❌ (TS 插件) | 中 | 🔍 调研完成 |
+| OpenClaw | ✅ (TS 插件) | 中 | ✅ v0.1.6 完成 |
+| Kilo Code | ✅ (TS 插件, Bun.spawn) | 中 | ✅ v0.1.6 完成 |
+| OpenCode | ✅ (同上，共用 API) | 中 | ✅ v0.1.6 完成 |
 | Kilo Code / OpenCode | ❌ (TS 插件) | 高 | 🔍 调研完成（同一产品） |

@@ -588,10 +588,11 @@ function renderTrackedTools(data) {
     const name = toolNames[id] || id;
     if (!meta) return '';
     const imgTag = meta.logo.endsWith('.svg')
-      ? `<img src="${meta.logo}" alt="${name}" class="tool-logo-svg" loading="lazy">`
-      : `<img src="${meta.logo}" alt="${name}" class="tool-logo-png" loading="lazy">`;
-    return `<span class="tracked-tool-badge ${meta.class}" title="${name}">
+      ? `<img src="${escAttr(meta.logo)}" alt="${escHtml(name)}" class="tool-logo-svg" loading="lazy">`
+      : `<img src="${escAttr(meta.logo)}" alt="${escHtml(name)}" class="tool-logo-png" loading="lazy">`;
+    return `<span class="tracked-tool-badge ${meta.class}" title="${escHtml(name)}">
       <span class="tool-icon">${imgTag}</span>
+      <span class="tool-name">${escHtml(name)}</span>
     </span>`;
   }).join('');
 }

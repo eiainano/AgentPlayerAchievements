@@ -2340,7 +2340,6 @@ body {
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0,0,0,.25);
 }
-
 .tracked-tool-badge .tool-icon {
   display: inline-flex;
   align-items: center;
@@ -2357,7 +2356,10 @@ body {
   width: 20px; height: 20px;
   display: block;
 }
-.tracked-tool-badge .tool-name { letter-spacing: .2px; }
+.tracked-tool-badge .tool-name {
+  letter-spacing: .2px;
+  white-space: nowrap;
+}
 
 /* Claude Code */
 .tracked-tool-badge.tool-claude-code {

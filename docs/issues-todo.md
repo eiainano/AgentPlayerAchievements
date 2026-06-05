@@ -1,6 +1,6 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-05 | 总成就数: 166 | 条件类型: 11 | Tests: 478 ✅ | 0 不可达 ✅ | 终端 ANSI 弹窗 + 进度感知已上线
+> 最后更新: 2026-06-05 | 总成就数: 166 | 条件类型: 11 | Tests: 484 ✅ | 0 不可达 ✅ | 终端 ANSI 弹窗 + 进度感知 + 分享卡片已上线
 
 ---
 
@@ -27,6 +27,16 @@ Phase 1-3 全线实施完毕后，集中扫清 11 个不可达成就并大幅扩
 - **测试总量**: 150 → 446 (18 文件, 全绿)
 
 ---
+
+## 🆕 本次新增 — Dashboard 分享卡片 (v0.1.6, 6/5)
+
+Dashboard 新增 📸 Share 按钮，生成 Steam 风格成就卡片 PNG：
+
+- `src/dashboard/api.ts` — `buildCardResponse()` 聚合 stats + 展示柜 + 热力图 + 里程碑
+- `src/dashboard/server.ts` — 注册 `GET /api/card` 路由
+- 前端 — 隐藏 DOM 渲染 + html2canvas 截图 + 浏览器下载（840px @2x）
+- 支持中英双语、进行中成就补位、稀有度分布
+- 新增 6 个 API 测试，全量 484 ✅
 
 ## 🆕 本次新增 — 终端 ANSI 弹窗 + 进度感知 (v0.1.6, 6/5)
 

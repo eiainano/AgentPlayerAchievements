@@ -14,7 +14,7 @@ import { homedir } from 'node:os';
 import { TOOLS, findTool, INSTRUCTION_FILES } from '../tool-registry.js';
 import type { ToolDef } from '../tool-registry.js';
 import { parseYAML } from '../engine/yaml-parser.js';
-import { setTrackedTools, getProfileMeta, DEFAULT_PROFILE } from '../utils/profile.js';
+import { setTrackedTools, getProfileMeta, createProfile, validateProfileName, DEFAULT_PROFILE } from '../utils/profile.js';
 
 const AGPA_DIR = path.join(homedir(), '.agent-achievements');
 const AGPA_MAIN = path.resolve(import.meta.dirname, '../main.ts');
@@ -573,6 +573,69 @@ function injectInstructions(filePath: string, marker: string): boolean {
   const sep = content.trimEnd() ? '\n\n' : '';
   fs.writeFileSync(filePath, content.trimEnd() + sep + INSTRUCTION_BLOCK + '\n');
   return true;
+}
+
+// ── Profile creation prompt ─────────────────────────────────────────────
+
+/**
+ * Optional profile creation step.
+ * User can type a name to create a named profile, or press Enter to skip
+ * and use the default profile (shared across all tools).
+ *
+ * Non-TTY fallback: use default profile.
+ */
+function promptProfileName(lang: string): Promise<string> {
+  if (!process.stdin.isTTY) {
+    console.log('  📂 Using default profile');
+    return Promise.resolve(DEFAULT_PROFILE);
+  }
+
+  const isZh = lang === 'zh';
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
+  return new Promise(resolve => {
+    console.log('');
+    console.log(isZh
+      ? '  👤 创建 profile（可选）— 不同 profile 可以跟踪不同的工具'
+      : '  👤 Create a profile (optional) — different profiles can track different tools');
+    console.log(isZh
+      ? '  \x1b[90m  输入名字创建新 profile，回车跳过（使用 default）\x1b[0m'
+      : '  \x1b[90m  Enter a name to create a new profile, or press Enter to use default\x1b[0m');
+    console.log('');
+
+    rl.question(isZh ? '  Profile 名称 > ' : '  Profile name > ', (raw) => {
+      rl.close();
+      const trimmed = raw.trim();
+
+      if (!trimmed) {
+        // Skip — use default
+        console.log(isZh ? '  ✅ 使用 default profile' : '  ✅ Using default profile');
+        resolve(DEFAULT_PROFILE);
+        return;
+      }
+
+      const error = validateProfileName(trimmed);
+      if (error) {
+        console.log(`  \x1b[33m⚠ ${error}\x1b[0m`);
+        console.log(isZh ? '  ✅ 回退到 default profile' : '  ✅ Falling back to default profile');
+        resolve(DEFAULT_PROFILE);
+        return;
+      }
+
+      try {
+        createProfile(trimmed);
+        console.log(isZh
+          ? `  ✅ Profile "${trimmed}" 已创建`
+          : `  ✅ Profile "${trimmed}" created`);
+        resolve(trimmed);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        console.log(`  \x1b[33m⚠ ${msg}\x1b[0m`);
+        console.log(isZh ? '  ✅ 回退到 default profile' : '  ✅ Falling back to default profile');
+        resolve(DEFAULT_PROFILE);
+      }
+    });
+  });
 }
 
 // ── Tool Detection ─────────────────────────────────────────────────────
@@ -1176,7 +1239,7 @@ function promptLanguage(): Promise<string> {
 // ── Main ───────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
-  const { tool: toolArg, profile } = parseCliArgs();
+  const { tool: toolArg, profile: cliProfile } = parseCliArgs();
 
   printWelcome();
 
@@ -1185,6 +1248,9 @@ async function main(): Promise<void> {
   }
 
   const lang = await promptLanguage();
+
+  // If --profile was passed on CLI, use it. Otherwise prompt interactively.
+  const profile: string = cliProfile || (await promptProfileName(lang));
 
   // Determine which tools to configure
   let toolIds: string[];
@@ -1198,17 +1264,16 @@ async function main(): Promise<void> {
     console.log('');
 
     // Persist tracked_tools for this profile
-    const profileName = profile || DEFAULT_PROFILE;
-    if (!profile) {
+    if (profile === DEFAULT_PROFILE) {
       // Default profile: merge with all detected tools + the explicit one
       const detected = scanTools().filter(r => r.detected).map(r => r.id);
       const merged = [...new Set([...detected, ...toolIds])];
-      setTrackedTools(profileName, merged.length > 0 ? merged : toolIds);
+      setTrackedTools(profile, merged.length > 0 ? merged : toolIds);
     } else {
       // Named profile: union existing tracked tools with the newly added one
-      const existing = getProfileMeta(profileName).tracked_tools || [];
+      const existing = getProfileMeta(profile).tracked_tools || [];
       const merged = [...new Set([...existing, ...toolIds])];
-      setTrackedTools(profileName, merged);
+      setTrackedTools(profile, merged);
     }
   } else {
     // No --tool: scan + interactive picker
@@ -1219,15 +1284,14 @@ async function main(): Promise<void> {
     console.log('');
 
     // Persist tracked_tools to profile metadata
-    const profileName = profile || DEFAULT_PROFILE;
-    if (!profile) {
+    if (profile === DEFAULT_PROFILE) {
       // Default profile: track all detected tools
       const detectedIds = scanResults.filter(r => r.detected).map(r => r.id);
       const allIds = detectedIds.length > 0 ? detectedIds : ['claude-code'];
-      setTrackedTools(profileName, allIds);
+      setTrackedTools(profile, allIds);
     } else {
       // Named profile: track exactly what user selected
-      setTrackedTools(profileName, toolIds);
+      setTrackedTools(profile, toolIds);
     }
   }
 

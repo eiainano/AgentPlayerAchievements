@@ -47,6 +47,20 @@
 - **`store.reset()` 漏删 `stats.json`** — `store.ts` 新增 `statsPath` 清理，修复 reset 后 Dashboard stats 残留旧数据（heatmap/streak/usage_xp 显示异常直到下次 poll 覆盖）
 - **`scopeEvents()` 单 task 边界泄露** — `evaluator.ts` 三层语义边界重构：0 task → 限当前 session（原行为 return entire events），1 task → 从最近 `session.start` 切片（原行为 `slice(0,)` 泄露前序 session 事件），≥2 task → 不变。修复 20+ 个 single_task 成就规则边界
 
+### 测试覆盖扩展 P0-P1 — 2026-06-05
+
+新增 53 个测试用例，7 文件→11 文件，150→203 tests：
+
+**P0: 引擎层脆弱路径锁死（+18）**
+- `tests/engine/store.test.ts`（12） — `reset()` 4 文件清理、load 损坏恢复、saveState+appendEvent 全周期、loadStats 缺失/损坏/corrupt schema
+- `tests/engine/evaluator.test.ts`（+3）— `scopeEvents` 三层边界：0 task 限当前 session、1 task 跨 session 隔离、无 session.start fallback
+- `tests/engine/stats.test.ts`（修复 1 个时序断言, 21→21）
+
+**P1: 工具函数 + 安全边界（+35）**
+- `tests/utils/activity.test.ts`（15）— `calcStreak` 全部路径（空/单日/连续/中断/历史最长）、`computeHeatmap` 量变分位桶、`calcStreakFromDaily`/`computeHeatmapFromDaily` 对称覆盖
+- `tests/utils/profile.test.ts`（16）— `validateProfileName` 12 场景（合法/空/大写/数字开头/特殊字符/超长/保留名）、`resolveProfileDir` 穿越防御
+- `tests/tools/registry.test.ts`（7）— `findTool` 按 id/别名/未知查找、TOOLS 结构完整性
+
 ### P1-1~P1-4 设计文档 — 2026-06-05
 
 基于 Round 3 竞品调研 + Gap Analysis 的 6 条建议，完成 4 篇 P1 优先级设计文档：

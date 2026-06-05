@@ -1466,3 +1466,190 @@ function showToast(icon, name, rarity) {
     setTimeout(() => toast.remove(), 300);
   }, 3000);
 }
+
+// ── Shareable Card Generation ─────────────────────────────────
+
+function generateCard() {
+  var btn = document.getElementById('share-btn');
+  if (!btn) return;
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating...';
+
+  try {
+    if (typeof html2canvas === 'undefined') {
+      alert('This feature requires an internet connection to load html2canvas.');
+      btn.disabled = false;
+      btn.textContent = '📸 Share';
+      return;
+    }
+
+    fetch(apiUrl('/api/card'))
+      .then(function(res) {
+        if (!res.ok) throw new Error('API error: ' + res.status);
+        return res.json();
+      })
+      .then(function(data) {
+        var preview = document.getElementById('card-preview');
+        preview.innerHTML = buildCardHTML(data);
+        preview.style.visibility = 'visible';
+
+        requestAnimationFrame(function() {
+          html2canvas(preview, {
+            scale: 2,
+            backgroundColor: '#171a21',
+            useCORS: true,
+            logging: false
+          }).then(function(canvas) {
+            var date = new Date().toISOString().slice(0, 10);
+            var profileName = data.profile || 'default';
+            var link = document.createElement('a');
+            link.download = 'agpa-card-' + profileName + '-' + date + '.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+
+            preview.innerHTML = '';
+            preview.style.visibility = 'hidden';
+            btn.disabled = false;
+            btn.textContent = '📸 Share';
+          }).catch(function(err) {
+            console.error('Card capture failed:', err);
+            alert('Failed to generate card. Please try again.');
+            preview.innerHTML = '';
+            preview.style.visibility = 'hidden';
+            btn.disabled = false;
+            btn.textContent = '📸 Share';
+          });
+        });
+      })
+      .catch(function(err) {
+        console.error('Card API failed:', err);
+        alert('Failed to load card data. Please try again.');
+        btn.disabled = false;
+        btn.textContent = '📸 Share';
+      });
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = '📸 Share';
+  }
+}
+
+function buildCardHTML(data) {
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function hmColor(level) {
+    var colors = ['#1e2529', '#0e4429', '#006d32', '#26a641', '#39d353'];
+    return colors[level] || colors[0];
+  }
+
+  var html = '';
+
+  // Header
+  html += '<div class="card-header">';
+  html += '<div class="card-avatar">' + esc(data.profile_emoji) + '</div>';
+  html += '<div>';
+  html += '<div class="card-profile-name">' + esc(data.profile) + '</div>';
+  html += '<div class="card-level">Agent Level ' + data.level + ' · ' + (data.total_xp || 0).toLocaleString() + ' XP</div>';
+  html += '</div>';
+  html += '<div class="card-unlocked-stat">';
+  html += '<div class="card-unlocked-num">' + data.unlocked + '</div>';
+  html += '<div class="card-unlocked-label">/ ' + data.total + ' unlocked</div>';
+  html += '</div></div>';
+
+  // Stats grid
+  html += '<div class="card-stats-grid">';
+  html += '<div class="card-stat"><div class="card-stat-val">' + data.stats.streak_days + '</div><div class="card-stat-label">🔥 streak</div></div>';
+  html += '<div class="card-stat"><div class="card-stat-val">' + (data.stats.total_tasks || 0).toLocaleString() + '</div><div class="card-stat-label">📋 tasks</div></div>';
+  html += '<div class="card-stat"><div class="card-stat-val">' + (data.stats.total_tool_uses || 0).toLocaleString() + '</div><div class="card-stat-label">🔧 tools</div></div>';
+  html += '<div class="card-stat"><div class="card-stat-val">' + (data.stats.total_sessions || 0).toLocaleString() + '</div><div class="card-stat-label">💻 sessions</div></div>';
+  html += '</div>';
+
+  // XP bar
+  var xpPct = data.xp_target > 0 ? Math.round((data.xp_current / data.xp_target) * 100) : 0;
+  html += '<div class="card-xp-bar">';
+  html += '<div class="card-xp-header"><span>Level ' + data.level + '</span><span>' + (data.xp_current || 0).toLocaleString() + ' / ' + (data.xp_target || 1).toLocaleString() + ' XP</span></div>';
+  html += '<div class="card-xp-track"><div class="card-xp-fill" style="width:' + xpPct + '%"></div></div>';
+  html += '</div>';
+
+  html += '<div class="card-divider"></div>';
+
+  // Achievements
+  html += '<div class="card-section-title">🏆 ' + (data.achievements.length > 0 ? 'Showcase' : 'Start your journey →') + '</div>';
+  html += '<div class="card-ach-list">';
+
+  for (var i = 0; i < data.achievements.length; i++) {
+    var ach = data.achievements[i];
+    html += '<div class="card-ach-row">';
+    html += '<div class="card-ach-left" style="background:' + esc(ach.rarity_color) + ';min-height:auto"></div>';
+    html += '<div class="card-ach-icon">' + esc(ach.icon) + '</div>';
+    html += '<div class="card-ach-info">';
+    html += '<div class="card-ach-name-row">';
+    html += '<span class="card-ach-name" style="color:' + esc(ach.rarity_color) + '">' + esc(ach.name) + '</span>';
+    html += '<span class="card-ach-tag" style="color:' + esc(ach.rarity_color) + ';background:' + esc(ach.rarity_color) + '22">' + esc(ach.rarity_label) + '</span>';
+    html += '</div>';
+    html += '<div class="card-ach-desc">' + esc(ach.description) + '</div>';
+
+    if (ach.in_progress) {
+      html += '<div class="card-ach-meta" style="margin-bottom:4px">';
+      html += '<div class="card-progress-bar" style="flex:1"><div style="height:100%;width:' + (ach.progress_pct || 0) + '%;background:' + esc(ach.rarity_color) + ';border-radius:2px"></div></div>';
+      html += '<span style="font-size:9px;color:' + esc(ach.rarity_color) + '">' + esc(ach.progress_text || '') + '</span>';
+      html += '</div>';
+      html += '<div class="card-ach-meta"><span>In Progress</span></div>';
+    } else {
+      html += '<div class="card-ach-meta">';
+      html += '<span>📅 ' + (ach.unlocked_at ? ach.unlocked_at.slice(0, 10) : '') + '</span>';
+      if (ach.set_name) html += '<span>Set: ' + esc(ach.set_name) + (ach.set_progress ? ' (' + esc(ach.set_progress) + ')' : '') + '</span>';
+      html += '</div>';
+    }
+
+    html += '</div></div>';
+  }
+  html += '</div>';
+
+  // Heatmap
+  if (data.heatmap && data.heatmap.length > 0) {
+    html += '<div class="card-heatmap-box">';
+    html += '<div class="card-heatmap-title">📊 Activity · last 4 months</div>';
+    html += '<div class="card-heatmap-grid">';
+    for (var j = 0; j < data.heatmap.length; j++) {
+      var d = data.heatmap[j];
+      html += '<div class="card-hm-cell" style="background:' + hmColor(d.count) + '"></div>';
+    }
+    html += '</div>';
+    html += '<div class="card-heatmap-legend"><span>Less</span>';
+    html += '<div class="card-hm-cell" style="background:#1e2529"></div><div class="card-hm-cell" style="background:#0e4429"></div><div class="card-hm-cell" style="background:#006d32"></div><div class="card-hm-cell" style="background:#26a641"></div><div class="card-hm-cell" style="background:#39d353"></div>';
+    html += '<span>More</span></div>';
+    html += '</div>';
+  }
+
+  // Rarity breakdown
+  html += '<div class="card-rarity-grid">';
+  for (var k = 0; k < data.rarity_breakdown.length; k++) {
+    var rb = data.rarity_breakdown[k];
+    html += '<div class="card-rarity-item"><div class="card-rarity-label" style="color:' + esc(rb.color) + '">' + esc(rb.rarity) + '</div><div class="card-rarity-count" style="color:' + esc(rb.color) + '">' + rb.count + '</div></div>';
+  }
+  html += '</div>';
+
+  // Milestones
+  if (data.milestones && data.milestones.length > 0) {
+    html += '<div class="card-milestone-box">';
+    html += '<div class="card-milestone-title">📌 Milestones</div>';
+    html += '<div class="card-milestone-list">';
+    for (var m = 0; m < data.milestones.length; m++) {
+      var ms = data.milestones[m];
+      html += '<div class="card-milestone-row">';
+      html += '<span class="card-milestone-bullet">✦</span>';
+      html += '<span class="card-milestone-date">' + esc(ms.unlocked_at ? ms.unlocked_at.slice(0, 10) : '') + '</span>';
+      html += '<span class="card-milestone-name">' + esc(ms.name) + '</span>';
+      html += '<span class="card-milestone-rarity" style="color:' + esc(ms.rarity_color) + '">' + esc(ms.rarity) + '</span>';
+      html += '</div>';
+    }
+    html += '</div></div>';
+  }
+
+  // Footer
+  html += '<div class="card-footer">🎮 Generated by AGPA · agpa v0.1.6 · ' + new Date().toISOString().slice(0, 10) + '</div>';
+
+  return html;
+}

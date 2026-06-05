@@ -2185,3 +2185,129 @@ body {
   0%, 100% { box-shadow: 0 0 0 0 rgba(255, 200, 0, 0); }
   50% { box-shadow: 0 0 0 4px rgba(255, 200, 0, 0.3); }
 }
+
+/* ── Shareable Card Preview ───────────────────────────────────── */
+
+.share-btn {
+  padding: 6px 14px;
+  background: rgba(102, 192, 244, 0.12);
+  border: 1px solid rgba(102, 192, 244, 0.25);
+  border-radius: 6px;
+  color: #66c0f4;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  font-family: inherit;
+}
+.share-btn:hover { background: rgba(102, 192, 244, 0.22); border-color: #66c0f4; }
+.share-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+#card-preview {
+  visibility: hidden;
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  width: 420px;
+  background: linear-gradient(180deg, #171a21 0%, #1b2838 30%, #2a475e 100%);
+  border-radius: 12px;
+  padding: 32px;
+  color: #c7d5e0;
+  font-family: 'SF Mono', Monaco, Menlo, monospace;
+  z-index: -1;
+}
+#card-preview * { box-sizing: border-box; }
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.card-avatar {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4f94cd, #27ae60);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; flex-shrink: 0;
+}
+.card-profile-name { font-weight: bold; font-size: 17px; color: #fff; }
+.card-level { font-size: 13px; color: #66c0f4; }
+.card-unlocked-stat { margin-left: auto; text-align: right; flex-shrink: 0; }
+.card-unlocked-num { font-size: 22px; font-weight: 700; color: #fff; }
+.card-unlocked-label { font-size: 10px; color: #888; }
+
+.card-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 22px;
+}
+.card-stat {
+  background: rgba(0,0,0,.25);
+  padding: 8px 4px; border-radius: 6px;
+  text-align: center;
+}
+.card-stat-val { font-size: 18px; font-weight: 700; color: #fff; }
+.card-stat-label { font-size: 9px; color: #888; }
+
+.card-xp-bar { margin-bottom: 22px; }
+.card-xp-header { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 10px; color: #888; }
+.card-xp-track { height: 6px; background: rgba(0,0,0,.4); border-radius: 3px; overflow: hidden; }
+.card-xp-fill { height: 100%; background: linear-gradient(90deg, #4f94cd, #66c0f4); border-radius: 3px; }
+
+.card-divider { height: 1px; background: rgba(255,255,255,.06); margin: 0 0 20px 0; }
+
+.card-section-title {
+  font-size: 11px;
+  color: #66c0f4;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.card-ach-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.card-ach-row {
+  background: rgba(0,0,0,.4);
+  padding: 14px; border-radius: 8px;
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.card-ach-left { width: 4px; align-self: stretch; border-radius: 2px; flex-shrink: 0; }
+.card-ach-icon { font-size: 30px; flex-shrink: 0; line-height: 1; }
+.card-ach-info { flex: 1; min-width: 0; }
+.card-ach-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.card-ach-name { font-weight: bold; font-size: 14px; }
+.card-ach-tag { font-size: 9px; padding: 2px 8px; border-radius: 4px; }
+.card-ach-desc { font-size: 11px; color: #aaa; line-height: 1.5; margin-bottom: 8px; }
+.card-ach-desc b { color: #ddd; }
+.card-ach-meta { display: flex; align-items: center; gap: 12px; font-size: 10px; color: #666; }
+
+.card-progress-bar {
+  height: 5px;
+  background: rgba(255,255,255,.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.card-heatmap-box { background: rgba(0,0,0,.35); border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; }
+.card-heatmap-title { font-size: 11px; color: #888; margin-bottom: 10px; }
+.card-heatmap-grid {
+  display: flex; gap: 2px; justify-content: center; flex-wrap: wrap; margin-bottom: 6px;
+}
+.card-hm-cell { width: 11px; height: 11px; border-radius: 2px; }
+.card-heatmap-legend { display: flex; justify-content: flex-end; align-items: center; gap: 4px; font-size: 8px; color: #666; }
+
+.card-rarity-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-bottom: 16px; }
+.card-rarity-item { text-align: center; }
+.card-rarity-label { font-size: 10px; }
+.card-rarity-count { font-size: 16px; font-weight: 700; }
+
+.card-milestone-box { background: rgba(0,0,0,.3); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; }
+.card-milestone-title { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.card-milestone-list { display: flex; flex-direction: column; gap: 6px; }
+.card-milestone-row { display: flex; align-items: center; gap: 8px; font-size: 11px; }
+.card-milestone-bullet { color: #3b7ec0; }
+.card-milestone-date { color: #aaa; }
+.card-milestone-name { color: #ddd; }
+.card-milestone-rarity { margin-left: auto; font-size: 9px; }
+
+.card-footer { text-align: center; font-size: 10px; color: #555; margin-top: 8px; }

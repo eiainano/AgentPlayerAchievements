@@ -1550,25 +1550,25 @@ function buildCardHTML(data) {
   html += '<div class="card-avatar">' + esc(data.profile_emoji) + '</div>';
   html += '<div>';
   html += '<div class="card-profile-name">' + esc(data.profile) + '</div>';
-  html += '<div class="card-level">Agent Level ' + data.level + ' · ' + (data.total_xp || 0).toLocaleString() + ' XP</div>';
+  html += '<div class="card-level">Agent Level ' + esc(data.level) + ' · ' + esc((data.total_xp || 0).toLocaleString()) + ' XP</div>';
   html += '</div>';
   html += '<div class="card-unlocked-stat">';
-  html += '<div class="card-unlocked-num">' + data.unlocked + '</div>';
-  html += '<div class="card-unlocked-label">/ ' + data.total + ' unlocked</div>';
+  html += '<div class="card-unlocked-num">' + esc(data.unlocked) + '</div>';
+  html += '<div class="card-unlocked-label">/ ' + esc(data.total) + ' unlocked</div>';
   html += '</div></div>';
 
   // Stats grid
   html += '<div class="card-stats-grid">';
-  html += '<div class="card-stat"><div class="card-stat-val">' + data.stats.streak_days + '</div><div class="card-stat-label">🔥 streak</div></div>';
-  html += '<div class="card-stat"><div class="card-stat-val">' + (data.stats.total_tasks || 0).toLocaleString() + '</div><div class="card-stat-label">📋 tasks</div></div>';
-  html += '<div class="card-stat"><div class="card-stat-val">' + (data.stats.total_tool_uses || 0).toLocaleString() + '</div><div class="card-stat-label">🔧 tools</div></div>';
-  html += '<div class="card-stat"><div class="card-stat-val">' + (data.stats.total_sessions || 0).toLocaleString() + '</div><div class="card-stat-label">💻 sessions</div></div>';
+  html += '<div class="card-stat"><div class="card-stat-val">' + esc(data.stats.streak_days) + '</div><div class="card-stat-label">🔥 streak</div></div>';
+  html += '<div class="card-stat"><div class="card-stat-val">' + esc((data.stats.total_tasks || 0).toLocaleString()) + '</div><div class="card-stat-label">📋 tasks</div></div>';
+  html += '<div class="card-stat"><div class="card-stat-val">' + esc((data.stats.total_tool_uses || 0).toLocaleString()) + '</div><div class="card-stat-label">🔧 tools</div></div>';
+  html += '<div class="card-stat"><div class="card-stat-val">' + esc((data.stats.total_sessions || 0).toLocaleString()) + '</div><div class="card-stat-label">💻 sessions</div></div>';
   html += '</div>';
 
   // XP bar
   var xpPct = data.xp_target > 0 ? Math.round((data.xp_current / data.xp_target) * 100) : 0;
   html += '<div class="card-xp-bar">';
-  html += '<div class="card-xp-header"><span>Level ' + data.level + '</span><span>' + (data.xp_current || 0).toLocaleString() + ' / ' + (data.xp_target || 1).toLocaleString() + ' XP</span></div>';
+  html += '<div class="card-xp-header"><span>Level ' + esc(data.level) + '</span><span>' + esc((data.xp_current || 0).toLocaleString()) + ' / ' + esc((data.xp_target || 1).toLocaleString()) + ' XP</span></div>';
   html += '<div class="card-xp-track"><div class="card-xp-fill" style="width:' + xpPct + '%"></div></div>';
   html += '</div>';
 
@@ -1627,7 +1627,7 @@ function buildCardHTML(data) {
   html += '<div class="card-rarity-grid">';
   for (var k = 0; k < data.rarity_breakdown.length; k++) {
     var rb = data.rarity_breakdown[k];
-    html += '<div class="card-rarity-item"><div class="card-rarity-label" style="color:' + esc(rb.color) + '">' + esc(rb.rarity) + '</div><div class="card-rarity-count" style="color:' + esc(rb.color) + '">' + rb.count + '</div></div>';
+    html += '<div class="card-rarity-item"><div class="card-rarity-label" style="color:' + esc(rb.color) + '">' + esc(rb.rarity) + '</div><div class="card-rarity-count" style="color:' + esc(rb.color) + '">' + esc(rb.count) + '</div></div>';
   }
   html += '</div>';
 

@@ -4,7 +4,7 @@
 
 ## 总体状态
 
-v0.1.6 完成。Round 3 竞品调研（12 项目 × 40+ 维度）→ 6 条建议全部实施。160 个成就，150 个测试全绿。
+v0.1.6 完成。Round 3 竞品调研（12 项目 × 40+ 维度）→ 6 条建议全部实施。160 个成就，203 个测试全绿（11 文件）。
 
 **本次新增 (2026-06-05):**
 - P0-1: JSONL 解析（CC transcript → token/user message/session 精确数据）
@@ -82,7 +82,7 @@ v0.1.6 完成。Round 3 竞品调研（12 项目 × 40+ 维度）→ 6 条建议
 - [x] **路径遍历 guard**：拒绝 .. 和越界绝对路径读文件
 - [x] **P1 evaluator 4 项修复**：空 conditions guard、evalMode target、set_id 删除、evalStreak窗口/field/same_target
 - [x] **P2 数据一致性**：milestone 命名、set 成员补全、缺失 set 字段、im_sorry_dave 窗口
-- [x] 测试覆盖：120 tests, 7 files（evaluator 47 + integration 5 + yaml-parser 6 + api 5 + xp 6 + hook 36 + stats 10）
+- [x] 测试覆盖：203 tests, 11 files（evaluator 50 + integration 5 + yaml-parser 20 + api 10 + xp 15 + hook 30 + stats 21 + store 12 + activity 15 + profile 16 + registry 7）
 
 ### 中优先级
 - [x] **用户审阅 160 成就清单**：已逐条 review，修复 30+ 个不一致，删除 3 个重复，新增 1 个

@@ -42,6 +42,11 @@
 
 **测试:** +30 tests → 150/150 ✅ (stats: +11, xp: +9, hook: +10)
 
+### Bugfix: reset 漏删 stats.json + single_task 会话泄露 — 2026-06-05
+
+- **`store.reset()` 漏删 `stats.json`** — `store.ts` 新增 `statsPath` 清理，修复 reset 后 Dashboard stats 残留旧数据（heatmap/streak/usage_xp 显示异常直到下次 poll 覆盖）
+- **`scopeEvents()` 单 task 边界泄露** — `evaluator.ts` 三层语义边界重构：0 task → 限当前 session（原行为 return entire events），1 task → 从最近 `session.start` 切片（原行为 `slice(0,)` 泄露前序 session 事件），≥2 task → 不变。修复 20+ 个 single_task 成就规则边界
+
 ### P1-1~P1-4 设计文档 — 2026-06-05
 
 基于 Round 3 竞品调研 + Gap Analysis 的 6 条建议，完成 4 篇 P1 优先级设计文档：

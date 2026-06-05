@@ -475,6 +475,51 @@ describe('single_task / same_task window', () => {
     };
     expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 2, target: 2 });
   });
+
+  it('0 tasks scopes to current session, not returning all events', () => {
+    const events = [
+      makeEvent('session.start', { payload: {}, context: { session_id: 'prev', model: 'auto' } }),
+      makeEvent('tool.complete', { payload: { tool_name: 'Read' }, context: { session_id: 'prev', model: 'auto' } }),
+      makeEvent('tool.complete', { payload: { tool_name: 'Edit' }, context: { session_id: 'prev', model: 'auto' } }),
+      makeEvent('session.end', { payload: {}, context: { session_id: 'prev', model: 'auto' } }),
+      makeEvent('session.start', { payload: {}, context: { session_id: 'current', model: 'auto' } }),
+      makeEvent('tool.complete', { payload: { tool_name: 'Read' }, context: { session_id: 'current', model: 'auto' } }),
+    ];
+    const cond: Condition = {
+      type: 'counter', event: 'tool.complete', window: 'single_task', value: 3, operator: '>=',
+    };
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: false, progress: 1, target: 3 });
+  });
+
+  it('first task uses session.start as boundary, not events[0]', () => {
+    const events = [
+      makeEvent('session.start', { payload: {}, context: { session_id: 'prev', model: 'auto' } }),
+      makeEvent('tool.complete', { payload: { tool_name: 'Read' }, context: { session_id: 'prev', model: 'auto' } }),
+      makeEvent('tool.complete', { payload: { tool_name: 'Edit' }, context: { session_id: 'prev', model: 'auto' } }),
+      makeEvent('tool.complete', { payload: { tool_name: 'Bash' }, context: { session_id: 'prev', model: 'auto' } }),
+      makeEvent('task.complete', { payload: {}, context: { session_id: 'prev', model: 'auto' } }),
+      makeEvent('session.start', { payload: {}, context: { session_id: 'current', model: 'auto' } }),
+      makeEvent('tool.complete', { payload: { tool_name: 'Read' }, context: { session_id: 'current', model: 'auto' } }),
+      makeEvent('tool.complete', { payload: { tool_name: 'Edit' }, context: { session_id: 'current', model: 'auto' } }),
+      makeEvent('task.complete', { payload: {}, context: { session_id: 'current', model: 'auto' } }),
+    ];
+    const cond: Condition = {
+      type: 'counter', event: 'tool.complete', window: 'single_task', value: 3, operator: '>=',
+    };
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: false, progress: 2, target: 3 });
+  });
+
+  it('first task with no prior session.start falls back to events[0]', () => {
+    const events = [
+      makeEvent('tool.complete', { payload: { tool_name: 'Read' }, context: { session_id: 's1', model: 'auto' } }),
+      makeEvent('tool.complete', { payload: { tool_name: 'Edit' }, context: { session_id: 's1', model: 'auto' } }),
+      makeEvent('task.complete', { payload: {}, context: { session_id: 's1', model: 'auto' } }),
+    ];
+    const cond: Condition = {
+      type: 'counter', event: 'tool.complete', window: 'single_task', value: 2, operator: '>=',
+    };
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 2, target: 2 });
+  });
 });
 
 describe('evalStreak window / field / same_target', () => {

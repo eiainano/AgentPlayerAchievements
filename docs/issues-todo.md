@@ -4,17 +4,19 @@
 
 ---
 
-## 🆕 本次新增 — Kilo Code / OpenCode 双通道 + 交互式安装流程 (v0.1.6, 6/6)
+## 🆕 本次新增 — Kilo Code / OpenCode 双通道 + 交互式安装 + CLI 扩展 (v0.1.6, 6/6)
 
-5 个工具全部实现 MCP + auto-track 双通道覆盖：
+5 个工具全部实现 MCP + auto-track 双通道覆盖，19 个 CLI 命令：
 
-- **Kilo Code / OpenCode auto-track** — `hook.ts` 新增 `kilocode-auto` 模式（`KILOCODE_EVENT_MAP` + `KILOCODE_TOOL_MAP` + `normalizeKilocodeStdin()`），init.ts 生成 `Bun.spawn` 驱动的 TS 插件，通过 `tool.execute.before/after` + `event` hook 监听工具调用、会话生命周期等 32+ 事件
-- **交互式安装** — `agpa init` 流程升级：语言选择 → 可选创建 profile → 多选要 track 的工具（↑↓ Space Enter），非 TTY 自动回退全选
-- **Profile-tracked_tools** — `profile.json` 记录 `tracked_tools: ["claude-code", ...]`，每个 profile 独立管理跟踪的工具集合
-- **Dashboard 工具徽章** — Hero 区域显示当前 profile 跟踪的工具，使用官方 logo（Claude/Kilo/Nous Research/OpenCode/OpenClaw），暗亮双主题
-- **Hero 布局重构** — Streak + 热力图同行，展示柜 + 统计数字同行，Share 按钮右上角
-- **安全修复** — `--profile` CLI 参数走 `validateProfileName()`，`config.ts` 新增 `setConfigDir()` 测试隔离，XSS defense-in-depth
-- 测试 484→514（+30 KiloCode 翻译测试），23 文件
+- **Kilo Code / OpenCode auto-track** — `hook.ts` 新增 `kilocode-auto` 模式（`KILOCODE_EVENT_MAP` + `KILOCODE_TOOL_MAP` + `normalizeKilocodeStdin()`），init.ts 生成 `Bun.spawn` 驱动的 TS 插件，监听 `tool.execute.before/after` + `event` 32+ 事件
+- **交互式安装** — 语言 → profile 创建 → 多选工具（↑↓ Space Enter），非 TTY 自动回退
+- **Profile-tracked_tools** — `agpa profile tools [name]` 交互式管理，`profile.json` 记录，Dashboard 5 工具官方 logo 徽章 + 暗亮主题双语
+- **CLI 扩展** — `agpa config` / `profile switch` / `showcase` / `search` / `suggest` / `web`，共 19 命令
+- **Share 卡片主题化** — 暗/亮 + 中/英跟随 Dashboard，480px 现代化设计
+- **Hero 布局** — 统计大字居中 → Streak(紧凑) + 热力图同行 → 展示柜独占行
+- **AGPA logo** — `scripts/generate-logo.ts`，PS4 手柄 + 星光像素画
+- **安全** — `--profile` CLI 验证 + config 测试隔离 + XSS defense-in-depth
+- 测试 484→514（+30 KiloCode 翻译），23 文件全绿
 
 ## 🎉 本次实施 — 不可达成就全面清零 + 测试覆盖 446 (v0.1.6, 6/5)
 
@@ -46,9 +48,9 @@ Dashboard 新增 📸 Share 按钮，生成 Steam 风格成就卡片 PNG：
 
 - `src/dashboard/api.ts` — `buildCardResponse()` 聚合 stats + 展示柜 + 热力图 + 里程碑
 - `src/dashboard/server.ts` — 注册 `GET /api/card` 路由
-- 前端 — 隐藏 DOM 渲染 + html2canvas 截图 + 浏览器下载（840px @2x）
+- 前端 — 隐藏 DOM 渲染 + html2canvas 截图 + 浏览器下载（960px @2x）
 - 支持中英双语、进行中成就补位、稀有度分布
-- 新增 6 个 API 测试，全量 484 ✅
+- 新增 6 个 API 测试
 
 ## 🆕 本次新增 — 终端 ANSI 弹窗 + 进度感知 (v0.1.6, 6/5)
 
@@ -58,7 +60,7 @@ Dashboard 新增 📸 Share 按钮，生成 Steam 风格成就卡片 PNG：
 - `src/utils/progress-nudge.ts` — 近锁成就计算器，支持 counter/threshold/streak/distinct_count/sequence_count 5 种类型
 - `src/cli/hook.ts` `cmdPoll()` — Stop hook 触发时同时输出 popup + nudge
 - Non-TTY 自动跳过，纯文本 fallback 不受影响
-- 新增 26 个测试（12 popup + 14 nudge），全量 478 ✅
+- 新增 26 个测试（12 popup + 14 nudge）
 
 ## 🆕 本次新增 — 6 事件填空型新成就 (v0.1.6, 6/5)
 
@@ -125,7 +127,7 @@ Dashboard 新增 📸 Share 按钮，生成 Steam 风格成就卡片 PNG：
 
 ## P3 — YAML 质量 / 资产
 
-- [x] **Hidden 分类** — 35/160 = 22%。41→21→35（经过一次重归类又部分回退）。剩余 35 个全是真彩蛋。
+- [x] **Hidden 分类** — 约 35 个（166 个总成就中约 21%）。41→21→35（经过一次重归类又部分回退）。剩余 35 个全是真彩蛋。
 - [ ] **手动 review 全部 160 条 pixelArtDesc** — `docs/pixel-art-ideas.md` 中每个成就的像素画描述，逐条审阅和修改。改完后重跑 `npx tsx scripts/generate-pixel-art.ts` 即可用最新描述生图。
 - [ ] **像素画 icon 资产暂缺** — `scripts/generate-pixel-art.ts` 已就绪（Gemini 3.1 Nano Banana 2），`docs/pixel-art-ideas.md` 已含 160 条描述。下一步：review 描述 → 生成全部 160 张 → 选 The Beginning（14 个）做 Dashboard icon 试点。方案：32×32 pixel art PNG → `public/icons/` → YAML `icon: { src, alt }` → Dashboard `iconHtml()` 渲染。emoji 和 pixel art 并存，渐进替换。
 - [x] **Set 名称只有英文** — 9→10 个 set，全部添加 `name_cn`，套装页中英双语切换。Set 系统重构：合并散装 set，扩充合理 set。`git_flow`（7→9）、`agent_commander`（5→7）、`creators_forge`（5→6）、`polar_night`（2→3）。59/160 有归属。

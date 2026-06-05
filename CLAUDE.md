@@ -3,7 +3,7 @@
 ## Commands
 
 ```
-npm run test       # vitest (110 tests, 6 files)
+npm run test       # vitest (514 tests, 23 files)
 npm run build      # tsc --noEmit
 npm run dashboard  # start on :3867, then open browser (supports --profile <name>)
 npm run demo       # generate MVP data + stats
@@ -11,7 +11,7 @@ npm run doctor     # diagnose system state
 npm run profile    # manage achievement profiles (create <name> | list)
 ```
 
-Unified CLI via `bin` field (npm link to use): `agpa init | verify | doctor | dashboard | profile | demo | stats | progress | reset | mcp`
+Unified CLI via `bin` field (npm link): 19 commands — `agpa init | verify | doctor | dashboard | profile <create|list|switch|tools> | demo | stats | progress | reset | mcp | sound | activity | export | import | config | showcase | search | suggest | web`
 
 ## Architecture
 
@@ -52,8 +52,9 @@ Three layers, **two channels**:
 | `auto` | CC | CC hook manager spawns hook.ts, writes JSON to stdin |
 | `hermes-auto` | Hermes | Hermes hook manager spawns hook.ts, writes JSON to stdin |
 | `openclaw-auto` | OpenClaw | Our TS plugin spawns hook.ts, writes JSON to stdin |
+| `kilocode-auto` | Kilo Code / OpenCode | Our TS plugin Bun.spawns hook.ts, writes JSON to stdin |
 
-All three share the same translation pattern: tool-specific fields → CC standard `HookStdin` → `mapEvents()` → `ENGINE.track()`.
+All four share the same translation pattern: tool-specific fields → CC standard `HookStdin` → `mapEvents()` → `ENGINE.track()`.
 
 Useful for quick testing: `echo '{"hook_event_name":"PostToolUse","tool_name":"Read"}' | npx tsx src/cli/hook.ts auto`
 

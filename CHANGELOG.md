@@ -72,6 +72,12 @@
   - S5 error recovery: 3 轮 fail→fix→pass → the_debugger + triple_debugger
   - S6 baseline: 最小触发（单消息+单工具）验证引擎能解锁
 
+**Approach B — 逐成就触发测试** (`tests/engine/every-achievement.test.ts`): 为每个成就自动生成最小触发事件并验证解锁。153/160 可达，7 跳过的包含 2 future + 5 set_completion（需 evaluator 修复 future 过滤）。覆盖 11 种条件类型、filter && 链、role、consecutive sequences、per_event、metric 表达式。
+
+**YAML Bug 修复**: streak_3/7/30/100 + daily_checkin 补上 `window: all`（5 个成就永不可达）。
+
+**测试总量**: 18 文件, 439 tests ✅
+
 ### P1-1~P1-4 设计文档 — 2026-06-05
 
 基于 Round 3 竞品调研 + Gap Analysis 的 6 条建议，完成 4 篇 P1 优先级设计文档：

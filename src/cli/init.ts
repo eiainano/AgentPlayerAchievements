@@ -3,7 +3,7 @@
  * AGPA Init — detect & configure AI coding tools for achievement tracking
  *
  * Usage:
- *   npx tsx src/cli/init.ts               Auto-detect & configure all tools
+ *   npx tsx src/cli/init.ts               Scan & pick tools interactively
  *   npx tsx src/cli/init.ts --tool <tool>  Configure a specific tool
  */
 
@@ -202,7 +202,7 @@ function printHelp(): void {
 🏆 AGPA Init — Connect AI coding tools to the achievement system
 
 Usage:
-  npx tsx src/cli/init.ts               Auto-detect & configure all tools
+  npx tsx src/cli/init.ts               Scan & pick tools interactively
   npx tsx src/cli/init.ts --tool <name>  Configure a specific tool
 
 Tools:
@@ -216,8 +216,8 @@ Options:
   --profile <name>       Use a named profile (default: "default")
   --help, -h             Show this help
 
-Without --tool, scans existing config files and configures all tools found.
-Default: Claude Code if nothing detected.
+Without --tool, scans for installed tools & lets you pick which to configure.
+Non-TTY (piped) falls back to auto-selecting all detected tools.
 `);
 }
 
@@ -576,38 +576,142 @@ function injectInstructions(filePath: string, marker: string): boolean {
 
 // ── Tool Detection ─────────────────────────────────────────────────────
 
+interface ScanResult {
+  name: string;
+  id: string;
+  detected: boolean;
+  configPath: string;
+}
+
 /**
- * When no --tool is provided, scan for existing tool config files
- * and offer to configure all found tools.
+ * Scan for existing tool config files. Returns full results (detected + not detected).
  */
-function detectTools(): string[] {
-  const found: string[] = [];
-  const scanResults: Array<{ name: string; id: string; detected: boolean }> = [];
-
+function scanTools(): ScanResult[] {
+  const results: ScanResult[] = [];
   for (const t of TOOLS) {
-    const detected = fs.existsSync(t.configPath);
-    scanResults.push({ name: t.name, id: t.id, detected });
-    if (detected) found.push(t.id);
+    results.push({
+      name: t.name,
+      id: t.id,
+      detected: fs.existsSync(t.configPath),
+      configPath: t.configPath,
+    });
   }
+  return results;
+}
 
-  // Display scan results
-  console.log('');
-  for (const r of scanResults) {
-    if (r.detected) {
-      console.log(`  \u{2705} ${r.name.padEnd(18)} ${r.id}`);
-    } else {
-      console.log(`  \u{2014} ${r.name.padEnd(18)} not detected`);
+/**
+ * Interactive multi-select prompt for picking which tools to configure.
+ * Shows detected/not-detected status for all 5 tools.
+ * User navigates with ↑/↓, toggles selection with Space, confirms with Enter.
+ * Default: all detected tools pre-selected. Undetected tools can still be selected
+ * (we'll create their config files later).
+ */
+function promptTools(scanResults: ScanResult[]): Promise<string[]> {
+  // Non-TTY fallback: auto-select all detected tools (no keyboard available)
+  if (!process.stdin.isTTY) {
+    const detectedIds = scanResults.filter(r => r.detected).map(r => r.id);
+    if (detectedIds.length === 0) {
+      console.log('\n  \u{2139}\u{FE0F}  No config files found. Defaulting to Claude Code.');
+      return Promise.resolve(['claude-code']);
     }
+    console.log('');
+    for (const r of scanResults) {
+      if (r.detected) {
+        console.log(`  \u{2705} ${r.name.padEnd(18)} detected  (auto-selected)`);
+      } else {
+        console.log(`  \u{2014} ${r.name.padEnd(18)} not detected`);
+      }
+    }
+    console.log('');
+    return Promise.resolve(detectedIds);
   }
 
-  if (found.length === 0) {
-    console.log('\n  \u{2139}\u{FE0F}  No config files found. Defaulting to Claude Code.');
-    console.log('  \u{2139}\u{FE0F}  Use --tool <name> to configure a different tool.');
-    found.push('claude-code');
-  }
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise(resolve => {
+    // Pre-select all detected tools; none detected → default to claude-code
+    const selected: boolean[] = scanResults.map(r => r.detected);
+    const hasAnyDetected = scanResults.some(r => r.detected);
+    if (!hasAnyDetected) {
+      const ccIdx = scanResults.findIndex(r => r.id === 'claude-code');
+      if (ccIdx >= 0) selected[ccIdx] = true;
+    }
 
-  console.log('');
-  return found;
+    let cursor = 0;
+    let lineCount = 0;
+
+    const clear = () => {
+      if (lineCount > 0) {
+        process.stdout.write(`\x1b[${lineCount}A\x1b[J`);
+        lineCount = 0;
+      }
+    };
+
+    const render = () => {
+      clear();
+      const lines: string[] = [];
+      lines.push('');
+      lines.push('  \u{1F50D} Select AI coding tools to configure:');
+      lines.push('');
+      for (let i = 0; i < scanResults.length; i++) {
+        const r = scanResults[i]!;
+        const isCursor = i === cursor;
+        const isSelected = selected[i]!;
+        const prefix = isCursor ? ' ❯' : '  ';
+        const check = isSelected ? '\x1b[32m[✓]\x1b[0m' : '\x1b[90m[ ]\x1b[0m';
+        const status = r.detected ? `  \x1b[32mdetected\x1b[0m` : `  \x1b[90mnot detected\x1b[0m`;
+        const pathInfo = r.detected ? ` \x1b[90m${r.configPath.replace(homedir(), '~')}\x1b[0m` : '';
+        lines.push(`${prefix}${check} ${r.name}${pathInfo}${status}`);
+      }
+      lines.push('');
+      if (!hasAnyDetected) {
+        lines.push('  \x1b[33m\u{26A0}  No config files found. Select a tool to create its config.\x1b[0m');
+      }
+      lines.push('  \x1b[90m↑/↓ navigate  Space toggle  Enter confirm | Ctrl+C cancel\x1b[0m');
+      const out = '\n' + lines.join('\n') + '\n';
+      process.stdout.write(out);
+      lineCount = lines.length + 1;
+    };
+
+    render();
+
+    readline.emitKeypressEvents(process.stdin);
+    if (process.stdin.isTTY) process.stdin.setRawMode(true);
+
+    const onKeypress = (_str: string, key: readline.Key) => {
+      if (key.name === 'up') {
+        cursor = (cursor - 1 + scanResults.length) % scanResults.length;
+        render();
+      } else if (key.name === 'down') {
+        cursor = (cursor + 1) % scanResults.length;
+        render();
+      } else if (key.name === 'space') {
+        selected[cursor] = !selected[cursor];
+        render();
+      } else if (key.name === 'return') {
+        cleanup();
+        clear();
+        const chosen = scanResults.filter((_, i) => selected[i]).map(r => r.id);
+        if (chosen.length === 0) {
+          // User deselected everything — default to claude-code
+          resolve(['claude-code']);
+        } else {
+          resolve(chosen);
+        }
+      } else if (key.name === 'c' && key.ctrl) {
+        cleanup();
+        console.log('\n  Cancelled.\n');
+        process.exit(0);
+      }
+    };
+
+    const cleanup = () => {
+      process.stdin.removeListener('keypress', onKeypress);
+      if (process.stdin.isTTY) process.stdin.setRawMode(false);
+      rl.close();
+    };
+
+    process.stdin.on('keypress', onKeypress);
+  });
 }
 
 // ── CC Hook injector (merge-aware) ─────────────────────────────────────
@@ -1082,13 +1186,21 @@ async function main(): Promise<void> {
   const lang = await promptLanguage();
 
   // Determine which tools to configure
-  const toolIds = toolArg ? [toolArg] : detectTools();
-
+  let toolIds: string[];
   if (toolArg) {
+    // Explicit --tool: use that tool directly
+    toolIds = [toolArg];
     const toolDef = findTool(toolArg);
     if (toolDef) {
       console.log(`  🎯 Configuring: ${toolDef.name}`);
     }
+    console.log('');
+  } else {
+    // No --tool: scan + interactive picker
+    const scanResults = scanTools();
+    toolIds = await promptTools(scanResults);
+    console.log('');
+    console.log(`  ✅ Selected: ${toolIds.length} tool(s)`);
     console.log('');
   }
 

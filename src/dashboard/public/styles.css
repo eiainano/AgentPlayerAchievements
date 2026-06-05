@@ -857,38 +857,25 @@ body {
 /* ── Stats Row ─────────────────────────────────────── */
 .stats-row {
   display: flex;
-  gap: 12px;
+  gap: 28px;
   justify-content: center;
   flex-wrap: wrap;
   flex: 1;
-  align-items: stretch;
+  align-items: center;
 }
 
-.stat-card {
-  background: var(--stat-card-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 18px 28px;
+.stat-big {
   text-align: center;
-  min-width: 130px;
-  transition: all .25s cubic-bezier(.4,0,.2,1);
-  box-shadow: var(--card-base-shadow);
+  min-width: 90px;
 }
-.stat-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--gold);
-  box-shadow: 0 6px 24px rgba(245, 184, 0, .1);
-}
-
-.stat-card .stat-value {
-  font-size: 30px; font-weight: 800;
+.stat-big-value {
+  font-size: 42px; font-weight: 800;
   color: var(--gold);
   font-family: var(--font-mono);
-  letter-spacing: -1px;
-  line-height: 1.1;
+  letter-spacing: -2px;
+  line-height: 1;
 }
-
-.stat-card .stat-label {
+.stat-big-label {
   font-size: 11px;
   color: var(--text-dim);
   margin-top: 4px;

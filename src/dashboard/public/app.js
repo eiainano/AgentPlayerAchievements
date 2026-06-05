@@ -941,9 +941,9 @@ function renderProfile(data) {
       { value: `${stats.completion_pct}%`, label: t('stat_complete') },
     ];
     row.innerHTML = statItems.map(s => `
-      <div class="stat-card">
-        <div class="stat-value">${s.value}</div>
-        <div class="stat-label">${s.label}</div>
+      <div class="stat-big">
+        <div class="stat-big-value">${s.value}</div>
+        <div class="stat-big-label">${s.label}</div>
       </div>
     `).join('');
   }

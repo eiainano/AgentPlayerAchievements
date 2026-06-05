@@ -1,4 +1,5 @@
 import * as path from 'node:path';
+import * as fs from 'node:fs';
 import { homedir } from 'node:os';
 
 const HOME = homedir();
@@ -55,6 +56,27 @@ export const INSTRUCTION_FILES = [
   { name: 'CLAUDE.md', path: path.join(HOME, '.claude', 'CLAUDE.md') },
   { name: 'AGENTS.md', path: path.join(process.cwd(), 'AGENTS.md') },
 ];
+
+export interface ScanResult {
+  name: string;
+  id: string;
+  detected: boolean;
+  configPath: string;
+}
+
+/** Scan for installed AI coding tools (check config file existence). */
+export function scanTools(): ScanResult[] {
+  const results: ScanResult[] = [];
+  for (const t of TOOLS) {
+    results.push({
+      name: t.name,
+      id: t.id,
+      detected: fs.existsSync(t.configPath),
+      configPath: t.configPath,
+    });
+  }
+  return results;
+}
 
 export function findTool(toolId: string): ToolDef | null {
   const lower = toolId.toLowerCase();

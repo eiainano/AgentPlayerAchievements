@@ -11,7 +11,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as readline from 'node:readline';
 import { homedir } from 'node:os';
-import { TOOLS, findTool, INSTRUCTION_FILES } from '../tool-registry.js';
+import { TOOLS, findTool, INSTRUCTION_FILES, scanTools, type ScanResult } from '../tool-registry.js';
 import type { ToolDef } from '../tool-registry.js';
 import { parseYAML } from '../engine/yaml-parser.js';
 import { setTrackedTools, getProfileMeta, createProfile, validateProfileName, DEFAULT_PROFILE } from '../utils/profile.js';
@@ -639,29 +639,7 @@ function promptProfileName(lang: string): Promise<string> {
 }
 
 // ── Tool Detection ─────────────────────────────────────────────────────
-
-interface ScanResult {
-  name: string;
-  id: string;
-  detected: boolean;
-  configPath: string;
-}
-
-/**
- * Scan for existing tool config files. Returns full results (detected + not detected).
- */
-function scanTools(): ScanResult[] {
-  const results: ScanResult[] = [];
-  for (const t of TOOLS) {
-    results.push({
-      name: t.name,
-      id: t.id,
-      detected: fs.existsSync(t.configPath),
-      configPath: t.configPath,
-    });
-  }
-  return results;
-}
+// scanTools() and ScanResult are imported from ../tool-registry.js
 
 /**
  * Interactive multi-select prompt for picking which tools to configure.

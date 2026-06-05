@@ -2,6 +2,15 @@
 
 ## [0.1.6] — 2026-06-05
 
+### 终端 UX 增强设计文档 — 2026-06-05
+
+- `docs/superpowers/specs/2026-06-05-terminal-ux-enhancement-design.md` — 方案 B 设计文档
+- 新增 `src/utils/ansi-popup.ts` — ANSI 彩色成就弹窗渲染器（Unicode 框线 + 稀有度着色）
+- 新增 `src/utils/progress-nudge.ts` — 近锁成就计算器（counter/threshold/streak/distinct_count/set_completion 进度）
+- 修改 `src/cli/hook.ts` `cmdPoll()` — 在 OS 通知后插入 ANSI popup + progress nudge 输出
+- 修改 `src/engine/evaluator.ts` — `evaluateMetric` 改为 export
+- Non-TTY fallback：管道/CI 环境自动跳过 ANSI 渲染，保持纯文本
+
 ### Init 体验优化 — 2026-06-05
 
 - `agpa init` 新增 pre-flight 检查：Node ≥ 18 + tsx 已安装，不满足报错退出

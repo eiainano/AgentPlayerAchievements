@@ -51,10 +51,37 @@ export interface ProfileMeta {
   name: string;
   emoji: string;
   created_at: string;
+  /** Which AI coding tools this profile tracks (by tool ID) */
+  tracked_tools?: string[];
 }
 
 const DEFAULT_EMOJI = '📂';
 const NEW_PROFILE_DEFAULT_EMOJI = '🎮';
+
+/**
+ * Save metadata for a profile. Returns the written meta.
+ * For "default", writes to ~/.agent-achievements/profile.json.
+ * For named profiles, writes to ~/.agent-achievements/profiles/<name>/profile.json.
+ */
+export function saveProfileMeta(name: string, meta: ProfileMeta): ProfileMeta {
+  let metaPath: string;
+  if (name === DEFAULT_PROFILE) {
+    metaPath = path.join(getLegacyDir(), 'profile.json');
+  } else {
+    metaPath = path.join(getProfilesBaseDir(), name, 'profile.json');
+  }
+  fs.mkdirSync(path.dirname(metaPath), { recursive: true });
+  fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2));
+  return meta;
+}
+
+/**
+ * Set tracked_tools for a profile. Merges with existing metadata.
+ */
+export function setTrackedTools(profileName: string, toolIds: string[]): ProfileMeta {
+  const meta = getProfileMeta(profileName);
+  return saveProfileMeta(profileName, { ...meta, tracked_tools: toolIds });
+}
 
 /** Get profile metadata. Returns defaults if profile.json doesn't exist. */
 export function getProfileMeta(name: string): ProfileMeta {

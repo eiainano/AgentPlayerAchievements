@@ -7,7 +7,8 @@
  *   npx tsx src/cli/profile.ts list             List all profiles
  */
 
-import { createProfile, listProfiles, validateProfileName, MAX_PROFILES } from '../utils/profile.js';
+import { createProfile, listProfiles, listProfilesWithMeta, validateProfileName, MAX_PROFILES } from '../utils/profile.js';
+import { TOOLS } from '../tool-registry.js';
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -42,11 +43,14 @@ switch (command) {
   }
 
   case 'list': {
-    const profiles = listProfiles();
-    console.log(`Profiles (${profiles.length}/${MAX_PROFILES + 1} max):`);
-    for (const p of profiles) {
-      const marker = p === 'default' ? ' (default)' : '';
-      console.log(`  ${p}${marker}`);
+    const metaList = listProfilesWithMeta();
+    console.log(`Profiles (${metaList.length}/${MAX_PROFILES + 1} max):\n`);
+    for (const m of metaList) {
+      const marker = m.name === 'default' ? ' (default)' : '';
+      const tools = (m.tracked_tools || []).map(id => TOOLS.find(t => t.id === id)?.name || id).join(', ') || 'none';
+      console.log(`  ${m.emoji}  ${m.name}${marker}`);
+      console.log(`     Tools: ${tools}`);
+      console.log('');
     }
     break;
   }

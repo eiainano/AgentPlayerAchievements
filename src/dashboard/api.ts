@@ -82,7 +82,7 @@ export interface DashboardData {
   config: Pick<AppConfig, 'lang'>;
   profile?: string;
   profile_emoji?: string;
-  profiles?: Array<{ name: string; emoji: string }>;
+  profiles?: Array<{ name: string; emoji: string; tracked_tools?: string[] }>;
   max_profiles?: number;
 }
 

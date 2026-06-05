@@ -14,6 +14,7 @@ import { homedir } from 'node:os';
 import { TOOLS, findTool, INSTRUCTION_FILES } from '../tool-registry.js';
 import type { ToolDef } from '../tool-registry.js';
 import { parseYAML } from '../engine/yaml-parser.js';
+import { setTrackedTools, getProfileMeta, DEFAULT_PROFILE } from '../utils/profile.js';
 
 const AGPA_DIR = path.join(homedir(), '.agent-achievements');
 const AGPA_MAIN = path.resolve(import.meta.dirname, '../main.ts');
@@ -1195,6 +1196,20 @@ async function main(): Promise<void> {
       console.log(`  🎯 Configuring: ${toolDef.name}`);
     }
     console.log('');
+
+    // Persist tracked_tools for this profile
+    const profileName = profile || DEFAULT_PROFILE;
+    if (!profile) {
+      // Default profile: merge with all detected tools + the explicit one
+      const detected = scanTools().filter(r => r.detected).map(r => r.id);
+      const merged = [...new Set([...detected, ...toolIds])];
+      setTrackedTools(profileName, merged.length > 0 ? merged : toolIds);
+    } else {
+      // Named profile: union existing tracked tools with the newly added one
+      const existing = getProfileMeta(profileName).tracked_tools || [];
+      const merged = [...new Set([...existing, ...toolIds])];
+      setTrackedTools(profileName, merged);
+    }
   } else {
     // No --tool: scan + interactive picker
     const scanResults = scanTools();
@@ -1202,6 +1217,18 @@ async function main(): Promise<void> {
     console.log('');
     console.log(`  ✅ Selected: ${toolIds.length} tool(s)`);
     console.log('');
+
+    // Persist tracked_tools to profile metadata
+    const profileName = profile || DEFAULT_PROFILE;
+    if (!profile) {
+      // Default profile: track all detected tools
+      const detectedIds = scanResults.filter(r => r.detected).map(r => r.id);
+      const allIds = detectedIds.length > 0 ? detectedIds : ['claude-code'];
+      setTrackedTools(profileName, allIds);
+    } else {
+      // Named profile: track exactly what user selected
+      setTrackedTools(profileName, toolIds);
+    }
   }
 
   // Shared data directory

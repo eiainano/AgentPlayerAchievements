@@ -2,6 +2,14 @@
 
 ## [0.1.6] — 2026-06-05
 
+### Init 体验优化 — 2026-06-05
+
+- `agpa init` 新增 pre-flight 检查：Node ≥ 18 + tsx 已安装，不满足报错退出
+- 输出文案去技术化：MCP → Tracking、Hooks → Auto-track、Instruct → Instructions
+- 总结框重构：重启警告置顶，下一步指引更简洁
+- 新增方向键交互式语言选择（English / 中文），非 TTY 默认 en
+- 所选语言写入 MCP env `AGPA_LANG`，控制成就通知/Dashboard/activity 展示语言
+
 ### P0-P1 全线实施 — 2026-06-05
 
 基于 Round 3 竞品调研（12 项目 × 40+ 维度）的 Gap Analysis 全部 6 条建议（P0-1, P1-1~P1-4）完整落地：

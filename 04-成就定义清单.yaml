@@ -494,6 +494,7 @@ definitions:
       - type: streak
         event: session.start
         unit: day
+        window: all
         operator: ">="
         value: 100
     set: endurance
@@ -1760,6 +1761,7 @@ definitions:
       - type: streak
         event: session.start
         unit: day
+        window: all
         operator: ">="
         value: 15
       - type: threshold

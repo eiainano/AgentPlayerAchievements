@@ -1,6 +1,6 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-05 | 总成就数: 166 | 条件类型: 11 | Tests: 452 ✅ | 0 不可达 ✅ | 6 事件填空型新成就 | Evaluator +2 操作符
+> 最后更新: 2026-06-05 | 总成就数: 166 | 条件类型: 11 | Tests: 478 ✅ | 0 不可达 ✅ | 终端 ANSI 弹窗 + 进度感知已上线
 
 ---
 
@@ -27,6 +27,16 @@ Phase 1-3 全线实施完毕后，集中扫清 11 个不可达成就并大幅扩
 - **测试总量**: 150 → 446 (18 文件, 全绿)
 
 ---
+
+## 🆕 本次新增 — 终端 ANSI 弹窗 + 进度感知 (v0.1.6, 6/5)
+
+基于方案 B 设计文档，两阶段（ANSI popup + progress nudge）全部落地：
+
+- `src/utils/ansi-popup.ts` — ANSI 256 色 Unicode 框线卡片，6 级稀有度着色，最多 5 张/次
+- `src/utils/progress-nudge.ts` — 近锁成就计算器，支持 counter/threshold/streak/distinct_count/sequence_count 5 种类型
+- `src/cli/hook.ts` `cmdPoll()` — Stop hook 触发时同时输出 popup + nudge
+- Non-TTY 自动跳过，纯文本 fallback 不受影响
+- 新增 26 个测试（12 popup + 14 nudge），全量 478 ✅
 
 ## 🆕 本次新增 — 6 事件填空型新成就 (v0.1.6, 6/5)
 

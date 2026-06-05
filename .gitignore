@@ -21,3 +21,8 @@ workspace/
 # Research (cloned third-party repos for analysis)
 research/
 .superpowers/
+
+# Playwright MCP artifacts
+.playwright-mcp/
+*.png
+!src/dashboard/public/tool-logos/*.png

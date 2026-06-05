@@ -35,7 +35,7 @@ v0.1.6 完成。Round 3 竞品调研（12 项目 × 40+ 维度）→ 6 条建议
 - [x] 进度条显示（有 `progress_trackable` 的成就）
 - [x] 分类过滤、已解锁/未解锁过滤
 - [x] Toast 弹窗（5 分钟内新解锁的成就）
-- [x] 展示柜（profile hero 中的 4 个槽位）
+- [x] 展示柜（profile hero 中的 6 个槽位）
 - [x] 🔥 Streak 卡片 — 当前连续天数 + 历史最高 + 今天活跃状态（XP bar 下方）
 - [x] 📊 活动热力图 — GitHub 风格 4 个月贡献图，分位桶自适应染色，CSS Grid 渲染
 
@@ -72,7 +72,7 @@ v0.1.6 完成。Round 3 竞品调研（12 项目 × 40+ 维度）→ 6 条建议
 - [x] **`tool_source` 硬编码问题**：`engine.ts` 中写死为 `'claude-code'` → 改为从 MCP clientInfo 动态检测 + `AGPA_TOOL_SOURCE` 环境变量 fallback + `init.ts` 注入 env var
 - [x] **展示柜管理**：点击槽位进入 pick 模式，为已解锁成就显示 📌 按钮，支持 auto-fill、点击清除
 - [x] **agpa doctor 命令**：诊断数据目录、event.log、state.json、成就定义、MCP 配置、指令文件
-- [x] **Claude Code Hook 自动 track**：`src/cli/hook.ts` 提供 `track`/`poll`/`auto` 命令，`init.ts` 注入 9 个 hooks（含 SessionStart/Stop/PostToolUse 等）到 `~/.claude/settings.json`，支持与已有 hooks 合并
+- [x] **Claude Code Hook 自动 track**：`src/cli/hook.ts` 提供 `track`/`poll`/`auto` 命令，`init.ts` 注入 10 个 hooks（含 SessionStart/UserPromptSubmit/Stop/PostToolUse 等）到 `~/.claude/settings.json`，支持与已有 hooks 合并
 - [x] **真实环境测试**：event.log 验证 hooks 正常写入，session_id 正确传递，5 工具 MCP + 指令全绿
 - [x] **`npm run init` 无参模式**：自动检测 5 工具配置文件，一键配置全部
 - [x] **evaluator single_task 窗口**：用 task.complete 事件边界推断，不依赖 task_id
@@ -98,7 +98,7 @@ v0.1.6 完成。Round 3 竞品调研（12 项目 × 40+ 维度）→ 6 条建议
 
 ### 低优先级（v1.0）
 - [ ] 全球统计 opt-in + 稀有度动态计算
-- [ ] agpa export/import
+- [x] agpa export/import
 - [ ] 响应式布局（手机可看）
 - [ ] Legendary 呼吸光效 / Mythic 烟花动画
 - [x] 多 profile 支持

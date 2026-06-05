@@ -195,25 +195,21 @@ describe('findNearUnlocks', () => {
     expect(result[0]!.target).toBe(3);
   });
 
-  // ── Set completion ──────────────────────────────────────────────
+  // ── Set completion is skipped (removed — used set_id not condition fields) ─
 
-  it('computes set_completion progress', () => {
+  it('skips set_completion type', () => {
     const defs: AchievementDefinition[] = [
-      makeDef({ id: 's1', set_id: 'bug_catcher', conditions: [{ type: 'set_completion', value: 3 }] }),
+      makeDef({ id: 's1', set_id: 'bug_catcher', conditions: [{ type: 'set_completion', value: 3 }] as Condition[] }),
       makeDef({ id: 's2', set_id: 'bug_catcher' }),
       makeDef({ id: 's3', set_id: 'bug_catcher' }),
-      makeDef({ id: 's4', set_id: 'bug_catcher' }),
     ];
     const state = makeState({
       unlocked: { s2: '2026-01-01', s3: '2026-01-02' },
     });
-    // s1 is our target (unlocked), s2/s3 unlocked, s4 locked
-    // Progress for s1 = 2/3 (s2, s3 unlocked out of s2,s3,s4)
 
     const result = findNearUnlocks(defs, [], state);
-    expect(result).toHaveLength(1);
-    expect(result[0]!.current).toBe(2); // s2 + s3
-    expect(result[0]!.target).toBe(3);  // s2, s3, s4 (excluding self)
+    // set_completion is no longer supported — should return empty
+    expect(result).toEqual([]);
   });
 
   // ── Sorting and truncation ──────────────────────────────────────
@@ -238,13 +234,14 @@ describe('findNearUnlocks', () => {
 
   // ── Unsupported types skipped ───────────────────────────────────
 
-  it('skips sequence, event, pattern_match, ratio, mode types', () => {
+  it('skips sequence, event, pattern_match, ratio, mode, set_completion types', () => {
     const defs: AchievementDefinition[] = [
       makeDef({ id: 'seq', conditions: [{ type: 'sequence', value: 1 }] as Condition[] }),
       makeDef({ id: 'evt', conditions: [{ type: 'event', value: 1 }] as Condition[] }),
       makeDef({ id: 'pm', conditions: [{ type: 'pattern_match', value: 1 }] as Condition[] }),
       makeDef({ id: 'rat', conditions: [{ type: 'ratio', value: 1 }] as Condition[] }),
       makeDef({ id: 'mod', conditions: [{ type: 'mode', value: 1 }] as Condition[] }),
+      makeDef({ id: 'set', conditions: [{ type: 'set_completion', value: 1 }] as Condition[] }),
     ];
 
     const result = findNearUnlocks(defs, [makeEvent()], makeState());

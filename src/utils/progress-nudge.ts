@@ -152,22 +152,25 @@ function streakProgress(events: TrackedEvent[], cond: Condition): number {
 
 function distinctCountProgress(events: TrackedEvent[], cond: Condition): number {
   const scoped = windowFilter(events, cond);
+  const whitelist: Set<string> | null = cond.values ? new Set(cond.values) : null;
   const values = new Set<string>();
   for (const e of scoped) {
     if (cond.event && e.event_type !== cond.event) continue;
     const val = cond.field ? String(e.payload?.[cond.field] ?? '') : '';
     if (!val) continue;
+    if (whitelist && !whitelist.has(val)) continue;
     values.add(val);
   }
   return values.size;
 }
 
 function sequenceCountProgress(events: TrackedEvent[], cond: Condition): number {
+  const scoped = windowFilter(events, cond);
   const pattern = Array.isArray(cond.pattern) ? (cond.pattern as string[]) : null;
   if (!pattern || pattern.length === 0) return 0;
   let count = 0;
   let pi = 0;
-  for (const e of events) {
+  for (const e of scoped) {
     if (e.event_type === pattern[pi]) {
       pi++;
       if (pi >= pattern.length) { count++; pi = 0; }
@@ -176,24 +179,6 @@ function sequenceCountProgress(events: TrackedEvent[], cond: Condition): number 
     }
   }
   return count;
-}
-
-function setCompletionProgress(
-  def: AchievementDefinition,
-  state: AchievementState,
-  definitions: AchievementDefinition[],
-): number {
-  // Count how many members of this set are unlocked
-  if (!def.set_id) return 0;
-  const memberIds = definitions
-    .filter(d => d.set_id === def.set_id && d.id !== def.id)
-    .map(d => d.id);
-  if (memberIds.length === 0) return 0;
-  let unlocked = 0;
-  for (const id of memberIds) {
-    if (state.unlocked[id]) unlocked++;
-  }
-  return unlocked;
 }
 
 // ── Main calculator ────────────────────────────────────────────────
@@ -260,15 +245,6 @@ export function findNearUnlocks(
       case 'sequence_count': {
         current = sequenceCountProgress(events, cond);
         unitLabel = cond.unit || 'cycles';
-        break;
-      }
-      case 'set_completion': {
-        current = setCompletionProgress(def, state, definitions);
-        if (!def.set_id) continue;
-        const members = definitions.filter(d => d.set_id === def.set_id && d.id !== def.id);
-        target = members.length;
-        if (target === 0) continue;
-        unitLabel = cond.unit || 'members';
         break;
       }
       default:

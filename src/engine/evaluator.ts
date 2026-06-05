@@ -17,7 +17,7 @@ function parseWindow(w: string): number {
   }
 }
 
-function matchFilter(event: TrackedEvent, filter: string): boolean {
+export function matchFilter(event: TrackedEvent, filter: string): boolean {
   const ctx: Record<string, string | boolean | number> = {
     event_type: event.event_type,
     tool_name: event.payload?.tool_name || '',

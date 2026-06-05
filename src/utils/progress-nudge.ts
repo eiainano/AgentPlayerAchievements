@@ -11,7 +11,7 @@ import type {
   Condition,
   TrackedEvent,
 } from '../engine/types.js';
-import { evaluateMetric } from '../engine/evaluator.js';
+import { evaluateMetric, matchFilter } from '../engine/evaluator.js';
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -59,6 +59,21 @@ function windowFilter(events: TrackedEvent[], cond: Condition): TrackedEvent[] {
   return events.filter(e => now - new Date(e.timestamp).getTime() <= windowMs);
 }
 
+/**
+ * Filter events by window + event type + filter expression.
+ * Mirrors the evaluator's event scoping logic.
+ */
+function scopedEvents(events: TrackedEvent[], cond: Condition): TrackedEvent[] {
+  const scoped = windowFilter(events, cond);
+  return scoped.filter(e => {
+    if (cond.event && e.event_type !== cond.event) return false;
+    if (cond.filter) {
+      try { return matchFilter(e, cond.filter); } catch { return true; }
+    }
+    return true;
+  });
+}
+
 function eventTypeLabel(eventType: string): string {
   const map: Record<string, string> = {
     'session.start': 'sessions',
@@ -78,11 +93,10 @@ function eventTypeLabel(eventType: string): string {
 // ── Per-type progress calculators ───────────────────────────────────
 
 function counterProgress(events: TrackedEvent[], cond: Condition): number {
-  const scoped = windowFilter(events, cond);
+  const scoped = scopedEvents(events, cond);
   if (cond.same_target && cond.field) {
     const fieldCounts: Record<string, number> = {};
     for (const e of scoped) {
-      if (cond.event && e.event_type !== cond.event) continue;
       const val = String(e.payload?.[cond.field] ?? '');
       if (!val) continue;
       fieldCounts[val] = (fieldCounts[val] || 0) + 1;
@@ -91,29 +105,20 @@ function counterProgress(events: TrackedEvent[], cond: Condition): number {
     for (const v of Object.values(fieldCounts)) if (v > max) max = v;
     return max;
   }
-  let count = 0;
-  for (const e of scoped) {
-    if (cond.event && e.event_type !== cond.event) continue;
-    count++;
-  }
-  return count;
+  return scoped.length;
 }
 
 function thresholdProgress(events: TrackedEvent[], cond: Condition): number | null {
   if (!cond.metric) return null;
-  const scoped = windowFilter(events, cond);
-  const filtered = cond.event
-    ? scoped.filter(e => e.event_type === cond.event)
-    : scoped;
-  const val = evaluateMetric(cond.metric, filtered);
+  const scoped = scopedEvents(events, cond);
+  const val = evaluateMetric(cond.metric, scoped);
   return val !== null ? Math.round(val * 1000) / 1000 : null;
 }
 
 function streakProgress(events: TrackedEvent[], cond: Condition): number {
-  const scoped = windowFilter(events, cond);
+  const scoped = scopedEvents(events, cond);
   const days = new Set<string>();
   for (const e of scoped) {
-    if (cond.event && e.event_type !== cond.event) continue;
     days.add(e.timestamp.slice(0, 10));
   }
   // Count consecutive days ending today
@@ -151,11 +156,10 @@ function streakProgress(events: TrackedEvent[], cond: Condition): number {
 }
 
 function distinctCountProgress(events: TrackedEvent[], cond: Condition): number {
-  const scoped = windowFilter(events, cond);
+  const scoped = scopedEvents(events, cond);
   const whitelist: Set<string> | null = cond.values ? new Set(cond.values) : null;
   const values = new Set<string>();
   for (const e of scoped) {
-    if (cond.event && e.event_type !== cond.event) continue;
     const val = cond.field ? String(e.payload?.[cond.field] ?? '') : '';
     if (!val) continue;
     if (whitelist && !whitelist.has(val)) continue;
@@ -165,7 +169,7 @@ function distinctCountProgress(events: TrackedEvent[], cond: Condition): number 
 }
 
 function sequenceCountProgress(events: TrackedEvent[], cond: Condition): number {
-  const scoped = windowFilter(events, cond);
+  const scoped = scopedEvents(events, cond);
   const pattern = Array.isArray(cond.pattern) ? (cond.pattern as string[]) : null;
   if (!pattern || pattern.length === 0) return 0;
   let count = 0;

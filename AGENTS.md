@@ -22,6 +22,8 @@ All tool calls, file operations, git commits/PRs, subagents, sessions, task comp
 | Entering plan mode | `plan.mode_entered` | `{}` |
 | Reading help/docs | `help.accessed` | `{}` |
 | Connecting to an MCP server | `mcp.server_used` | `{ server_name }` |
+| MCP connection first established | `mcp.connect` | `{}` |
+| Activating Auto Mode | `automode.start` | `{}` |
 | Installing a plugin | `plugin.installed` | `{ plugin_name }` |
 | Configuring hooks | `hook.configured` | `{ hook_count }` |
 | Creating an Agent/subagent | `agent.created` | `{ agent_type }` |

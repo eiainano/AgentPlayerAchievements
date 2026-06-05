@@ -261,7 +261,6 @@ definitions:
     hint: Let Claude drive autonomously for a while
     hint_cn: 让 Claude 自己开一会儿——激活自动驾驶模式
     set: the_beginning
-    future: true
     conditions:
       - type: counter
         event: automode.start
@@ -283,7 +282,6 @@ definitions:
     hint: Establish a connection to an external server
     hint_cn: 建立一条通往外部服务器的连接
     set: the_beginning
-    future: true
     conditions:
       - type: counter
         event: mcp.connect

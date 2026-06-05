@@ -139,6 +139,8 @@ Call \`achievement_track\` when you observe these:
 - Enter plan mode → \`plan.mode_entered\`
 - Read help/docs → \`help.accessed\`
 - Connect MCP server → \`mcp.server_used\` with \`{ server_name }\`
+- MCP connection first established → \`mcp.connect\`
+- Activate Auto Mode → \`automode.start\`
 - Install plugin → \`plugin.installed\` with \`{ plugin_name }\`
 - Configure hooks → \`hook.configured\` with \`{ hook_count }\`
 - Create agent/subagent → \`agent.created\` with \`{ agent_type }\`

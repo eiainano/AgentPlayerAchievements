@@ -9,6 +9,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import * as readline from 'node:readline';
 import { homedir } from 'node:os';
 import { TOOLS, findTool, INSTRUCTION_FILES } from '../tool-registry.js';
 import type { ToolDef } from '../tool-registry.js';
@@ -580,6 +581,7 @@ function initTool(
   toolDef: ToolDef,
   initData: InitToolData,
   profile: string | null,
+  lang: string,
   dataDir: string,
   quiet: boolean,
 ): string | null {
@@ -592,7 +594,7 @@ function initTool(
   // ── Inject MCP config ──────────────────────────────────────────────
   const configExists = fs.existsSync(toolDef.configPath);
   if (configExists && fs.readFileSync(toolDef.configPath, 'utf-8').includes('agent-achievements')) {
-    console.log(`  \u{23ED}  MCP:       ${toolDef.configPath} (already present)`);
+    console.log(`  \u{23ED}  Tracking:  ${toolDef.configPath} (already set up)`);
   } else {
     if (toolDef.configFormat === 'yaml') {
       if (!configExists) {
@@ -602,6 +604,7 @@ function initTool(
         fs.writeFileSync(toolDef.configPath, '');
       }
       const mcpEnv: Record<string, string> = { AGPA_TOOL_SOURCE: toolDef.id };
+      if (lang !== 'en') mcpEnv.AGPA_LANG = lang;
       if (profile) mcpEnv.AGPA_PROFILE = profile;
       const injected = injectYamlMCPBlock(toolDef.configPath, 'agent-achievements', {
         command: 'tsx',
@@ -610,9 +613,9 @@ function initTool(
         env: mcpEnv,
       });
       if (injected) {
-        console.log(`  \u{2705} MCP:       ${toolDef.configPath}`);
+        console.log(`  \u{2705} Tracking:  ${toolDef.configPath}`);
       } else {
-        console.log(`  \u{23ED}  MCP:       ${toolDef.configPath} (already present)`);
+        console.log(`  \u{23ED}  Tracking:  ${toolDef.configPath} (already set up)`);
       }
     } else {
       let config: Record<string, unknown> | null;
@@ -629,17 +632,25 @@ function initTool(
         config = {};
       }
       const updated = initData.mcpInject(config);
-      // Inject profile into MCP server env if set
-      if (profile) {
+      // Inject lang & profile into MCP server env
+      {
         const mcps = (updated as Record<string, unknown>).mcpServers as Record<string, { env?: Record<string, string> }> | undefined;
         const server = mcps?.['agent-achievements'];
-        if (server?.env) server.env.AGPA_PROFILE = profile;
-        const alts = (updated as Record<string, unknown>).servers as Record<string, { env?: Record<string, string> }> | undefined;
-        const altServer = alts?.['agent-achievements'];
-        if (altServer?.env) altServer.env.AGPA_PROFILE = profile;
+        if (server?.env) {
+          if (lang !== 'en') server.env.AGPA_LANG = lang;
+          if (profile) server.env.AGPA_PROFILE = profile;
+        }
+        // OpenClaw uses .mcp.servers instead of .mcpServers
+        const mcp = (updated as Record<string, unknown>).mcp as Record<string, Record<string, { env?: Record<string, string> }>> | undefined;
+        const altServers = mcp?.servers;
+        const altServer = altServers?.['agent-achievements'];
+        if (altServer?.env) {
+          if (lang !== 'en') altServer.env.AGPA_LANG = lang;
+          if (profile) altServer.env.AGPA_PROFILE = profile;
+        }
       }
       writeJSON(toolDef.configPath, updated);
-      console.log(`  \u{2705} MCP:       ${toolDef.configPath}`);
+      console.log(`  \u{2705} Tracking:  ${toolDef.configPath}`);
     }
   }
 
@@ -647,9 +658,9 @@ function initTool(
   for (const inst of initData.instructionFiles) {
     const injected = injectInstructions(inst.path, inst.marker);
     if (injected) {
-      console.log(`  \u{2705} Instruct:  ${inst.path}`);
+      console.log(`  \u{2705} Instructions: ${inst.path}`);
     } else {
-      console.log(`  \u{23ED}  Instruct:  ${inst.path} (already present)`);
+      console.log(`  \u{23ED}  Instructions: ${inst.path} (already present)`);
     }
   }
 
@@ -657,7 +668,7 @@ function initTool(
   if (toolDef.id === 'claude-code') {
     let hookCfg = readJSON(toolDef.configPath);
     if (!hookCfg) {
-      console.log(`  \u{26A0}  Hooks:     cannot read ${toolDef.configPath} \u{2014} skipping`);
+      console.log(`  \u{26A0}  Auto-track cannot read ${toolDef.configPath} \u{2014} skipping`);
     } else {
       const hooks = (hookCfg.hooks as Record<string, unknown>) || {};
       const injectedKeys: string[] = [];
@@ -674,9 +685,9 @@ function initTool(
       if (injectedKeys.length > 0) {
         hookCfg.hooks = hooks;
         writeJSON(toolDef.configPath, hookCfg);
-        console.log(`  \u{2705} Hooks:     ${injectedKeys.join(', ')}`);
+        console.log(`  \u{2705} Auto-track (${injectedKeys.length} hooks)`);
       } else {
-        console.log(`  \u{23ED}  Hooks:     (all already present)`);
+        console.log(`  \u{23ED}  Auto-track (already present)`);
       }
     }
   }
@@ -692,10 +703,10 @@ function initTool(
         on_session_end:    `${hookCmd(HOOK_HERMES_ENV, 'track session.end', profile)} && ${hookCmd(HOOK_HERMES_ENV, 'poll', profile)}`,
       });
       if (injected) {
-        console.log(`  \u{2705} Hooks:     hermes shell hooks (4 events)`);
+        console.log(`  \u{2705} Auto-track (4 hooks)`);
       }
     } else {
-      console.log(`  \u{23ED}  Hooks:     (already present or config missing)`);
+      console.log(`  \u{23ED}  Auto-track (already present or config missing)`);
     }
   }
 
@@ -703,9 +714,9 @@ function initTool(
   if (toolDef.id === 'openclaw') {
     const injected = injectOpenClawPlugin(profile);
     if (injected) {
-      console.log(`  ✅ Hooks:     OpenClaw TS plugin (extensions/agpa-track.ts)`);
+      console.log(`  ✅ Auto-track (TS plugin)`);
     } else {
-      console.log(`  ⏭  Hooks:     (plugin already present)`);
+      console.log(`  ⏭  Auto-track (plugin already present)`);
     }
   }
 
@@ -742,9 +753,9 @@ function installAchievementCommands(): boolean {
   }
 
   if (installed > 0) {
-    console.log(`  \u{2705} Commands:  /achievements, /achievements settings → ~/.claude/commands/`);
+    console.log(`  \u{2705} Commands:  /achievements, /achievements-settings`);
   } else if (alreadyPresent > 0) {
-    console.log(`  \u{23ED}  Commands:  /achievements, /achievements settings (already present)`);
+    console.log(`  \u{23ED}  Commands:  (already present)`);
   }
 
   return installed > 0 || alreadyPresent > 0;
@@ -841,12 +852,115 @@ function printWelcome(): void {
   console.log('');
 }
 
+// ── Preflight ────────────────────────────────────────────────────────────
+
+function runPreflight(): boolean {
+  let ok = true;
+
+  // Node.js >= 18
+  const majorMatch = process.version.match(/^v(\d+)/);
+  const major = majorMatch ? parseInt(majorMatch[1]!, 10) : 0;
+  if (major < 18) {
+    console.log(`  \u{274C} Node.js ${process.version} \u{2014} need ≥ 18.0.0`);
+    console.log('     Fix: brew install node@20  or  nvm install 20');
+    ok = false;
+  }
+
+  // tsx available (local install)
+  if (!fs.existsSync(TSX_BIN)) {
+    console.log(`  \u{274C} tsx not found \u{2014} run: npm install`);
+    ok = false;
+  }
+
+  return ok;
+}
+
+// ── Language picker ──────────────────────────────────────────────────────
+
+const LANG_CHOICES = [
+  { label: 'English',  value: 'en' },
+  { label: '中文',     value: 'zh' },
+];
+
+/**
+ * Arrow-key language picker. Returns "en" or "zh".
+ * Only shows when stdin is a TTY; otherwise default to "en".
+ */
+function promptLanguage(): Promise<string> {
+  if (!process.stdin.isTTY) return Promise.resolve('en');
+
+  return new Promise((resolve) => {
+    let selected = 0;
+    let lineCount = 0;
+
+    const rl = readline.createInterface({
+      input: process.stdin,
+      escapeCodeTimeout: 50,
+    });
+
+    const clear = () => {
+      if (lineCount > 0) {
+        process.stdout.write(`[${lineCount}A[J`);
+        lineCount = 0;
+      }
+    };
+
+    const render = () => {
+      clear();
+      const lines: string[] = [];
+      lines.push('  \u{1F310} Language / \u{8BED}\u{8A00}');
+      for (let i = 0; i < LANG_CHOICES.length; i++) {
+        const prefix = i === selected ? '  ❯' : '   ';
+        lines.push(`${prefix} ${LANG_CHOICES[i]!.label}`);
+      }
+      const out = '\n' + lines.join('\n') + '\n';
+      process.stdout.write(out);
+      lineCount = lines.length + 1; // +1 for the leading \n
+    };
+
+    render();
+
+    readline.emitKeypressEvents(process.stdin);
+    if (process.stdin.isTTY) process.stdin.setRawMode(true);
+
+    const onKeypress = (_str: string, key: readline.Key) => {
+      if (key.name === 'up') {
+        selected = (selected - 1 + LANG_CHOICES.length) % LANG_CHOICES.length;
+        render();
+      } else if (key.name === 'down') {
+        selected = (selected + 1) % LANG_CHOICES.length;
+        render();
+      } else if (key.name === 'return') {
+        cleanup();
+        clear();
+        resolve(LANG_CHOICES[selected]!.value);
+      } else if (key.name === 'c' && key.ctrl) {
+        process.exit(0);
+      }
+    };
+
+    const cleanup = () => {
+      process.stdin.removeListener('keypress', onKeypress);
+      if (process.stdin.isTTY) process.stdin.setRawMode(false);
+      rl.close();
+    };
+
+    process.stdin.on('keypress', onKeypress);
+  });
+}
+
 // ── Main ───────────────────────────────────────────────────────────────
 
-function main(): void {
+async function main(): Promise<void> {
   const { tool: toolArg, profile } = parseCliArgs();
 
   printWelcome();
+
+  if (!runPreflight()) {
+    process.exit(1);
+  }
+
+  const lang = await promptLanguage();
 
   // Determine which tools to configure
   const toolIds = toolArg ? [toolArg] : detectTools();
@@ -887,7 +1001,7 @@ function main(): void {
       continue;
     }
 
-    const name = initTool(toolDef, initData, profile, dataDir, !multiTool);
+    const name = initTool(toolDef, initData, profile, lang, dataDir, !multiTool);
     if (name) configuredTools.push(name);
   }
 
@@ -910,33 +1024,31 @@ function main(): void {
   console.log(`  \u{2502}  \u{1F389}  AGPA is ready!                              \u{2502}`);
   console.log(`  \u{2502}                                                 \u{2502}`);
   console.log(`  \u{2502}  ${toolLine.padEnd(47)}\u{2502}`);
+  const langLabel = `Language: ${lang === 'zh' ? '中文' : 'English'}`;
+  console.log(`  \u{2502}  ${langLabel.padEnd(47)}\u{2502}`);
   console.log(`  \u{2502}  Data:    ${dataDir.padEnd(37)}\u{2502}`);
   console.log(`  \u{2502}                                                 \u{2502}`);
-  console.log(`  \u{2502}  \u{2500}\u{2500}\u{2500} What\u{2019}s next \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500} \u{2502}`);
+  console.log(`  \u{2502}  \u{26A0}\u{FE0F}  Restart your AI tool to activate            \u{2502}`);
+  console.log(`  \u{2502}     Achievements won\u{2019}t track until you do       \u{2502}`);
   console.log(`  \u{2502}                                                 \u{2502}`);
-  console.log(`  \u{2502}  1\u{FE0F}\u{20E3}  Run:  agpa verify                              \u{2502}`);
-  console.log(`  \u{2502}     Confirm everything works (takes 2 seconds)  \u{2502}`);
-  console.log(`  \u{2502}                                                 \u{2502}`);
-  console.log(`  \u{2502}  2\u{FE0F}\u{20E3}  Start your AI tool and chat normally            \u{2502}`);
-  console.log(`  \u{2502}     Achievements unlock automatically            \u{2502}`);
-  console.log(`  \u{2502}                                                 \u{2502}`);
-  console.log(`  \u{2502}  3\u{FE0F}\u{20E3}  Run:  agpa dashboard                          \u{2502}`);
-  console.log(`  \u{2502}     Browse achievements at localhost:3867        \u{2502}`);
-  console.log(`  \u{2502}                                                 \u{2502}`);
+  console.log(`  \u{2502}  After restart:                                  \u{2502}`);
+  console.log(`  \u{2502}    agpa verify        quick health check          \u{2502}`);
   if (commandsInstalled) {
-    console.log(`  \u{2502}  4\u{FE0F}\u{20E3}  Type /achievements in Claude Code                \u{2502}`);
-    console.log(`  \u{2502}     View progress & unlock hints in chat          \u{2502}`);
-    console.log(`  \u{2502}                                                 \u{2502}`);
+    console.log(`  \u{2502}    /achievements      view progress in chat       \u{2502}`);
   }
+  console.log(`  \u{2502}    agpa dashboard     browse all 160 achievements \u{2502}`);
+  console.log(`  \u{2502}                                                 \u{2502}`);
   if (jsonCompiled) {
     console.log(`  \u{2502}  \u{1F4E6} 160 achievements compiled — /achievements ready  \u{2502}`);
     console.log(`  \u{2502}                                                 \u{2502}`);
   }
-  console.log(`  \u{2502}  \u{1F4A1} Your first achievement ("first_contact")  \u{2502}`);
-  console.log(`  \u{2502}     unlocks the moment you send your first       \u{2502}`);
-  console.log(`  \u{2502}     message to your AI tool!                    \u{2502}`);
+  console.log(`  \u{2502}  \u{1F4A1} Your first achievement unlocks the moment    \u{2502}`);
+  console.log(`  \u{2502}     you send your first message!                  \u{2502}`);
   console.log(`  \u{2502}                                                 \u{2502}`);
   console.log(`  \u{2514}${'\u{2500}'.repeat(W)}\u{2518}`);
 }
 
-main();
+main().catch((err: unknown) => {
+  console.error((err instanceof Error ? err.message : String(err)));
+  process.exit(1);
+});

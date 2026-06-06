@@ -23,7 +23,7 @@
  *   TaskCompleted      → task.complete   { task_id, duration_ms }
  *   PostCompact        → context.compacted
  *   SubagentStart      → agent.spawn     { agent_type }
- *   SubagentStop       → (no event emitted)
+ *   SubagentStop       → agent.end        { agent_type }
  *   SessionStart       → session.start   { source }
  *   SessionEnd         → session.end     { reason }
  *
@@ -204,6 +204,7 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
       results.push({ event_type: 'agent.spawn', payload: { ...base } });
       break;
     case 'SubagentStop':
+      results.push({ event_type: 'agent.end', payload: { ...base } });
       break;
     case 'SessionStart':
       results.push({ event_type: 'session.start', payload: { ...base } });
@@ -278,9 +279,17 @@ export function parseTranscriptJsonl(filePath: string): TranscriptStats | null {
     let firstTimestamp = '';
     let lastTimestamp = '';
 
+    // Format validation counters
+    let validJsonCount = 0;
+    let parseErrorCount = 0;
+    let hasTypeField = false;
+    let hasUsageField = false;
+    let hasTimestamp = false;
+
     for (const line of lines) {
       try {
         const entry = JSON.parse(line);
+        validJsonCount++;
 
         if (!firstTimestamp) firstTimestamp = entry.timestamp;
         lastTimestamp = entry.timestamp;
@@ -288,14 +297,42 @@ export function parseTranscriptJsonl(filePath: string): TranscriptStats | null {
         if (entry.type === 'user') userMsgCount++;
 
         if (entry.usage) {
+          hasUsageField = true;
           inputTokens += entry.usage.input_tokens || 0;
           outputTokens += entry.usage.output_tokens || 0;
           cacheReadTokens += entry.usage.cache_read_input_tokens || 0;
           cacheCreationTokens += entry.usage.cache_creation_input_tokens || 0;
         }
+
+        // Track field presence on first valid entry
+        if (validJsonCount === 1) {
+          hasTypeField = !!entry.type;
+          hasTimestamp = !!entry.timestamp;
+        }
       } catch {
-        // Skip malformed lines
+        parseErrorCount++;
       }
+    }
+
+    // ═══ Format structure check ═══
+    // If nothing parsed, warn: file may not be JSONL at all
+    if (validJsonCount === 0) {
+      process.stderr.write(`[AGPA] ⚠ JSONL format warning: "${path.basename(filePath)}" — 0/${lines.length} lines parsed as JSON. CC log format may have changed.\n`);
+      return null;
+    }
+
+    // If expected fields are missing, warn: structure likely changed
+    const formatHints: string[] = [];
+    if (!hasTypeField) formatHints.push('missing "type" field');
+    if (!hasTimestamp) formatHints.push('missing "timestamp"');
+    if (!hasUsageField && validJsonCount > 3) {
+      formatHints.push('no "usage" object found in any entry');
+    }
+    if (parseErrorCount > lines.length * 0.2) {
+      formatHints.push(`${parseErrorCount}/${lines.length} lines unparseable`);
+    }
+    if (formatHints.length > 0) {
+      process.stderr.write(`[AGPA] ⚠ JSONL format warning: "${path.basename(filePath)}" — ${formatHints.join(', ')}. CC log format may have changed.\n`);
     }
 
     const totalTokens = inputTokens + outputTokens + cacheReadTokens + cacheCreationTokens;

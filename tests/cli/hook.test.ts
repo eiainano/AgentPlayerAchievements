@@ -119,10 +119,12 @@ describe('mapEvents', () => {
       expect(results[0]!.payload.agent_type).toBe('explore');
     });
 
-    it('SubagentStop emits nothing', () => {
-      const data = { hook_event_name: 'SubagentStop' };
+    it('SubagentStop emits agent.end', () => {
+      const data = { hook_event_name: 'SubagentStop', agent_type: 'explore' };
       const results = mapEvents('SubagentStop', data);
-      expect(results).toHaveLength(0);
+      expect(results).toHaveLength(1);
+      expect(results[0]!.event_type).toBe('agent.end');
+      expect(results[0]!.payload.agent_type).toBe('explore');
     });
   });
 

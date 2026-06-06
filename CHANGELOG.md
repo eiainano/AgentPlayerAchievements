@@ -12,6 +12,12 @@
 - `agpa web` — `dashboard` 别名，更直觉
 - CLI 从 16 命令扩展至 19 命令，5 个新模块（config.ts/search.ts/showcase.ts/suggest.ts + profile switch），tsc 零错误，514 测试全绿
 
+### suggest 过滤修复 + 安全加固 — 2026-06-06
+
+- `progress-nudge.ts` 忽略 `filter` 字段导致 `agpa suggest` 过度计算（seeker 显示 8350%），新增 `scopedEvents()` 统一合并 window/event/filter 三层过滤，所有 5 个进度计算函数全部修正
+- `matchFilter` 抛异常时 fail-open（return true）→ fail-closed（return false），防止畸形 filter 导致误计数
+- `matchFilter` 改为 `export` 供 progress-nudge 复用，去掉重复的 try-catch 包装
+
 ### Kilo Code / OpenCode 双通道 + 交互式安装 — 2026-06-06
 
 - Kilo Code / OpenCode auto-track：`hook.ts` 新增 `kilocode-auto` 模式、`KILOCODE_EVENT_MAP`、`KILOCODE_TOOL_MAP`、`normalizeKilocodeStdin()`，`init.ts` 生成 `Bun.spawn` TS 插件，监听 32+ 事件

@@ -2,13 +2,13 @@
 
 ## [0.1.6] — 2026-06-06
 
-### AGPA Logo 像素画 — 2026-06-07
+### AGPA Logo 像素画 + README 双语改版 — 2026-06-07
 
 - 128×128 像素画 logo：屏幕上 `>_`（绿色） + 思考云（蓝白色）通过数据线连接 PS4 DS4 手柄（PS4 官方按键配色）
 - 暗色版（深蓝 #0a0e17 背景）和亮色版（白色背景）双主题
 - Dashboard 集成：favicon（32px）、导航栏 logo（24px，主题自动切换）、分享卡片底部水印
-- README.md 顶部 logo banner，暗/亮主题自适应
-- 生成脚本 `scripts/generate-logo.ts`（Gemini 3.1 Flash Image）
+- README 双语改版：全新结构（Logo hero、Badges、快速开始、工作原理、功能特性、Dashboard、架构图、FAQ），新增 `README.zh-CN.md` 中文版
+- 参考 `modelcontextprotocol/servers`、Continue.dev、`anthropic-quickstarts` 等热门 MCP 项目 README 结构
 - 设计文档：`docs/superpowers/specs/2026-06-07-agpa-logo-design.md`
 - `.gitignore` 添加 logo PNG 例外规则
 

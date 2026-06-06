@@ -6,13 +6,17 @@
   <meta name="dev-token" content="__DEV_TOKEN__">
   <title>AGPA — Achievements Dashboard</title>
   <link rel="stylesheet" href="/styles.css">
+  <link rel="icon" type="image/png" href="/favicon.png">
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
 <body>
   <!-- Navigation -->
   <nav id="top-nav">
     <div class="nav-inner">
-      <span class="nav-brand">🎮 AGPA</span>
+      <span class="nav-brand">
+        <img src="/agpa-logo-dark-24.png" alt="" class="nav-logo" id="nav-logo">
+        <span class="nav-brand-text">AGPA</span>
+      </span>
       <!-- Profile selector -->
       <div class="profile-selector">
         <button class="profile-btn" id="profile-btn" onclick="toggleProfileDropdown()">

@@ -1,5 +1,11 @@
 # Agent Player Achievements (AGPA)
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="pixel-art-output/agpa-logo-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="pixel-art-output/agpa-logo-light.png">
+  <img alt="AGPA Logo" src="pixel-art-output/agpa-logo-dark.png" width="192">
+</picture>
+
 给 AI coding Agent 的成就系统。支持 Claude Code、Kilo Code、OpenCode、Hermes Agent、OpenClaw。
 
 当你等 AI 输出时，不妨看看成就面板？

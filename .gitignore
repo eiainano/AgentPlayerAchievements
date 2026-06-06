@@ -26,3 +26,6 @@ research/
 .playwright-mcp/
 *.png
 !src/dashboard/public/tool-logos/*.png
+!pixel-art-output/agpa-logo-*.png
+!src/dashboard/public/agpa-logo-*.png
+!src/dashboard/public/favicon.png

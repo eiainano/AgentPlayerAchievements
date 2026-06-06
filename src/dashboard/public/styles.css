@@ -301,6 +301,15 @@ body {
 }
 
 .nav-brand {
+  display: flex; align-items: center;
+  gap: 8px;
+}
+.nav-logo {
+  width: 24px; height: 24px;
+  image-rendering: pixelated;
+  display: block;
+}
+.nav-brand-text {
   font-size: 17px; font-weight: 700;
   letter-spacing: -.3px;
   background: linear-gradient(135deg, var(--text), var(--gold));
@@ -2434,6 +2443,11 @@ body {
   display: flex; align-items: center; justify-content: center;
   gap: 6px;
   font-size: 10px; color: #555;
+}
+.card-footer-logo {
+  width: 18px; height: 18px;
+  image-rendering: pixelated;
+  vertical-align: middle;
 }
 
 /* ── Card: Light theme overrides ─────────────────── */

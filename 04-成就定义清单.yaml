@@ -2421,6 +2421,23 @@ definitions:
         operator: ">="
         value: 337
         window: all
+  - id: meltdown
+    name: Meltdown
+    name_cn: 熔断
+    description: 5 tool failures in a single session. Someone's having a rough day.
+    description_cn: 单 session 中 5 次工具失败。今天诸事不顺。
+    icon: 💥
+    category: hidden
+    rarity: uncommon
+    hidden: true
+    hint: When tools fail repeatedly, step back and reassess
+    hint_cn: 工具接连失败时，退一步重新评估
+    conditions:
+      - type: counter
+        event: tool.failure
+        window: single_session
+        operator: ">="
+        value: 5
   - id: silent_night
     name: Silent Night
     name_cn: 静夜思
@@ -2603,6 +2620,25 @@ definitions:
         window: same_session
         operator: ">="
         value: 3
+  - id: in_the_zone
+    name: In the Zone
+    name_cn: 心流状态
+    description: Completed 5+ tasks in a single session. When you're in the zone,
+      you're unstoppable.
+    description_cn: 单 session 里完成了 5+ 个 task。进入状态的人，势不可挡。
+    icon: 🌪️
+    category: challenge
+    rarity: rare
+    hidden: false
+    challenge: true
+    hint: Complete multiple tasks in one sitting — momentum is everything
+    hint_cn: 一口气完成多个 task——势头就是一切
+    conditions:
+      - type: counter
+        event: task.complete
+        window: single_session
+        operator: ">="
+        value: 5
   - id: trophy_case
     name: Trophy Case
     name_cn: 奖杯柜
@@ -2709,6 +2745,26 @@ definitions:
         event: achievement.unlocked
         operator: ">="
         value: 20
+        window: all
+  - id: achievement_hunter
+    name: Achievement Hunter
+    name_cn: 成就猎人
+    description: Unlocked 50 achievements. Not just collecting — you've become a
+      hunter.
+    description_cn: 解锁了 50 个成就。不是收集而已——你已成猎人。
+    icon: 🎯
+    category: community
+    rarity: rare
+    hidden: false
+    hint: Keep unlocking achievements — there's always more to discover
+    hint_cn: 继续解锁成就——永远有新的等着你
+    set: completionist
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: achievement.unlocked
+        operator: ">="
+        value: 50
         window: all
   - id: pipemaster
     name: Pipemaster
@@ -2877,6 +2933,23 @@ definitions:
         operator: ">="
         value: 30
         window: all
+  - id: scribe
+    name: Scribe
+    name_cn: 笔耕不辍
+    description: Wrote 50 files from scratch. Words become code, code becomes files.
+    description_cn: 从零写了 50 个文件。文字变代码，代码变文件。
+    icon: ✍️
+    category: tool_mastery
+    rarity: common
+    hidden: false
+    hint: Ask Claude to create new files — each one starts with a blank page
+    hint_cn: 让 Claude 从零创建新文件——每一页都从空白开始
+    conditions:
+      - type: counter
+        event: file.write
+        operator: ">="
+        value: 50
+        window: all
   - id: delegator
     name: Delegator
     name_cn: 放权大师
@@ -2930,6 +3003,24 @@ definitions:
         operator: ==
         value: 6
     set: agent_commander
+  - id: shipper
+    name: Ship It
+    name_cn: 一键发货
+    description: 10 git pushes. Ship early, ship often.
+    description_cn: 10 次 git 推送。早发多发。
+    icon: 🚢
+    category: workflow
+    rarity: common
+    hidden: false
+    hint: Push your commits regularly — code not shipped is just a dream
+    hint_cn: 记得推送你的 commit——不推上去的代码只是白日梦
+    set: git_flow
+    conditions:
+      - type: counter
+        event: git.push
+        operator: ">="
+        value: 10
+        window: all
 sets:
   the_beginning:
     name: The Beginning

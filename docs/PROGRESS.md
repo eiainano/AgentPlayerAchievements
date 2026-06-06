@@ -1,12 +1,16 @@
 # AGPA 开发进度
 
-> 最后更新: 2026-06-06
+> 最后更新: 2026-06-07
 
 ## 总体状态
 
-v0.1.6 完成。19 个 CLI 命令，5 个 Agent 双通道覆盖，166 个成就，514 个测试全绿（23 文件）。
+v0.1.6 完成。19 个 CLI 命令，5 个 Agent 双通道覆盖，171 个成就，519 个测试全绿（24 文件）。
 
-**本次新增 (2026-06-06):**
+**本次新增 (2026-06-07):**
+- 5 新成就：Scribe(笔耕不辍, file.write×50)、Ship It(一键发货, git.push×10)、In the Zone(心流状态, task×5/session)、Meltdown(熔断, tool.failure×5/session)、Achievement Hunter(成就猎人, unlock×50)
+- 全部基于 hook 自动写入的真实事件，零手动 track 依赖
+
+**之前新增 (2026-06-06):**
 - Kilo Code / OpenCode auto-track 双通道：`hook.ts` 新增 `kilocode-auto` 模式 + 翻译层，`init.ts` 生成 `Bun.spawn` TS 插件
 - 交互式安装流程：语言 → profile 创建 → 多选工具（↑↓ Space Enter）
 - `agpa profile tools [name]`：交互式管理每个 profile 跟踪的 Agent 软件

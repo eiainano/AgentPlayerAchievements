@@ -1,6 +1,19 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-06 | 总成就数: 166 | 条件类型: 11 | Tests: 514 ✅ | 0 不可达 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | 终端 ANSI 弹窗 + 进度感知 + 分享卡片 + 交互式安装
+> 最后更新: 2026-06-07 | 总成就数: 171 | 条件类型: 11 | Tests: 519 ✅ | 0 不可达 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | 终端 ANSI 弹窗 + 进度感知 + 分享卡片 + 交互式安装 | CLI 19 命令 ✅
+
+---
+
+## 🆕 本次新增 — 5 新成就 (v0.1.6, 6/7)
+
+基于事件利用率分析，选择 5 个 hook 自动写入但无成就覆盖的真实事件：
+
+- **tool_mastery** — `scribe` (Scribe/笔耕不辍)，file.write×50，Common
+- **workflow** — `shipper` (Ship It/一键发货)，git.push×10，Common，set: git_flow
+- **challenge** — `in_the_zone` (In the Zone/心流状态)，task.complete×5/single_session，Rare
+- **hidden** — `meltdown` (Meltdown/熔断)，tool.failure×5/single_session，Uncommon
+- **community** — `achievement_hunter` (Achievement Hunter/成就猎人)，achievement.unlocked×50，Rare，set: completionist
+- 测试自动覆盖 +5，171 成就/519 测试/24 文件全绿
 
 ---
 
@@ -127,10 +140,10 @@ Dashboard 新增 📸 Share 按钮，生成 Steam 风格成就卡片 PNG：
 
 ## P3 — YAML 质量 / 资产
 
-- [x] **Hidden 分类** — 约 35 个（166 个总成就中约 21%）。41→21→35（经过一次重归类又部分回退）。剩余 35 个全是真彩蛋。
-- [ ] **手动 review 全部 160 条 pixelArtDesc** — `docs/pixel-art-ideas.md` 中每个成就的像素画描述，逐条审阅和修改。改完后重跑 `npx tsx scripts/generate-pixel-art.ts` 即可用最新描述生图。
-- [ ] **像素画 icon 资产暂缺** — `scripts/generate-pixel-art.ts` 已就绪（Gemini 3.1 Nano Banana 2），`docs/pixel-art-ideas.md` 已含 160 条描述。下一步：review 描述 → 生成全部 160 张 → 选 The Beginning（14 个）做 Dashboard icon 试点。方案：32×32 pixel art PNG → `public/icons/` → YAML `icon: { src, alt }` → Dashboard `iconHtml()` 渲染。emoji 和 pixel art 并存，渐进替换。
-- [x] **Set 名称只有英文** — 9→10 个 set，全部添加 `name_cn`，套装页中英双语切换。Set 系统重构：合并散装 set，扩充合理 set。`git_flow`（7→9）、`agent_commander`（5→7）、`creators_forge`（5→6）、`polar_night`（2→3）。59/160 有归属。
+- [x] **Hidden 分类** — 约 35 个（171 个总成就中约 20%）。41→21→35（经过一次重归类又部分回退）。剩余 35 个全是真彩蛋。
+- [ ] **手动 review 全部 171 条 pixelArtDesc** — `docs/pixel-art-ideas.md` 中每个成就的像素画描述，逐条审阅和修改。改完后重跑 `npx tsx scripts/generate-pixel-art.ts` 即可用最新描述生图。
+- [ ] **像素画 icon 资产暂缺** — `scripts/generate-pixel-art.ts` 已就绪（Gemini 3.1 Nano Banana 2），`docs/pixel-art-ideas.md` 已含 171 条描述（含新 5 条待加）。下一步：review 描述 → 生成全部 171 张 → 选 The Beginning（14 个）做 Dashboard icon 试点。方案：32×32 pixel art PNG → `public/icons/` → YAML `icon: { src, alt }` → Dashboard `iconHtml()` 渲染。emoji 和 pixel art 并存，渐进替换。
+- [x] **Set 名称只有英文** — 9→10 个 set，全部添加 `name_cn`，套装页中英双语切换。Set 系统重构：合并散装 set，扩充合理 set。`git_flow`（7→9）、`agent_commander`（5→7）、`creators_forge`（5→6）、`polar_night`（2→3）。59/171 有归属。
 
 ---
 

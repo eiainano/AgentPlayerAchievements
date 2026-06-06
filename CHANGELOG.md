@@ -2,6 +2,16 @@
 
 ## [0.1.6] — 2026-06-06
 
+### 5 新成就：基于真实事件填充 — 2026-06-07
+
+- `scribe` — Scribe / 笔耕不辍，file.write×50，Common tool_mastery
+- `shipper` — Ship It / 一键发货，git.push×10，Common workflow (set: git_flow)
+- `in_the_zone` — In the Zone / 心流状态，task.complete×5/single_session，Rare challenge
+- `meltdown` — Meltdown / 熔断，tool.failure×5/single_session，Uncommon hidden
+- `achievement_hunter` — Achievement Hunter / 成就猎人，achievement.unlocked×50，Rare community (set: completionist)
+- 全部基于 hook 自动写入的真实事件（tool.requested/file.write/git.push/tool.failure/task.complete），零手动 track
+- 测试 514→519（+5 自动覆盖），171 成就/24 文件全绿
+
 ### CLI 扩展：6 新命令 — 2026-06-06
 
 - `agpa config` — 通用配置中心：查看/修改 lang、sound、profile、debug 等设置

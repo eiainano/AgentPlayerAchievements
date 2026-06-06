@@ -1,6 +1,6 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-07 | 总成就数: 171 | 条件类型: 11 | Tests: 519 ✅ | 0 不可达 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | 终端 ANSI 弹窗 + 进度感知 + 分享卡片 + 交互式安装 | CLI 19 命令 ✅
+> 最后更新: 2026-06-07 | 总成就数: 171 | 条件类型: 11 | Tests: 519 ✅ | 0 不可达 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | Logo 像素画 + Dashboard 集成 ✅ | CLI 19 命令 ✅
 
 ---
 

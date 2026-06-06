@@ -7,6 +7,8 @@
 v0.1.6 完成。19 个 CLI 命令，5 个 Agent 双通道覆盖，171 个成就，519 个测试全绿（24 文件）。
 
 **本次新增 (2026-06-07):**
+- AGPA Logo 像素画：128×128，`>_` 绿色 + 思考云蓝白色 + DS4 手柄，暗/亮双主题
+- Dashboard favicon、导航栏 logo（主题自适应）、分享卡片水印、README banner 全部落地
 - 5 新成就：Scribe(笔耕不辍, file.write×50)、Ship It(一键发货, git.push×10)、In the Zone(心流状态, task×5/session)、Meltdown(熔断, tool.failure×5/session)、Achievement Hunter(成就猎人, unlock×50)
 - 全部基于 hook 自动写入的真实事件，零手动 track 依赖
 

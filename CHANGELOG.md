@@ -2,7 +2,15 @@
 
 ## [0.1.6] — 2026-06-06
 
-### Gacha Reveal 抽卡动画 — 2026-06-07
+### Timeline 里程碑 + Insights 趋势看板 — 2026-06-07/08
+
+- **Timeline 重写**：同日合并显示（"同一天"标签）+ 里程碑卡片（第10/50/100个成就、首个 Mythic、套装集齐），橙色渐变背景+左边框醒目样式，中英双语
+- **Insights Tab**：3 个 Canvas 2D 折线图（每日 Session / Tool / Task 30天趋势）+ 24h×7d 编码活跃热力图，hover 显示日期+数值 tooltip，10 秒自动轮询刷新
+- **后端**：DailyBucket +`tasks_completed`（可选，向后兼容），API 暴露 `daily_stats[]` 数组，zod schema 同步
+- **CSS**：milestone 卡片、多成就分组、insights 2列网格、热力图图例、响应式 (@800px)
+- 测试 550/550，tsc clean，22 文件全绿
+
+### 系统可触发审计 & 全量修复：不可达成就 8→0 — 2026-06-07
 
 - **替换纯文字 Toast**：新增 `gacha-reveal.js`（439 行），6 级稀有度渐进式翻牌解锁动画系统
 - **6 级动画矩阵**：
@@ -59,22 +67,6 @@
 
 套装变更：新增 `linguist`（9 成员，Polyglot 称号），`endurance` 5→7
 测试：519→549（+30），26 文件全绿，tsc 零错误
-
-### 系统可触发审计 & 全量修复：不可达成就 8→0 — 2026-06-07
-
-全链路审计（YAML → hook.ts → AGENTS.md → evaluator → test）发现 8 个成就因事件无法被 hook/engine 产生而在生产中不可达。全部修复：
-
-- **hook.ts PostToolUseFailure → error.occurred**（修复 error_resilient）
-- **hook.ts Bash rm/unlink → file.delete**（修复 file_purger）
-- **hook.ts Read 图像文件 → image.read + image.upload**（修复 visual_prompt/image_whisperer/multi_image_day）
-- **hook.ts TaskCreate/TaskUpdate tool → task.create/task.update**（修复 task_creator/task_updater）
-- **engine.ts DeepSeek 模型检测 → deepseek.conversation**，per-session dedup（修复 deepseek_dabbler）
-- **YAML its_learning**：role agent→assistant + pattern humor_detected→真实可匹配内容
-- **dashboard.opened** 已有 auto-track（dashboard server L153），仅文档补全
-- AGENTS.md 同步所有事件 auto/manual 状态
-- issues-todo.md 0 不可达验证通过，完整修复记录
-- 测试 519→525（+6：image read、task create/update、deepseek ×2、failure 双事件）
-- 设计模式：Hook cascade（1 hook → N engine events）+ Engine state-aware emission
 
 ### 5 新成就：基于真实事件填充 — 2026-06-07
 

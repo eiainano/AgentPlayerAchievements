@@ -1,6 +1,20 @@
 # Changelog
 
-## [0.1.6] — 2026-06-06
+## [0.1.6] — 2026-06-08
+
+### Dashboard UX 打磨 — 2026-06-08
+
+- **Error Boundary**：`renderSafe()` 包裹全部 10 个 render 函数，任意渲染崩溃不白屏，顶部红色 banner 显示错误详情可关闭
+- **Canvas Retina**：`setupRetinaCanvas()` 统一适配 4 张 Insights 图表，2×/3× 屏幕线条文字不再模糊
+- **热力图**：色谱 GitHub 绿→蓝青，与 Dashboard 主色调统一，图例从底部横排改为右侧竖排节省空间，tooltip 从上方改为下方避免滚动容器截断
+- **Showcase 卡片化**：橱柜从独立 1×6 行移入 hero-cards-row，2×3 网格 + icon-only 槽位，Auto/重播按钮在标题栏内联
+- **Streak 卡片重设计**：左侧当前连胜（🔥+大数字金色渐变）+ 居中竖线分割 + 右侧历史最高（📅+Best），右上角 Today pill 绝对定位
+- **统计行扩展**：取消 XP 进度条，新增 Level、XP、Events 三项统计（Unlocked + Complete 保持不变）
+- **Hero 标题**：`Agent Achievements` → `Agent Player Achievements` / `Agent 玩家成就`
+- **Hero 宽度**：`max-width: 960px` → `1160px`，与下方成就区对齐
+- **Gacha 重播**：解锁成就详情 Modal 右下角新增 🎴 Replay 按钮，重播动画后卡片不自动消失，需用户点击或按键关闭
+- **安全**：Modal replay 按钮 inline onclick → `data-ach-id` + 委托事件监听
+- 测试 550/550，tsc 零错误，4 文件
 
 ### Timeline 里程碑 + Insights 趋势看板 — 2026-06-07/08
 

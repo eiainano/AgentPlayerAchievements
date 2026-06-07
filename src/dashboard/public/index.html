@@ -42,6 +42,7 @@
         <a href="#achievements" class="nav-link" data-section="achievements" data-i18n="nav_achievements">Achievements</a>
         <a href="#sets" class="nav-link" data-section="sets" data-i18n="nav_sets">Sets</a>
         <a href="#timeline" class="nav-link" data-section="timeline" data-i18n="nav_timeline">Timeline</a>
+        <a href="#insights" class="nav-link" data-section="insights" data-i18n="nav_insights">Insights</a>
       </div>
       <div class="nav-controls">
         <label class="switch" title="Language">
@@ -205,6 +206,39 @@
     <div class="timeline" id="timeline-list"></div>
   </section>
 
+  <!-- Insights -->
+  <section id="insights" class="section">
+    <div class="section-header">
+      <h2 data-i18n="section_insights">Insights</h2>
+    </div>
+    <div class="insights-grid">
+      <div class="insight-card">
+        <h3 class="insight-title" data-i18n="insight_sessions">Daily Sessions</h3>
+        <canvas class="insight-canvas" id="chart-sessions" width="560" height="160"></canvas>
+      </div>
+      <div class="insight-card">
+        <h3 class="insight-title" data-i18n="insight_tools">Daily Tool Calls</h3>
+        <canvas class="insight-canvas" id="chart-tools" width="560" height="160"></canvas>
+      </div>
+      <div class="insight-card">
+        <h3 class="insight-title" data-i18n="insight_tasks">Daily Tasks</h3>
+        <canvas class="insight-canvas" id="chart-tasks" width="560" height="160"></canvas>
+      </div>
+      <div class="insight-card insight-heatmap-card">
+        <h3 class="insight-title" data-i18n="insight_heatmap">Coding Hours</h3>
+        <canvas class="insight-canvas" id="chart-heatmap" width="560" height="200"></canvas>
+        <div class="heatmap-legend">
+          <span data-i18n="heatmap_less">Less</span>
+          <div class="heatmap-legend-swatch l1"></div>
+          <div class="heatmap-legend-swatch l2"></div>
+          <div class="heatmap-legend-swatch l3"></div>
+          <div class="heatmap-legend-swatch l4"></div>
+          <span data-i18n="heatmap_more">More</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Toast container -->
   <div id="toast-container"></div>
 
@@ -236,7 +270,7 @@
   </div>
 
   <script src="/gacha-reveal.js"></script>
-  <script src="/app.js"></script>
+  <script src="/app.js?v=0.1.6"></script>
   <div id="card-preview"></div>
 </body>
 </html>

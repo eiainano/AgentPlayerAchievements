@@ -256,6 +256,18 @@ describe('aggregateDaily', () => {
     expect(result[today]!.unique_tools).toBe(1);
   });
 
+  it('counts task.complete events', () => {
+    const today = new Date().toISOString().slice(0, 10);
+    const events: TrackedEvent[] = [
+      makeEvent('task.complete', 'cc', { timestamp: `${today}T10:00:00.000Z` }),
+      makeEvent('task.complete', 'cc', { timestamp: `${today}T10:30:00.000Z` }),
+      makeEvent('task.complete', 'cc', { timestamp: `${today}T11:00:00.000Z` }),
+    ];
+
+    const result = aggregateDaily(events);
+    expect(result[today]!.tasks_completed).toBe(3);
+  });
+
   it('accumulates duration_secs from tool.complete', () => {
     const today = new Date().toISOString().slice(0, 10);
     const events: TrackedEvent[] = [
@@ -276,20 +288,21 @@ describe('aggregateDaily', () => {
 
 describe('mergeDaily', () => {
   it('merges two disjoint daily records', () => {
-    const a = { '2026-06-01': { tool_calls: 5, sessions: 2, user_msgs: 10, tokens: 1000, unique_tools: 3, duration_secs: 60, tools_used: ['Read', 'Write'] } };
-    const b = { '2026-06-02': { tool_calls: 3, sessions: 1, user_msgs: 5, tokens: 500, unique_tools: 2, duration_secs: 30, tools_used: ['Read'] } };
+    const a = { '2026-06-01': { tool_calls: 5, sessions: 2, tasks_completed: 3, user_msgs: 10, tokens: 1000, unique_tools: 3, duration_secs: 60, tools_used: ['Read', 'Write'] } };
+    const b = { '2026-06-02': { tool_calls: 3, sessions: 1, tasks_completed: 1, user_msgs: 5, tokens: 500, unique_tools: 2, duration_secs: 30, tools_used: ['Read'] } };
 
     const result = mergeDaily(a, b);
     expect(Object.keys(result).length).toBe(2);
   });
 
   it('merges same-date buckets with union of tools', () => {
-    const a = { '2026-06-01': { tool_calls: 5, sessions: 2, user_msgs: 10, tokens: 1000, unique_tools: 2, duration_secs: 60, tools_used: ['Read', 'Write'] } };
-    const b = { '2026-06-01': { tool_calls: 3, sessions: 1, user_msgs: 5, tokens: 500, unique_tools: 2, duration_secs: 30, tools_used: ['Read', 'Edit'] } };
+    const a = { '2026-06-01': { tool_calls: 5, sessions: 2, tasks_completed: 3, user_msgs: 10, tokens: 1000, unique_tools: 2, duration_secs: 60, tools_used: ['Read', 'Write'] } };
+    const b = { '2026-06-01': { tool_calls: 3, sessions: 1, tasks_completed: 1, user_msgs: 5, tokens: 500, unique_tools: 2, duration_secs: 30, tools_used: ['Read', 'Edit'] } };
 
     const result = mergeDaily(a, b);
     expect(result['2026-06-01']!.tool_calls).toBe(8);
     expect(result['2026-06-01']!.sessions).toBe(3);
+    expect(result['2026-06-01']!.tasks_completed).toBe(4);
     expect(result['2026-06-01']!.user_msgs).toBe(15);
     expect(result['2026-06-01']!.tokens).toBe(1500);
     expect(result['2026-06-01']!.unique_tools).toBe(3); // Read, Write, Edit

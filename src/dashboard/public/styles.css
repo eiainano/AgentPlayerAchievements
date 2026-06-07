@@ -1375,6 +1375,59 @@ body {
 .timeline-entry .tl-icon { font-size: 18px; }
 .timeline-entry .tl-name { font-size: 14px; font-weight: 500; letter-spacing: -.1px; }
 
+/* timeline: multi-achievement groups */
+.tl-items { display: flex; flex-direction: column; gap: 3px; }
+.tl-group-multi { padding: 14px 0 10px 22px; }
+.tl-ach-row { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
+.tl-sameday {
+  font-size: 10px; color: var(--text-dim); font-style: italic;
+  margin-top: 3px; padding-left: 26px;
+}
+.tl-milestone {
+  margin-top: 8px; padding: 6px 12px;
+  background: linear-gradient(135deg, rgba(255,183,77,.15), rgba(255,183,77,.05));
+  border-left: 3px solid #ffb74d;
+  border-radius: 0 8px 8px 0;
+  font-size: 12px; font-weight: 600; color: #ffb74d;
+}
+
+/* ── Insights ───────────────────────────────────────── */
+.insights-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.insight-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+.insight-card:last-child { grid-column: 1 / -1; }
+.insight-title {
+  font-size: 13px; font-weight: 600; color: var(--text-dim);
+  margin-bottom: 10px; text-transform: uppercase; letter-spacing: .5px;
+}
+.insight-canvas { width: 100%; height: auto; border-radius: 8px; }
+.insight-empty {
+  padding: 40px 20px; text-align: center;
+  color: var(--text-dim); font-size: 14px;
+}
+.heatmap-legend {
+  display: flex; align-items: center; justify-content: center;
+  gap: 5px; margin-top: 8px; font-size: 10px; color: var(--text-dim);
+}
+.heatmap-legend-swatch {
+  width: 12px; height: 12px; border-radius: 2px;
+}
+.heatmap-legend-swatch.l1 { background: rgba(79,195,247,.1); }
+.heatmap-legend-swatch.l2 { background: rgba(79,195,247,.25); }
+.heatmap-legend-swatch.l3 { background: rgba(79,195,247,.45); }
+.heatmap-legend-swatch.l4 { background: rgba(79,195,247,.7); }
+@media (max-width: 800px) {
+  .insights-grid { grid-template-columns: 1fr; }
+}
+
 /* ── Toast ─────────────────────────────────────────── */
 #toast-container {
   position: fixed;

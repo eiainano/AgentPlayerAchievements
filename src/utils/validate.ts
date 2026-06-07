@@ -32,6 +32,7 @@ export const dailyBucketSchema = z.object({
   unique_tools: z.number().default(0),
   duration_secs: z.number().default(0),
   tools_used: z.array(z.string()).default([]),
+  tasks_completed: z.number().optional(),
 });
 
 export const agentToolStatsSchema = z.object({

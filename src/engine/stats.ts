@@ -5,6 +5,7 @@ import type { TrackedEvent } from './types.js';
 export interface DailyBucket {
   tool_calls: number;
   sessions: number;
+  tasks_completed?: number;
   user_msgs: number;
   tokens: number;
   unique_tools: number;
@@ -115,9 +116,9 @@ export function aggregateDaily(events: TrackedEvent[]): Record<string, DailyBuck
     const date = e.timestamp.slice(0, 10);
     if (!buckets[date]) {
       buckets[date] = {
-        tool_calls: 0, sessions: 0, user_msgs: 0,
-        tokens: 0, unique_tools: 0, duration_secs: 0,
-        tools_used: [],
+        tool_calls: 0, sessions: 0, tasks_completed: 0,
+        user_msgs: 0, tokens: 0, unique_tools: 0,
+        duration_secs: 0, tools_used: [],
       };
     }
     const b = buckets[date]!;
@@ -140,6 +141,9 @@ export function aggregateDaily(events: TrackedEvent[]): Record<string, DailyBuck
         break;
       case 'token.consumed':
         b.tokens += (e.payload.amount as number) || 0;
+        break;
+      case 'task.complete':
+        b.tasks_completed = (b.tasks_completed ?? 0) + 1;
         break;
     }
   }
@@ -171,6 +175,7 @@ export function mergeDaily(
       merged[date] = {
         tool_calls: e.tool_calls + b.tool_calls,
         sessions: e.sessions + b.sessions,
+        tasks_completed: (e.tasks_completed ?? 0) + (b.tasks_completed ?? 0),
         user_msgs: e.user_msgs + b.user_msgs,
         tokens: e.tokens + b.tokens,
         unique_tools: toolSet.size,

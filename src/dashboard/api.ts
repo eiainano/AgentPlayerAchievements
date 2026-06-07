@@ -56,6 +56,13 @@ export interface SetItem {
 
 export type { StreakData, DayActivity, HeatmapData } from '../utils/activity.js';
 
+export interface DailyStatPoint {
+  date: string;
+  sessions: number;
+  tool_calls: number;
+  tasks_completed: number;
+}
+
 export interface DashboardStats {
   total_achievements: number;
   unlocked: number;
@@ -72,6 +79,7 @@ export interface DashboardStats {
   tool_stats?: AgentToolStats;
   usage_xp: number;
   usage_breakdown?: UsageBreakdown;
+  daily_stats?: Array<{ date: string; sessions: number; tool_calls: number; tasks: number }>;
 }
 
 export interface DashboardData {
@@ -409,6 +417,21 @@ export function buildApiResponse(
     usageBreakdown.usage_xp,
   );
 
+  // Build daily_stats from stats.json cache (30 most recent days)
+  const dailyStats: Array<{ date: string; sessions: number; tool_calls: number; tasks: number }> = [];
+  if (toolStats?.daily) {
+    const dates = Object.keys(toolStats.daily).sort().slice(-30);
+    for (const date of dates) {
+      const b = toolStats.daily[date]!;
+      dailyStats.push({
+        date,
+        sessions: b.sessions,
+        tool_calls: b.tool_calls,
+        tasks: (b as { tasks_completed?: number }).tasks_completed ?? 0,
+      });
+    }
+  }
+
   return {
     achievements,
     stats: {
@@ -431,6 +454,7 @@ export function buildApiResponse(
       tool_stats: toolStats,
       usage_xp: usageBreakdown.usage_xp,
       usage_breakdown: usageBreakdown,
+      daily_stats: dailyStats,
     },
     timeline: buildTimeline(state.unlocked),
     sets: buildSetsResponse(definitions, state, setDefinitions),

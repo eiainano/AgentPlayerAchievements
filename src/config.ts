@@ -22,6 +22,7 @@ export interface AppConfig {
   telemetry_server: string;
   active_profile: string;
   sound_enabled: boolean;
+  simple_animations: boolean;
 }
 
 const DEFAULTS: AppConfig = {
@@ -30,6 +31,7 @@ const DEFAULTS: AppConfig = {
   telemetry_server: '',
   active_profile: 'default',
   sound_enabled: true,
+  simple_animations: false,
 };
 
 /** Read config from file, then override with env vars */
@@ -68,6 +70,10 @@ export function loadConfig(): AppConfig {
     cfg.sound_enabled = process.env.AGPA_SOUND === 'true';
   }
 
+  if (process.env.AGPA_SIMPLE_ANIMATIONS === 'true') {
+    cfg.simple_animations = true;
+  }
+
   return cfg;
 }
 
@@ -95,4 +101,14 @@ export function isSoundEnabled(): boolean {
 /** Toggle sound effects on/off, persisted to config.json */
 export function setSoundEnabled(enabled: boolean): void {
   saveConfig({ sound_enabled: enabled });
+}
+
+/** Check if simplified animations are enabled */
+export function isSimpleAnimations(): boolean {
+  return loadConfig().simple_animations;
+}
+
+/** Toggle simplified animations on/off, persisted to config.json */
+export function setSimpleAnimations(enabled: boolean): void {
+  saveConfig({ simple_animations: enabled });
 }

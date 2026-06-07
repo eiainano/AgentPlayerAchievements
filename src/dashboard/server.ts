@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { AchievementEngine } from '../engine/engine.js';
-import { saveConfig, loadConfig, isSoundEnabled, setSoundEnabled } from '../config.js';
+import { saveConfig, loadConfig, isSoundEnabled, setSoundEnabled, isSimpleAnimations, setSimpleAnimations } from '../config.js';
 import { formatAchievement, RARITY_RANK, loadShowcase, saveShowcase } from '../helpers.js';
 import type { ShowcaseData } from '../helpers.js';
 import { buildApiResponse, buildCardResponse } from './api.js';
@@ -442,6 +442,27 @@ export function createServer(port: number, defaultProfile: string): http.Server 
       setSoundEnabled(body.sound_enabled);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ sound_enabled: body.sound_enabled }));
+      return;
+    }
+
+    // ── GET /api/config/animations — read animation toggle state ─────
+    if (url.pathname === '/api/config/animations' && req.method === 'GET') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ simple_animations: isSimpleAnimations() }));
+      return;
+    }
+
+    // ── POST /api/config/animations — toggle simple animations ─────
+    if (url.pathname === '/api/config/animations' && req.method === 'POST') {
+      const body = await parseJsonBody<{ simple_animations: boolean }>(req);
+      if (!body || typeof body.simple_animations !== 'boolean') {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Missing simple_animations (boolean)' }));
+        return;
+      }
+      setSimpleAnimations(body.simple_animations);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ simple_animations: body.simple_animations }));
       return;
     }
 

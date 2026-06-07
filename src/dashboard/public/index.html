@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="dev-token" content="__DEV_TOKEN__">
-  <title>AGPA — Achievements Dashboard</title>
+  <title>AGPA — Agent Player Achievements</title>
   <link rel="stylesheet" href="/styles.css">
   <link rel="icon" type="image/png" href="/favicon.png">
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
@@ -75,74 +75,75 @@
     </div>
   </nav>
 
+  <!-- Error banner (hidden by default) -->
+  <div id="error-banner" class="error-banner" style="display:none" role="alert">
+    <span class="error-banner-icon">⚠️</span>
+    <span class="error-banner-msg" id="error-banner-msg"></span>
+    <button class="error-banner-close" onclick="dismissErrors()" aria-label="Dismiss">✕</button>
+  </div>
+
   <!-- Profile Hero -->
   <section id="profile" class="section hero-section">
     <div class="hero-inner">
-      <h1 class="hero-title" data-i18n="hero_title">Agent Achievements</h1>
-      <div class="xp-bar-container">
-        <div class="xp-bar" id="xp-bar">
-          <div class="xp-bar-fill" id="xp-bar-fill"></div>
-        </div>
-        <span class="xp-label" id="xp-label">0 / 0 XP</span>
-      </div>
+      <h1 class="hero-title" data-i18n="hero_title">Agent Player Achievements</h1>
       <button id="share-btn" class="share-btn" onclick="generateCard()" data-i18n="share_card">📸 Share</button>
       <!-- Tracked Tools Badges -->
       <div class="tracked-tools-bar" id="tracked-tools-bar"></div>
       <!-- Stats row -->
       <div class="stats-row" id="stats-row"></div>
-      <!-- Streak + Heatmap row -->
+      <!-- Streak + Showcase + Heatmap row -->
       <div class="hero-cards-row">
         <div class="streak-card" id="streak-card">
-          <div class="streak-header">
+          <div class="streak-left">
             <span class="streak-icon">🔥</span>
-            <span class="streak-title" data-i18n="streak_title">Coding Streak</span>
-            <span class="streak-today" id="streak-today"></span>
+            <span class="streak-count" id="streak-current">0</span>
+            <span class="streak-unit" data-i18n="streak_days">days</span>
           </div>
-          <div class="streak-body">
-            <div class="streak-main">
-              <span class="streak-count" id="streak-current">0</span>
-              <span class="streak-unit" data-i18n="streak_days">days</span>
-            </div>
-            <div class="streak-divider"></div>
-            <div class="streak-record">
-              <span class="streak-record-icon">📅</span>
-              <span class="streak-record-value" id="streak-longest">0</span>
-              <span class="streak-record-label" data-i18n="streak_best">Best</span>
-            </div>
+          <div class="streak-vsplit"></div>
+          <div class="streak-right">
+            <span class="streak-best-icon">📅</span>
+            <span class="streak-best-label" data-i18n="streak_best">Best</span>
+            <span class="streak-best-num" id="streak-longest">0</span>
           </div>
+          <span class="streak-today" id="streak-today"></span>
+        </div>
+        <div class="showcase-card" id="showcase-card">
+          <div class="showcase-card-header">
+            <span class="showcase-card-icon">🏆</span>
+            <span class="showcase-card-title" data-i18n="showcase_title">Showcase</span>
+            <span class="showcase-card-sub" data-i18n="showcase_sub">Pick your 6 best</span>
+            <span class="showcase-card-header-spacer"></span>
+            <span id="pick-banner" class="pick-banner-inline" style="display:none">
+              <span class="pick-banner-text"></span>
+              <button class="pick-cancel-btn" onclick="cancelPick()" data-i18n="pick_cancel">✕ Cancel</button>
+            </span>
+            <button id="showcase-auto" class="showcase-auto-btn" onclick="autoFillShowcase()" title="Auto-fill with rarest">⚡</button>
+          </div>
+          <div class="showcase-grid" id="showcase"></div>
         </div>
         <div class="heatmap-card" id="heatmap-card">
           <div class="heatmap-header">
             <span class="heatmap-icon">📊</span>
             <span class="heatmap-title" data-i18n="heatmap_title">Activity</span>
           </div>
-          <div class="heatmap-grid-wrapper">
-            <div class="heatmap-row-labels" id="heatmap-row-labels"></div>
-            <div class="heatmap-scroll">
-              <div class="heatmap-col-labels" id="heatmap-col-labels"></div>
-              <div class="heatmap-grid" id="heatmap-grid"></div>
+          <div class="heatmap-body">
+            <div class="heatmap-grid-wrapper">
+              <div class="heatmap-row-labels" id="heatmap-row-labels"></div>
+              <div class="heatmap-scroll">
+                <div class="heatmap-col-labels" id="heatmap-col-labels"></div>
+                <div class="heatmap-grid" id="heatmap-grid"></div>
+              </div>
+            </div>
+            <div class="heatmap-legend heatmap-legend-v">
+              <span class="heatmap-legend-label" data-i18n="heatmap_more">More</span>
+              <span class="heatmap-legend-cell" data-level="4"></span>
+              <span class="heatmap-legend-cell" data-level="3"></span>
+              <span class="heatmap-legend-cell" data-level="2"></span>
+              <span class="heatmap-legend-cell" data-level="1"></span>
+              <span class="heatmap-legend-cell" data-level="0"></span>
+              <span class="heatmap-legend-label" data-i18n="heatmap_less">Less</span>
             </div>
           </div>
-          <div class="heatmap-legend">
-            <span class="heatmap-legend-label" data-i18n="heatmap_less">Less</span>
-            <span class="heatmap-legend-cell" data-level="0"></span>
-            <span class="heatmap-legend-cell" data-level="1"></span>
-            <span class="heatmap-legend-cell" data-level="2"></span>
-            <span class="heatmap-legend-cell" data-level="3"></span>
-            <span class="heatmap-legend-cell" data-level="4"></span>
-            <span class="heatmap-legend-label" data-i18n="heatmap_more">More</span>
-          </div>
-        </div>
-      </div>
-      <!-- Showcase row -->
-      <div class="hero-showcase-row">
-        <div class="showcase" id="showcase"></div>
-        <div class="showcase-actions">
-          <span id="pick-banner" class="pick-banner" style="display:none">
-            <span class="pick-banner-text"></span>
-            <button class="pick-cancel-btn" onclick="cancelPick()" data-i18n="pick_cancel">✕ Cancel</button>
-          </span>
-          <button id="showcase-auto" class="showcase-auto-btn" onclick="autoFillShowcase()" title="Auto-fill with rarest">⚡ Auto</button>
         </div>
       </div>
       <div id="next-ach-card" class="next-ach-card" style="display:none"></div>

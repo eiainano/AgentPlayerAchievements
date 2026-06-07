@@ -143,7 +143,7 @@ class ParticleSystem {
 // ── GachaReveal — single achievement animation ──────────
 
 class GachaReveal {
-  constructor(achievement) {
+  constructor(achievement, options) {
     this.ach = achievement;
     this.rarity = achievement.rarity || 'common';
     this.config = RARITY_CONFIG[this.rarity] || RARITY_CONFIG.common;
@@ -154,6 +154,7 @@ class GachaReveal {
     this.onClick = null;
     this.onKey = null;
     this.onResize = null;
+    this.noAutoDismiss = !!(options && options.noAutoDismiss);
   }
 
   start() {
@@ -317,6 +318,12 @@ class GachaReveal {
   }
 
   _autoDismiss() {
+    if (this.noAutoDismiss) {
+      // Resolve immediately so queue can continue, but leave overlay visible.
+      // User dismisses by clicking anywhere or pressing Escape.
+      if (this.resolvePromise) this.resolvePromise();
+      return;
+    }
     var dwellTime = Math.max(this.config.duration * 0.25, 400);
     setTimeout(function() {
       if (this.destroyed) return;
@@ -368,6 +375,8 @@ class GachaQueue {
 
   enqueue(achievements, options) {
     options = options || {};
+    // Store for playNext to pass to GachaReveal
+    this._enqueueOpts = options;
     var sorted = [].concat(achievements).sort(function(a, b) {
       var ra = __gachaRARITY_ORDER.indexOf(a.rarity) || 0;
       var rb = __gachaRARITY_ORDER.indexOf(b.rarity) || 0;
@@ -387,7 +396,10 @@ class GachaQueue {
   playNext() {
     if (this.queue.length === 0) {
       this.isPlaying = false;
-      this.currentReveal = null;
+      // Keep currentReveal alive for noAutoDismiss replays so user can click/Esc to dismiss
+      if (!(this.currentReveal && this.currentReveal.noAutoDismiss)) {
+        this.currentReveal = null;
+      }
       this._drain();
       return;
     }
@@ -404,12 +416,18 @@ class GachaQueue {
     }
 
     var ach = this.queue.shift();
-    var reveal = new GachaReveal(ach);
+    var opts = this._enqueueOpts;
+    var reveal = new GachaReveal(ach, opts);
     this.currentReveal = reveal;
 
     reveal.start().then(function() {
-      reveal.destroy();
-      this.currentReveal = null;
+      if (reveal.noAutoDismiss) {
+        // Keep overlay alive — user dismisses by click or Escape.
+        // Don't call destroy() and keep currentReveal so skip() works.
+      } else {
+        reveal.destroy();
+        this.currentReveal = null;
+      }
 
       // Continue queue on next tick with small delay between animations
       setTimeout(function() {

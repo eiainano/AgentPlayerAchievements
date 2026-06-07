@@ -144,17 +144,20 @@ const I18N = {
     section_achievements: 'Achievements',
     section_sets: 'Sets',
     section_timeline: 'Timeline',
-    hero_title: 'Agent Achievements',
+    hero_title: 'Agent Player Achievements',
     xp_label: '{xp} XP • Level {level}',
     streak_title: 'Coding Streak',
     streak_days: 'days',
     streak_best: 'Best',
     streak_today_done: 'Coded today ✓',
     streak_today_pending: 'Not yet today',
+    stat_level: 'Level',
+    stat_xp: 'XP',
     stat_unlocked: 'Unlocked',
 
     stat_streak: 'Day Streak',
     stat_complete: 'Complete',
+    stat_events: 'Events',
     heatmap_title: 'Activity',
     heatmap_less: 'Less',
     heatmap_more: 'More',
@@ -167,7 +170,9 @@ const I18N = {
     pick_banner: 'Pick an achievement for slot {n}',
     click_to_remove: 'click to remove',
     click_to_pick: 'Click to pick an achievement',
-    showcase_auto: '⚡ Auto',
+    showcase_title: 'Showcase',
+    showcase_sub: 'Pick your 6 best',
+    showcase_auto: '⚡',
     showcase_auto_title: 'Auto-fill with rarest',
     no_sets: 'No achievement sets defined.',
     nav_insights: 'Insights',
@@ -201,6 +206,7 @@ const I18N = {
     rarity_all: 'All Rarities',
     modal_close: 'Close',
     modal_unlocked: 'Unlocked',
+    modal_replay: 'Replay',
     modal_locked: 'Locked',
     unlocked_label: '✓ Unlocked',
     modal_category: 'Category',
@@ -233,17 +239,20 @@ const I18N = {
     section_sets: '套装',
     section_timeline: '时间线',
     section_insights: '洞察',
-    hero_title: 'Agent 成就系统',
+    hero_title: 'Agent 玩家成就',
     xp_label: '{xp} XP • {level} 级',
     streak_title: '编码连胜',
     streak_days: '天',
     streak_best: '最高纪录',
     streak_today_done: '今天已编码 ✓',
     streak_today_pending: '今天还没写代码',
+    stat_level: '等级',
+    stat_xp: '经验',
     stat_unlocked: '已解锁',
 
     stat_streak: '连续天数',
     stat_complete: '完成度',
+    stat_events: '总事件',
     heatmap_title: '活动热力图',
     heatmap_less: '少',
     heatmap_more: '多',
@@ -255,7 +264,9 @@ const I18N = {
     pick_banner: '为第 {n} 格选择成就',
     click_to_remove: '点击移除',
     click_to_pick: '点击选择成就',
-    showcase_auto: '⚡ 自动',
+    showcase_title: '展示柜',
+    showcase_sub: '挑选6个最佳成就',
+    showcase_auto: '⚡',
     showcase_auto_title: '自动填充(最稀有)',
     no_sets: '暂无套装定义。',
     no_timeline: '还没有解锁任何成就。',
@@ -287,6 +298,7 @@ const I18N = {
     rarity_all: '全部稀有度',
     modal_close: '关闭',
     modal_unlocked: '已解锁',
+    modal_replay: '重播',
     modal_locked: '未解锁',
     unlocked_label: '✓ 已解锁',
     modal_category: '分类',
@@ -422,17 +434,46 @@ let pickSlot = null;
 const RARITY_ORDER = { common: 0, uncommon: 1, rare: 2, epic: 3, legendary: 4, mythic: 5 };
 const RARITY_LEVELS = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'mythic'];
 
+// ── Error Boundary ──────────────────────────────────────
+
+let renderErrors = [];
+
+function renderSafe(name, fn) {
+  try { fn(); } catch (e) {
+    console.error(`[AGPA] render "${name}" failed:`, e);
+    renderErrors.push({ name, message: e.message || String(e) });
+    showErrorBanner();
+  }
+}
+
+function showErrorBanner() {
+  const banner = document.getElementById('error-banner');
+  const msg = document.getElementById('error-banner-msg');
+  if (!banner || !msg) return;
+  msg.textContent = renderErrors.length === 1
+    ? renderErrors[0].name + ': ' + renderErrors[0].message
+    : renderErrors.length + ' sections failed to render. Check console for details.';
+  banner.style.display = 'flex';
+}
+
+function dismissErrors() {
+  renderErrors = [];
+  const banner = document.getElementById('error-banner');
+  if (banner) banner.style.display = 'none';
+}
+
 function renderAll(data) {
-  renderI18n();
-  renderNav(data);
-  renderProfile(data);
-  renderFirstVisitTip(data);
-  renderNextAchievement(data);
-  renderOnboardingGuide(data);
-  renderAchievements(data);
-  renderSets(data);
-  renderTimeline(data);
-  renderInsights(data);
+  renderErrors = [];
+  renderSafe('i18n', () => renderI18n());
+  renderSafe('nav', () => renderNav(data));
+  renderSafe('profile', () => renderProfile(data));
+  renderSafe('visit-tip', () => renderFirstVisitTip(data));
+  renderSafe('next-achievement', () => renderNextAchievement(data));
+  renderSafe('onboarding', () => renderOnboardingGuide(data));
+  renderSafe('achievements', () => renderAchievements(data));
+  renderSafe('sets', () => renderSets(data));
+  renderSafe('timeline', () => renderTimeline(data));
+  renderSafe('insights', () => renderInsights(data));
 }
 
 // ── Setup global listeners (once) ──────────────────────
@@ -464,6 +505,12 @@ function setupGlobalHandlers() {
   document.addEventListener('click', e => {
     if (e.target.id === 'modal-backdrop') {
       closeModal();
+    }
+    // Delegated: replay gacha button in modal
+    if (e.target.closest('.modal-replay-btn')) {
+      const btn = e.target.closest('.modal-replay-btn');
+      const achId = btn.dataset.achId;
+      if (achId) replayGacha(achId);
     }
   });
 }
@@ -990,16 +1037,6 @@ function renderProfile(data) {
   renderStreakCard(stats.streak);
   renderHeatmap(stats.heatmap);
 
-  const fill = document.getElementById('xp-bar-fill');
-  const label = document.getElementById('xp-label');
-  if (fill && label) {
-    const pct = stats.xp_progress.target > 0
-      ? (stats.xp_progress.current / stats.xp_progress.target) * 100
-      : 0;
-    fill.style.width = `${Math.min(pct, 100)}%`;
-    label.textContent = t('xp_label', { xp: stats.total_xp.toLocaleString(), level: stats.level });
-  }
-
   const showcase = document.getElementById('showcase');
   if (showcase) {
     showcase.innerHTML = stats.showcase.map(s => {
@@ -1008,8 +1045,7 @@ function renderProfile(data) {
         return `<div class="showcase-slot filled" data-rarity="${s.achievement.rarity}"
           title="${escHtml(nameDisplay)} — ${t('click_to_remove')}"
           onclick="clearSlot(${s.slot})">
-          ${iconHtml(s.achievement.icon, { size: 28, className: 'showcase-slot-icon' })}
-          <span class="showcase-slot-name">${escHtml(nameDisplay)}</span>
+          ${iconHtml(s.achievement.icon, { size: 32, className: 'showcase-slot-icon' })}
         </div>`;
       }
       return `<div class="showcase-slot empty"
@@ -1029,8 +1065,11 @@ function renderProfile(data) {
   if (row) {
     const unlockedCount = data.achievements.filter(a => a.unlocked).length;
     const statItems = [
+      { value: 'Lv.' + (stats.level || 1), label: t('stat_level') },
+      { value: (stats.total_xp || 0).toLocaleString(), label: t('stat_xp') },
       { value: unlockedCount.toLocaleString(), label: t('stat_unlocked') },
       { value: `${stats.completion_pct}%`, label: t('stat_complete') },
+      { value: (stats.total_events || 0).toLocaleString(), label: t('stat_events') },
     ];
     row.innerHTML = statItems.map(s => `
       <div class="stat-big">
@@ -1425,8 +1464,9 @@ function openModal(ach) {
     });
     bottomSections += `
       <div class="modal-divider"></div>
-      <div class="modal-unlock-info">
-        ${t('modal_unlocked')}: <span class="modal-unlock-date">${dateStr}</span>
+      <div class="modal-unlock-row">
+        <span class="modal-unlock-date">${t('modal_unlocked')}: ${dateStr}</span>
+        <button class="modal-replay-btn" data-ach-id="${escHtml(ach.id)}" title="${escHtml(t('modal_replay'))}">🎴 ${escHtml(t('modal_replay'))}</button>
       </div>`;
   }
 
@@ -1479,6 +1519,17 @@ function openModal(ach) {
     container.offsetHeight;
     container.style.animation = '';
   });
+}
+
+function replayGacha(achId) {
+  if (!window.gachaQueue || !dashboardData) return;
+  const ach = dashboardData.achievements.find(a => a.id === achId);
+  if (!ach) return;
+  closeModal();
+  // Wait briefly for modal to close, then play
+  setTimeout(function() {
+    window.gachaQueue.enqueue([ach], { noAutoDismiss: true });
+  }, 200);
 }
 
 function toggleHiddenDesc(e) {
@@ -1656,12 +1707,17 @@ function renderInsights(data) {
     for (const id of ['chart-sessions', 'chart-tools', 'chart-tasks', 'chart-heatmap']) {
       const canvas = document.getElementById(id);
       if (canvas) {
+        setupRetinaCanvas(canvas);
         const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const dpr = window.devicePixelRatio || 1;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const W = canvas.clientWidth || canvas.width / dpr;
+        const H = canvas.clientHeight || canvas.height / dpr;
+        ctx.clearRect(0, 0, W, H);
         ctx.fillStyle = 'rgba(128,128,128,0.5)';
         ctx.font = '13px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(t('insight_nodata'), canvas.width / 2, canvas.height / 2);
+        ctx.fillText(t('insight_nodata'), W / 2, H / 2);
       }
     }
     return;
@@ -1673,11 +1729,33 @@ function renderInsights(data) {
   drawTimeHeatmap('chart-heatmap', data);
 }
 
+// ── Retina Canvas Helper ──────────────────────────────
+
+function setupRetinaCanvas(canvas) {
+  if (!canvas || canvas._retinaReady) return;
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = canvas.clientWidth || parseInt(canvas.getAttribute('width')) || 560;
+  const origW = parseInt(canvas.getAttribute('width')) || 560;
+  const origH = parseInt(canvas.getAttribute('height')) || 160;
+  const cssH = cssW * (origH / origW);
+  canvas.width = Math.round(cssW * dpr);
+  canvas.height = Math.round(cssH * dpr);
+  canvas.style.width = cssW + 'px';
+  canvas.style.height = cssH + 'px';
+  canvas._retinaReady = true;
+}
+
 function drawLineChart(canvasId, daily, field, color, label) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
+
+  setupRetinaCanvas(canvas);
   const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
+  const dpr = window.devicePixelRatio || 1;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const W = canvas.clientWidth || canvas.width / dpr;
+  const H = canvas.clientHeight || canvas.height / dpr;
   const pad = { top: 12, right: 16, bottom: 24, left: 32 };
   const pw = W - pad.left - pad.right;
   const ph = H - pad.top - pad.bottom;
@@ -1690,14 +1768,13 @@ function drawLineChart(canvasId, daily, field, color, label) {
     date: d.date,
   }));
 
-  // Store data on canvas for hover lookup
   canvas._chartData = { daily, field, color, label, pts, max, pad, W, H, pw, ph };
 
-  // Build render function (reused for redraw with/without tooltip)
   canvas._redraw = function(hoverIdx) {
+    ctx.save();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
 
-    // Grid lines
     ctx.strokeStyle = 'rgba(128,128,128,0.12)';
     ctx.lineWidth = 0.5;
     for (let i = 0; i <= 3; i++) {
@@ -1711,7 +1788,6 @@ function drawLineChart(canvasId, daily, field, color, label) {
       }
     }
 
-    // X-axis labels (every ~5 days)
     ctx.fillStyle = 'rgba(128,128,128,0.6)';
     ctx.font = '9px monospace';
     ctx.textAlign = 'center';
@@ -1719,7 +1795,6 @@ function drawLineChart(canvasId, daily, field, color, label) {
       ctx.fillText(daily[i].date.slice(5), pts[i].x, H - 4);
     }
 
-    // Fill area
     ctx.beginPath();
     ctx.moveTo(pts[0].x, pad.top + ph);
     for (const p of pts) ctx.lineTo(p.x, p.y);
@@ -1731,7 +1806,6 @@ function drawLineChart(canvasId, daily, field, color, label) {
     ctx.fillStyle = grad;
     ctx.fill();
 
-    // Line
     ctx.beginPath();
     ctx.strokeStyle = color;
     ctx.lineWidth = 2;
@@ -1741,7 +1815,6 @@ function drawLineChart(canvasId, daily, field, color, label) {
     }
     ctx.stroke();
 
-    // Dot at hover point
     if (hoverIdx != null && hoverIdx >= 0 && hoverIdx < pts.length) {
       const hp = pts[hoverIdx];
       ctx.beginPath();
@@ -1752,7 +1825,6 @@ function drawLineChart(canvasId, daily, field, color, label) {
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Tooltip box
       const dateLabel = hp.date.slice(5);
       const text = `${dateLabel}  ${hp.val}`;
       ctx.font = 'bold 11px monospace';
@@ -1772,16 +1844,14 @@ function drawLineChart(canvasId, daily, field, color, label) {
       ctx.textAlign = 'center';
       ctx.fillText(text, tx + tw / 2, ty + 15);
     }
+    ctx.restore();
   };
 
-  // Initial render
   canvas._redraw();
 
-  // Hover events
   canvas.onmousemove = function(e) {
     const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const mx = (e.clientX - rect.left) * scaleX;
+    const mx = e.clientX - rect.left;
     let closestIdx = -1, closestDist = 30;
     for (let i = 0; i < pts.length; i++) {
       const dist = Math.abs(pts[i].x - mx);
@@ -1807,33 +1877,27 @@ function roundRect(ctx, x, y, w, h, r) {
 function drawTimeHeatmap(canvasId, data) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
+
+  setupRetinaCanvas(canvas);
   const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
+  const dpr = window.devicePixelRatio || 1;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const W = canvas.clientWidth || canvas.width / dpr;
+  const H = canvas.clientHeight || canvas.height / dpr;
   const pad = { top: 8, right: 8, bottom: 4, left: 32 };
   const pw = W - pad.left - pad.right;
   const ph = H - pad.top - pad.bottom - 24;
 
-  // Count events per (hour × day_of_week) from event data
   const grid = Array.from({ length: 7 }, () => Array(24).fill(0));
-  // We don't have events directly in data; approximate from hourly style achievements
-  // that reference the session.start hour/day_of_week payload fields.
-  // For now, we'll use a simple even distribution or show "no data" gracefully.
-  // The actual data comes from the daily_stats or events log.
-  // Since the API doesn't pass raw events, we approximate from any tool_stats available.
-
-  const maxVal = 1; // Will be filled if we have data
+  const daily = data.stats?.daily_stats;
   let hasData = false;
 
-  // Try to derive from daily activity if available
-  const daily = data.stats?.daily_stats;
   if (daily && daily.length > 0) {
-    // Simple approximation: each day with activity gets distributed
-    // across typical working hours (9-18) on weekdays
     for (const d of daily) {
       const dow = new Date(d.date + 'T12:00:00Z').getDay();
       if (d.sessions > 0) {
         hasData = true;
-        // Distribute sessions across work hours
         for (let h = 9; h <= 18; h++) {
           grid[dow][h] += d.sessions;
         }
@@ -1855,7 +1919,7 @@ function drawTimeHeatmap(canvasId, data) {
 
   for (let day = 0; day < 7; day++) {
     for (let h = 0; h < 24; h++) {
-      const intensity = maxVal > 0 ? Math.min(grid[day][h] / maxVal, 1) : 0;
+      const intensity = 1 > 0 ? Math.min(grid[day][h] / 1, 1) : 0;
       let fill = 'rgba(128,128,128,0.06)';
       if (intensity > levels[3]) fill = 'rgba(79,195,247,0.7)';
       else if (intensity > levels[2]) fill = 'rgba(79,195,247,0.45)';
@@ -1869,7 +1933,6 @@ function drawTimeHeatmap(canvasId, data) {
     }
   }
 
-  // Day labels
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   ctx.fillStyle = 'rgba(128,128,128,0.6)';
   ctx.font = '10px monospace';
@@ -1878,7 +1941,6 @@ function drawTimeHeatmap(canvasId, data) {
     ctx.fillText(days[d], pad.left - 6, pad.top + d * cellH + cellH / 2 + 3);
   }
 
-  // Hour labels
   ctx.textAlign = 'center';
   for (let h = 0; h < 24; h += 3) {
     ctx.fillText(h + 'h', pad.left + h * cellW + cellW / 2, pad.top + ph + 16);
@@ -1982,7 +2044,7 @@ function buildCardHTML(data) {
   function esc(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
-  function hmClr(l) { var c=['#1e2529','#0e4429','#006d32','#26a641','#39d353']; return c[l]||c[0]; }
+  function hmClr(l) { var c=['rgba(128,128,144,.06)','rgba(79,195,247,.18)','rgba(79,195,247,.40)','rgba(79,195,247,.68)','#4fc3f7']; return c[l]||c[0]; }
   var isZh = (data.lang || 'en') === 'zh';
   var L = function(en, zh) { return isZh ? zh : en; };
 
@@ -2055,7 +2117,7 @@ function buildCardHTML(data) {
       h += '<div class="card-hm-cell" style="background:' + hmClr(dt.count) + '"></div>';
     }
     h += '</div>';
-    h += '<div class="card-hm-legend"><span>' + L('Less', '少') + '</span><div class="card-hm-cell" style="background:#1e2529"></div><div class="card-hm-cell" style="background:#0e4429"></div><div class="card-hm-cell" style="background:#006d32"></div><div class="card-hm-cell" style="background:#26a641"></div><div class="card-hm-cell" style="background:#39d353"></div><span>' + L('More', '多') + '</span></div>';
+    h += '<div class="card-hm-legend"><span>' + L('Less', '少') + '</span><div class="card-hm-cell" style="background:rgba(128,128,144,.15)"></div><div class="card-hm-cell" style="background:rgba(79,195,247,.18)"></div><div class="card-hm-cell" style="background:rgba(79,195,247,.40)"></div><div class="card-hm-cell" style="background:rgba(79,195,247,.68)"></div><div class="card-hm-cell" style="background:#4fc3f7"></div><span>' + L('More', '多') + '</span></div>';
     h += '</div>';
   }
 

@@ -41,6 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load initial state from server
     loadSoundState(soundToggle);
   }
+  const animToggle = document.getElementById('anim-toggle');
+  if (animToggle) {
+    animToggle.addEventListener('change', toggleAnimations);
+    loadAnimState(animToggle);
+  }
 });
 
 // ── Language ────────────────────────────────────────────
@@ -86,6 +91,34 @@ async function loadSoundState(toggle) {
     if (res.ok) {
       const data = await res.json();
       toggle.checked = data.sound_enabled;
+    }
+  } catch { /* use default (checked) */ }
+}
+
+// ── Animation Toggle ────────────────────────────────────
+
+async function toggleAnimations() {
+  const toggle = document.getElementById('anim-toggle');
+  if (!toggle) return;
+  const enabled = toggle.checked;
+  try {
+    await fetch('/api/config/animations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ simple_animations: !enabled }),
+    });
+  } catch {
+    toggle.checked = !enabled;
+  }
+}
+
+async function loadAnimState(toggle) {
+  try {
+    const res = await fetch('/api/config/animations');
+    if (res.ok) {
+      const data = await res.json();
+      // checked = full animations (toggle ON), unchecked = simple
+      toggle.checked = !data.simple_animations;
     }
   } catch { /* use default (checked) */ }
 }
@@ -431,14 +464,18 @@ function setupGlobalHandlers() {
 
   renderAll(data);
 
-  // Toast for recently unlocked (within 5 min)
+  // Gacha reveal for recently unlocked (within 5 min)
   const now = Date.now();
+  const recentAchs = [];
   data.timeline.forEach(t => {
     if (now - new Date(t.unlocked_at).getTime() < 300000) {
       const ach = data.achievements.find(a => a.id === t.id);
-      if (ach) showToast(ach.icon, displayName(ach), ach.rarity);
+      if (ach) recentAchs.push(ach);
     }
   });
+  if (recentAchs.length > 0) {
+    window.gachaQueue.enqueue(recentAchs);
+  }
 
   startAutoPoll();
 })();
@@ -468,15 +505,22 @@ function startAutoPoll() {
       if (hasNewUnlocks || statsChanged) {
         dashboardData = newData;
 
-        // Toast for new unlocks
+        // Gacha reveal for new unlocks
+        const freshAchs = [];
         for (const id of freshIds) {
           const ach = newData.achievements.find(a => a.id === id);
-          if (ach) showToast(ach.icon, displayName(ach), ach.rarity);
+          if (ach) freshAchs.push(ach);
         }
 
-        // Re-render only if modal isn't open
-        if (!isModalOpen) {
-          renderAll(newData);
+        if (freshAchs.length > 0) {
+          window.gachaQueue.enqueue(freshAchs, {
+            onDrain: function() {
+              if (!isModalOpen) renderAll(newData);
+            },
+          });
+        } else {
+          // No gacha (stats-only change), render immediately
+          if (!isModalOpen) renderAll(newData);
         }
       }
     } catch {}
@@ -490,6 +534,16 @@ const RARITY_COLORS = {
   epic: '#B446F0', legendary: '#FF8C00', mythic: '#FF3232',
 };
 function rarityColor(r) { return RARITY_COLORS[r] || RARITY_COLORS.common; }
+
+// Bridge for gacha-reveal.js sound sync (respects sound toggle state)
+window.__playAchievementSound = function(rarity) {
+  var toggle = document.getElementById('sound-toggle');
+  if (toggle && !toggle.checked) return;
+  // Sound plays server-side via notification system; the gacha visual
+  // sync uses this as a timing anchor. The sound effect itself is
+  // triggered by the server's notification (poll), so we just ensure
+  // the sound toggle state is respected at the flip moment.
+};
 
 // ── Navigation ───────────────────────────────────────
 

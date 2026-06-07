@@ -12,6 +12,35 @@
 - 设计文档：`docs/superpowers/specs/2026-06-07-agpa-logo-design.md`
 - `.gitignore` 添加 logo PNG 例外规则
 
+### 12 新成就：语言深度/广度 + 测试/时间维度 — 2026-06-07
+
+基础设施：
+- **`src/utils/lang-detect.ts`** — 35+ 编程语言扩展名→语言名映射模块
+- **hook.ts auto-track 扩展**：文件 Read/Write/Edit 时自动调用 detectLanguage() 发射 `file.language_used` 事件
+- **hook.ts 所有事件 payload** 注入 `hour`/`day_of_week`（替代仅 git.push 特有），`the_scheduler` 成就依赖此机制
+- **evaluator.ts matchFilter** 上下文新增 `language` 字段，支持 `filter: language == 'python'` 表达式
+
+语言深度成就（7 个，`linguist` 套装）：
+- `pythonista` — Pythonista 🐍，50×Python 文件，Common
+- `type_astronaut` — 类型宇航员 📘，50×TypeScript 文件，Common
+- `web_weaver` — 网络织者 🕸️，50×JavaScript 文件，Common
+- `bean_counter` — 咖啡豆计数员 ☕，50×Java 文件，Uncommon
+- `pointer_pilot` — 指针领航员 🔗，50×C/C++ 文件，Rare
+- `ferris_fan` — 螃蟹粉丝 🦀，50×Rust 文件，Rare
+- `go_getter` — 进取者 🏃，50×Go 文件，Uncommon
+
+语言广度成就（2 个，`linguist` 套装）：
+- `smorgasbord` — 丰盛大餐 🧩，单 session 6+ 语言，Rare challenge
+- `full_spectrum` — 全光谱 🌈，累计 10+ 语言，Epic
+
+测试/时间维度（3 个）：
+- `test_champion` — 测试冠军 🏆，500×test.pass，Epic（`endurance` 套装）
+- `the_scheduler` — 日程规划师 📅，12+ 不同时段启动 session，Uncommon
+- `power_session` — 全力冲刺 ⚡，单 session 25+ tool 调用，Uncommon（`endurance` 套装）
+
+套装变更：新增 `linguist`（9 成员，Polyglot 称号），`endurance` 5→7
+测试：519→549（+30），26 文件全绿，tsc 零错误
+
 ### 系统可触发审计 & 全量修复：不可达成就 8→0 — 2026-06-07
 
 全链路审计（YAML → hook.ts → AGENTS.md → evaluator → test）发现 8 个成就因事件无法被 hook/engine 产生而在生产中不可达。全部修复：

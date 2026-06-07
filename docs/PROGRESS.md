@@ -4,13 +4,18 @@
 
 ## 总体状态
 
-v0.1.6 完成。19 个 CLI 命令，5 个 Agent 双通道覆盖，171 个成就，519 个测试全绿（24 文件）。
+v0.1.6 完成。19 个 CLI 命令，5 个 Agent 双通道覆盖，**183 个成就**，**549 个测试全绿（26 文件）**。
 
 **本次新增 (2026-06-07):**
 - AGPA Logo 像素画：128×128，`>_` 绿色 + 思考云蓝白色 + DS4 手柄，暗/亮双主题
 - Dashboard favicon、导航栏 logo（主题自适应）、分享卡片水印、README banner 全部落地
 - 5 新成就：Scribe(笔耕不辍, file.write×50)、Ship It(一键发货, git.push×10)、In the Zone(心流状态, task×5/session)、Meltdown(熔断, tool.failure×5/session)、Achievement Hunter(成就猎人, unlock×50)
 - 全部基于 hook 自动写入的真实事件，零手动 track 依赖
+- **12 新成就 + 语言自动检测**：7 语言深度（Pythonista/Type Astronaut/Web Weaver/Bean Counter/Pointer Pilot/Ferris Fan/Go Getter）+ 2 语言广度（Smorgasbord/Full Spectrum）+ 测试里程碑 Test Champion + 时间维度 The Scheduler/Power Session
+- 新套装 `linguist`（9 成员，Polyglot 称号），Endurance 5→7
+- 新增基础设施：`src/utils/lang-detect.ts`（35+ 语言映射）、hook.ts 文件操作自动检测语言、evaluator matchFilter 新增 `language` 字段
+- 所有事件 payload 自动注入 `hour`/`day_of_week`（替代原先仅 git.push 特有）
+- 测试 519→549（+30），26 文件全绿
 
 **之前新增 (2026-06-06):**
 - Kilo Code / OpenCode auto-track 双通道：`hook.ts` 新增 `kilocode-auto` 模式 + 翻译层，`init.ts` 生成 `Bun.spawn` TS 插件

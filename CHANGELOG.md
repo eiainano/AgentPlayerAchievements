@@ -12,6 +12,22 @@
 - 设计文档：`docs/superpowers/specs/2026-06-07-agpa-logo-design.md`
 - `.gitignore` 添加 logo PNG 例外规则
 
+### 系统可触发审计 & 全量修复：不可达成就 8→0 — 2026-06-07
+
+全链路审计（YAML → hook.ts → AGENTS.md → evaluator → test）发现 8 个成就因事件无法被 hook/engine 产生而在生产中不可达。全部修复：
+
+- **hook.ts PostToolUseFailure → error.occurred**（修复 error_resilient）
+- **hook.ts Bash rm/unlink → file.delete**（修复 file_purger）
+- **hook.ts Read 图像文件 → image.read + image.upload**（修复 visual_prompt/image_whisperer/multi_image_day）
+- **hook.ts TaskCreate/TaskUpdate tool → task.create/task.update**（修复 task_creator/task_updater）
+- **engine.ts DeepSeek 模型检测 → deepseek.conversation**，per-session dedup（修复 deepseek_dabbler）
+- **YAML its_learning**：role agent→assistant + pattern humor_detected→真实可匹配内容
+- **dashboard.opened** 已有 auto-track（dashboard server L153），仅文档补全
+- AGENTS.md 同步所有事件 auto/manual 状态
+- issues-todo.md 0 不可达验证通过，完整修复记录
+- 测试 519→525（+6：image read、task create/update、deepseek ×2、failure 双事件）
+- 设计模式：Hook cascade（1 hook → N engine events）+ Engine state-aware emission
+
 ### 5 新成就：基于真实事件填充 — 2026-06-07
 
 - `scribe` — Scribe / 笔耕不辍，file.write×50，Common tool_mastery

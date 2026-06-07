@@ -1394,19 +1394,19 @@ body {
 /* ── Insights ───────────────────────────────────────── */
 .insights-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
 }
 .insight-card {
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 16px;
+  padding: 12px;
 }
-.insight-card:last-child { grid-column: 1 / -1; }
+.insight-card.insight-heatmap-card { grid-column: 1 / -1; }
 .insight-title {
-  font-size: 13px; font-weight: 600; color: var(--text-dim);
-  margin-bottom: 10px; text-transform: uppercase; letter-spacing: .5px;
+  font-size: 12px; font-weight: 600; color: var(--text-dim);
+  margin-bottom: 8px; text-transform: uppercase; letter-spacing: .5px;
 }
 .insight-canvas { width: 100%; height: auto; border-radius: 8px; }
 .insight-empty {
@@ -1424,8 +1424,8 @@ body {
 .heatmap-legend-swatch.l2 { background: rgba(79,195,247,.25); }
 .heatmap-legend-swatch.l3 { background: rgba(79,195,247,.45); }
 .heatmap-legend-swatch.l4 { background: rgba(79,195,247,.7); }
-@media (max-width: 800px) {
-  .insights-grid { grid-template-columns: 1fr; }
+@media (max-width: 900px) {
+  .insights-grid { grid-template-columns: 1fr 1fr; }
 }
 
 /* ── Toast ─────────────────────────────────────────── */

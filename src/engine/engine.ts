@@ -209,13 +209,11 @@ export class AchievementEngine {
     return newlyUnlocked;
   }
 
-  /** Load cached tool stats; if missing, compute from events */
+  /** Load cached tool stats; if missing, compute from events. Does NOT write — poll() handles persistence. */
   toolStats(): AgentToolStats {
     const cached = this.store.loadStats();
     if (cached) return cached;
-    const stats = computeStats(this.events);
-    this.store.saveStats(stats);
-    return stats;
+    return computeStats(this.events);
   }
 
   stats(): AchievementStats {

@@ -3021,6 +3021,241 @@ definitions:
         operator: ">="
         value: 10
         window: all
+  - id: pythonista
+    name: Pythonista
+    name_cn: Pythonista
+    description: Write 50+ Python files. Snake? No, Python.
+    description_cn: 写了 50+ 个 Python 文件。是蟒蛇不是巨蟒。
+    icon: 🐍
+    category: tool_mastery
+    rarity: common
+    hidden: false
+    hint: Work with Python files regularly
+    hint_cn: 经常使用 Python 写代码
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: file.language_used
+        filter: language == 'python'
+        operator: ">="
+        value: 50
+        window: all
+    set: linguist
+  - id: type_astronaut
+    name: Type Astronaut
+    name_cn: 类型宇航员
+    description: Write 50+ TypeScript files. Types are rocket fuel.
+    description_cn: 写了 50+ 个 TypeScript 文件。类型就是火箭燃料。
+    icon: 📘
+    category: tool_mastery
+    rarity: common
+    hidden: false
+    hint: Work with TypeScript regularly — types pay off in the long run
+    hint_cn: 经常使用 TypeScript——类型系统长期来看是值得的
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: file.language_used
+        filter: language == 'typescript'
+        operator: ">="
+        value: 50
+        window: all
+    set: linguist
+  - id: web_weaver
+    name: Web Weaver
+    name_cn: 网络织者
+    description: Write 50+ JavaScript files. Weaving the web since '95.
+    description_cn: 写了 50+ 个 JavaScript 文件。95 年就开始织网。
+    icon: 🕸️
+    category: tool_mastery
+    rarity: common
+    hidden: false
+    hint: Work with JavaScript files regularly
+    hint_cn: 经常使用 JavaScript 写代码
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: file.language_used
+        filter: language == 'javascript'
+        operator: ">="
+        value: 50
+        window: all
+    set: linguist
+  - id: bean_counter
+    name: Bean Counter
+    name_cn: 咖啡豆计数员
+    description: Write 50+ Java files. Object my my my.
+    description_cn: 写了 50+ 个 Java 文件。对象啊对象。
+    icon: ☕
+    category: tool_mastery
+    rarity: uncommon
+    hidden: false
+    hint: Work with Java files
+    hint_cn: 经常使用 Java 写代码
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: file.language_used
+        filter: language == 'java'
+        operator: ">="
+        value: 50
+        window: all
+    set: linguist
+  - id: pointer_pilot
+    name: Pointer Pilot
+    name_cn: 指针领航员
+    description: Write 50+ C or C++ files. Manual memory? manual fun.
+    description_cn: 写了 50+ 个 C 或 C++ 文件。手动内存，手动乐趣。
+    icon: 🔗
+    category: tool_mastery
+    rarity: rare
+    hidden: false
+    hint: Work with C or C++ files
+    hint_cn: 经常使用 C 或 C++ 写代码
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: file.language_used
+        filter: language in ['c', 'cpp']
+        operator: ">="
+        value: 50
+        window: all
+    set: linguist
+  - id: ferris_fan
+    name: Ferris Fan
+    name_cn: 螃蟹粉丝
+    description: Write 50+ Rust files. The borrow checker approves.
+    description_cn: 写了 50+ 个 Rust 文件。借用检查器表示通过。
+    icon: 🦀
+    category: tool_mastery
+    rarity: rare
+    hidden: false
+    hint: Work with Rust files — fearless concurrency awaits
+    hint_cn: 经常使用 Rust——无畏并发在等你
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: file.language_used
+        filter: language == 'rust'
+        operator: ">="
+        value: 50
+        window: all
+    set: linguist
+  - id: go_getter
+    name: Go Getter
+    name_cn: 进取者
+    description: Write 50+ Go files. Simplicity is a feature.
+    description_cn: 写了 50+ 个 Go 文件。简洁就是一种特性。
+    icon: 🏃
+    category: tool_mastery
+    rarity: uncommon
+    hidden: false
+    hint: Work with Go files regularly
+    hint_cn: 经常使用 Go 写代码
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: file.language_used
+        filter: language == 'go'
+        operator: ">="
+        value: 50
+        window: all
+    set: linguist
+  - id: smorgasbord
+    name: Smorgasbord
+    name_cn: 丰盛大餐
+    description: Use 6+ languages in one session. All-you-can-code buffet.
+    description_cn: 单次 session 用 6+ 种语言。编码自助餐。
+    icon: 🧩
+    category: challenge
+    rarity: rare
+    hidden: false
+    hint: Switch between many programming languages in a single session
+    hint_cn: 单次 session 中使用多种编程语言
+    challenge: true
+    conditions:
+      - type: distinct_count
+        event: file.language_used
+        field: language
+        window: single_session
+        operator: ">="
+        value: 6
+    set: linguist
+  - id: full_spectrum
+    name: Full Spectrum
+    name_cn: 全光谱
+    description: Use 10+ languages cumulatively. True polyglot, no impostor.
+    description_cn: 累计使用过 10+ 种语言。真多语言者。
+    icon: 🌈
+    category: milestones
+    rarity: epic
+    hidden: false
+    progress_trackable: true
+    conditions:
+      - type: distinct_count
+        event: file.language_used
+        field: language
+        window: all
+        operator: ">="
+        value: 10
+    set: linguist
+  - id: test_champion
+    name: Test Champion
+    name_cn: 测试冠军
+    description: 500 tests passed. The CI pipeline worships you.
+    description_cn: 累计 500 个测试通过。CI 流程视你为神。
+    icon: 🏆
+    category: milestones
+    rarity: epic
+    hidden: false
+    hint: Keep writing tests — green is the best color
+    hint_cn: 持续写测试——绿色是最好的颜色
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: test.pass
+        operator: ">="
+        value: 500
+        window: all
+    set: endurance
+  - id: the_scheduler
+    name: The Scheduler
+    name_cn: 日程规划师
+    description: Start sessions at 12+ different hours. You're always there.
+    description_cn: 在 12+ 个不同时间段启动过 session。你无处不在。
+    icon: 📅
+    category: style
+    rarity: uncommon
+    hidden: false
+    hint: Code at different times of day — see how the world changes
+    hint_cn: 在不同时间编码——看看世界如何变化
+    progress_trackable: true
+    conditions:
+      - type: distinct_count
+        event: session.start
+        field: hour
+        window: all
+        operator: ">="
+        value: 12
+  - id: power_session
+    name: Power Session
+    name_cn: 全力冲刺
+    description: 25+ tools in a single session. Full throttle.
+    description_cn: 单次 session 中发起 25+ 次工具调用。马力全开。
+    icon: ⚡
+    category: endurance
+    rarity: uncommon
+    hidden: false
+    hint: A focused session with high tool throughput — go deep
+    hint_cn: 一次高工具吞吐量的专注 session——深度工作
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: tool.complete
+        window: single_session
+        operator: ">="
+        value: 25
+    set: endurance
 sets:
   the_beginning:
     name: The Beginning
@@ -3092,6 +3327,8 @@ sets:
       - streak_30
       - streak_100
       - marathon
+      - test_champion
+      - power_session
     reward:
       type: badge
       value: streak_master
@@ -3151,3 +3388,19 @@ sets:
     reward:
       type: badge
       value: 100% Complete
+  linguist:
+    name: Linguist
+    name_cn: 语言学者
+    achievements:
+      - pythonista
+      - type_astronaut
+      - web_weaver
+      - bean_counter
+      - pointer_pilot
+      - ferris_fan
+      - go_getter
+      - smorgasbord
+      - full_spectrum
+    reward:
+      type: title
+      value: Polyglot

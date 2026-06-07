@@ -7,7 +7,14 @@
 v0.1.6 完成。19 个 CLI 命令，5 个 Agent 双通道覆盖，**183 个成就**，**549 个测试全绿（26 文件）**。
 
 **本次新增 (2026-06-07):**
-- AGPA Logo 像素画：128×128，`>_` 绿色 + 思考云蓝白色 + DS4 手柄，暗/亮双主题
+- **✨ Gacha Reveal 抽卡动画**：替换纯文字 Toast，6 级稀有度渐进式翻牌动画（Common→Mythic）
+- Common/Uncommon：缩放入场 + 辉光脉冲；Rare+：CSS 3D 卡片翻转；Epic+：Canvas 粒子爆发 + 冲击环 + 边缘辉光
+- Legendary：屏幕震动 + 60 星尘粒子 + 拖尾轨迹；Mythic：从天而降 + 落地冲击波 + 100+ 金红粒子爆炸
+- **多成就排队**：按稀有度降序逐一播放，点击跳过当前 / Esc 跳过全部
+- **简化模式开关**：导航栏 ✨/🎴 切换，关闭后所有稀有度统一淡入（配置持久化）
+- 新文件 `gacha-reveal.js`（GachaQueue + GachaReveal + ParticleSystem）+ ~235 行 CSS（overlay/3D flip/keyframes）
+- 配置后端：`simple_animations` config 字段 + API 端点
+- AGPA Logo 像素画：128×128，`>_` 绿色 + 思考云蓝白色 + PS4 DS4 手柄，暗/亮双主题
 - Dashboard favicon、导航栏 logo（主题自适应）、分享卡片水印、README banner 全部落地
 - 5 新成就：Scribe(笔耕不辍, file.write×50)、Ship It(一键发货, git.push×10)、In the Zone(心流状态, task×5/session)、Meltdown(熔断, tool.failure×5/session)、Achievement Hunter(成就猎人, unlock×50)
 - 全部基于 hook 自动写入的真实事件，零手动 track 依赖

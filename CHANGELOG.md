@@ -2,6 +2,25 @@
 
 ## [0.1.6] — 2026-06-06
 
+### Gacha Reveal 抽卡动画 — 2026-06-07
+
+- **替换纯文字 Toast**：新增 `gacha-reveal.js`（439 行），6 级稀有度渐进式翻牌解锁动画系统
+- **6 级动画矩阵**：
+  - Common：淡入 0.6s，无翻转无粒子
+  - Uncommon：缩放入场 1s + 辉光脉冲
+  - Rare：CSS 3D 卡片 180° 翻转 1.5s + 12 金色粒子
+  - Epic：翻转 2s + 30 火焰粒子喷射 + 冲击环 + 屏幕边缘辉光
+  - Legendary：翻转 3s + 60 星尘粒子（带拖尾）+ 冲击环 + 屏幕震动
+  - Mythic：从天而降 4s + 落地冲击波 + 100+ 红金粒子爆炸 + 全屏辉光
+- **多成就排队**：按稀有度降序逐一播放，动画启动时 renderAll() 延迟到队列排空后执行
+- **跳过机制**：点击动画任意位置跳到当前成就详情 / Esc 跳过全部队列
+- **简化动画模式**：持久化配置 `simple_animations`（`src/config.ts` + `src/utils/validate.ts` + `src/dashboard/server.ts` API）
+- **导航栏开关**：✨/🎴 switch 切换全动画 / 简化模式（reuse 现有 CSS switch 模式）
+- **Canvas 粒子系统**：仅 Epic+ 激活，`requestAnimationFrame` 驱动，低核设备（<4）自动降半
+- **音效同步**：Rare+ 在翻转瞬间触发稀有度音效；Common/Uncommon 在动画结束时触发
+- 新增 ~235 行 CSS（overlay/card flip/particle container/5 组 @keyframes 动画）
+- 7 次 commit，全部 549 测试通过，tsc 零错误
+
 ### AGPA Logo 像素画 + README 双语改版 — 2026-06-07
 
 - 128×128 像素画 logo：屏幕上 `>_`（绿色） + 思考云（蓝白色）通过数据线连接 PS4 DS4 手柄（PS4 官方按键配色）

@@ -120,6 +120,26 @@ describe('AchievementEngine', () => {
       expect(engine.currentModel).toBe('claude-opus-4-8');
     });
 
+    it('auto-emits deepseek.conversation once per session when model is DeepSeek', () => {
+      engine.track('model.switch', { to: 'deepseek-v4' });
+      expect(engine.currentModel).toBe('deepseek-v4');
+      // First event in DeepSeek session — should auto-emit
+      engine.track('session.start');
+      const dsEvents1 = engine.events.filter(e => e.event_type === 'deepseek.conversation');
+      expect(dsEvents1).toHaveLength(1);
+      // Second event in same session — should NOT duplicate
+      engine.track('conversation.message');
+      const dsEvents2 = engine.events.filter(e => e.event_type === 'deepseek.conversation');
+      expect(dsEvents2).toHaveLength(1);
+    });
+
+    it('does NOT emit deepseek.conversation for non-DeepSeek models', () => {
+      engine.track('model.switch', { to: 'claude-opus-4-8' });
+      engine.track('session.start');
+      const dsEvents = engine.events.filter(e => e.event_type === 'deepseek.conversation');
+      expect(dsEvents).toHaveLength(0); // previous deepseek event from other test, not this session
+    });
+
     it('includes task_id in context when set', () => {
       const engine = new AchievementEngine({ stateDir: dir, sessionId: 'test-session' });
       engine.taskId = 'task-123';

@@ -1826,8 +1826,8 @@ definitions:
   - id: its_learning
     name: Sitcom
     name_cn: 情景喜剧
-    description: Agent output included humorous mode.
-    description_cn: agent 输出中包含幽默模式。
+    description: Agent output made you laugh — or at least smirk.
+    description_cn: agent 的回复把你逗笑了——或至少让你嘴角上扬了。
     icon: 🤖💬
     category: hidden
     rarity: mythic
@@ -1835,8 +1835,8 @@ definitions:
     conditions:
       - type: pattern_match
         event: conversation.message
-        role: agent
-        pattern: humor_detected
+        role: assistant
+        pattern: haha|lmao|funny|😄|😂|wink
   - id: agent_collector
     name: Playboy
     name_cn: 花花公子

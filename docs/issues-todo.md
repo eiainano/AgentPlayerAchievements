@@ -4,6 +4,28 @@
 
 ---
 
+## 🆕 系统可触发审计 & 全量修复 (v0.1.6, 6/7)
+
+全链路审计（YAML → hook.ts → AGENTS.md → evaluator → test）发现 8 个不可达/几乎不可达成就，全部修复至 0：
+
+### 修复清单
+
+| 成就 | 事件 | 修复方式 |
+|------|------|----------|
+| `error_resilient` | `error.occurred` | hook.ts: `PostToolUseFailure` 新增 `error.occurred` 发射 |
+| `file_purger` | `file.delete` | hook.ts: Bash `rm`/`unlink` 检测 → `file.delete` |
+| `task_creator` | `task.create` | hook.ts: `PostToolUse` 检测 `TaskCreate` tool → `task.create` |
+| `task_updater` | `task.update` | hook.ts: `PostToolUse` 检测 `TaskUpdate` tool → `task.update` |
+| `multi_image_day` | `image.upload` | hook.ts: Read image 文件扩展名匹配 → `image.read` + `image.upload` |
+| `visual_prompt` + `image_whisperer` | `image.read` | 同上（Read 图像文件现在也 emit `image.read`，此前仅 emit `file.read`） |
+| `deepseek_dabbler` | `deepseek.conversation` | engine.ts: `track()` 中检测 `currentModel` 含 'deepseek' → 每 session 发一次 |
+| `its_learning` | `conversation.message` | YAML: role `agent`→`assistant` + pattern `humor_detected`→真实可匹配内容 |
+| `dashboard_visitor` | `dashboard.opened` | ✅ 已有（dashboard server L153 auto-track） |
+
+### tool.deny 已知限制（仍依赖手动 track）
+
+`tool.deny` 无 hook auto-track（PreToolUse → tool.requested 仅记录请求，拒绝由用户操作决定）。受影响：`ill_do_it_myself` / `the_negotiator` / `im_sorry_dave` — 需 agent 手动 track。`full_auto` — `tool.deny == 0` 条件因无事件而永真，解锁比设计意图更容易。
+
 ## 🆕 本次新增 — 5 新成就 (v0.1.6, 6/7)
 
 基于事件利用率分析，选择 5 个 hook 自动写入但无成就覆盖的真实事件：

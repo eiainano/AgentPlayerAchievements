@@ -14,8 +14,9 @@ All tool calls, file operations, git commits/PRs, subagents, sessions, task comp
 | Trigger | Event to track | Payload |
 |---------|---------------|---------|
 | Read an image file (png/jpg/gif/svg) | `image.read` | (auto — hook detects file type) |
-| **Each time the user sends you a message** | `user.message` | (no payload needed) |
-| Send a prompt/message (track length for brevity) | `conversation.message` | `{ length }` (character count of your message) |
+| Upload an image for Claude to read | `image.upload` | `{}` (auto — hook detects image read via file extension) |
+| **Each time the user sends you a message** | `user.message` | (auto — hook emits via UserPromptSubmit) |
+| Send a prompt/message (track length for brevity) | `conversation.message` | `{ length }` (auto — hook emits with role) |
 | Create a file in a specific language | `file.language_used` | `{ language }` e.g. "typescript" |
 | Edit the same function repeatedly | `function.edited` | `{ function_name }` |
 | After any slash command runs | `command.slash_used` | `{ command }` |
@@ -35,10 +36,16 @@ All tool calls, file operations, git commits/PRs, subagents, sessions, task comp
 | Creating a worktree | `worktree.created` | `{ path }` |
 | Requesting code review | `code.review_requested` | `{}` |
 | Reviewing code (done) | `code.review_completed` | `{ issues_found }` |
-| Generating significant tokens (~10k+) | `token.consumed` | `{ amount }` |
+| Generating significant tokens (~10k+) | `token.consumed` | (auto — hook parses JSONL transcript) |
 | Reverting a file to previous version | `file.revert` | `{ file_path }` |
 | Switching from plan mode to agent mode | `agent.mode_activated` | `{}` |
 | Fixing your own bug successfully | `agent.self_fix` | `{ fix_description }` |
+| An error occurs during execution | `error.occurred` | (auto — hook emits on PostToolUseFailure) |
+| A file is deleted (rm / unlink) | `file.delete` | (auto — hook detects rm in Bash commands) |
+| Creating a new task (e.g. via TaskCreate) | `task.create` | `{}` (auto — hook detects TaskCreate tool calls) |
+| Updating task status | `task.update` | `{ new_status }` (auto — hook detects TaskUpdate tool calls) |
+| Opening the AGPA Dashboard | `dashboard.opened` | `{}` (auto — dashboard server tracks on page load) |
+| Using a DeepSeek model | `deepseek.conversation` | `{}` (auto — engine detects when currentModel contains "deepseek") |
 
 ### User-action events (when the USER does something you can see)
 

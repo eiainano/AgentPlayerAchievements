@@ -122,6 +122,29 @@ export class AchievementEngine {
     if (eventType === 'model.switch' && typeof payload.to === 'string' && payload.to) {
       this.currentModel = payload.to;
     }
+    // Auto-emit deepseek.conversation when any event happens in a DeepSeek session
+    const isDeepSeek = this.currentModel.toLowerCase().includes('deepseek') ||
+                       this.toolSource.toLowerCase().includes('deepseek');
+    if (isDeepSeek && eventType !== 'deepseek.conversation') {
+      const hasInSession = this.events.some(
+        e => e.event_type === 'deepseek.conversation' && e.context?.session_id === this.sessionId
+      );
+      if (!hasInSession) {
+        const dsEvent: TrackedEvent = {
+          protocol_version: '1.0',
+          event_id: crypto.randomUUID
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+          timestamp: new Date().toISOString(),
+          tool_source: this.toolSource,
+          event_type: 'deepseek.conversation',
+          payload: { model: this.currentModel },
+          context: { session_id: this.sessionId, model: this.currentModel },
+        };
+        this.events.push(dsEvent);
+        this.store.appendEvent(dsEvent);
+      }
+    }
     const event: TrackedEvent = {
       protocol_version: '1.0',
       event_id: crypto.randomUUID

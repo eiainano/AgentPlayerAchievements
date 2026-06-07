@@ -122,7 +122,15 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
       }
       results.push({ event_type: 'conversation.message', payload: msgPayload });
       // Also emit file-type events based on tool name
-      if (data.tool_name === 'Read') results.push({ event_type: 'file.read', payload: { ...base } });
+      if (data.tool_name === 'Read') {
+        results.push({ event_type: 'file.read', payload: { ...base } });
+        // If reading an image file, also emit image.read + image.upload
+        const readPath = ti.file_path as string;
+        if (readPath && /\.(png|jpe?g|gif|svg|webp|bmp|ico)$/i.test(readPath)) {
+          results.push({ event_type: 'image.read', payload: { ...base } });
+          results.push({ event_type: 'image.upload', payload: { ...base } });
+        }
+      }
       if (data.tool_name === 'Write') {
         results.push({ event_type: 'file.create', payload: { ...base } });
         results.push({ event_type: 'file.write', payload: { ...base } });
@@ -169,14 +177,31 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
           const now = new Date();
           results.push({ event_type: 'git.push', payload: { ...base, day_of_week: now.getDay(), hour: now.getHours() } });
         }
+        // Detect file deletion via rm / unlink
+        if (/\brm\b/.test(ti.command) || /\bunlink\b/.test(ti.command)) {
+          results.push({ event_type: 'file.delete', payload: { ...base } });
+        }
       }
       // MCP tool call
       if (data.tool_name?.startsWith('mcp__')) {
         results.push({ event_type: 'mcp.tool_call', payload: { ...base } });
       }
+      // Task management tools (CC deferred tools TaskCreate / TaskUpdate)
+      if (data.tool_name === 'TaskCreate') {
+        const taskPayload: Record<string, unknown> = { ...base };
+        if (typeof ti.title === 'string') taskPayload.title = ti.title;
+        if (typeof ti.description === 'string') taskPayload.description = ti.description;
+        results.push({ event_type: 'task.create', payload: taskPayload });
+      }
+      if (data.tool_name === 'TaskUpdate') {
+        const updatePayload: Record<string, unknown> = { ...base };
+        if (typeof ti.status === 'string') updatePayload.new_status = ti.status;
+        results.push({ event_type: 'task.update', payload: updatePayload });
+      }
       break;
     case 'PostToolUseFailure':
       results.push({ event_type: 'tool.failure', payload: { ...base } });
+      results.push({ event_type: 'error.occurred', payload: { ...base } });
       break;
     case 'UserPromptSubmit': {
       const promptText = (ti.prompt_text as string) || (data.prompt_text as string) || '';

@@ -21,6 +21,23 @@ describe('mapEvents', () => {
       expect(evt!.payload.file_path).toBe('/tmp/a.ts');
     });
 
+    it('emits image.read + image.upload when Read reads an image file', () => {
+      const data = { hook_event_name: 'PostToolUse', tool_name: 'Read', tool_input: { file_path: '/tmp/screenshot.png' } };
+      const results = mapEvents('PostToolUse', data);
+      const types = results.map(r => r.event_type);
+      expect(types).toContain('file.read');
+      expect(types).toContain('image.read');
+      expect(types).toContain('image.upload');
+    });
+
+    it('does NOT emit image.read for non-image files', () => {
+      const data = { hook_event_name: 'PostToolUse', tool_name: 'Read', tool_input: { file_path: '/tmp/a.ts' } };
+      const results = mapEvents('PostToolUse', data);
+      const types = results.map(r => r.event_type);
+      expect(types).not.toContain('image.read');
+      expect(types).not.toContain('image.upload');
+    });
+
     it('emits file.create + file.write for Write tool', () => {
       const data = { hook_event_name: 'PostToolUse', tool_name: 'Write', tool_input: { file_path: '/tmp/b.ts' } };
       const results = mapEvents('PostToolUse', data);
@@ -89,14 +106,38 @@ describe('mapEvents', () => {
       const evt = results.find(r => r.event_type === 'mcp.tool_call');
       expect(evt).toBeDefined();
     });
+
+    it('emits task.create for TaskCreate tool', () => {
+      const data = {
+        hook_event_name: 'PostToolUse', tool_name: 'TaskCreate',
+        tool_input: { title: 'Do the thing', description: 'A thing to do' },
+      };
+      const results = mapEvents('PostToolUse', data);
+      const evt = results.find(r => r.event_type === 'task.create');
+      expect(evt).toBeDefined();
+      expect(evt!.payload.title).toBe('Do the thing');
+      expect(evt!.payload.description).toBe('A thing to do');
+    });
+
+    it('emits task.update for TaskUpdate tool', () => {
+      const data = {
+        hook_event_name: 'PostToolUse', tool_name: 'TaskUpdate',
+        tool_input: { status: 'completed' },
+      };
+      const results = mapEvents('PostToolUse', data);
+      const evt = results.find(r => r.event_type === 'task.update');
+      expect(evt).toBeDefined();
+      expect(evt!.payload.new_status).toBe('completed');
+    });
   });
 
   describe('PostToolUseFailure', () => {
-    it('emits tool.failure', () => {
+    it('emits tool.failure + error.occurred', () => {
       const data = { hook_event_name: 'PostToolUseFailure', tool_name: 'Read' };
       const results = mapEvents('PostToolUseFailure', data);
-      expect(results).toHaveLength(1);
+      expect(results).toHaveLength(2);
       expect(results[0]!.event_type).toBe('tool.failure');
+      expect(results[1]!.event_type).toBe('error.occurred');
     });
   });
 

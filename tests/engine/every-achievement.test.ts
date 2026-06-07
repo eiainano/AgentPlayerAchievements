@@ -1,7 +1,7 @@
 /**
- * Approach B: Per-achievement trigger test (v2).
+ * Approach B: Per-achievement trigger test (v3).
  *
- * For each of the 160 achievements, auto-generate minimal events that satisfy
+ * For each of the 171 achievements, auto-generate minimal events that satisfy
  * its conditions, then verify the achievement unlocks.
  *
  * Data-driven regression test: catches evaluator regressions and YAML issues.

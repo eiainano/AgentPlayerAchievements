@@ -99,6 +99,9 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
   if (data.agent_type) base.agent_type = data.agent_type;
   if (typeof data.duration_ms === 'number') base.duration_ms = data.duration_ms;
   if (data.source) base.source = data.source;
+  const now = new Date();
+  base.hour = now.getHours();
+  base.day_of_week = now.getDay();
 
   // Extract context from tool_input
   const ti = data.tool_input || {};
@@ -174,8 +177,7 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
           results.push({ event_type: 'merge.conflict_resolved', payload: { ...base, agent_involved: true } });
         }
         if (ti.command.includes('git push')) {
-          const now = new Date();
-          results.push({ event_type: 'git.push', payload: { ...base, day_of_week: now.getDay(), hour: now.getHours() } });
+          results.push({ event_type: 'git.push', payload: { ...base } });
         }
         // Detect file deletion via rm / unlink
         if (/\brm\b/.test(ti.command) || /\bunlink\b/.test(ti.command)) {

@@ -8,6 +8,8 @@
  *     -> playNext() or all done -> onDrain callback -> renderAll()
  */
 
+(function() {
+
 // ── Rarity configuration matrix ──────────────────────────
 
 const RARITY_CONFIG = {
@@ -19,7 +21,7 @@ const RARITY_CONFIG = {
   mythic:    { flip: true,  particles: 100, entry: 'drop',  duration: 4000, soundAt: 'flip',    hasRing: true,  hasGlow: true,  hasShake: true },
 };
 
-const RARITY_ORDER = ['mythic', 'legendary', 'epic', 'rare', 'uncommon', 'common'];
+const __gachaRARITY_ORDER = ['mythic', 'legendary', 'epic', 'rare', 'uncommon', 'common'];
 
 // ── Helpers ─────────────────────────────────────────────
 
@@ -367,8 +369,8 @@ class GachaQueue {
   enqueue(achievements, options) {
     options = options || {};
     var sorted = [].concat(achievements).sort(function(a, b) {
-      var ra = RARITY_ORDER.indexOf(a.rarity) || 0;
-      var rb = RARITY_ORDER.indexOf(b.rarity) || 0;
+      var ra = __gachaRARITY_ORDER.indexOf(a.rarity) || 0;
+      var rb = __gachaRARITY_ORDER.indexOf(b.rarity) || 0;
       if (ra !== rb) return ra - rb;
       return (a.unlocked_at || '').localeCompare(b.unlocked_at || '');
     });
@@ -437,3 +439,6 @@ class GachaQueue {
 
 // ── Singleton ───────────────────────────────────────────
 var gachaQueue = new GachaQueue();
+window.gachaQueue = gachaQueue;
+
+})();

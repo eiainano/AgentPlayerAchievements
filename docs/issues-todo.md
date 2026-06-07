@@ -35,7 +35,7 @@
 - **challenge** — `in_the_zone` (In the Zone/心流状态)，task.complete×5/single_session，Rare
 - **hidden** — `meltdown` (Meltdown/熔断)，tool.failure×5/single_session，Uncommon
 - **community** — `achievement_hunter` (Achievement Hunter/成就猎人)，achievement.unlocked×50，Rare，set: completionist
-- 测试自动覆盖 +5，171 成就/519 测试/24 文件全绿
+- 测试自动覆盖 +5，183 成就/549 测试/22 文件全绿
 
 ---
 
@@ -162,10 +162,10 @@ Dashboard 新增 📸 Share 按钮，生成 Steam 风格成就卡片 PNG：
 
 ## P3 — YAML 质量 / 资产
 
-- [x] **Hidden 分类** — 约 35 个（171 个总成就中约 20%）。41→21→35（经过一次重归类又部分回退）。剩余 35 个全是真彩蛋。
+- [x] **Hidden 分类** — 约 35 个（183 个总成就中约 19%）。41→21→35（经过一次重归类又部分回退）。剩余 35 个全是真彩蛋。
 - [ ] **手动 review 全部 183 条 pixelArtDesc** — `docs/pixel-art-ideas.md` 中每个成就的像素画描述，逐条审阅和修改。改完后重跑 `npx tsx scripts/generate-pixel-art.ts` 即可用最新描述生图。
 - [ ] **像素画 icon 资产暂缺** — `scripts/generate-pixel-art.ts` 已就绪（Gemini 3.1 Nano Banana 2），`docs/pixel-art-ideas.md` 已含 171 条描述（含新 5 条待加）。下一步：review 描述 → 生成全部 171 张 → 选 The Beginning（14 个）做 Dashboard icon 试点。方案：32×32 pixel art PNG → `public/icons/` → YAML `icon: { src, alt }` → Dashboard `iconHtml()` 渲染。emoji 和 pixel art 并存，渐进替换。
-- [x] **Set 名称只有英文** — 9→10 个 set，全部添加 `name_cn`，套装页中英双语切换。Set 系统重构：合并散装 set，扩充合理 set。`git_flow`（7→9）、`agent_commander`（5→7）、`creators_forge`（5→6）、`polar_night`（2→3）、`linguist`（新增 9）。71/183 有归属。
+- [x] **Set 名称只有英文** — 9→11 个 set，全部添加 `name_cn`，套装页中英双语切换。Set 系统重构：合并散装 set，扩充合理 set。`git_flow`（7→9）、`agent_commander`（5→7）、`creators_forge`（5→6）、`polar_night`（2→3）、`endurance`（5→7）、`linguist`（新增 9）。71/183 有归属。
 
 ---
 

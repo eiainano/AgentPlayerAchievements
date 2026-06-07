@@ -51,6 +51,7 @@ import { sendNotification } from '../utils/notify.js';
 import { resolveProfileDir, DEFAULT_PROFILE } from '../utils/profile.js';
 import { renderPopup, type PopupAchievement } from '../utils/ansi-popup.js';
 import { findNearUnlocks } from '../utils/progress-nudge.js';
+import { detectLanguage } from '../utils/lang-detect.js';
 
 const activeProfile = process.env.AGPA_PROFILE || loadConfig().active_profile || DEFAULT_PROFILE;
 const stateDir = resolveProfileDir(activeProfile);
@@ -133,10 +134,19 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
           results.push({ event_type: 'image.read', payload: { ...base } });
           results.push({ event_type: 'image.upload', payload: { ...base } });
         }
+        // Emit file.language_used for known code file types
+        const readLang = detectLanguage(ti.file_path as string || '');
+        if (readLang) {
+          results.push({ event_type: 'file.language_used', payload: { ...base, language: readLang } });
+        }
       }
       if (data.tool_name === 'Write') {
         results.push({ event_type: 'file.create', payload: { ...base } });
         results.push({ event_type: 'file.write', payload: { ...base } });
+        const writeLang = detectLanguage(ti.file_path as string || '');
+        if (writeLang) {
+          results.push({ event_type: 'file.language_used', payload: { ...base, language: writeLang } });
+        }
       }
       if (data.tool_name === 'Edit') {
         // Extract edit_lines from old_string, total_file_lines from file on disk (for surgeon metric)
@@ -157,6 +167,10 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
           }
         }
         results.push({ event_type: 'file.edit', payload: editPayload });
+        const editLang = detectLanguage(ti.file_path as string || '');
+        if (editLang) {
+          results.push({ event_type: 'file.language_used', payload: { ...base, language: editLang } });
+        }
       }
       if (data.tool_name === 'Bash' && typeof ti.command === 'string') {
         const cmdPayload: Record<string, unknown> = { ...base, command: ti.command };

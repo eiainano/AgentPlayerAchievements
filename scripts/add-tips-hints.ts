@@ -5,7 +5,7 @@
 import * as fs from 'fs';
 import * as YAML from 'yaml';
 
-const YAML_PATH = '04-成就定义清单.yaml';
+const YAML_PATH = 'achievement-definitions.yaml';
 
 // ── Onboarding: tip (educational) + hint (unlock clue) ──
 const ONBOARDING: Record<string, { tip_cn: string; tip: string; hint_cn: string; hint: string }> = {

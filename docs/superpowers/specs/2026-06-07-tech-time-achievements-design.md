@@ -179,7 +179,7 @@ language: event.payload?.language || '',
 | `src/utils/lang-detect.ts` | **新建** | `detectLanguage(filePath)` 函数 + 语言映射表 |
 | `src/cli/hook.ts` | 修改 | 检测文件扩展名时发射 `file.language_used` + `base` 加 `hour` |
 | `src/engine/evaluator.ts` | 修改 | matchFilter ctx 补 `language` 字段 |
-| `04-成就定义清单.yaml` | 修改 | 新增 12 个成就定义 + `linguist` 套装 + `endurance` 扩展 |
+| `achievement-definitions.yaml` | 修改 | 新增 12 个成就定义 + `linguist` 套装 + `endurance` 扩展 |
 | `src/cli/init.ts` | 修改 | AGENTS.md 注入文档更新（说明语言事件已 auto-track） |
 | `tests/` | 新增/修改 | `lang-detect.test.ts`（映射表覆盖） + every-achievement.ts 新 12 条 + test 总数 |
 

@@ -13,7 +13,7 @@ const stateDir = process.argv.includes('--state-dir')
   ? process.argv[process.argv.indexOf('--state-dir') + 1]!
   : resolveProfileDir('default');
 
-const yamlPath = '04-成就定义清单.yaml';
+const yamlPath = 'achievement-definitions.yaml';
 
 if (!fs.existsSync(yamlPath)) {
   console.error(`❌ YAML file not found: ${yamlPath}`);

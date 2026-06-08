@@ -1,6 +1,34 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-08 | 总成就数: 183 | 条件类型: 11 | Tests: 845 ✅ (33 files) | 0 不可达 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | Logo 像素画 + Dashboard 集成 ✅ | 语言自动检测 ✅ | CLI 24 命令 ✅ | agpa uninstall ✅ | 跨平台通知增强 ✅ | macOS JXA 通知 ✅ | Dashboard 导出按钮 ✅ | 共享主题常量 ✅
+> 最后更新: 2026-06-08 | 总成就数: 183 | 条件类型: 11 | Tests: 897 ✅ (34 files) | 0 不可达 ✅ | 0 审计错误 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | Logo 像素画 + Dashboard 集成 ✅ | 语言自动检测 ✅ | CLI 24 命令 ✅ | agpa uninstall ✅ | 跨平台通知增强 ✅ | macOS JXA 通知 ✅ | Dashboard 导出按钮 ✅ | 共享主题常量 ✅
+
+---
+
+## 🆕 成就审计系统 Phase 1 + 3 YAML Bug 修复 (v0.1.6, 6/8)
+
+### Phase 1: 规则引擎 (`src/verify/auditor.ts`)
+
+混合方案（规则引擎 CI gate + LLM 按需审计）的规则引擎部分落地：
+
+- **Layer A（数值/窗口/操作符一致性）** — 从 EN + CN 描述中提取数字、窗口、操作符，与 conditions 逐项比对
+- **Layer B（语义模式匹配）** — condition type ↔ 描述意图（"N different" → distinct_count, "N consecutive" → streak 等）、window 必填检查、event ↔ 主语映射、filter 必填提示
+- **LLM 标记启发式** — set_completion、多类型条件、无数字描述、pattern_match/ratio → 标记为 `needsLLMReview`
+- **51 测试** (`tests/verify/auditor.test.ts`) — 覆盖所有 Layer A/B 模式 + 真实 YAML 集成（183 成就 → 0 错误）
+- **CI 集成** — `hasErrors(report)` 返回 true 时 CI 阻断；warnings 仅输出
+
+### 审计发现的 3 个真 Bug（YAML 已修复）
+
+| 成就 | Bug | 修复 |
+|------|-----|------|
+| `marathon` | "Single session ≥ 3h" 但 threshold 不加 `per_event`，累加所有 session 的 duration | +`per_event: true` |
+| `iterative_refiner` | "Single task 20+ turns" 但 threshold 不加 `per_event`，累加所有 task 的 step_count；且 operator `>` 应为 `>=`（描述说"20+"） | +`per_event: true`，`>`→`>=` |
+| `the_all_nighter` | "Single task ≥ 6h" 但 threshold 不加 `per_event`，累加所有 task 的 duration | +`per_event: true` |
+
+### Phase 2: LLM 审计脚本（待实施）
+
+- `scripts/audit-achievements.ts` — 按 spec `docs/superpowers/specs/2026-06-08-achievement-audit-system-design.md` 实现
+- 覆盖：Layer B 深层语义 + Layer C 完整性（描述有但条件缺？条件有但描述无？）
+- 标注了 103 个 `needsLLMReview` 的成就 ID
 
 ---
 

@@ -17,7 +17,7 @@ import { ANSI_GREEN as GREEN, ANSI_RED as RED, ANSI_YELLOW as YELLOW, ANSI_BOLD 
 
 const AGPA_DIR = path.join(homedir(), '.agent-achievements');
 const PROJECT_ROOT = path.resolve(import.meta.dirname, '../..');
-const DEFS_YAML = path.join(PROJECT_ROOT, '04-成就定义清单.yaml');
+const DEFS_YAML = path.join(PROJECT_ROOT, 'achievement-definitions.yaml');
 
 // ── Types ─────────────────────────────────────────────────────────────────
 

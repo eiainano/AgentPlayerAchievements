@@ -53,7 +53,7 @@ export class AchievementEngine {
   constructor(opts: EngineOptions = {}) {
     const defaultStateDir = path.join(process.env.HOME || '~', '.agent-achievements');
     this.stateDir = opts.stateDir || defaultStateDir;
-    this.defsPath = opts.defsPath || path.join(ROOT, '04-成就定义清单.yaml');
+    this.defsPath = opts.defsPath || path.join(ROOT, 'achievement-definitions.yaml');
     this.enabledCategories = opts.enabledCategories;
     this.toolSource = opts.toolSource || process.env.AGPA_TOOL_SOURCE || 'unknown';
     this.sessionId = opts.sessionId || `agpa_${Date.now()}`;

@@ -1043,7 +1043,7 @@ function installAchievementCommands(): boolean {
  * Claude command files read this JSON to know metadata (Claude can't parse YAML).
  */
 function compileAchievementsJSON(dataDir: string): string | null {
-  const yamlPath = path.join(AGPA_ROOT, '04-成就定义清单.yaml');
+  const yamlPath = path.join(AGPA_ROOT, 'achievement-definitions.yaml');
   if (!fs.existsSync(yamlPath)) return null;
 
   const yamlText = fs.readFileSync(yamlPath, 'utf-8');

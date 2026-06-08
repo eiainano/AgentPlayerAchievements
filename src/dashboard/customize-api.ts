@@ -1,7 +1,7 @@
 /**
  * Self-Customize API — achievement name/description personalization backend.
  *
- * Reads/writes 04-成就定义清单.yaml directly (bypasses engine). The customize
+ * Reads/writes achievement-definitions.yaml directly (bypasses engine). The customize
  * page at /customize is intentionally unlinked from the main Dashboard — users
  * find it via documentation, not navigation.
  */
@@ -11,7 +11,7 @@ import * as YAML from 'yaml';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-let yamlPath = path.resolve(__dirname, '..', '..', '04-成就定义清单.yaml');
+let yamlPath = path.resolve(__dirname, '..', '..', 'achievement-definitions.yaml');
 export function setYamlPathForTest(p: string): void { yamlPath = p; }
 
 // ── Types ────────────────────────────────────────────────────────────────

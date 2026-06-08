@@ -16,7 +16,7 @@ import { parseYAML } from '../../src/engine/yaml-parser.js';
 import type { Condition, TrackedEvent, AchievementDefinition } from '../../src/engine/types.js';
 
 const TEMP_DIR = path.join(os.tmpdir(), `agpa-every-ach-${Date.now()}`);
-const YAML_PATH = path.resolve(import.meta.dirname, '../../04-成就定义清单.yaml');
+const YAML_PATH = path.resolve(import.meta.dirname, '../../achievement-definitions.yaml');
 
 const yamlText = fs.readFileSync(YAML_PATH, 'utf-8');
 const { definitions: ALL_DEFS } = parseYAML(yamlText);
@@ -165,7 +165,11 @@ function genEvents(cond: Condition): TrackedEvent[] {
       if (cond.max_per_day != null) return [];
 
       if (cond.per_event && cond.field) {
-        const eventPayload = { ...payload, [cond.field]: cond.value };
+        // For '>' operator, set field to value+1 to satisfy strict greater-than
+        const adjusted = cond.operator === '>' ? cond.value + 1
+          : cond.operator === '>=' ? cond.value
+          : cond.value;
+        const eventPayload = { ...payload, [cond.field]: adjusted };
         return [evt(cond.event || 'task.complete', eventPayload, { context: { session_id: 'test-session', model: 'auto', ...ctx } })];
       }
 

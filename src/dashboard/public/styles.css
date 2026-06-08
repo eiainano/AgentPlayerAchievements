@@ -189,6 +189,11 @@ body {
 .profile-option:hover { background: var(--bg-card-hover); }
 .profile-option.active { color: var(--gold); font-weight: 600; }
 .profile-check { color: var(--gold); font-weight: 700; }
+.profile-option-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 8px;
+}
 
 .profile-dropdown-footer {
   border-top: 1px solid var(--border);

@@ -704,23 +704,6 @@ function renderNav(data) {
     demoBadge.style.display = data.is_demo ? 'inline-block' : 'none';
   }
 
-  // Demo: show profile switcher link (opens dropdown, doesn't hardcode a target)
-  const navControls = document.querySelector('.nav-controls');
-  const existingSwitch = document.getElementById('demo-switch');
-  if (existingSwitch) existingSwitch.remove();
-  if (data.is_demo && navControls) {
-    const switchLink = document.createElement('a');
-    switchLink.id = 'demo-switch';
-    switchLink.className = 'demo-switch-link';
-    switchLink.href = '#';
-    switchLink.textContent = '切换档案 →';
-    switchLink.onclick = (e) => {
-      e.preventDefault();
-      toggleProfileDropdown();
-    };
-    navControls.appendChild(switchLink);
-  }
-
   const links = document.querySelectorAll('.nav-link');
   const sections = ['profile', 'achievements', 'sets', 'timeline', 'insights'];
   const observer = new IntersectionObserver(entries => {
@@ -741,26 +724,37 @@ function renderNav(data) {
 function renderProfileSelector(data) {
   const profiles = data.profiles || [{ name: 'default', emoji: '📂' }];
   const active = data.profile || currentProfile || 'default';
+  const isDemo = data.is_demo;
   const activeMeta = profiles.find(p => p.name === active) || { name: active, emoji: active === '_demo' ? '🔬' : active === 'default' ? '📂' : '👤' };
   const maxProfiles = data.max_profiles || 3;
 
-  // Update nav button with profile emoji + name
+  // Update nav button — _demo uses readable "Demo" label
   const display = document.getElementById('profile-name-display');
-  if (display) display.textContent = active;
+  if (display) display.textContent = active === '_demo' ? 'Demo' : active;
 
   const emojiEl = document.getElementById('profile-emoji');
-  if (emojiEl) emojiEl.textContent = activeMeta.emoji || '📂';
+  if (emojiEl) emojiEl.textContent = active === '_demo' ? '🔬' : (activeMeta.emoji || '📂');
 
   const list = document.getElementById('profile-list');
   if (!list) return;
 
-  list.innerHTML = profiles.map(p => `
+  // Build profile options — in demo mode, prepend a _demo entry so user can return
+  let options = '';
+  if (isDemo) {
+    options += `<div class="profile-option active" onclick="switchProfile('_demo')">
+      <span>🔬 Demo 数据（试用体验）</span>
+      <span class="profile-check">✓</span>
+    </div>
+    <div class="profile-option-sep"></div>`;
+  }
+  options += profiles.map(p => `
     <div class="profile-option ${p.name === active ? 'active' : ''}"
          onclick="switchProfile('${escAttr(p.name)}')">
       <span>${escHtml(p.emoji || '👤')} ${escHtml(p.name)}</span>
       ${p.name === active ? '<span class="profile-check">✓</span>' : ''}
     </div>
   `).join('');
+  list.innerHTML = options;
 
   // Show/hide create section based on limit (named profiles only, excluding default)
   const createSection = document.getElementById('profile-create-section');
@@ -837,14 +831,16 @@ function toggleProfileDropdown() {
 }
 
 async function switchProfile(profileName) {
-  // Persist choice to config.json so MCP server tracks to this profile
-  try {
-    await fetch('/api/profiles/active', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ profile: profileName }),
-    });
-  } catch { /* ignore, still navigate even if API fails */ }
+  // _demo is a read-only system profile — don't persist as active
+  if (profileName !== '_demo') {
+    try {
+      await fetch('/api/profiles/active', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ profile: profileName }),
+      });
+    } catch { /* ignore, still navigate even if API fails */ }
+  }
 
   const url = new URL(window.location);
   url.searchParams.set('profile', profileName);
@@ -1203,8 +1199,12 @@ function renderOnboardingGuide(data) {
   const section = document.getElementById('onboarding-guide');
   if (!section) return;
 
-  if (data.stats.unlocked > 0) {
+  // Demo mode has its own banner+tour; suppress onboarding guide + first-visit-tip
+  if (data.is_demo || data.stats.unlocked > 0) {
     section.style.display = 'none';
+    // Also suppress first-visit-tip
+    const visitTip = document.getElementById('first-visit-tip');
+    if (visitTip) visitTip.style.display = 'none';
     return;
   }
 
@@ -1245,8 +1245,8 @@ function renderFirstVisitTip(data) {
 
   const unlocked = data.stats.unlocked;
 
-  // Show only when 1-5 achievements unlocked and not dismissed
-  if (unlocked < 1 || unlocked > 5 || localStorage.getItem('agpa-visit-tip-dismissed')) {
+  // Show only when 1-5 achievements unlocked, not in demo mode, and not dismissed
+  if (data.is_demo || unlocked < 1 || unlocked > 5 || localStorage.getItem('agpa-visit-tip-dismissed')) {
     section.style.display = 'none';
     return;
   }

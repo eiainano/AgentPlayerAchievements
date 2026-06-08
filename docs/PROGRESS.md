@@ -4,7 +4,12 @@
 
 ## 总体状态
 
-v0.1.6 完成。24 个 CLI 命令，5 个 Agent 双通道覆盖，**183 个成就**，**897 个测试全绿（34 文件）**。
+v0.1.6 完成。24 个 CLI 命令，5 个 Agent 双通道覆盖，**183 个成就**，**962 个测试全绿（36 文件）**。
+
+**本次新增 (2026-06-08 成就审计系统 Phase 1 + 2):**
+- **Phase 1 规则引擎** (`src/verify/auditor.ts` 已有) — Layer A（数值/窗口/操作符）+ Layer B（语义模式）的自审计，51 测试
+- **Phase 2 LLM 审计脚本** (`scripts/audit-achievements.ts`) — 双 Provider（Anthropic/OpenAI），智能分批 20，默认仅审计 102 个 flagged 成就，结构化报告 + dry-run 模式，38 测试
+- **测试扩展**：924 → 962（+38），35 → 36 文件
 
 **本次新增 (2026-06-08 全面审视):**
 - **Bug 修复**：`evalPredicate` `<`/`>` fail-safe、`file.create` birthtime 检测、CSS keyframes 冲突、crypto.randomUUID 去重

@@ -42,8 +42,8 @@ definitions:
         operator: ">="
         value: 3
   - id: tool_time
-    name: I Got Tools
-    name_cn: 工具学徒
+    name: Prometheus
+    name_cn: 普罗米修斯
     description: Your agent executed its first tool call.
     description_cn: agent 执行了第一个 tool call。
     icon: 🔧
@@ -438,6 +438,7 @@ definitions:
         field: duration_ms
         operator: ">="
         value: 10800000
+        per_event: true
     set: endurance
   - id: streak_7
     name: Streak 7
@@ -816,8 +817,6 @@ definitions:
     category: skill
     rarity: uncommon
     hidden: false
-    hint: Work during off-peak hours — late night or early morning
-    hint_cn: 在某个时间段保持低调——深夜或凌晨
     conditions:
       - type: event
         event: task.complete
@@ -830,7 +829,7 @@ definitions:
         value: 0
   - id: first_try
     name: Smooth Criminal
-    name_cn: 一次就过
+    name_cn: 尽享丝滑
     description: Agent's first test run passed on the first try — zero failures,
       smooth as silk.
     description_cn: agent 写完代码后第一次测试就直接通过，中间无失败，非常丝滑。
@@ -949,6 +948,7 @@ definitions:
         field: step_count
         operator: ">"
         value: 20
+        per_event: true
   - id: night_owl
     name: Night Owl
     name_cn: 夜猫子
@@ -2135,8 +2135,8 @@ definitions:
           - tool.complete
         window: single_task
   - id: u_turn
-    name: Scorched Earth Redux
-    name_cn: 推倒重来
+    name: Remastered
+    name_cn: 重制版
     description: Had your agent revert and start over in a new direction. Starting
       over takes courage — and knowing what you want.
     description_cn: 主动让 agent revert 后换方向重新实现。推翻重来需要勇气，也说明你明确知道自己要什么。
@@ -2266,8 +2266,8 @@ definitions:
         value: 50
         window: single_session
   - id: deepseek_dabbler
-    name: Deep Diversified
-    name_cn: 深海探索者
+    name: Whale Song
+    name_cn: 鲸歌
     description: Used a DeepSeek model at least once. Diving into new waters.
     description_cn: 用过一次 DeepSeek 模型。潜入了新的海域。
     icon: 🌊
@@ -2315,8 +2315,8 @@ definitions:
         operator: ">="
         value: 3
   - id: whale_song
-    name: Whale Song
-    name_cn: 鲸歌
+    name: Orca
+    name_cn: 杀手鲸
     description: Completed a task using a DeepSeek model. The deep sea hums — and
       you listened.
     description_cn: 使用 DeepSeek 模型完成了一个 task。深海在低语——而你听见了。
@@ -2827,8 +2827,6 @@ definitions:
     category: skill
     rarity: common
     hidden: false
-    hint: Do the same thing three times in a row
-    hint_cn: 同一件事连做三次
     conditions:
       - type: counter
         event: command.run

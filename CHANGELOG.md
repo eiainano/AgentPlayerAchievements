@@ -2,6 +2,17 @@
 
 ## [0.1.6] — 2026-06-08
 
+### CLI 大扩展 + Hook 测试覆盖 + 文档同步 — 2026-06-08
+
+- **4 新命令**：`agpa completion <bash|zsh|fish>`（Shell 自动补全）、`agpa upgrade [--check]`（版本检查+升级引导）、`agpa watch [--poll <sec>]`（实时成就监控，非 TTY 输出 JSON 快速退出）、`agpa history [--N] [--event] [--today] [--json]`（事件日志浏览，彩色表格式输出 + Top 5 事件类型统计）
+- **CLI 增强**：`--json` 输出支持（stats/progress/search/suggest/activity，脚本化消费）；`--profile` 一致性（stats/progress/reset/search/suggest/activity/watch 全部支持）；`init --auto`（非交互模式，一键全自动配置）；`init --upgrade`（仅刷新 hooks+instructions+commands，不动 MCP 配置）；`uninstall --yes`（`--all` 别名，脚本友好）；`doctor --quick`（= verify 的 6 项检查）；`watch` 非 TTY 模式输出 stats JSON 立即退出
+- **verify 合并到 doctor**：`agpa verify` → `doctor --quick`，共享检查函数，消除 ~350 行重复维护
+- **init auto-verify**：`agpa init` 完成后自动运行健康检查（5 项）并显示摘要
+- **Hook 测试覆盖率**（750→845 tests，+95）：`normalizeHermesStdin` 35 tests（原 0），4 个事件/工具映射表完整性检查，Bash git 事件全覆盖（push/pr_created/bisect/merge/file.delete），`file.language_used` 5 tests，图片扩展名全 8 格式检测，`computePromptPayload` 边界情况，`parseTranscriptJsonl` 有效/混合/无效行，`UserPromptSubmit` 中文+代码块+hash 指纹
+- **hook.ts 导出**：`HERMES_EVENT_MAP`、`HERMES_TOOL_MAP`、`normalizeHermesStdin` 从 `const` → `export const`
+- **文档同步**：CLAUDE.md / README.md / README.zh-CN.md / PROGRESS.md / issues-todo.md — 722→845 tests，29→33 files，20→24 CLI commands，171→183 achievements
+- 构建 + 845 测试全绿（33 文件）
+
 ### 全面审视 + 修复 — 2026-06-08
 
 - **Bug 修复**：`evalPredicate` `<`/`>` 非数字值改回 `false`（fail-safe）；`file.create` 仅在文件首次创建时触发（birthtime ≈ mtime 检测）；`crypto.randomUUID` 去重提取为 `uuid()`；CSS `card-in` keyframes 重名冲突修复

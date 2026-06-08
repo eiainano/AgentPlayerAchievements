@@ -138,92 +138,6 @@ function renderProgressJSON(defs: AchievementDefinition[], state: AchievementSta
   return JSON.stringify(items, null, 2);
 }
 
-// ── Demo scenario ────────────────────────────────────────────────────
-
-function runDemo(): void {
-  const engine = new AchievementEngine();
-  engine.resetState();
-  engine.init();
-
-  console.log(`${B}\x1b[38;2;255;200;0m`);
-  console.log('  ╔══════════════════════════════════════════════╗');
-  console.log('  ║     🎮  AGPA MVP — Simulation Mode  🎮      ║');
-  console.log('  ║    Agent Player Achievements System          ║');
-  console.log('  ╚══════════════════════════════════════════════╝');
-  console.log(`${R}`);
-
-  const session: Array<{ event: string; payload?: Record<string, unknown> }> = [
-    { event: 'session.start' },
-    { event: 'conversation.message' },
-    { event: 'conversation.message' },
-    { event: 'conversation.message' },
-    { event: 'tool.complete', payload: { tool_name: 'Read' } },
-    { event: 'conversation.message' },
-    { event: 'tool.complete', payload: { tool_name: 'Edit' } },
-    { event: 'task.complete' },
-    { event: 'conversation.message' },
-    { event: 'tool.complete', payload: { tool_name: 'Bash' } },
-    { event: 'task.complete' },
-    { event: 'tool.complete', payload: { tool_name: 'Write' } },
-    { event: 'task.complete' },
-    { event: 'conversation.message' },
-    { event: 'session.end' },
-  ];
-
-  console.log(`${D}Simulating first session...${R}\n`);
-
-  for (const { event, payload } of session) {
-    engine.track(event, payload || {});
-    process.stdout.write('.');
-  }
-
-  const first = engine.poll();
-  if (first.length > 0) {
-    console.log('\n');
-    for (const ach of first) {
-      console.log(renderPopup(ach));
-      console.log();
-    }
-  }
-
-  console.log(`${D}Simulating continued usage (10 sessions)...${R}\n`);
-
-  for (let s = 0; s < 10; s++) {
-    engine.track('session.start');
-    engine.track('conversation.message');
-    engine.track('tool.complete', { tool_name: 'Read' });
-    engine.track('conversation.message');
-    engine.track('tool.complete', { tool_name: 'Edit' });
-    engine.track('task.complete');
-    engine.track('conversation.message');
-    engine.track('tool.complete', { tool_name: 'Bash' });
-    engine.track('tool.complete', { tool_name: 'Read' });
-    engine.track('conversation.message');
-    engine.track('task.complete');
-
-    if (s % 2 === 0) {
-      engine.track('task.complete');
-      engine.track('conversation.message');
-    }
-
-    engine.track('session.end');
-  }
-
-  const more = engine.poll();
-  if (more.length > 0) {
-    for (const ach of more) {
-      console.log(renderPopup(ach));
-      console.log();
-    }
-  }
-
-  const stats = engine.stats();
-  console.log(renderStats(stats));
-
-  console.log(`\n\n${D}Run "agpa progress" to see all achievements.${R}`);
-  console.log(`${D}Run "agpa reset" to start over.${R}\n`);
-}
-
 // ── Main ─────────────────────────────────────────────────────────────
 
 function parseProfile(args: string[]): string | null {
@@ -238,14 +152,12 @@ function resolveStateDir(profile: string | null): string | undefined {
   return p !== 'default' ? resolveProfileDir(p) : undefined;
 }
 
-const cmd = process.argv[2] || 'demo';
+const cmd = process.argv[2] || 'stats';
 const args = process.argv.slice(3);
 const jsonOutput = args.includes('--json');
 const profile = parseProfile(args);
 
-if (cmd === 'demo') {
-  runDemo();
-} else if (cmd === 'stats') {
+if (cmd === 'stats') {
   const stateDir = resolveStateDir(profile);
   const engine = new AchievementEngine(stateDir ? { stateDir } : {});
   engine.init();

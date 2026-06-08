@@ -27,6 +27,7 @@
         <img src="/agpa-logo-dark-24.png" alt="" class="nav-logo" id="nav-logo">
         <span class="nav-brand-text">AGPA</span>
       </span>
+      <span class="demo-badge" id="demo-badge" style="display:none">🔬 Demo 数据</span>
       <!-- Profile selector -->
       <div class="profile-selector">
         <button class="profile-btn" id="profile-btn" onclick="toggleProfileDropdown()">
@@ -84,6 +85,21 @@
       </div>
     </div>
   </nav>
+
+  <!-- Demo banner (shown when viewing _demo profile) -->
+  <div id="demo-banner" class="demo-banner" style="display:none">
+    <div class="demo-banner-content">
+      <span class="demo-banner-icon">🎮</span>
+      <div class="demo-banner-text">
+        <div class="demo-banner-title">这是你的 Demo 体验数据</div>
+        <div class="demo-banner-sub">我们用模拟的一天使用历史帮你解锁了 5 个入门成就。探索下面的面板，了解 AGPA 能追踪什么。</div>
+      </div>
+      <div class="demo-banner-actions">
+        <button class="demo-banner-tour-btn" onclick="startTour()">👀 带我逛逛</button>
+        <button class="demo-banner-close-btn" onclick="dismissDemoBanner()">✕ 关闭</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Error banner (hidden by default) -->
   <div id="error-banner" class="error-banner" style="display:none" role="alert">
@@ -294,6 +310,7 @@
   </div>
 
   <script src="/gacha-reveal.js"></script>
+  <script src="/tour.js"></script>
   <script src="/app.js?v=0.1.6"></script>
   <div id="card-preview"></div>
 

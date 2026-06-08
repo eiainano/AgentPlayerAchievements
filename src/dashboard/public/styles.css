@@ -3622,3 +3622,176 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
   }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   Demo Experience — badge, banner, tour, card glow
+   ═══════════════════════════════════════════════════════════ */
+
+/* Demo badge in nav */
+.demo-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 4px;
+  background: #7c3aed;
+  color: #fff;
+  margin-left: 8px;
+  white-space: nowrap;
+  letter-spacing: .02em;
+}
+
+/* Demo switch-to-real link */
+.demo-switch-link {
+  color: var(--text-dim);
+  font-size: 12px;
+  text-decoration: none;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  margin-left: 12px;
+  transition: color .2s, border-color .2s;
+}
+.demo-switch-link:hover {
+  color: var(--text);
+  border-color: var(--text-dim);
+}
+
+/* Demo banner */
+.demo-banner {
+  background: linear-gradient(135deg, #4c1d95, #7c3aed);
+  color: #fff;
+  margin: 0 auto;
+  max-width: 900px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  animation: demo-banner-in .5s ease both;
+}
+@keyframes demo-banner-in {
+  0% { opacity: 0; transform: translateY(-8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.demo-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  flex-wrap: wrap;
+}
+.demo-banner-icon { font-size: 28px; flex-shrink: 0; }
+.demo-banner-text { flex: 1; min-width: 0; }
+.demo-banner-title { font-size: 15px; font-weight: 700; }
+.demo-banner-sub { font-size: 13px; opacity: .85; margin-top: 2px; }
+.demo-banner-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.demo-banner-tour-btn {
+  background: #fff;
+  color: #7c3aed;
+  border: none;
+  padding: 6px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity .2s;
+}
+.demo-banner-tour-btn:hover { opacity: .9; }
+.demo-banner-close-btn {
+  background: none;
+  border: 1px solid rgba(255,255,255,.3);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background .2s;
+}
+.demo-banner-close-btn:hover { background: rgba(255,255,255,.15); }
+
+/* Product Tour Overlay */
+.tour-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 10000;
+  display: none;
+  cursor: default;
+}
+.tour-highlight {
+  box-shadow: 0 0 0 4px rgba(250,204,21,.6), 0 0 20px rgba(250,204,21,.25) !important;
+  border-radius: 8px;
+  animation: tour-pulse 2s ease-in-out infinite;
+}
+@keyframes tour-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(250,204,21,.6), 0 0 20px rgba(250,204,21,.25); }
+  50%      { box-shadow: 0 0 0 6px rgba(250,204,21,.8), 0 0 28px rgba(250,204,21,.35); }
+}
+.tour-tooltip {
+  position: fixed;
+  z-index: 10002;
+  display: none;
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.4);
+  min-width: 300px;
+}
+.tour-tooltip-step {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 6px;
+}
+.tour-tooltip-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.tour-tooltip-desc {
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+.tour-tooltip-btns {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.tour-btn {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text);
+  transition: background .2s, border-color .2s;
+}
+.tour-btn:hover { background: var(--bg-card-hover); border-color: var(--border-strong); }
+.tour-btn-next, .tour-btn-done {
+  background: #7c3aed;
+  color: #fff;
+  border-color: transparent;
+}
+.tour-btn-next:hover, .tour-btn-done:hover {
+  background: #6d28d9;
+  border-color: transparent;
+}
+.tour-btn-skip { color: var(--text-dim); opacity: .6; }
+.tour-btn-skip:hover { opacity: 1; }
+
+/* Demo achievement card golden glow */
+.ach-card.demo-unlocked {
+  box-shadow: 0 0 4px rgba(250,204,21,.4);
+  animation: demo-glow 2.5s ease-in-out infinite;
+  border-color: rgba(250,204,21,.3);
+}
+@keyframes demo-glow {
+  0%, 100% { box-shadow: 0 0 4px rgba(250,204,21,.4); }
+  50%      { box-shadow: 0 0 12px rgba(250,204,21,.7); }
+}

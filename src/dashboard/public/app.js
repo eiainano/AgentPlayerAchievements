@@ -534,6 +534,7 @@ function renderAll(data) {
   renderErrors = [];
   renderSafe('i18n', () => renderI18n());
   renderSafe('nav', () => renderNav(data));
+  renderSafe('demo-banner', () => renderDemoBanner(data));
   renderSafe('profile', () => renderProfile(data));
   renderSafe('visit-tip', () => renderFirstVisitTip(data));
   renderSafe('next-achievement', () => renderNextAchievement(data));
@@ -696,6 +697,29 @@ function renderNav(data) {
 
   renderProfileSelector(data);
   renderTrackedTools(data);
+
+  // Demo badge visibility
+  const demoBadge = document.getElementById('demo-badge');
+  if (demoBadge) {
+    demoBadge.style.display = data.is_demo ? 'inline-block' : 'none';
+  }
+
+  // Demo switch-to-real link
+  const navControls = document.querySelector('.nav-controls');
+  const existingSwitch = document.getElementById('demo-switch');
+  if (existingSwitch) existingSwitch.remove();
+  if (data.is_demo && navControls) {
+    const switchLink = document.createElement('a');
+    switchLink.id = 'demo-switch';
+    switchLink.className = 'demo-switch-link';
+    switchLink.href = '#';
+    switchLink.textContent = '切换到真实数据 →';
+    switchLink.onclick = (e) => {
+      e.preventDefault();
+      switchProfile('default');
+    };
+    navControls.appendChild(switchLink);
+  }
 
   const links = document.querySelectorAll('.nav-link');
   const sections = ['profile', 'achievements', 'sets', 'timeline', 'insights'];
@@ -1237,6 +1261,36 @@ function dismissVisitTip() {
   if (section) section.style.display = 'none';
 }
 
+// ── Demo Banner ──────────────────────────────────────
+
+function renderDemoBanner(data) {
+  const banner = document.getElementById('demo-banner');
+  if (!banner) return;
+
+  if (!data.is_demo) {
+    banner.style.display = 'none';
+    return;
+  }
+
+  if (localStorage.getItem('agpa-demo-banner-dismissed')) {
+    banner.style.display = 'none';
+    return;
+  }
+
+  banner.style.display = 'block';
+}
+
+function dismissDemoBanner() {
+  localStorage.setItem('agpa-demo-banner-dismissed', '1');
+  const banner = document.getElementById('demo-banner');
+  if (banner) {
+    banner.style.transition = 'opacity .3s, transform .3s';
+    banner.style.opacity = '0';
+    banner.style.transform = 'translateY(-8px)';
+    setTimeout(function() { banner.style.display = 'none'; }, 300);
+  }
+}
+
 // ── Next achievement recommendation (1-10 unlocked) ──
 
 function renderNextAchievement(data) {
@@ -1497,9 +1551,10 @@ function renderGrid(data) {
 
     const pickableClass = inPickMode && !locked ? ' pickable' : '';
     const lockedClass = locked ? ' locked' : '';
+    const demoClass = (dashboardData?.is_demo && !locked) ? ' demo-unlocked' : '';
 
     const cardColor = locked ? '' : `--card-color:var(--rarity-${a.rarity});`;
-    return `<div class="ach-card${lockedClass}${pickableClass}" data-rarity="${a.rarity}" data-id="${escAttr(a.id)}" style="${cardColor}--delay:${idx * 30}ms">
+    return `<div class="ach-card${lockedClass}${pickableClass}${demoClass}" data-rarity="${a.rarity}" data-id="${escAttr(a.id)}" style="${cardColor}--delay:${idx * 30}ms">
       <div class="ach-stripe"></div>
       ${pinBtn}
       <div class="ach-icon-wrap">${iconHtml(showIcon, { pixelArt: showPixelArt })}</div>

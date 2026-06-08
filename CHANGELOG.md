@@ -2,6 +2,15 @@
 
 ## [0.1.7] — 2026-06-08
 
+### GitHub Star 提示 — 5 个触点的自然增长引导 — 2026-06-08
+
+- **Dashboard 浮动按钮**：右下角 ⭐ "Star us on GitHub"，金色 hover 动效，移动端只显示图标
+- **第 10 次成就解锁**：桌面系统通知（macOS/Linux/Windows）提醒 star
+- **第 3 次成就解锁**：Agent TUI 终端尾部金色链接（仅 TTY）
+- **`agpa upgrade` 成功**：git/npm 升级完成后金色提示行
+- **`agpa` TUI 底部**：灰色低调链接，不干扰交互
+- 所有触点的文案、颜色、时机经过协调设计（关联 vs 打扰）
+
 ### 像素画渲染管线补全 — YAML→类型→API→双端渲染 — 2026-06-08
 
 - **强类型化**：`PixelArt` / `PixelArtSize` 接口替代 `Record<string, unknown>`（`src/engine/types.ts`）

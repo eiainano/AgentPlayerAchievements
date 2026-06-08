@@ -52,6 +52,7 @@ import { resolveProfileDir, DEFAULT_PROFILE } from '../utils/profile.js';
 import { renderPopup, type PopupAchievement } from '../utils/ansi-popup.js';
 import { findNearUnlocks } from '../utils/progress-nudge.js';
 import { detectLanguage } from '../utils/lang-detect.js';
+import { evaluateCondition } from '../engine/evaluator.js';
 
 const activeProfile = process.env.AGPA_PROFILE || loadConfig().active_profile || DEFAULT_PROFILE;
 const stateDir = resolveProfileDir(activeProfile);
@@ -511,18 +512,25 @@ function cmdPoll(): void {
   }
 
   // ── ANSI popup (TTY only) ─────────────────────────────────────
-  const popupData: PopupAchievement[] = newlyUnlocked.map(ach => ({
-    icon: ach.icon || '🏆',
-    name: useZh ? (ach.name_cn || ach.name) : ach.name,
-    description: useZh ? (ach.description_cn || ach.description) : ach.description,
-    rarity: ach.rarity,
-    category: ach.category,
-    set_name: undefined,
-    set_progress: undefined,
-    progress: ach.progress_trackable
-      ? { current: (ach as any).current ?? 0, max: (ach as any).target ?? 1 }
-      : undefined,
-  }));
+  const popupData: PopupAchievement[] = newlyUnlocked.map(ach => {
+    // Compute real progress from the first condition — AchievementDefinition
+    // has no 'current'/'target' fields; those come from evaluateCondition().
+    let progress: { current: number; max: number } | undefined;
+    if (ach.progress_trackable && ach.conditions.length > 0) {
+      const result = evaluateCondition(ach.conditions[0]!, ENGINE.events);
+      progress = { current: Math.min(result.progress, result.target), max: result.target };
+    }
+    return {
+      icon: ach.icon || '🏆',
+      name: useZh ? (ach.name_cn || ach.name) : ach.name,
+      description: useZh ? (ach.description_cn || ach.description) : ach.description,
+      rarity: ach.rarity,
+      category: ach.category,
+      set_name: undefined,
+      set_progress: undefined,
+      progress,
+    };
+  });
   const popup = renderPopup(popupData);
   if (popup) process.stdout.write(popup + '\n');
 

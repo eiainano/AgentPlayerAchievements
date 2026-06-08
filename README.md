@@ -20,7 +20,8 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <a href="#"><img src="https://img.shields.io/badge/achievements-183-blueviolet" alt="183 achievements"></a>
-  <a href="#"><img src="https://img.shields.io/badge/tests-845-green" alt="845 tests"></a>
+  <a href="#"><img src="https://img.shields.io/badge/tests-897-green" alt="897 tests"></a>
+  <a href="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml"><img src="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="#"><img src="https://img.shields.io/badge/node-%E2%89%A518-brightgreen" alt="Node >= 18"></a>
   <a href="#"><img src="https://img.shields.io/badge/CLI-24_commands-orange" alt="24 CLI commands"></a>
 </p>
@@ -392,6 +393,9 @@ A: Yes. The init wizard auto-detects Claude Code, Kilo Code, OpenCode, Hermes, a
 
 **Q: My achievements aren't unlocking?**
 A: Run `agpa doctor` — it diagnoses tracking status, hook registration, and event coverage.
+
+**Q: How is this different from WakaTime or coding activity trackers?**
+A: WakaTime tells you *what* you did — hours, languages, projects. AGPA makes it *fun* — XP, levels, achievements, streaks, and Steam-style dopamine hits. It's gamification layered on top of your existing workflow, not another dashboard to check. Think of it as the difference between a fitness tracker's raw step count and a Pokémon Go badge — same data, different experience.
 
 **Q: Can I customize achievement names?**
 A: Yes. `/customize` page in the dashboard lets you rename any achievement.

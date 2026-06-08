@@ -519,7 +519,10 @@ function evalSequence(events: TrackedEvent[], cond: Condition): EvaluationResult
     let maxConsecutive = 0;
     let currentRun = 0;
     for (const e of events) {
-      if (e.event_type !== cond.event) { currentRun = 0; continue; }
+      // Skip events of different types — they are unrelated noise in the stream
+      // (e.g. conversation.message between tool.completes). Only matching events
+      // participate in the consecutive run.
+      if (e.event_type !== cond.event) continue;
       if (!sessionWindow && now - new Date(e.timestamp).getTime() > windowMs) { currentRun = 0; continue; }
       if (cond.filter && !matchFilter(e, cond.filter)) { currentRun = 0; continue; }
       currentRun++;

@@ -2,6 +2,17 @@
 
 ## [0.1.7] — 2026-06-08
 
+### 成就审计系统 Phase 1 + 3 Bug 修复 + YAML 重命名 — 2026-06-08
+
+- **审计规则引擎**：`src/verify/auditor.ts` — Layer A（数值/窗口/操作符一致性）+ Layer B（语义 type/event/window 匹配），EN + CN 描述双向核对
+- **审计测试**：`tests/verify/auditor.test.ts` — 51 测试，含全部 183 成就集成（0 error）
+- **Bug `marathon`**：加 `per_event: true`（原 threshold 累加全部 session 的 duration，实际任何单 session 都不必 ≥ 3h 也能解锁）
+- **Bug `iterative_refiner`**：加 `per_event: true` + `>`→`>=`（同累加问题；"20+" = ≥20，原 `>` 要求 21+）
+- **Bug `the_all_nighter`**：加 `per_event: true`（同累加问题）
+- **重命名**：`04-成就定义清单.yaml` → `achievement-definitions.yaml`（kebab-case，9 处代码/脚本引用 + 3 份文档同步更新）
+- **Spec**：`docs/superpowers/specs/2026-06-08-achievement-audit-system-design.md`
+- Phase 2（LLM 审计脚本）待实施；标注 103 个 `needsLLMReview` 成就
+
 ### CLI UX 大修 — 11 项用户体验改进 — 2026-06-08
 
 - **#3 输错命令自动纠正**：Levenshtein 模糊匹配（距离 ≤ 3），`agpa dashbord` → "Did you mean **dashboard**?"
@@ -16,6 +27,17 @@
 - **#17 help 分组 + verify/doctor 澄清**：Setup/Dashboard/View 等 6 组分区；末行提示 verify = `doctor --quick`
 - **#24 命令行进度条**：`agpa progress` 每个分类旁 `[████░░░░]` 色块进度条 + 总进度条
 - 6 文件 +396 行，845 测试全绿，TypeScript 编译无错误
+
+### 中英文名润色 + 误导 hint 清理 — 2026-06-08
+
+- **tool_time**: `I Got Tools / 工具学徒` → `Prometheus / 普罗米修斯`
+- **deepseek_dabbler**: `Deep Diversified / 深海探索者` → `Whale Song / 鲸歌`
+- **whale_song**(旧): `Whale Song / 鲸歌` → `Orca / 杀手鲸`
+- **u_turn**: `Scorched Earth Redux / 推倒重来` → `Remastered / 重制版`
+- **first_try**: `一次就过` → `尽享丝滑`
+- **off_the_grid**: 删除 hint（原本错误指向"深夜凌晨"）
+- **cerberus**: 删除 hint（原本错误指向"连做三次"）
+- 1 文件，11 行插入 / 13 行删除
 
 ## [0.1.6] — 2026-06-08
 

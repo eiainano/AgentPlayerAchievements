@@ -20,7 +20,8 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <a href="#"><img src="https://img.shields.io/badge/成就-183-blueviolet" alt="183 成就"></a>
-  <a href="#"><img src="https://img.shields.io/badge/测试-845-green" alt="845 测试"></a>
+  <a href="#"><img src="https://img.shields.io/badge/测试-897-green" alt="897 测试"></a>
+  <a href="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml"><img src="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="#"><img src="https://img.shields.io/badge/node-%E2%89%A518-brightgreen" alt="Node >= 18"></a>
   <a href="#"><img src="https://img.shields.io/badge/CLI-24_命令-orange" alt="24 命令"></a>
 </p>

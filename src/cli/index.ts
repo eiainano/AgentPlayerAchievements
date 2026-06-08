@@ -256,22 +256,37 @@ async function showTui(): Promise<void> {
     rl.close();
     const trimmed = answer.trim().toLowerCase();
     if (!trimmed || trimmed === 'dashboard' || trimmed === 'd') {
-      dispatch('dashboard', []);
+      dispatch('dashboard', []).catch(err => {
+        console.error(`\n  \x1b[0m✖ dispatch failed: ${err instanceof Error ? err.message : String(err)}`);
+        process.exit(1);
+      });
     } else if (trimmed === 'help' || trimmed === 'h' || trimmed === '?') {
       printHelp();
       process.exit(0);
     } else if (trimmed === 'init') {
-      dispatch('init', []);
+      dispatch('init', []).catch(err => {
+        console.error(`\n  \x1b[0m✖ dispatch failed: ${err instanceof Error ? err.message : String(err)}`);
+        process.exit(1);
+      });
     } else if (trimmed === 'stats' || trimmed === 's') {
-      dispatch('stats', []);
+      dispatch('stats', []).catch(err => {
+        console.error(`\n  \x1b[0m✖ dispatch failed: ${err instanceof Error ? err.message : String(err)}`);
+        process.exit(1);
+      });
     } else if (trimmed === 'doctor') {
-      dispatch('doctor', []);
+      dispatch('doctor', []).catch(err => {
+        console.error(`\n  \x1b[0m✖ dispatch failed: ${err instanceof Error ? err.message : String(err)}`);
+        process.exit(1);
+      });
     } else if (trimmed === 'q' || trimmed === 'quit' || trimmed === 'exit') {
       process.stdout.write(`\n  ${D}👋${R}\n\n`);
       process.exit(0);
     } else {
       const parts = trimmed.split(/\s+/);
-      dispatch(parts[0]!, parts.slice(1));
+      dispatch(parts[0]!, parts.slice(1)).catch(err => {
+        console.error(`\n  \x1b[0m✖ dispatch failed: ${err instanceof Error ? err.message : String(err)}`);
+        process.exit(1);
+      });
     }
   });
 }

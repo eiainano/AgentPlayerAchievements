@@ -239,17 +239,35 @@ describe('evaluateCondition', () => {
     expect(evaluateCondition(cond, events).met).toBe(false);
   });
 
-  it('sequence: consecutive mode counts longest run', () => {
+  it('sequence: consecutive mode skips non-matching event types', () => {
+    // Non-matching event types (tool.deny, conversation.message) are unrelated
+    // noise — they should NOT reset the consecutive counter for tool.complete.
     const events = [
       makeEvent('tool.complete'), makeEvent('tool.complete'), makeEvent('tool.complete'),
-      makeEvent('tool.deny'), // breaks the run
+      makeEvent('conversation.message'), // non-matching type — skipped, not a break
       makeEvent('tool.complete'), makeEvent('tool.complete'),
     ];
     const cond: Condition = {
       type: 'sequence', event: 'tool.complete', consecutive: true,
+      count: { operator: '>=', value: 5 },
+    };
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 5, target: 5 });
+  });
+
+  it('sequence: consecutive mode resets on same-type events failing filter', () => {
+    // Same event type (tool.complete) that fails the filter SHOULD reset
+    const events = [
+      makeEvent('tool.complete'), makeEvent('tool.complete'),
+      makeEvent('tool.complete', { payload: { tool_name: 'Bash' } }),
+      makeEvent('tool.complete'), makeEvent('tool.complete'),
+    ];
+    const cond: Condition = {
+      type: 'sequence', event: 'tool.complete', consecutive: true,
+      filter: "tool_name != 'Bash'",
       count: { operator: '>=', value: 3 },
     };
-    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 3, target: 3 });
+    // First two match → run=2, third is Bash → reset run=0, next two match → max=2
+    expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: false, progress: 2, target: 3 });
   });
 
   it('distinct_count: respects values whitelist', () => {

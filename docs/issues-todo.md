@@ -1,6 +1,6 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-08 | 总成就数: 183 | 条件类型: 11 | Tests: 722 ✅ (29 files) | 0 不可达 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | Logo 像素画 + Dashboard 集成 ✅ | 语言自动检测 ✅ | CLI 20 命令 ✅ | agpa uninstall ✅ | 跨平台通知增强 ✅ | macOS JXA 通知 ✅ | Dashboard 导出按钮 ✅ | 共享主题常量 ✅
+> 最后更新: 2026-06-08 | 总成就数: 183 | 条件类型: 11 | Tests: 845 ✅ (33 files) | 0 不可达 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | Logo 像素画 + Dashboard 集成 ✅ | 语言自动检测 ✅ | CLI 24 命令 ✅ | agpa uninstall ✅ | 跨平台通知增强 ✅ | macOS JXA 通知 ✅ | Dashboard 导出按钮 ✅ | 共享主题常量 ✅
 
 ---
 
@@ -41,12 +41,12 @@
 
 ## 🆕 本次新增 — Kilo Code / OpenCode 双通道 + 交互式安装 + CLI 扩展 (v0.1.6, 6/6)
 
-5 个工具全部实现 MCP + auto-track 双通道覆盖，19 个 CLI 命令：
+5 个工具全部实现 MCP + auto-track 双通道覆盖，24 个 CLI 命令：
 
 - **Kilo Code / OpenCode auto-track** — `hook.ts` 新增 `kilocode-auto` 模式（`KILOCODE_EVENT_MAP` + `KILOCODE_TOOL_MAP` + `normalizeKilocodeStdin()`），init.ts 生成 `Bun.spawn` 驱动的 TS 插件，监听 `tool.execute.before/after` + `event` 32+ 事件
 - **交互式安装** — 语言 → profile 创建 → 多选工具（↑↓ Space Enter），非 TTY 自动回退
 - **Profile-tracked_tools** — `agpa profile tools [name]` 交互式管理，`profile.json` 记录，Dashboard 5 工具官方 logo 徽章 + 暗亮主题双语
-- **CLI 扩展** — `agpa config` / `profile switch` / `showcase` / `search` / `suggest` / `web`，共 19 命令
+- **CLI 扩展** — `agpa config` / `profile switch` / `showcase` / `search` / `suggest` / `web`，共 24 命令
 - **Share 卡片主题化** — 暗/亮 + 中/英跟随 Dashboard，480px 现代化设计
 - **Hero 布局** — 统计大字居中 → Streak(紧凑) + 热力图同行 → 展示柜独占行
 - **AGPA logo** — `scripts/generate-logo.ts`，PS4 手柄 + 星光像素画

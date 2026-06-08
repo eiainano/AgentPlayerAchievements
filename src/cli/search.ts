@@ -25,15 +25,25 @@ interface FilterOptions {
   rarity: string | null;
   category: string | null;
   status: 'unlocked' | 'locked' | null;
+  json: boolean;
+  profile: string | null;
 }
 
 function parseArgs(args: string[]): FilterOptions {
-  const opts: FilterOptions = { query: null, rarity: null, category: null, status: null };
+  const opts: FilterOptions = { query: null, rarity: null, category: null, status: null, json: false, profile: null };
   const positional: string[] = [];
 
   for (let i = 0; i < args.length; i++) {
     const a = args[i]!;
     switch (a) {
+      case '--json':
+        opts.json = true;
+        break;
+      case '--profile': {
+        const v = args[++i];
+        if (v) opts.profile = v;
+        break;
+      }
       case '--rarity': {
         const v = args[++i];
         if (!v || !VALID_RARITIES.has(v)) {
@@ -70,7 +80,9 @@ function parseArgs(args: string[]): FilterOptions {
 
 // ── Engine helper ────────────────────────────────────────────────────
 
-import { createEngine } from '../engine/factory.js';
+import { loadConfig } from '../config.js';
+import { resolveProfileDir, DEFAULT_PROFILE } from '../utils/profile.js';
+import { AchievementEngine } from '../engine/engine.js';
 
 // ── Filtering ─────────────────────────────────────────────────────────
 
@@ -90,7 +102,10 @@ function main(): void {
   const sliceFrom = process.argv[2] === 'search' ? 3 : 2;
   const opts = parseArgs(process.argv.slice(sliceFrom));
 
-  const engine = createEngine();
+  const resolvedProfile = opts.profile || loadConfig().active_profile || DEFAULT_PROFILE;
+  const stateDir = resolvedProfile !== 'default' ? resolveProfileDir(resolvedProfile) : undefined;
+  const engine = new AchievementEngine(stateDir ? { stateDir } : {});
+  engine.init();
   let results = [...engine.definitions];
 
   // Apply filters
@@ -114,6 +129,24 @@ function main(): void {
   // Separator
   const unlockedCount = results.filter(d => engine.state.unlocked[d.id]).length;
   const total = results.length;
+
+  if (opts.json) {
+    const output = results.map(d => ({
+      id: d.id,
+      name: d.name,
+      name_cn: d.name_cn || null,
+      description: d.description,
+      icon: d.icon || '🏆',
+      category: d.category,
+      rarity: d.rarity,
+      hidden: !!d.hidden,
+      unlocked: !!engine.state.unlocked[d.id],
+      unlocked_at: engine.state.unlocked[d.id] || null,
+    }));
+    console.log(JSON.stringify(output, null, 2));
+    return;
+  }
+
   const statusLine = opts.status
     ? `(${opts.status})`
     : `(${unlockedCount}/${total} unlocked)`;

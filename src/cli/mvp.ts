@@ -3,25 +3,19 @@
  * AGPA MVP Demo — simulate agent usage and watch achievements unlock
  *
  * Usage:
- *   npx tsx src/cli/mvp.ts demo
- *   npx tsx src/cli/mvp.ts stats
- *   npx tsx src/cli/mvp.ts progress
- *   npx tsx src/cli/mvp.ts reset
+ *   agpa mvp demo
+ *   agpa mvp stats [--json]
+ *   agpa mvp progress [--json]
+ *   agpa mvp reset
  */
 
 import { AchievementEngine } from '../engine/engine.js';
 import type { AchievementDefinition, AchievementStats, AchievementState } from '../engine/types.js';
+import { R, B, D, G, RARITY_COLORS, RARITY_LABELS_EN, RARITY_ORDER } from '../utils/theme.js';
+import { loadConfig } from '../config.js';
+import { resolveProfileDir, DEFAULT_PROFILE } from '../utils/profile.js';
 
 // ── Terminal rendering helpers ───────────────────────────────────────
-
-const RARITY_COLORS: Record<string, string> = {
-  common: '\x1b[38;2;150;150;150m',
-  uncommon: '\x1b[38;2;100;200;100m',
-  rare: '\x1b[38;2;66;133;244m',
-  epic: '\x1b[38;2;180;70;240m',
-  legendary: '\x1b[38;2;255;140;0m',
-  mythic: '\x1b[38;2;255;50;50m',
-};
 
 const RARITY_BADGE: Record<string, string> = {
   common: '⬜ Common',
@@ -35,44 +29,45 @@ const RARITY_BADGE: Record<string, string> = {
 function renderPopup(ach: AchievementDefinition): string {
   const rarity = ach.rarity || 'common';
   const color = RARITY_COLORS[rarity] || '';
-  const reset = '\x1b[0m';
-  const bold = '\x1b[1m';
-  const dim = '\x1b[2m';
   const gold = '\x1b[38;2;255;200;0m';
-
   const icon = ach.icon || '🏆';
   const name = ach.name || ach.id;
   const desc = ach.description || '';
-
   const W = 52;
 
   return [
-    `${color}${bold}  ╔${'═'.repeat(W - 2)}╗${reset}`,
-    `${color}${bold}  ║${reset}${gold}  🏆 ACHIEVEMENT UNLOCKED!${' '.repeat(W - 29)}${color}${bold}║${reset}`,
-    `${color}${bold}  ║${reset}${' '.repeat(W - 2)}${color}${bold}║${reset}`,
-    `${color}${bold}  ║${reset}    ${icon}  ${bold}${name}${reset}${' '.repeat(Math.max(0, W - name.length - 10))}${color}${bold}║${reset}`,
-    `${color}${bold}  ║${reset}    ${dim}${desc}${reset}${' '.repeat(Math.max(0, W - desc.length - 6))}${color}${bold}║${reset}`,
-    `${color}${bold}  ║${reset}${' '.repeat(W - 2)}${color}${bold}║${reset}`,
-    `${color}${bold}  ║${reset}    ${RARITY_BADGE[rarity] || rarity}${' '.repeat(W - rarity.length - 16)}${color}${bold}║${reset}`,
-    `${color}${bold}  ╚${'═'.repeat(W - 2)}╝${reset}`,
+    `${color}${B}  ╔${'═'.repeat(W - 2)}╗${R}`,
+    `${color}${B}  ║${R}${gold}  🏆 ACHIEVEMENT UNLOCKED!${' '.repeat(W - 29)}${color}${B}║${R}`,
+    `${color}${B}  ║${R}${' '.repeat(W - 2)}${color}${B}║${R}`,
+    `${color}${B}  ║${R}    ${icon}  ${B}${name}${R}${' '.repeat(Math.max(0, W - name.length - 10))}${color}${B}║${R}`,
+    `${color}${B}  ║${R}    ${D}${desc}${R}${' '.repeat(Math.max(0, W - desc.length - 6))}${color}${B}║${R}`,
+    `${color}${B}  ║${R}${' '.repeat(W - 2)}${color}${B}║${R}`,
+    `${color}${B}  ║${R}    ${RARITY_BADGE[rarity] || rarity}${' '.repeat(W - rarity.length - 16)}${color}${B}║${R}`,
+    `${color}${B}  ╚${'═'.repeat(W - 2)}╝${R}`,
   ].join('\n');
+}
+
+function renderBar(done: number, total: number, width: number): string {
+  const frac = total > 0 ? done / total : 0;
+  const filled = Math.round(frac * width);
+  const empty = width - filled;
+  return `${G}${'█'.repeat(filled)}${D}${'░'.repeat(empty)}${R}`;
 }
 
 function renderStats(stats: AchievementStats): string {
   const lines: string[] = [];
-  lines.push(`\n\x1b[1m\x1b[38;2;255;200;0m  ═══ AGPA Stats ═══\x1b[0m`);
+  lines.push(`\n${B}\x1b[38;2;255;200;0m  ═══ AGPA Stats ═══${R}`);
   lines.push(`  Achievements: ${stats.unlocked}/${stats.total_achievements} (${stats.completion_pct}%)`);
   lines.push(`  Events logged: ${stats.total_events}`);
 
-  lines.push(`\n  \x1b[1mBy Category:\x1b[0m`);
+  lines.push(`\n  ${B}By Category:${R}`);
   for (const [cat, v] of Object.entries(stats.by_category)) {
     const bar = renderBar(v.unlocked, v.total, 20);
     lines.push(`  ${cat.padEnd(14)} ${bar} ${v.unlocked}/${v.total}`);
   }
 
-  lines.push(`\n  \x1b[1mBy Rarity:\x1b[0m`);
-  const order = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'mythic'];
-  for (const rar of order) {
+  lines.push(`\n  ${B}By Rarity:${R}`);
+  for (const rar of RARITY_ORDER) {
     if (stats.by_rarity[rar]) {
       const v = stats.by_rarity[rar]!;
       const bar = renderBar(v.unlocked, v.total, 20);
@@ -83,19 +78,13 @@ function renderStats(stats: AchievementStats): string {
   return lines.join('\n');
 }
 
-function renderBar(done: number, total: number, width: number): string {
-  const frac = total > 0 ? done / total : 0;
-  const filled = Math.round(frac * width);
-  const empty = width - filled;
-  const green = '\x1b[38;2;100;200;100m';
-  const gray = '\x1b[38;2;60;60;60m';
-  const reset = '\x1b[0m';
-  return `${green}${'█'.repeat(filled)}${gray}${'░'.repeat(empty)}${reset}`;
+function renderStatsJSON(stats: AchievementStats): string {
+  return JSON.stringify(stats, null, 2);
 }
 
 function renderProgress(defs: AchievementDefinition[], state: AchievementState): string {
   const lines: string[] = [];
-  lines.push(`\n\x1b[1m\x1b[38;2;255;200;0m  ═══ All Achievements ═══\x1b[0m\n`);
+  lines.push(`\n${B}\x1b[38;2;255;200;0m  ═══ All Achievements ═══${R}\n`);
 
   const byCategory: Record<string, AchievementDefinition[]> = {};
   for (const d of defs) {
@@ -105,21 +94,34 @@ function renderProgress(defs: AchievementDefinition[], state: AchievementState):
   }
 
   for (const [cat, catDefs] of Object.entries(byCategory)) {
-    lines.push(`  \x1b[1m── ${cat.toUpperCase()} ──\x1b[0m`);
+    lines.push(`  ${B}── ${cat.toUpperCase()} ──${R}`);
     for (const d of catDefs) {
       const unlocked = !!state.unlocked[d.id];
-      const icon = unlocked ? '\x1b[38;2;100;200;100m✔\x1b[0m' : '\x1b[38;2;60;60;60m○\x1b[0m';
-      const color = unlocked ? '' : '\x1b[2m';
-      const reset_ = unlocked ? '\x1b[0m' : '\x1b[0m';
+      const icon = unlocked ? `${G}✔${R}` : `${D}○${R}`;
+      const color = unlocked ? '' : D;
       const hiddenTag = d.hidden ? ' 🔒' : '';
-      const rarityLabel = RARITY_BADGE[d.rarity] || d.rarity;
+      const rarityLabel = RARITY_LABELS_EN[d.rarity] || d.rarity;
       const displayIcon = (d.icon || '🏆').padEnd(2);
-      lines.push(`  ${icon} ${color}${displayIcon} ${d.name.padEnd(24)} ${rarityLabel}${hiddenTag}${reset_}`);
+      lines.push(`  ${icon} ${color}${displayIcon} ${d.name.padEnd(24)} ${rarityLabel}${hiddenTag}${R}`);
     }
     lines.push('');
   }
 
   return lines.join('\n');
+}
+
+function renderProgressJSON(defs: AchievementDefinition[], state: AchievementState): string {
+  const items = defs.map(d => ({
+    id: d.id,
+    name: d.name,
+    category: d.category,
+    rarity: d.rarity,
+    icon: d.icon,
+    unlocked: !!state.unlocked[d.id],
+    hidden: !!d.hidden,
+    unlocked_at: state.unlocked[d.id] || null,
+  }));
+  return JSON.stringify(items, null, 2);
 }
 
 // ── Demo scenario ────────────────────────────────────────────────────
@@ -129,12 +131,12 @@ function runDemo(): void {
   engine.resetState();
   engine.init();
 
-  console.log('\x1b[1m\x1b[38;2;255;200;0m');
+  console.log(`${B}\x1b[38;2;255;200;0m`);
   console.log('  ╔══════════════════════════════════════════════╗');
   console.log('  ║     🎮  AGPA MVP — Simulation Mode  🎮      ║');
   console.log('  ║    Agent Player Achievements System          ║');
   console.log('  ╚══════════════════════════════════════════════╝');
-  console.log('\x1b[0m');
+  console.log(`${R}`);
 
   const session: Array<{ event: string; payload?: Record<string, unknown> }> = [
     { event: 'session.start' },
@@ -154,7 +156,7 @@ function runDemo(): void {
     { event: 'session.end' },
   ];
 
-  console.log('\x1b[2mSimulating first session...\x1b[0m\n');
+  console.log(`${D}Simulating first session...${R}\n`);
 
   for (const { event, payload } of session) {
     engine.track(event, payload || {});
@@ -163,14 +165,14 @@ function runDemo(): void {
 
   const first = engine.poll();
   if (first.length > 0) {
-    console.log(`\n`);
+    console.log('\n');
     for (const ach of first) {
       console.log(renderPopup(ach));
       console.log();
     }
   }
 
-  console.log('\x1b[2mSimulating continued usage (10 sessions)...\x1b[0m\n');
+  console.log(`${D}Simulating continued usage (10 sessions)...${R}\n`);
 
   for (let s = 0; s < 10; s++) {
     engine.track('session.start');
@@ -204,29 +206,58 @@ function runDemo(): void {
   const stats = engine.stats();
   console.log(renderStats(stats));
 
-  console.log(`\n\n\x1b[2mRun "npm run progress" to see all achievements.\x1b[0m`);
-  console.log(`\x1b[2mRun "npm run reset" to start over.\x1b[0m\n`);
+  console.log(`\n\n${D}Run "agpa progress" to see all achievements.${R}`);
+  console.log(`${D}Run "agpa reset" to start over.${R}\n`);
 }
 
 // ── Main ─────────────────────────────────────────────────────────────
 
+function parseProfile(args: string[]): string | null {
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--profile' && args[i + 1]) return args[i + 1]!;
+  }
+  return null;
+}
+
+function resolveStateDir(profile: string | null): string | undefined {
+  const p = profile || loadConfig().active_profile || DEFAULT_PROFILE;
+  return p !== 'default' ? resolveProfileDir(p) : undefined;
+}
+
 const cmd = process.argv[2] || 'demo';
+const args = process.argv.slice(3);
+const jsonOutput = args.includes('--json');
+const profile = parseProfile(args);
 
 if (cmd === 'demo') {
   runDemo();
 } else if (cmd === 'stats') {
-  const engine = new AchievementEngine();
+  const stateDir = resolveStateDir(profile);
+  const engine = new AchievementEngine(stateDir ? { stateDir } : {});
   engine.init();
-  console.log(renderStats(engine.stats()));
+  const stats = engine.stats();
+  if (jsonOutput) {
+    console.log(renderStatsJSON(stats));
+  } else {
+    console.log(renderStats(stats));
+  }
 } else if (cmd === 'progress') {
-  const engine = new AchievementEngine();
+  const stateDir = resolveStateDir(profile);
+  const engine = new AchievementEngine(stateDir ? { stateDir } : {});
   engine.init();
-  console.log(renderProgress(engine.definitions, engine.state));
+  if (jsonOutput) {
+    console.log(renderProgressJSON(engine.definitions, engine.state));
+  } else {
+    console.log(renderProgress(engine.definitions, engine.state));
+  }
 } else if (cmd === 'reset') {
-  const engine = new AchievementEngine();
+  const stateDir = resolveStateDir(profile);
+  const engine = new AchievementEngine(stateDir ? { stateDir } : {});
   engine.init();
   engine.resetState();
-  console.log('\x1b[32m✔ State reset. Run "npm run demo" to start fresh.\x1b[0m');
+  console.log(`${G}✔ State reset. Run "agpa demo" to start fresh.${R}`);
+} else if (cmd === '--help' || cmd === '-h') {
+  console.log('Usage: agpa mvp [demo|stats|progress|reset] [--json] [--profile <name>]');
 } else {
-  console.log('Usage: npx tsx src/cli/mvp.ts [demo|stats|progress|reset]');
+  console.log('Usage: agpa mvp [demo|stats|progress|reset] [--json] [--profile <name>]');
 }

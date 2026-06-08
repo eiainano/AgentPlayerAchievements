@@ -3,7 +3,7 @@
 ## Commands
 
 ```
-npm run test       # vitest (722 tests, 29 files)
+npm run test       # vitest (845 tests, 33 files)
 npm run build      # tsc --noEmit
 npm run dashboard  # start on :3867, then open browser (supports --profile <name>)
 npm run demo       # generate MVP data + stats
@@ -11,7 +11,7 @@ npm run doctor     # diagnose system state
 npm run profile    # manage achievement profiles (create <name> | list)
 ```
 
-Unified CLI via `bin` field (npm link): 20 commands — `agpa init | uninstall | verify | doctor | dashboard | profile <create|list|switch|tools> | demo | stats | progress | reset | mcp | sound | activity | export | import | config | showcase | search | suggest | web`
+Unified CLI via `bin` field (npm link): 24 commands — `agpa init | uninstall | verify | doctor | config | dashboard | web | profile <create|list|switch|tools> | showcase | demo | stats | progress | reset | search | suggest | sound | activity | export | import | mcp | completion | upgrade | watch | history`
 
 ## Architecture
 

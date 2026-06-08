@@ -212,6 +212,7 @@ function main(): void {
   const args = process.argv.slice(2);
 let jsonMode = false;
 let singleCheck: string | null = null;
+let quickMode = false;
 
 for (let i = 0; i < args.length; i++) {
   if (args[i] === '--json') {
@@ -219,14 +220,17 @@ for (let i = 0; i < args.length; i++) {
   } else if (args[i] === '--check' && args[i + 1]) {
     singleCheck = args[i + 1]!;
     i++;
+  } else if (args[i] === '--quick') {
+    quickMode = true;
   } else if (args[i] === '--help' || args[i] === '-h') {
     console.log(`
 AGPA Doctor — diagnose configuration & data health
 
 Usage:
-  npx tsx src/cli/doctor.ts
-  npx tsx src/cli/doctor.ts --check <check-id>
-  npx tsx src/cli/doctor.ts --json
+  agpa doctor                       Full system diagnosis
+  agpa doctor --check <check-id>    Run a single check
+  agpa doctor --quick               Quick setup health check (same as agpa verify)
+  agpa doctor --json                Output as JSON
 
 Checks:
   data-dir      Directory integrity
@@ -235,6 +239,8 @@ Checks:
   defs-yaml     Achievement definitions
   mcp-config    MCP server registration (all 5 tools)
   instructions  Instruction file injection
+
+Quick mode (--quick): data-dir + state + defs-yaml + engine dry-run + MCP configs + instructions
 `);
     process.exit(0);
   }
@@ -242,22 +248,32 @@ Checks:
 
 let results: CheckResult[] = [];
 
-if (!singleCheck || singleCheck === 'data-dir') {
+if (singleCheck) {
+  // Single check mode
+  if (singleCheck === 'data-dir') results.push(checkDataDir());
+  else if (singleCheck === 'event-log') results.push(checkEventLog());
+  else if (singleCheck === 'state') results.push(checkStateJson());
+  else if (singleCheck === 'defs-yaml') results.push(checkDefsYaml());
+  else if (singleCheck === 'mcp-config') results.push(...checkMcpConfigs());
+  else if (singleCheck === 'instructions') results.push(...checkInstructionFiles());
+  else {
+    console.error(`Unknown check: "${singleCheck}"`);
+    process.exit(1);
+  }
+} else if (quickMode) {
+  // Quick mode: same checks as verify — data-dir + state + defs + MCP + instructions
   results.push(checkDataDir());
-}
-if (!singleCheck || singleCheck === 'event-log') {
-  results.push(checkEventLog());
-}
-if (!singleCheck || singleCheck === 'state') {
   results.push(checkStateJson());
-}
-if (!singleCheck || singleCheck === 'defs-yaml') {
   results.push(checkDefsYaml());
-}
-if (!singleCheck || singleCheck === 'mcp-config') {
   results.push(...checkMcpConfigs());
-}
-if (!singleCheck || singleCheck === 'instructions') {
+  results.push(...checkInstructionFiles());
+} else {
+  // Full mode: all checks
+  results.push(checkDataDir());
+  results.push(checkEventLog());
+  results.push(checkStateJson());
+  results.push(checkDefsYaml());
+  results.push(...checkMcpConfigs());
   results.push(...checkInstructionFiles());
 }
 
@@ -274,7 +290,8 @@ if (jsonMode) {
 const isDirectlyExecuted = process.argv[1]
   && (import.meta.url.endsWith(process.argv[1]!)
       || process.argv[1]!.endsWith('doctor.ts')
-      || process.argv[1]!.endsWith('doctor.js'));
+      || process.argv[1]!.endsWith('doctor.js')
+      || process.argv[2] === 'doctor');   // routed via agpa index.ts dispatch
 if (isDirectlyExecuted) {
   main();
 }

@@ -15,7 +15,14 @@ import { resolveProfileDir, DEFAULT_PROFILE } from '../utils/profile.js';
 import { calcStreak, computeHeatmap } from '../utils/activity.js';
 import type { StreakData, HeatmapData } from '../utils/activity.js';
 
-const activeProfile = process.env.AGPA_PROFILE || loadConfig().active_profile || DEFAULT_PROFILE;
+function parseProfile(args: string[]): string {
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--profile' && args[i + 1]) return args[i + 1]!;
+  }
+  return process.env.AGPA_PROFILE || loadConfig().active_profile || DEFAULT_PROFILE;
+}
+
+const activeProfile = parseProfile(process.argv.slice(3));
 const stateDir = resolveProfileDir(activeProfile);
 
 // ── ANSI helpers ─────────────────────────────────────────────────────────
@@ -45,14 +52,15 @@ const BLOCK_FG: Record<number, string> = {
 
 // ── CLI args ─────────────────────────────────────────────────────────────
 
-function parseArgs(): { streak: boolean; heatmap: boolean; compact: boolean } {
+function parseArgs(): { streak: boolean; heatmap: boolean; compact: boolean; json: boolean } {
   const args = process.argv.slice(3); // 0=node, 1=index.ts, 2=activity
   const streak = args.includes('--streak');
   const heatmap = args.includes('--heatmap');
   const compact = args.includes('--compact');
+  const json = args.includes('--json');
   // No flags → show all
-  if (!streak && !heatmap) return { streak: true, heatmap: true, compact };
-  return { streak, heatmap, compact };
+  if (!streak && !heatmap && !json) return { streak: true, heatmap: true, compact, json: false };
+  return { streak, heatmap, compact, json };
 }
 
 // ── Streak rendering ─────────────────────────────────────────────────────
@@ -186,12 +194,33 @@ function renderHeatmap(data: HeatmapData, compact: boolean, columns: number): vo
 // ── Main ─────────────────────────────────────────────────────────────────
 
 function main(): void {
-  const { streak: showStreak, heatmap: showHeatmap, compact } = parseArgs();
+  const { streak: showStreak, heatmap: showHeatmap, compact, json } = parseArgs();
   const columns = process.stdout.columns || 80;
 
   const engine = new AchievementEngine({ stateDir });
   engine.init();
   const events = engine.events;
+
+  if (json) {
+    const streakData = calcStreak(events);
+    const heatmapData = computeHeatmap(events);
+    const output = {
+      streak: {
+        current: streakData.current,
+        longest: streakData.longest,
+        today_active: streakData.today_active,
+      },
+      heatmap: {
+        days: heatmapData.days.map(d => ({
+          date: d.date,
+          level: d.level,
+          count: d.count,
+        })),
+      },
+    };
+    console.log(JSON.stringify(output, null, 2));
+    return;
+  }
 
   if (showStreak) {
     renderStreak(calcStreak(events));

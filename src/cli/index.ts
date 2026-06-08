@@ -4,7 +4,7 @@
  *
  * Unified entry point for all agpa commands:
  *   agpa init       Auto-detect & configure AI tools
- *   agpa verify     Verify setup health
+ *   agpa verify     Quick health check (= doctor --quick)
  *   agpa doctor     Diagnose system state
  *   agpa config     View/change settings
  *   agpa dashboard  Start web dashboard
@@ -22,6 +22,9 @@
  *   agpa import     Import achievement data
  *   agpa reset      Reset all data
  *   agpa mcp        Start MCP server
+ *   agpa completion  Generate shell completion script
+ *   agpa upgrade     Check for updates and upgrade
+ *   agpa watch       Real-time achievement monitor
  */
 
 import * as fs from 'node:fs';
@@ -37,26 +40,30 @@ interface Subcommand {
 }
 
 const COMMANDS: Subcommand[] = [
-  { name: 'init',       description: 'Auto-detect & configure AI coding tools for achievement tracking', usage: 'agpa init [--tool <name>] [--profile <name>]', module: './init.ts' },
-  { name: 'uninstall',  description: 'Cleanly remove AGPA from all configured tools',                     usage: 'agpa uninstall [--all] [--dry-run] [--keep-data]', module: './uninstall.ts' },
-  { name: 'verify',     description: 'Verify AGPA setup — 7 health checks',                               usage: 'agpa verify',                               module: './verify.ts' },
-  { name: 'doctor',     description: 'Full system diagnosis',                                              usage: 'agpa doctor [--check <id>] [--json]',       module: './doctor.ts' },
+  { name: 'init',       description: 'Auto-detect & configure AI coding tools for achievement tracking', usage: 'agpa init [--tool <name>] [--profile <name>] [--auto]', module: './init.ts' },
+  { name: 'uninstall',  description: 'Cleanly remove AGPA from all configured tools',                     usage: 'agpa uninstall [--all|--yes] [--dry-run] [--keep-data]', module: './uninstall.ts' },
+  { name: 'verify',     description: 'Quick setup health check (= doctor --quick)',                        usage: 'agpa verify [--profile <name>]',            module: './doctor.ts' },
+  { name: 'doctor',     description: 'Full system diagnosis',                                              usage: 'agpa doctor [--check <id>] [--quick] [--json]', module: './doctor.ts' },
   { name: 'config',     description: 'View or change AGPA settings',                                      usage: 'agpa config [key] [value]',                 module: './config.ts' },
   { name: 'dashboard',  description: 'Start achievement dashboard (default :3867)',                        usage: 'agpa dashboard [port] [--profile <name>]',   module: './dashboard.ts' },
   { name: 'web',        description: 'Alias for dashboard',                                                usage: 'agpa web [port] [--profile <name>]',         module: './dashboard.ts' },
   { name: 'profile',    description: 'Manage achievement profiles (create | list | switch)',               usage: 'agpa profile <create|list|switch> [name]',   module: './profile.ts' },
   { name: 'showcase',   description: 'Manage achievement showcase',                                        usage: 'agpa showcase <list|pin|unpin|auto-fill>',   module: './showcase.ts' },
   { name: 'demo',       description: 'Generate MVP demo data',                                             usage: 'agpa demo',                                 module: './mvp.ts' },
-  { name: 'stats',      description: 'View achievement stats in terminal',                                 usage: 'agpa stats',                                module: './mvp.ts' },
-  { name: 'progress',   description: 'List all achievements with unlock status',                           usage: 'agpa progress',                             module: './mvp.ts' },
-  { name: 'reset',      description: 'Reset all achievement data',                                         usage: 'agpa reset',                                module: './mvp.ts' },
-  { name: 'search',     description: 'Search achievements by keyword, rarity, or category',                usage: 'agpa search [query] [--rarity] [--category] [--unlocked]', module: './search.ts' },
-  { name: 'suggest',    description: 'Show nearest unlockable achievements',                               usage: 'agpa suggest [--N <n>] [--all] [--hidden]', module: './suggest.ts' },
+  { name: 'stats',      description: 'View achievement stats in terminal',                                 usage: 'agpa stats [--json] [--profile <name>]',    module: './mvp.ts' },
+  { name: 'progress',   description: 'List all achievements with unlock status',                           usage: 'agpa progress [--json] [--profile <name>]', module: './mvp.ts' },
+  { name: 'reset',      description: 'Reset all achievement data',                                         usage: 'agpa reset [--profile <name>]',             module: './mvp.ts' },
+  { name: 'search',     description: 'Search achievements by keyword, rarity, or category',                usage: 'agpa search [query] [--rarity] [--category] [--unlocked|--locked] [--json] [--profile <name>]', module: './search.ts' },
+  { name: 'suggest',    description: 'Show nearest unlockable achievements',                               usage: 'agpa suggest [--N <n>] [--all] [--hidden] [--json] [--profile <name>]', module: './suggest.ts' },
   { name: 'sound',      description: 'Toggle achievement sound effects (on | off)',                       usage: 'agpa sound <on|off>',                       module: './sound.ts' },
-  { name: 'activity',   description: 'View coding streak & activity heatmap in terminal',                  usage: 'agpa activity [--streak|--heatmap|--compact]', module: './activity.ts' },
+  { name: 'activity',   description: 'View coding streak & activity heatmap in terminal',                  usage: 'agpa activity [--streak|--heatmap|--compact] [--json] [--profile <name>]', module: './activity.ts' },
   { name: 'export',     description: 'Export achievement data to a portable JSON file',                     usage: 'agpa export [profile] [--output <path>] [--full] [--migrate]', module: './export.ts' },
   { name: 'import',     description: 'Import achievement data from a backup file',                          usage: 'agpa import <file> [--profile <name>] [--dry-run] [--force]', module: './import.ts' },
   { name: 'mcp',        description: 'Start MCP server (stdio)',                                           usage: 'agpa mcp',                                  module: '../main.ts' },
+  { name: 'completion', description: 'Generate shell completion script (bash | zsh | fish)',               usage: 'agpa completion <bash|zsh|fish>',           module: './completion.ts' },
+  { name: 'upgrade',    description: 'Check for updates and upgrade AGPA',                                 usage: 'agpa upgrade [--check]',                     module: './upgrade.ts' },
+  { name: 'watch',      description: 'Real-time achievement progress monitor',                             usage: 'agpa watch [--poll <sec>] [--profile <name>]', module: './watch.ts' },
+  { name: 'history',    description: 'Browse raw event log entries',                                       usage: 'agpa history [--N <n>] [--event <type>] [--today] [--json] [--profile <name>]', module: './history.ts' },
 ];
 
 // ── Help ─────────────────────────────────────────────────────────────────
@@ -125,6 +132,10 @@ function buildArgv(cmdName: string, cmdArgs: string[]): string[] {
     // args[0] must be "create" or "list", not "profile"
     case 'profile':
       return ['agpa', 'agpa', ...cmdArgs];
+
+    // verify is an alias for doctor --quick
+    case 'verify':
+      return ['agpa', 'agpa', 'doctor', '--quick', ...cmdArgs];
 
     // All others: slice(2) for flags, cmdName at [2] is harmless
     default:

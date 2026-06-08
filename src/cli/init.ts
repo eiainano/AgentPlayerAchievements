@@ -16,6 +16,8 @@ import { TOOLS, findTool, INSTRUCTION_FILES, scanTools, type ScanResult } from '
 import type { ToolDef } from '../tool-registry.js';
 import { parseYAML } from '../engine/yaml-parser.js';
 import { setTrackedTools, getProfileMeta, createProfile, validateProfileName, DEFAULT_PROFILE } from '../utils/profile.js';
+import { loadConfig } from '../config.js';
+import { checkDataDir, checkStateJson, checkDefsYaml, checkMcpConfigs, checkInstructionFiles, statusIcon } from './doctor.js';
 
 const AGPA_DIR = path.join(homedir(), '.agent-achievements');
 const AGPA_MAIN = path.resolve(import.meta.dirname, '../main.ts');
@@ -178,10 +180,12 @@ Call \`achievement_track\` when you observe these:
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
-function parseCliArgs(): { tool: string | null; profile: string | null } {
+function parseCliArgs(): { tool: string | null; profile: string | null; auto: boolean; upgrade: boolean } {
   const args = process.argv.slice(2);
   let tool: string | null = null;
   let profile: string | null = null;
+  let auto = false;
+  let upgrade = false;
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--tool' && args[i + 1]) {
@@ -190,13 +194,17 @@ function parseCliArgs(): { tool: string | null; profile: string | null } {
     } else if (args[i] === '--profile' && args[i + 1]) {
       profile = args[i + 1]!;
       i++;
+    } else if (args[i] === '--auto') {
+      auto = true;
+    } else if (args[i] === '--upgrade') {
+      upgrade = true;
     } else if (args[i] === '--help' || args[i] === '-h') {
       printHelp();
       process.exit(0);
     }
   }
 
-  return { tool, profile };
+  return { tool, profile, auto, upgrade };
 }
 
 function printHelp(): void {
@@ -216,10 +224,13 @@ Tools:
 
 Options:
   --profile <name>       Use a named profile (default: "default")
+  --auto                 Skip all prompts, auto-detect & configure all tools
+  --upgrade              Update hooks, instructions & commands (skip MCP config)
   --help, -h             Show this help
 
 Without --tool, scans for installed tools & lets you pick which to configure.
-Non-TTY (piped) falls back to auto-selecting all detected tools.
+--auto skips all interactive prompts — ideal for scripting and CI.
+--upgrade is safe to run repeatedly — only injects missing items.
 `);
 }
 
@@ -1215,20 +1226,141 @@ function promptLanguage(): Promise<string> {
   });
 }
 
+/**
+ * Auto-verify after init — runs a quick health check and returns a summary line.
+ * Uses shared check functions from doctor.ts to avoid duplication.
+ */
+function autoVerify(dataDir: string): string | null {
+  const results = [
+    checkDataDir(dataDir),
+    checkStateJson(dataDir),
+    checkDefsYaml(),
+    ...checkMcpConfigs(),
+    ...checkInstructionFiles(),
+  ];
+
+  const errors = results.filter(r => r.status === 'error');
+  const warns = results.filter(r => r.status === 'warn');
+  const oks = results.filter(r => r.status === 'ok');
+
+  const lines: string[] = [];
+  lines.push(`\n  ${'─'.repeat(51)}`);
+  lines.push(`  Auto-verify: ${oks.length}/${results.length} checks passed`);
+
+  if (errors.length > 0) {
+    for (const e of errors) {
+      lines.push(`  ${statusIcon('error')} ${e.label}: ${e.detail}`);
+    }
+  }
+  if (warns.length > 0 && warns.length <= 3) {
+    for (const w of warns) {
+      lines.push(`  ${statusIcon('warn')} ${w.label}: ${w.detail}`);
+    }
+  } else if (warns.length > 3) {
+    lines.push(`  ${statusIcon('warn')} ${warns.length} warnings — run 'agpa verify' for details`);
+  }
+
+  if (errors.length === 0 && warns.length === 0) {
+    lines.push(`  ${'─'.repeat(51)}`);
+  } else {
+    lines.push(`  ${'─'.repeat(51)}`);
+    if (errors.length > 0) {
+      lines.push(`  Run 'agpa verify' for fix suggestions.`);
+    }
+  }
+
+  return lines.join('\n');
+}
+
 // ── Main ───────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
-  const { tool: toolArg, profile: cliProfile } = parseCliArgs();
+  const { tool: toolArg, profile: cliProfile, auto, upgrade } = parseCliArgs();
 
   printWelcome();
+
+  // --upgrade mode: re-inject hooks, instructions, commands, achievement JSON
+  if (upgrade) {
+    const lang = loadConfig().lang === 'zh' ? 'zh' : 'en';
+    const profile = cliProfile || DEFAULT_PROFILE;
+
+    // Detect what's installed from existing configs
+    const scanResults = scanTools();
+    const detectedIds = scanResults.filter(r => r.detected).map(r => r.id);
+    const toolIds = toolArg ? [toolArg] : (detectedIds.length > 0 ? detectedIds : ['claude-code']);
+
+    const DIM = '\x1b[2m';
+    const RESET = '\x1b[0m';
+    console.log(lang === 'zh' ? `\n  \u{1F504} 升级模式 — 刷新 hooks + instructions + commands` : `\n  \u{1F504} Upgrade mode — refreshing hooks + instructions + commands`);
+    console.log(`  ${DIM}  MCP configs will not be touched.${RESET}`);
+    console.log(`  ${DIM}  Profile: ${profile}${RESET}`);
+
+    const dataDir = profile === DEFAULT_PROFILE
+      ? AGPA_DIR
+      : path.join(AGPA_DIR, 'profiles', profile);
+    ensureDataDir(dataDir);
+    initEngineState();
+    copySounds(dataDir);
+
+    // Re-run instruction injection for each tool
+    for (const tid of toolIds) {
+      const toolDef = findTool(tid);
+      if (!toolDef) continue;
+      const initData = INIT_DATA[toolDef.id];
+      if (!initData) continue;
+
+      for (const inst of initData.instructionFiles) {
+        injectInstructions(inst.path, inst.marker);
+      }
+
+      // Re-inject hooks for CC
+      if (toolDef.id === 'claude-code') {
+        let hookCfg = readJSON(toolDef.configPath);
+        if (hookCfg) {
+          const hooks = (hookCfg.hooks as Record<string, unknown>) || {};
+          for (const hk of getHookKeys(profile === DEFAULT_PROFILE ? null : profile)) {
+            const opts: HookEntry = { type: 'command', command: hk.command };
+            if (hk.async !== undefined) opts.async = hk.async;
+            if (hk.timeout !== undefined) opts.timeout = hk.timeout;
+            injectHook(hooks, hk.key, hk.command, opts);
+          }
+          hookCfg.hooks = hooks;
+          writeJSON(toolDef.configPath, hookCfg);
+        }
+      }
+
+      // Re-inject Hermes hooks
+      if (toolDef.id === 'hermes') {
+        injectHermesHooks(toolDef.configPath, {
+          pre_tool_call:     hookCmd(HOOK_HERMES_ENV, 'hermes-auto', profile === DEFAULT_PROFILE ? null : profile),
+          post_tool_call:    hookCmd(HOOK_HERMES_ENV, 'hermes-auto', profile === DEFAULT_PROFILE ? null : profile),
+          on_session_start:  hookCmd(HOOK_HERMES_ENV, 'track session.start', profile === DEFAULT_PROFILE ? null : profile),
+          on_session_end:    `${hookCmd(HOOK_HERMES_ENV, 'track session.end', profile === DEFAULT_PROFILE ? null : profile)} && ${hookCmd(HOOK_HERMES_ENV, 'poll', profile === DEFAULT_PROFILE ? null : profile)}`,
+        });
+      }
+
+      // Re-inject plugins
+      if (toolDef.id === 'openclaw') injectOpenClawPlugin(profile === DEFAULT_PROFILE ? null : profile);
+      if (toolDef.id === 'kilo-code' || toolDef.id === 'opencode') injectKiloCodePlugin(toolDef.id, profile === DEFAULT_PROFILE ? null : profile);
+    }
+
+    // Commands + JSON
+    installAchievementCommands();
+    compileAchievementsJSON(dataDir);
+
+    console.log(`\n  \u{2705} ${lang === 'zh' ? '升级完成！' : 'Upgrade complete!'}`);
+    console.log(`  ${DIM}  ${lang === 'zh' ? '重启工具以生效。' : 'Restart your tools to activate.'}${RESET}\n`);
+    return;
+  }
 
   if (!runPreflight()) {
     process.exit(1);
   }
 
-  const lang = await promptLanguage();
+  // --auto mode: skip all interactive prompts
+  const lang = auto ? 'en' : await promptLanguage();
 
-  // If --profile was passed on CLI, use it. Otherwise prompt interactively.
+  // If --profile was passed on CLI, use it. Otherwise prompt interactively (skip in --auto).
   let profile: string;
   if (cliProfile) {
     const error = validateProfileName(cliProfile);
@@ -1239,6 +1371,9 @@ async function main(): Promise<void> {
     } else {
       profile = cliProfile;
     }
+  } else if (auto) {
+    console.log('  📂 Auto mode: using default profile');
+    profile = DEFAULT_PROFILE;
   } else {
     profile = await promptProfileName(lang);
   }
@@ -1266,6 +1401,28 @@ async function main(): Promise<void> {
       const merged = [...new Set([...existing, ...toolIds])];
       setTrackedTools(profile, merged);
     }
+  } else if (auto) {
+    // --auto mode: auto-select all detected tools (same as non-TTY fallback)
+    const scanResults = scanTools();
+    const detectedIds = scanResults.filter(r => r.detected).map(r => r.id);
+    if (detectedIds.length === 0) {
+      console.log('\n  ℹ️  No config files found. Defaulting to Claude Code.\n');
+      toolIds = ['claude-code'];
+    } else {
+      console.log('');
+      for (const r of scanResults) {
+        if (r.detected) {
+          console.log(`  ✅ ${r.name.padEnd(18)} detected  (auto-selected)`);
+        } else {
+          console.log(`  — ${r.name.padEnd(18)} not detected`);
+        }
+      }
+      console.log('');
+      toolIds = detectedIds;
+    }
+    // Persist tracked_tools
+    const allDetected = scanTools().filter(r => r.detected).map(r => r.id);
+    setTrackedTools(profile, allDetected.length > 0 ? allDetected : ['claude-code']);
   } else {
     // No --tool: scan + interactive picker
     const scanResults = scanTools();
@@ -1390,12 +1547,17 @@ async function main(): Promise<void> {
   console.log(`  \u{2502}     you send your first message!                  \u{2502}`);
   console.log(`  \u{2502}                                                 \u{2502}`);
   console.log(`  \u{2514}${'\u{2500}'.repeat(W)}\u{2518}`);
+
+  // ── Auto-verify after init ────────────────────────────────────────────
+  const verifyResults = autoVerify(dataDir);
+  if (verifyResults) console.log(verifyResults);
 }
 
 const isDirectlyExecuted = process.argv[1]
   && (import.meta.url.endsWith(process.argv[1]!)
       || process.argv[1]!.endsWith('init.ts')
-      || process.argv[1]!.endsWith('init.js'));
+      || process.argv[1]!.endsWith('init.js')
+      || process.argv[2] === 'init');   // routed via agpa index.ts dispatch
 if (isDirectlyExecuted) {
   main().catch((err: unknown) => {
     console.error((err instanceof Error ? err.message : String(err)));

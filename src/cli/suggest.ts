@@ -9,7 +9,9 @@
  *   agpa suggest --hidden     Include hidden achievements (spoilers!)
  */
 
-import { createEngine } from '../engine/factory.js';
+import { AchievementEngine } from '../engine/engine.js';
+import { loadConfig } from '../config.js';
+import { resolveProfileDir, DEFAULT_PROFILE } from '../utils/profile.js';
 import { findNearUnlocks } from '../utils/progress-nudge.js';
 import type { NearUnlock } from '../utils/progress-nudge.js';
 import { R, B, D, RARITY_COLORS, RARITY_LABELS_EN } from '../utils/theme.js';
@@ -21,14 +23,24 @@ const RARITY_LABELS = RARITY_LABELS_EN;
 interface SuggestOptions {
   count: number;
   includeHidden: boolean;
+  json: boolean;
+  profile: string | null;
 }
 
 function parseArgs(args: string[]): SuggestOptions {
-  const opts: SuggestOptions = { count: 5, includeHidden: false };
+  const opts: SuggestOptions = { count: 5, includeHidden: false, json: false, profile: null };
 
   for (let i = 0; i < args.length; i++) {
     const a = args[i]!;
     switch (a) {
+      case '--json':
+        opts.json = true;
+        break;
+      case '--profile': {
+        const v = args[++i];
+        if (v) opts.profile = v;
+        break;
+      }
       case '--all':
         opts.count = 999;
         break;
@@ -81,7 +93,10 @@ function formatPct(current: number, target: number): string {
 function main(): void {
   const opts = parseArgs(process.argv.slice(3)); // "agpa" "suggest" ...
 
-  const engine = createEngine();
+  const resolvedProfile = opts.profile || loadConfig().active_profile || DEFAULT_PROFILE;
+  const stateDir = resolvedProfile !== 'default' ? resolveProfileDir(resolvedProfile) : undefined;
+  const engine = new AchievementEngine(stateDir ? { stateDir } : {});
+  engine.init();
   const unlockedCount = Object.keys(engine.state.unlocked).length;
 
   const nearUnlocks = findNearUnlocks(engine.definitions, engine.events, engine.state, {
@@ -98,6 +113,21 @@ function main(): void {
       });
 
   const shown = results.slice(0, opts.count);
+
+  if (opts.json) {
+    const output = shown.map(n => ({
+      achievement_id: n.achievement_id,
+      name: n.name,
+      icon: n.icon,
+      rarity: n.rarity,
+      current: n.current,
+      target: n.target,
+      unit_label: n.unit_label,
+      progress_pct: n.target > 0 ? Math.round((n.current / n.target) * 100) : 0,
+    }));
+    console.log(JSON.stringify(output, null, 2));
+    return;
+  }
 
   console.log(`\n${B}🎯 Nearest Unlocks${R}  ${D}${unlockedCount}/${engine.definitions.length} unlocked${R}\n`);
 

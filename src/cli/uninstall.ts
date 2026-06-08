@@ -303,7 +303,7 @@ function buildActions(): RemovalAction[] {
 
 function main(): void {
   const args = process.argv.slice(2);
-  const isAll = args.includes('--all');
+  const isAll = args.includes('--all') || args.includes('--yes'); // --yes is alias for --all
   dryRun = args.includes('--dry-run');
   const keepData = args.includes('--keep-data');
 
@@ -314,6 +314,7 @@ AGPA Uninstall — cleanly remove AGPA from your AI coding tools
 Usage:
   agpa uninstall                   Interactive removal
   agpa uninstall --all             Remove everything without confirmation
+  agpa uninstall --yes             Same as --all (for scripting)
   agpa uninstall --dry-run         Preview what would be removed
   agpa uninstall --keep-data       Keep ~/.agent-achievements/ directory
 
@@ -364,7 +365,8 @@ What this removes:
 const isDirectlyExecuted = process.argv[1]
   && (import.meta.url.endsWith(process.argv[1]!)
       || process.argv[1]!.endsWith('uninstall.ts')
-      || process.argv[1]!.endsWith('uninstall.js'));
+      || process.argv[1]!.endsWith('uninstall.js')
+      || process.argv[2] === 'uninstall');   // routed via agpa index.ts dispatch
 if (isDirectlyExecuted) {
   main();
 }

@@ -547,7 +547,7 @@ function cmdPoll(): void {
 /**
  * Hermes hook event names → CC hook event names
  */
-const HERMES_EVENT_MAP: Record<string, string> = {
+export const HERMES_EVENT_MAP: Record<string, string> = {
   'post_tool_call':   'PostToolUse',
   'pre_tool_call':    'PreToolUse',
   'on_session_start': 'SessionStart',
@@ -557,7 +557,7 @@ const HERMES_EVENT_MAP: Record<string, string> = {
 /**
  * Hermes tool names → CC tool names
  */
-const HERMES_TOOL_MAP: Record<string, string> = {
+export const HERMES_TOOL_MAP: Record<string, string> = {
   'read_file':    'Read',
   'write_file':   'Write',
   'edit_file':    'Edit',
@@ -571,7 +571,7 @@ const HERMES_TOOL_MAP: Record<string, string> = {
  * - Maps tool names: write_file → Write, read_file → Read, etc.
  * - Maps field names: tool_input.path → tool_input.file_path
  */
-function normalizeHermesStdin(raw: Record<string, unknown>): HookStdin {
+export function normalizeHermesStdin(raw: Record<string, unknown>): HookStdin {
   const event = HERMES_EVENT_MAP[raw.hook_event_name as string] || raw.hook_event_name as string;
   let toolName = (raw.tool_name as string) || '';
   toolName = HERMES_TOOL_MAP[toolName] || toolName;

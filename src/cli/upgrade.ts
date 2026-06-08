@@ -88,6 +88,7 @@ function main(): void {
   // When invoked via agpa index.ts, argv[2] is 'upgrade' followed by flags.
   const args = rawArgs[0] === 'upgrade' ? rawArgs.slice(1) : rawArgs;
   const checkOnly = args.includes('--check');
+  const autoYes = args.includes('--yes');
 
   if (args.includes('--help') || args.includes('-h')) {
     console.log(`
@@ -96,6 +97,7 @@ ${B}AGPA Upgrade${R} — check for updates and upgrade
 Usage:
   agpa upgrade              Check for updates and upgrade interactively
   agpa upgrade --check      Only check (exit 0 = up-to-date, 1 = update available)
+  agpa upgrade --yes        Auto-upgrade without prompt (non-interactive)
   agpa upgrade --help       Show this help
 
 Install methods:
@@ -140,6 +142,37 @@ Current version: ${getCurrentVersion()}
   if (checkOnly) {
     console.log(`  Run "${B}agpa upgrade${R}" to upgrade.\n`);
     process.exit(1);
+  }
+
+  // ── Auto upgrade with --yes ──────────────────────────────────────────
+  if (autoYes) {
+    console.log(`  ${B}Auto-upgrading...${R}\n`);
+    if (isGitRepo()) {
+      console.log(`  ${D}git pull...${R}`);
+      const pullResult = spawnSync('git', ['pull'], { cwd: PROJECT_ROOT, stdio: 'inherit' });
+      if (pullResult.status !== 0) {
+        console.log(`\n  ${Y}⚠ git pull failed (status ${pullResult.status})${R}\n`);
+        process.exit(1);
+      }
+      console.log(`  ${D}npm install...${R}`);
+      const installResult = spawnSync('npm', ['install'], { cwd: PROJECT_ROOT, stdio: 'inherit' });
+      if (installResult.status !== 0) {
+        console.log(`\n  ${Y}⚠ npm install failed${R}\n`);
+        process.exit(1);
+      }
+      console.log(`\n  ${G}✅ Upgraded to ${latest.version}!${R}`);
+      console.log(`  ${D}Run "agpa init --upgrade" to refresh hooks/configs.${R}\n`);
+    } else {
+      console.log(`  ${D}npm update -g agpa...${R}`);
+      const npmResult = spawnSync('npm', ['update', '-g', 'agpa'], { stdio: 'inherit' });
+      if (npmResult.status !== 0) {
+        console.log(`\n  ${Y}⚠ npm update failed${R}\n`);
+        process.exit(1);
+      }
+      console.log(`\n  ${G}✅ Upgraded to ${latest.version}!${R}`);
+      console.log(`  ${D}Run "agpa init --auto" to refresh hooks/configs.${R}\n`);
+    }
+    process.exit(0);
   }
 
   // Show upgrade instructions based on install method

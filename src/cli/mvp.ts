@@ -9,9 +9,10 @@
  *   agpa mvp reset
  */
 
+import * as fs from 'node:fs';
 import { AchievementEngine } from '../engine/engine.js';
 import type { AchievementDefinition, AchievementStats, AchievementState } from '../engine/types.js';
-import { R, B, D, G, RARITY_COLORS, RARITY_LABELS_EN, RARITY_ORDER } from '../utils/theme.js';
+import { R, B, D, G, C, RARITY_COLORS, RARITY_LABELS_EN, RARITY_ORDER } from '../utils/theme.js';
 import { loadConfig } from '../config.js';
 import { resolveProfileDir, DEFAULT_PROFILE } from '../utils/profile.js';
 
@@ -93,8 +94,17 @@ function renderProgress(defs: AchievementDefinition[], state: AchievementState):
     byCategory[cat]!.push(d);
   }
 
+  let totalUnlocked = 0;
+  const totalDefs = defs.length;
+
   for (const [cat, catDefs] of Object.entries(byCategory)) {
-    lines.push(`  ${B}── ${cat.toUpperCase()} ──${R}`);
+    const catUnlocked = catDefs.filter(d => !!state.unlocked[d.id]).length;
+    const catTotal = catDefs.length;
+    totalUnlocked += catUnlocked;
+
+    // Category header with inline progress bar
+    const catBar = renderBar(catUnlocked, catTotal, 16);
+    lines.push(`  ${B}── ${cat.toUpperCase()} ──${R} ${catBar} ${catUnlocked}/${catTotal}`);
     for (const d of catDefs) {
       const unlocked = !!state.unlocked[d.id];
       const icon = unlocked ? `${G}✔${R}` : `${D}○${R}`;
@@ -106,6 +116,10 @@ function renderProgress(defs: AchievementDefinition[], state: AchievementState):
     }
     lines.push('');
   }
+
+  // Overall progress bar
+  const overallBar = renderBar(totalUnlocked, totalDefs, 32);
+  lines.push(`  ${B}TOTAL${R}    ${overallBar} ${totalUnlocked}/${totalDefs} (${totalDefs > 0 ? Math.round(totalUnlocked / totalDefs * 100) : 0}%)\n`);
 
   return lines.join('\n');
 }
@@ -251,11 +265,36 @@ if (cmd === 'demo') {
     console.log(renderProgress(engine.definitions, engine.state));
   }
 } else if (cmd === 'reset') {
+  // Require confirmation in TTY mode
+  const isTTY = process.stdin.isTTY && process.stdout.isTTY;
+  if (isTTY) {
+    const stateDirTmp = resolveStateDir(profile);
+    const engineTmp = new AchievementEngine(stateDirTmp ? { stateDir: stateDirTmp } : {});
+    engineTmp.init();
+    const statsTmp = engineTmp.stats();
+    console.log(`\n${B}⚠️  Reset Achievement Data${R}\n`);
+    console.log(`  Current profile: ${profile || 'default'}`);
+    console.log(`  ${G}${statsTmp.unlocked}${R}/${statsTmp.total_achievements} achievements unlocked`);
+    console.log(`  ${statsTmp.total_events} events logged`);
+    console.log(`  ${statsTmp.completion_pct}% complete`);
+    console.log(`\n${C}This will DELETE all achievement data for this profile.${R}`);
+    console.log(`  ${D}To keep a backup, run: agpa export [profile]${R}`);
+    process.stdout.write(`\n${B}Type "yes" to confirm:${R} `);
+    // Synchronous stdin read (single line)
+    const buf = Buffer.alloc(1024);
+    const fd = process.stdin.fd !== undefined ? process.stdin.fd : 0;
+    const bytesRead = fs.readSync(fd, buf, 0, buf.length, null);
+    const input = buf.toString('utf-8', 0, bytesRead).trim().toLowerCase();
+    if (input !== 'yes') {
+      console.log(`\n  ${C}Reset cancelled.${R}\n`);
+      process.exit(0);
+    }
+  }
   const stateDir = resolveStateDir(profile);
   const engine = new AchievementEngine(stateDir ? { stateDir } : {});
   engine.init();
   engine.resetState();
-  console.log(`${G}✔ State reset. Run "agpa demo" to start fresh.${R}`);
+  console.log(`\n${G}✔ State reset.${R} ${D}Run "agpa demo" to start fresh.${R}\n`);
 } else if (cmd === '--help' || cmd === '-h') {
   console.log('Usage: agpa mvp [demo|stats|progress|reset] [--json] [--profile <name>]');
 } else {

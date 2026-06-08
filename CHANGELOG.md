@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.1.7] — 2026-06-08
+
+### CLI UX 大修 — 11 项用户体验改进 — 2026-06-08
+
+- **#3 输错命令自动纠正**：Levenshtein 模糊匹配（距离 ≤ 3），`agpa dashbord` → "Did you mean **dashboard**?"
+- **#4 Dashboard 离线化**：html2canvas 本地缓存（`public/lib/`），Server 端 CDN 懒加载+磁盘回退+内存缓存三级保障
+- **#5 统一 `--json` 输出**：stats/progress/search/suggest/activity 等所有展示命令一致支持
+- **#6 Shell 补全自动安装**：`agpa init` 末尾互动询问，自动检测 bash/zsh/fish 并写入对应 rc 文件
+- **#7 交互式 TUI**：`agpa` 无参数进入 TUI，ASCII art logo + 实时状态 + 命令菜单 + 提示符
+- **#9 init 分步指示**：3 阶段进度提示（Detecting → Configuring → Verification），每阶段前彩色分隔线
+- **#10 自动升级**：`agpa upgrade --yes` 自动执行 `git pull && npm install` 或 `npm update -g agpa`
+- **#13 reset 双重确认**：先显示当前进度摘要（解锁数/事件数/完成率），输入 "yes" 才执行
+- **#16 Dashboard 防闪白**：内联关键背景色 CSS + `font-display: swap` 消除 Google Fonts 加载闪烁
+- **#17 help 分组 + verify/doctor 澄清**：Setup/Dashboard/View 等 6 组分区；末行提示 verify = `doctor --quick`
+- **#24 命令行进度条**：`agpa progress` 每个分类旁 `[████░░░░]` 色块进度条 + 总进度条
+- 6 文件 +396 行，845 测试全绿，TypeScript 编译无错误
+
 ## [0.1.6] — 2026-06-08
 
 ### Dashboard 视觉大修 — 字体/氛围/等级环/计数动画/卡片时间线/图表动效 — 2026-06-08

@@ -2,6 +2,7 @@ import * as http from 'http';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
+import * as https from 'https';
 import { fileURLToPath } from 'url';
 import { AchievementEngine } from '../engine/engine.js';
 import { saveConfig, loadConfig, isSoundEnabled, setSoundEnabled, isSimpleAnimations, setSimpleAnimations } from '../config.js';
@@ -41,6 +42,44 @@ const MIME_TYPES: Record<string, string> = {
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
 };
+
+// ── Lazy CDN cache for offline dependency loading ──────────────────────
+
+const HTML2CANVAS_CDN = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
+const LOCAL_LIB = path.join(PUBLIC_DIR, 'lib', 'html2canvas.min.js');
+let html2canvasBuffer: Buffer | null = null;
+
+async function ensureHtml2canvas(): Promise<Buffer> {
+  // Return cached in-memory copy first
+  if (html2canvasBuffer) return html2canvasBuffer;
+  // Return local file if exists
+  try {
+    const local = fs.readFileSync(LOCAL_LIB);
+    html2canvasBuffer = local;
+    return local;
+  } catch { /* not on disk */ }
+  // Fetch from CDN as last resort
+  try {
+    const buf = await new Promise<Buffer>((resolve, reject) => {
+      https.get(HTML2CANVAS_CDN, (res) => {
+        const chunks: Buffer[] = [];
+        res.on('data', (chunk: Buffer) => chunks.push(chunk));
+        res.on('end', () => resolve(Buffer.concat(chunks)));
+      }).on('error', reject);
+    });
+    html2canvasBuffer = buf;
+    // Write to disk for offline use (best-effort)
+    try {
+      fs.mkdirSync(path.dirname(LOCAL_LIB), { recursive: true });
+      fs.writeFileSync(LOCAL_LIB, buf);
+    } catch { /* write failed, in-memory fallback is fine */ }
+    return buf;
+  } catch {
+    // Absolute last resort: return a minimal stub that no-ops
+    html2canvasBuffer = Buffer.from('(function(){console.warn("AGPA: html2canvas not available (offline)");})();');
+    return html2canvasBuffer;
+  }
+}
 
 interface ShowcaseSlot {
   slot: number;
@@ -493,6 +532,19 @@ export function createServer(port: number, defaultProfile: string): http.Server 
         const msg = err instanceof Error ? err.message : 'Card generation failed';
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: msg }));
+      }
+      return;
+    }
+
+    // ── Serve html2canvas (local if possible, lazy CDN fallback) ──
+    if (url.pathname === '/lib/html2canvas.min.js') {
+      try {
+        const buf = await ensureHtml2canvas();
+        res.writeHead(200, { 'Content-Type': 'application/javascript; charset=utf-8' });
+        res.end(buf);
+      } catch {
+        res.writeHead(200, { 'Content-Type': 'application/javascript; charset=utf-8' });
+        res.end('(function(){console.warn("AGPA: html2canvas unavailable");})();');
       }
       return;
     }

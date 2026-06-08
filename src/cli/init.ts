@@ -1272,6 +1272,96 @@ function autoVerify(dataDir: string): string | null {
   return lines.join('\n');
 }
 
+// ── Phase indicator helper ──────────────────────────────────────────────
+
+function printPhase(num: number, total: number, label: string): void {
+  const DIM = '\x1b[2m';
+  const RST = '\x1b[0m';
+  const BLD = '\x1b[1m';
+  const CYN = '\x1b[36m';
+  console.log(`\n  ${CYN}${BLD}═══ Phase ${num}/${total}: ${label} ═══${RST}\n`);
+}
+
+// ── Shell completion install prompt ──────────────────────────────────────
+
+async function promptCompletion(lang: string, auto: boolean): Promise<void> {
+  if (!process.stdin.isTTY || auto) return;
+
+  const isZh = lang === 'zh';
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
+  return new Promise(resolve => {
+    console.log('');
+    console.log(isZh
+      ? '  💡 要安装命令自动补全吗？（tab 键提示 agpa 命令）'
+      : '  💡 Install shell tab-completion for agpa commands?');
+    const question = isZh ? '  安装 shell 补全？(Y/n) ' : '  Install shell completion? (Y/n) ';
+
+    rl.question(question, (answer: string) => {
+      rl.close();
+      const trimmed = answer.trim().toLowerCase();
+      if (trimmed === '' || trimmed === 'y' || trimmed === 'yes') {
+        // Detect shell and install
+        const shell = process.env.SHELL || '';
+        const home = homedir();
+
+        if (shell.includes('zsh')) {
+          const rcFile = path.join(home, '.zshrc');
+          const marker = 'source <(COMP_WORDS="" agpa completion zsh)';
+          let content = '';
+          if (fs.existsSync(rcFile)) content = fs.readFileSync(rcFile, 'utf-8');
+          if (!content.includes('agpa completion')) {
+            const newContent = content.trimEnd() + '\n\n# AGPA shell completion\nautoload -Uz compinit && compinit\n' + marker + '\n';
+            fs.writeFileSync(rcFile, newContent);
+            console.log(isZh
+              ? `  ✅ 补全已添加到 ${rcFile}（重启终端生效）`
+              : `  ✅ Completion added to ${rcFile} (restart terminal)`);
+          } else {
+            console.log(isZh ? '  ⏭  已安装' : '  ⏭  Already installed');
+          }
+        } else if (shell.includes('bash')) {
+          const rcFile = path.join(home, '.bashrc');
+          const marker = 'source <(agpa completion bash)';
+          let content = '';
+          if (fs.existsSync(rcFile)) content = fs.readFileSync(rcFile, 'utf-8');
+          if (!content.includes('agpa completion')) {
+            const newContent = content.trimEnd() + '\n\n# AGPA shell completion\n' + marker + '\n';
+            fs.writeFileSync(rcFile, newContent);
+            console.log(isZh
+              ? `  ✅ 补全已添加到 ${rcFile}（重启终端生效）`
+              : `  ✅ Completion added to ${rcFile} (restart terminal)`);
+          } else {
+            console.log(isZh ? '  ⏭  已安装' : '  ⏭  Already installed');
+          }
+        } else if (shell.includes('fish')) {
+          const fishDir = path.join(home, '.config', 'fish', 'completions');
+          fs.mkdirSync(fishDir, { recursive: true });
+          const dest = path.join(fishDir, 'agpa.fish');
+          if (!fs.existsSync(dest)) {
+            const result = spawnSync('agpa', ['completion', 'fish'], { stdio: ['ignore', 'pipe', 'pipe'] });
+            if (result.status === 0 && result.stdout) {
+              fs.writeFileSync(dest, result.stdout.toString());
+              console.log(isZh
+                ? `  ✅ 补全已安装到 ${dest}`
+                : `  ✅ Completion installed: ${dest}`);
+            }
+          } else {
+            console.log(isZh ? '  ⏭  已安装' : '  ⏭  Already installed');
+          }
+        } else {
+          console.log(isZh
+            ? '  ⚠️  无法检测 shell。运行: agpa completion <bash|zsh|fish>'
+            : '  ⚠️  Unknown shell. Run: agpa completion <bash|zsh|fish>');
+        }
+        console.log('');
+      } else {
+        console.log(isZh ? '  ⏭  跳过' : '  ⏭  Skipped\n');
+      }
+      resolve();
+    });
+  });
+}
+
 // ── Main ───────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
@@ -1356,6 +1446,8 @@ async function main(): Promise<void> {
   if (!runPreflight()) {
     process.exit(1);
   }
+
+  printPhase(1, 3, 'Detecting tools & preferences');
 
   // --auto mode: skip all interactive prompts
   const lang = auto ? 'en' : await promptLanguage();
@@ -1485,6 +1577,8 @@ async function main(): Promise<void> {
     }
   }
 
+  printPhase(2, 3, 'Configuring tools');
+
   const configuredTools: string[] = [];
   const multiTool = toolIds.length > 1;
 
@@ -1548,9 +1642,14 @@ async function main(): Promise<void> {
   console.log(`  \u{2502}                                                 \u{2502}`);
   console.log(`  \u{2514}${'\u{2500}'.repeat(W)}\u{2518}`);
 
+  printPhase(3, 3, 'Verification');
+
   // ── Auto-verify after init ────────────────────────────────────────────
   const verifyResults = autoVerify(dataDir);
   if (verifyResults) console.log(verifyResults);
+
+  // ── Shell completion prompt ───────────────────────────────────────────
+  await promptCompletion(lang, auto);
 }
 
 const isDirectlyExecuted = process.argv[1]

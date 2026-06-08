@@ -17,6 +17,16 @@
 - **图表 CSS fade-in**：所有 insight canvas opacity 0→1 渐入（`chart-fade-in` 0.6s 0.15s 延迟）
 - 845 测试全绿，3 文件 +450/-80 行
 
+### Dashboard 细节打磨 — Hero/套装/筛选/空状态/Modal — 2026-06-08
+
+- **Hero 标题**：gold shimmer 渐变动画（`hero-shimmer` 4s 循环），新增金色装饰分隔线（`hero-accent` 3px）
+- **Share/Export 按钮**：统一为金色镶边胶囊 pill（`border-radius: 20px`），hover 时 golden glow + lift
+- **套装卡片**：100% 完成套装箱金边呼吸辉光 + 右上角 gold ✓ badge（`set-complete-glow`）；成员图标 hover scale 1.15；名称改用 `--font-display`
+- **筛选/搜索栏**：filter/category/rarity pill hover 时 `translateY(-1px)` lift；search icon focus 时 scale 1.1 + gold 变色（`focus-within`）；sort select 增加 focus ring
+- **空状态**：统一 `.empty-state` 样式（浮动 emoji 动画 `empty-icon-float` + 加强文案排版），应用于无套装/无时间线
+- **Modal 装饰**：`.modal-container::before` 顶部稀有度色条，通过 `--modal-rarity-color` 赋值，未锁定成就显示对应 rarity 颜色
+- 845 测试全绿，3 文件 +239/-52 行
+
 ### CLI 大扩展 + Hook 测试覆盖 + 文档同步 — 2026-06-08
 
 - **4 新命令**：`agpa completion <bash|zsh|fish>`（Shell 自动补全）、`agpa upgrade [--check]`（版本检查+升级引导）、`agpa watch [--poll <sec>]`（实时成就监控，非 TTY 输出 JSON 快速退出）、`agpa history [--N] [--event] [--today] [--json]`（事件日志浏览，彩色表格式输出 + Top 5 事件类型统计）

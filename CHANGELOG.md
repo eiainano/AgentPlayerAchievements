@@ -27,6 +27,12 @@
 - **Modal 装饰**：`.modal-container::before` 顶部稀有度色条，通过 `--modal-rarity-color` 赋值，未锁定成就显示对应 rarity 颜色
 - 845 测试全绿，3 文件 +239/-52 行
 
+### Dashboard 收尾 — 进度条金渐变 + 火焰动画 — 2026-06-08
+
+- **进度条美化**：`ach-progress-fill` 改为蓝→绿渐变（default），达到 100% 时替换为金→琥珀渐变 + 呼吸辉光动画（`progress-full-glow`）
+- **火焰动画**：Streak 卡片的 🔥 emoji 增加 `streak-fire` 2s 弹性摆动（scale + rotate 组合 loop）
+- 845 测试全绿，1 文件 +24/-2 行
+
 ### CLI 大扩展 + Hook 测试覆盖 + 文档同步 — 2026-06-08
 
 - **4 新命令**：`agpa completion <bash|zsh|fish>`（Shell 自动补全）、`agpa upgrade [--check]`（版本检查+升级引导）、`agpa watch [--poll <sec>]`（实时成就监控，非 TTY 输出 JSON 快速退出）、`agpa history [--N] [--event] [--today] [--json]`（事件日志浏览，彩色表格式输出 + Top 5 事件类型统计）

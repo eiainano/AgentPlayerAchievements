@@ -116,6 +116,7 @@ export interface DashboardData {
   max_profiles?: number;
   titles: TitleItem[];
   badges: BadgeItem[];
+  is_demo?: boolean;
 }
 
 // ── Card API types ────────────────────────────────────────────────────

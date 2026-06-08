@@ -217,7 +217,10 @@ export function createServer(port: number, defaultProfile: string): http.Server 
       );
       data.profile = resolvedProfile;
       data.profile_emoji = getProfileMeta(resolvedProfile).emoji;
-      data.profiles = listProfilesWithMeta().map(p => ({ name: p.name, emoji: p.emoji, tracked_tools: p.tracked_tools }));
+      data.is_demo = (resolvedProfile as string) === '_demo';
+      data.profiles = listProfilesWithMeta()
+        .filter(p => p.name !== '_demo')
+        .map(p => ({ name: p.name, emoji: p.emoji, tracked_tools: p.tracked_tools }));
       data.max_profiles = MAX_PROFILES;
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(data));
@@ -255,7 +258,7 @@ export function createServer(port: number, defaultProfile: string): http.Server 
       res.end(JSON.stringify({
         active: resolvedProfile,
         active_meta: getProfileMeta(resolvedProfile),
-        profiles: profilesMeta.map(p => ({ name: p.name, emoji: p.emoji, tracked_tools: p.tracked_tools })),
+        profiles: profilesMeta.filter(p => p.name !== '_demo').map(p => ({ name: p.name, emoji: p.emoji, tracked_tools: p.tracked_tools })),
         max: MAX_PROFILES,
       }));
       return;
@@ -469,7 +472,10 @@ export function createServer(port: number, defaultProfile: string): http.Server 
       const data = buildApiResponse(engine.definitions, engine.state, engine.events, [], engine.stats(), engine.setDefinitions, engine.toolStats());
       data.profile = resolvedProfile;
       data.profile_emoji = getProfileMeta(resolvedProfile).emoji;
-      data.profiles = listProfilesWithMeta().map(p => ({ name: p.name, emoji: p.emoji, tracked_tools: p.tracked_tools }));
+      data.is_demo = (resolvedProfile as string) === '_demo';
+      data.profiles = listProfilesWithMeta()
+        .filter(p => p.name !== '_demo')
+        .map(p => ({ name: p.name, emoji: p.emoji, tracked_tools: p.tracked_tools }));
       data.max_profiles = MAX_PROFILES;
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ status: 'ok', data }));

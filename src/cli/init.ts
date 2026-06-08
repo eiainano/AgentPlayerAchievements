@@ -11,6 +11,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as readline from 'node:readline';
 import { homedir } from 'node:os';
+import { execSync } from 'node:child_process';
 import { TOOLS, findTool, INSTRUCTION_FILES, scanTools, type ScanResult } from '../tool-registry.js';
 import type { ToolDef } from '../tool-registry.js';
 import { parseYAML } from '../engine/yaml-parser.js';
@@ -1297,6 +1298,35 @@ async function main(): Promise<void> {
   ensureDataDir(dataDir);
   initEngineState();
   copySounds(dataDir);
+
+  // ── macOS: auto-install terminal-notifier for clickable notifications ──
+  if (process.platform === 'darwin') {
+    const intelPath = '/usr/local/bin/terminal-notifier';
+    const armPath = '/opt/homebrew/bin/terminal-notifier';
+    if (!fs.existsSync(intelPath) && !fs.existsSync(armPath)) {
+      // Check if Homebrew is available
+      let brewOk = false;
+      try {
+        execSync('brew --version', { stdio: 'ignore' });
+        brewOk = true;
+      } catch { /* brew not installed */ }
+
+      if (brewOk) {
+        console.log('\n  🍺 Installing terminal-notifier (for clickable achievement notifications)...');
+        try {
+          execSync('brew install --quiet terminal-notifier', { stdio: 'pipe' });
+          console.log('     ✓ terminal-notifier installed');
+        } catch {
+          console.log('     ⚠️  brew install failed — notifications will use built-in fallback');
+        }
+      } else {
+        console.log('');
+        console.log('  💡 For clickable achievement notifications, install Homebrew:');
+        console.log('     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"');
+        console.log('     Then: brew install terminal-notifier');
+      }
+    }
+  }
 
   const configuredTools: string[] = [];
   const multiTool = toolIds.length > 1;

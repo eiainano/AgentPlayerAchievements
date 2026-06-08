@@ -354,6 +354,10 @@ What this removes:
 
   log(`\n${G}Done.${R} ${removed} item(s) removed.\n`);
   log('  💡 To reinstall: agpa init');
+  if (process.platform === 'darwin') {
+    log('  ℹ️  terminal-notifier was kept (shared tool, may be used by other apps).');
+    log('     To remove it: brew uninstall terminal-notifier');
+  }
   log('');
 }
 

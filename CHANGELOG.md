@@ -2,6 +2,19 @@
 
 ## [0.1.7] — 2026-06-08
 
+### 像素画渲染管线补全 — YAML→类型→API→双端渲染 — 2026-06-08
+
+- **强类型化**：`PixelArt` / `PixelArtSize` 接口替代 `Record<string, unknown>`（`src/engine/types.ts`）
+- **YAML 解析**：`parsePixelArt()` 校验 48/128/256 三种分辨率，6 边界检查（palette 透明标记 ⬛、行数、列宽、索引字符合法性、36 色调色板上限、混合有效/无效分辨率按 key 跳过）
+- **共享渲染器**：`src/utils/pixel-art.ts`（新建）— `renderPixelArtANSI()` 半块字符终端渲染（48 像素 → 24 行），`renderPixelArtSVG()` SVG data URI（`shape-rendering="crispEdges"`），`PixelArtBrowserJS` 内联 snippet
+- **终端弹窗**：`ansi-popup.ts` — `PopupAchievement.pixel_art_48`，卡片上方 ANSI 像素画 banner，窄终端自适应降级
+- **API 层**：`api.ts` — `AchievementItem`/`CardAchievement`/`SetAchievementMember` 均新增 `pixel_art_48`（只传 48×48 避免 JSON 膨胀）
+- **Dashboard 浏览器渲染**：`app.js` — 内联 `PixelArtRenderer`，`iconHtml()` 第 3 分支（pixel_art → SVG `<img>`），9 个调用点传递 `pixelArt`
+- **数据传递**：`hook.ts` → `PopupAchievement`、`helpers.ts` → `FormattedAchievement`
+- **测试**：`tests/utils/pixel-art.test.ts`（新建）27 测试 — 解析校验、ANSI/SVG 渲染、YAML 集成、弹出窗集成、边界条件
+- Emoji fallback 保留不变
+- 9 文件 +907/-12，35 文件 / 924 测试全绿，TS 编译零错误
+
 ### 成就审计系统 Phase 1 + 3 Bug 修复 + YAML 重命名 — 2026-06-08
 
 - **审计规则引擎**：`src/verify/auditor.ts` — Layer A（数值/窗口/操作符一致性）+ Layer B（语义 type/event/window 匹配），EN + CN 描述双向核对

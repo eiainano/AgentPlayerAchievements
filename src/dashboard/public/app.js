@@ -1068,19 +1068,39 @@ function renderProfile(data) {
   const row = document.getElementById('stats-row');
   if (row) {
     const unlockedCount = data.achievements.filter(a => a.unlocked).length;
+    const totalXp = stats.total_xp || 0;
+    const lvl = stats.level || 1;
+    const xpPct = stats.xp_progress
+      ? Math.round((stats.xp_progress.current / stats.xp_progress.target) * 360)
+      : 360;
+
+    // Level + 4 numeric stats (first renders as ring, rest counter-animate)
     const statItems = [
-      { value: 'Lv.' + (stats.level || 1), label: t('stat_level') },
-      { value: (stats.total_xp || 0).toLocaleString(), label: t('stat_xp') },
-      { value: unlockedCount.toLocaleString(), label: t('stat_unlocked') },
-      { value: `${stats.completion_pct}%`, label: t('stat_complete') },
-      { value: (stats.total_events || 0).toLocaleString(), label: t('stat_events') },
+      { raw: lvl, label: t('stat_level'), isRing: true },
+      { raw: totalXp, label: t('stat_xp'), prefix: '', suffix: '' },
+      { raw: unlockedCount, label: t('stat_unlocked'), prefix: '', suffix: '' },
+      { raw: stats.completion_pct, label: t('stat_complete'), prefix: '', suffix: '%' },
+      { raw: (stats.total_events || 0), label: t('stat_events'), prefix: '', suffix: '' },
     ];
-    row.innerHTML = statItems.map(s => `
-      <div class="stat-big">
-        <div class="stat-big-value">${s.value}</div>
+
+    row.innerHTML = statItems.map((s, idx) => {
+      if (idx === 0) {
+        return `<div class="stat-big stat-ring-wrap">
+          <div class="stat-ring" style="--ring-pct:${xpPct}deg">
+            <div class="stat-ring-inner">
+              <span class="stat-ring-value">${lvl}</span>
+            </div>
+          </div>
+          <div class="stat-big-label">${s.label}</div>
+        </div>`;
+      }
+      return `<div class="stat-big">
+        <div class="stat-big-value counter-value" data-target="${s.raw}" data-prefix="${s.prefix}" data-suffix="${s.suffix}">0</div>
         <div class="stat-big-label">${s.label}</div>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
+
+    triggerCounters();
   }
 
   const banner = document.getElementById('pick-banner');
@@ -1679,13 +1699,21 @@ function renderTimeline(data) {
   list.innerHTML = groups.map(g => {
     const d = new Date(g.dateStr);
     const dateLabel = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-    const multiClass = g.items.length > 1 ? ' tl-group-multi' : '';
 
-    const itemsHtml = g.items.map(e => `
-      <div class="tl-ach-row">
-        ${iconHtml(e.ach.icon, { size: 18, className: 'tl-icon' })}
-        <span class="tl-name" style="color:${rarityColor(e.ach.rarity)}">${escHtml(displayName(e.ach))}</span>
-      </div>`).join('');
+    const itemsHtml = g.items.map((e, idx) => {
+      const achRarity = e.ach.rarity || 'common';
+      const achColor = rarityColor(achRarity);
+      const nameHtml = escHtml(displayName(e.ach));
+      const iconHtmlStr = iconHtml(e.ach.icon, { size: 16 });
+      return `<div class="tl-ach-card" data-rarity="${achRarity}" style="--tl-delay:${idx * 60}ms">
+        <div class="tl-ach-card-strip" style="background:${achColor}"></div>
+        <div class="tl-ach-card-icon">${iconHtmlStr}</div>
+        <div class="tl-ach-card-body">
+          <div class="tl-ach-card-name" style="color:${achColor}">${nameHtml}</div>
+        </div>
+        <span class="tl-ach-card-rarity" style="color:${achColor}">${displayRarity(achRarity)}</span>
+      </div>`;
+    }).join('');
     const sameDayTag = g.items.length > 1 ? `<div class="tl-sameday">${t('tl_sameday')}</div>` : '';
     const milestonesHtml = g.milestones.map(m => `<div class="tl-milestone">${m}</div>`).join('');
 
@@ -1694,9 +1722,9 @@ function renderTimeline(data) {
       return (order[e.ach.rarity] || 0) > (order[best] || 0) ? e.ach.rarity : best;
     }, 'common');
 
-    return `<div class="timeline-entry${multiClass}" data-rarity="${bestRarity}">
-      <div class="tl-time">${dateLabel}</div>
-      <div class="tl-items">${itemsHtml}${sameDayTag}</div>
+    return `<div class="timeline-entry" data-rarity="${bestRarity}">
+      <div class="tl-date-badge"><span class="tl-date-badge-icon">📅</span>${escHtml(dateLabel)}</div>
+      ${itemsHtml}${sameDayTag}
       ${milestonesHtml}
     </div>`;
   }).join('');
@@ -1774,11 +1802,8 @@ function drawLineChart(canvasId, daily, field, color, label) {
 
   canvas._chartData = { daily, field, color, label, pts, max, pad, W, H, pw, ph };
 
-  canvas._redraw = function(hoverIdx) {
-    ctx.save();
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, W, H);
-
+  // ── Static grid + labels ──
+  function drawStatic() {
     ctx.strokeStyle = 'rgba(128,128,128,0.12)';
     ctx.lineWidth = 0.5;
     for (let i = 0; i <= 3; i++) {
@@ -1791,33 +1816,47 @@ function drawLineChart(canvasId, daily, field, color, label) {
         ctx.fillText(Math.round(max - (max / 3) * i), pad.left - 6, y + 3);
       }
     }
-
     ctx.fillStyle = 'rgba(128,128,128,0.6)';
     ctx.font = '9px monospace';
     ctx.textAlign = 'center';
     for (let i = 0; i < daily.length; i += Math.max(Math.floor(daily.length / 6), 1)) {
       ctx.fillText(daily[i].date.slice(5), pts[i].x, H - 4);
     }
+  }
 
+  // ── Partial line + area up to `count` points ──
+  function drawPartialLine(count) {
+    const visible = pts.slice(0, count);
+    if (visible.length < 2) return;
+    // Area fill
     ctx.beginPath();
-    ctx.moveTo(pts[0].x, pad.top + ph);
-    for (const p of pts) ctx.lineTo(p.x, p.y);
-    ctx.lineTo(pts[pts.length - 1].x, pad.top + ph);
+    ctx.moveTo(visible[0].x, pad.top + ph);
+    for (const p of visible) ctx.lineTo(p.x, p.y);
+    ctx.lineTo(visible[visible.length - 1].x, pad.top + ph);
     ctx.closePath();
     const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + ph);
     grad.addColorStop(0, color + '40');
     grad.addColorStop(1, color + '05');
     ctx.fillStyle = grad;
     ctx.fill();
-
+    // Line
     ctx.beginPath();
     ctx.strokeStyle = color;
     ctx.lineWidth = 2;
     ctx.lineJoin = 'round';
-    for (let i = 0; i < pts.length; i++) {
-      i === 0 ? ctx.moveTo(pts[i].x, pts[i].y) : ctx.lineTo(pts[i].x, pts[i].y);
+    for (let i = 0; i < visible.length; i++) {
+      i === 0 ? ctx.moveTo(visible[i].x, visible[i].y) : ctx.lineTo(visible[i].x, visible[i].y);
     }
     ctx.stroke();
+  }
+
+  // ── Full redraw with hover highlight ──
+  canvas._redraw = function(hoverIdx) {
+    ctx.save();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    drawStatic();
+    drawPartialLine(pts.length);
 
     if (hoverIdx != null && hoverIdx >= 0 && hoverIdx < pts.length) {
       const hp = pts[hoverIdx];
@@ -1851,19 +1890,48 @@ function drawLineChart(canvasId, daily, field, color, label) {
     ctx.restore();
   };
 
-  canvas._redraw();
+  function setupHover() {
+    canvas.onmousemove = function(e) {
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      let closestIdx = -1, closestDist = 30;
+      for (let i = 0; i < pts.length; i++) {
+        const dist = Math.abs(pts[i].x - mx);
+        if (dist < closestDist) { closestDist = dist; closestIdx = i; }
+      }
+      canvas._redraw(closestIdx);
+    };
+    canvas.onmouseleave = function() { canvas._redraw(); };
+  }
 
-  canvas.onmousemove = function(e) {
-    const rect = canvas.getBoundingClientRect();
-    const mx = e.clientX - rect.left;
-    let closestIdx = -1, closestDist = 30;
-    for (let i = 0; i < pts.length; i++) {
-      const dist = Math.abs(pts[i].x - mx);
-      if (dist < closestDist) { closestDist = dist; closestIdx = i; }
+  // ── First draw: animate line left-to-right ──
+  if (!canvas._animated) {
+    canvas._animated = true;
+    const totalFrames = Math.min(pts.length * 2, 40);
+    let frame = 0;
+    function animTick() {
+      frame++;
+      const progress = Math.min(frame / totalFrames, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const drawCount = Math.max(2, Math.floor(eased * (pts.length - 1)) + 1);
+      ctx.save();
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      drawStatic();
+      drawPartialLine(drawCount);
+      ctx.restore();
+      if (frame < totalFrames) {
+        requestAnimationFrame(animTick);
+      } else {
+        canvas._redraw();
+        setupHover();
+      }
     }
-    canvas._redraw(closestIdx);
-  };
-  canvas.onmouseleave = function() { canvas._redraw(); };
+    animTick();
+  } else {
+    canvas._redraw();
+    setupHover();
+  }
 }
 
 function roundRect(ctx, x, y, w, h, r) {
@@ -1976,6 +2044,51 @@ function showToast(icon, name, rarity) {
     toast.classList.add('out');
     setTimeout(() => toast.remove(), 300);
   }, 3000);
+}
+
+// ── Counter animation ──────────────────────────────
+
+let _countersInitialized = false;
+
+function animateValue(el, start, end, duration, prefix, suffix) {
+  prefix = prefix || '';
+  suffix = suffix || '';
+  var startTime = null;
+  function step(timestamp) {
+    if (!startTime) startTime = timestamp;
+    var progress = Math.min((timestamp - startTime) / duration, 1);
+    var eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+    var current = Math.round(eased * (end - start) + start);
+    el.textContent = prefix + current.toLocaleString() + suffix;
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    } else {
+      el.textContent = prefix + end.toLocaleString() + suffix;
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+function triggerCounters() {
+  // Small delay so the DOM is fully painted
+  setTimeout(function() {
+    var els = document.querySelectorAll('.counter-value');
+    els.forEach(function(el) {
+      var target = parseFloat(el.dataset.target);
+      var prefix = el.dataset.prefix || '';
+      var suffix = el.dataset.suffix || '';
+      if (!isNaN(target)) {
+        if (!_countersInitialized && target > 0) {
+          animateValue(el, 0, target, 1200, prefix, suffix);
+        } else {
+          // Subsequent renders: show final value directly (no re-animation)
+          el.textContent = prefix + Number(target).toLocaleString() + suffix;
+        }
+      }
+      el.classList.add('counter-ready');
+    });
+    _countersInitialized = true;
+  }, 100);
 }
 
 // ── Shareable Card Generation ─────────────────────────────────

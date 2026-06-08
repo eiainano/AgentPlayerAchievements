@@ -75,8 +75,9 @@
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
-  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
-  --font-mono: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
+  --font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Plus Jakarta Sans', 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
 }
 
 /* ── Reset ─────────────────────────────────────────── */
@@ -93,13 +94,29 @@ html { scroll-behavior: smooth; }
 
 body {
   font-family: var(--font);
-  background: var(--bg);
   color: var(--text);
   line-height: 1.6;
   min-height: 100vh;
-  transition: background .4s ease, color .4s ease;
+  transition: background-color .4s ease, color .4s ease;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Dark-theme default: ambient blue/purple glow + micro dot noise */
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 650px 450px at 15% 8%, rgba(59, 126, 192, 0.05) 0%, transparent 100%),
+    radial-gradient(ellipse 550px 550px at 85% 92%, rgba(168, 88, 240, 0.035) 0%, transparent 100%),
+    radial-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: auto, auto, 24px 24px;
+}
+
+[data-theme="light"] body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 650px 450px at 15% 8%, rgba(59, 126, 192, 0.07) 0%, transparent 100%),
+    radial-gradient(ellipse 550px 550px at 85% 92%, rgba(168, 88, 240, 0.035) 0%, transparent 100%),
+    radial-gradient(rgba(0, 0, 0, 0.015) 1px, transparent 1px);
+  background-size: auto, auto, 24px 24px;
 }
 
 /* ── Profile Selector ────────────────────────────── */
@@ -440,6 +457,20 @@ body {
   max-width: 1160px;
   margin: 0 auto;
   padding: 36px 28px;
+}
+
+section.section {
+  animation: section-fade-in .55s ease both;
+}
+section.section:nth-of-type(2) { animation-delay: 0.06s; }
+section.section:nth-of-type(3) { animation-delay: 0.12s; }
+section.section:nth-of-type(4) { animation-delay: 0.18s; }
+section.section:nth-of-type(5) { animation-delay: 0.24s; }
+section.section:nth-of-type(6) { animation-delay: 0.30s; }
+
+@keyframes section-fade-in {
+  0%   { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 .section-header {
@@ -826,22 +857,41 @@ body {
 .showcase-slot-icon {
   font-size: 32px;
   line-height: 1;
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+.showcase-slot.filled:hover .showcase-slot-icon {
+  transform: scale(1.15) rotate(-3deg);
 }
 
 .showcase-slot.filled { border-color: var(--rarity-common); }
-.showcase-slot.filled[data-rarity="legendary"] {
-  border-color: var(--rarity-legendary);
-  box-shadow: 0 0 12px var(--glow-legendary);
+.showcase-slot.filled[data-rarity="common"] {
+  border-color: var(--rarity-common);
+  box-shadow: 0 0 6px var(--glow-common);
 }
-.showcase-slot.filled[data-rarity="mythic"] {
-  border-color: var(--rarity-mythic);
-  box-shadow: 0 0 12px var(--glow-mythic);
+.showcase-slot.filled[data-rarity="uncommon"] {
+  border-color: var(--rarity-uncommon);
+  box-shadow: 0 0 8px var(--glow-uncommon);
+}
+.showcase-slot.filled[data-rarity="rare"] {
+  border-color: var(--rarity-rare);
+  box-shadow: 0 0 10px var(--glow-rare);
+  animation: slot-glow-rare 3s ease-in-out infinite;
 }
 .showcase-slot.filled[data-rarity="epic"] {
   border-color: var(--rarity-epic);
-  box-shadow: 0 0 10px var(--glow-epic);
+  box-shadow: 0 0 12px var(--glow-epic);
+  animation: slot-glow-epic 3s ease-in-out infinite;
 }
-.showcase-slot.empty {
+.showcase-slot.filled[data-rarity="legendary"] {
+  border-color: var(--rarity-legendary);
+  box-shadow: 0 0 14px var(--glow-legendary);
+  animation: slot-glow-legendary 3s ease-in-out infinite;
+}
+.showcase-slot.filled[data-rarity="mythic"] {
+  border-color: var(--rarity-mythic);
+  box-shadow: 0 0 16px var(--glow-mythic);
+  animation: slot-glow-mythic 2.5s ease-in-out infinite;
+}
   opacity: .2;
   font-size: 16px;
   border-style: dashed;
@@ -877,6 +927,24 @@ body {
 }
 .showcase-auto-btn:hover { color: var(--gold); border-color: var(--gold); }
 
+/* Showcase slot rarity glow animations */
+@keyframes slot-glow-rare {
+  0%, 100% { box-shadow: 0 0 6px var(--glow-rare); }
+  50%      { box-shadow: 0 0 18px var(--glow-rare); }
+}
+@keyframes slot-glow-epic {
+  0%, 100% { box-shadow: 0 0 8px var(--glow-epic); }
+  50%      { box-shadow: 0 0 22px var(--glow-epic); }
+}
+@keyframes slot-glow-legendary {
+  0%, 100% { box-shadow: 0 0 10px var(--glow-legendary); }
+  50%      { box-shadow: 0 0 28px var(--glow-legendary); }
+}
+@keyframes slot-glow-mythic {
+  0%, 100% { box-shadow: 0 0 12px var(--glow-mythic); }
+  50%      { box-shadow: 0 0 32px var(--glow-mythic); }
+}
+
 /* ── Stats Row ─────────────────────────────────────── */
 .stats-row {
   display: flex;
@@ -903,6 +971,59 @@ body {
   text-transform: uppercase;
   letter-spacing: .5px;
   font-weight: 500;
+}
+
+/* ── Level Progress Ring ──────────────────────────── */
+.stat-ring-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.stat-ring {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: conic-gradient(var(--gold) var(--ring-pct, 0deg), var(--border-strong) var(--ring-pct, 0deg));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  position: relative;
+  flex-shrink: 0;
+  transition: background-color .4s ease;
+}
+
+.stat-ring-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color .4s ease;
+}
+
+.stat-ring-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.2px;
+  line-height: 1.2;
+}
+
+/* ── Counter animation ────────────────────────────── */
+@keyframes counter-pop {
+  0%   { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.counter-ready {
+  animation: counter-pop .35s ease both;
 }
 
 /* ── Filter Tabs ───────────────────────────────────── */
@@ -1181,6 +1302,11 @@ body {
 /* Activated icon-wrap border */
 .ach-card:not(.locked) .ach-icon-wrap {
   border: 1px solid var(--border-strong);
+  transition: all .3s cubic-bezier(.34,1.56,.64,1);
+}
+.ach-card:not(.locked):hover .ach-icon-wrap .ach-icon,
+.ach-card:not(.locked):hover .ach-icon-wrap .ach-icon-img {
+  animation: icon-wiggle .4s ease;
 }
 
 /* Legendary & Mythic breathing glow */
@@ -1340,32 +1466,33 @@ body {
 .timeline::before {
   content: '';
   position: absolute;
-  left: 13px; top: 4px; bottom: 4px;
+  left: 13px; top: 8px; bottom: 8px;
   width: 2px;
-  background: var(--border);
+  background: linear-gradient(180deg, var(--border), var(--border-strong) 40%, var(--border) 100%);
   border-radius: 1px;
 }
 
 .timeline-entry {
   position: relative;
-  padding: 10px 0 10px 22px;
+  padding: 6px 0 6px 22px;
   transition: transform .2s ease;
 }
-.timeline-entry:hover { transform: translateX(5px); }
 
+/* Bigger dot with rarity halo */
 .timeline-entry::before {
   content: '';
   position: absolute;
-  left: -23px; top: 16px;
-  width: 12px; height: 12px;
+  left: -23px; top: 18px;
+  width: 14px; height: 14px;
   border-radius: 50%;
   background: var(--rarity-common);
-  border: 2.5px solid var(--bg);
-  box-shadow: 0 0 0 2px var(--rarity-common);
-  transition: box-shadow .2s ease;
+  border: 3px solid var(--bg);
+  box-shadow: 0 0 0 2px var(--rarity-common), 0 0 6px transparent;
+  transition: box-shadow .25s ease;
+  z-index: 1;
 }
 .timeline-entry:hover::before {
-  box-shadow: 0 0 0 3px var(--rarity-common), 0 0 8px var(--rarity-common);
+  box-shadow: 0 0 0 3px var(--rarity-common), 0 0 12px var(--rarity-common);
 }
 
 .timeline-entry[data-rarity="uncommon"]::before { background: var(--rarity-uncommon); box-shadow: 0 0 0 2px var(--rarity-uncommon); }
@@ -1375,33 +1502,139 @@ body {
 .timeline-entry[data-rarity="mythic"]::before { background: var(--rarity-mythic); box-shadow: 0 0 0 2px var(--rarity-mythic); }
 
 .timeline-entry:hover::before {
-  box-shadow: 0 0 0 3px var(--rarity-common), 0 0 10px var(--rarity-common);
+  box-shadow: 0 0 0 3px var(--rarity-common), 0 0 14px var(--rarity-common);
 }
+.timeline-entry[data-rarity="uncommon"]:hover::before { box-shadow: 0 0 0 3px var(--rarity-uncommon), 0 0 14px var(--rarity-uncommon); }
+.timeline-entry[data-rarity="rare"]:hover::before { box-shadow: 0 0 0 3px var(--rarity-rare), 0 0 14px var(--rarity-rare); }
+.timeline-entry[data-rarity="epic"]:hover::before { box-shadow: 0 0 0 3px var(--rarity-epic), 0 0 14px var(--rarity-epic); }
+.timeline-entry[data-rarity="legendary"]:hover::before { box-shadow: 0 0 0 3px var(--rarity-legendary), 0 0 14px var(--rarity-legendary); }
+.timeline-entry[data-rarity="mythic"]:hover::before { box-shadow: 0 0 0 3px var(--rarity-mythic), 0 0 14px var(--rarity-mythic); }
 
-.timeline-entry .tl-time {
+/* Date badge */
+.tl-date-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 11px;
+  font-weight: 600;
   color: var(--text-dim);
-  margin-bottom: 3px;
-  font-family: var(--font-mono);
-}
-.timeline-entry .tl-ach { display: flex; align-items: center; gap: 8px; }
-.timeline-entry .tl-icon { font-size: 18px; }
-.timeline-entry .tl-name { font-size: 14px; font-weight: 500; letter-spacing: -.1px; }
-
-/* timeline: multi-achievement groups */
-.tl-items { display: flex; flex-direction: column; gap: 3px; }
-.tl-group-multi { padding: 14px 0 10px 22px; }
-.tl-ach-row { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
-.tl-sameday {
-  font-size: 10px; color: var(--text-dim); font-style: italic;
-  margin-top: 3px; padding-left: 26px;
-}
-.tl-milestone {
-  margin-top: 8px; padding: 6px 12px;
-  background: linear-gradient(135deg, rgba(255,183,77,.15), rgba(255,183,77,.05));
-  border-left: 3px solid #ffb74d;
+  letter-spacing: .2px;
+  margin-bottom: 6px;
+  padding: 3px 10px 3px 0;
   border-radius: 0 8px 8px 0;
-  font-size: 12px; font-weight: 600; color: #ffb74d;
+  background: linear-gradient(90deg, transparent, var(--bg-surface));
+  transition: color .2s;
+}
+.timeline-entry:hover .tl-date-badge {
+  color: var(--text);
+}
+.tl-date-badge-icon {
+  font-size: 12px;
+  opacity: .6;
+}
+
+/* Achievement card inside timeline */
+.tl-ach-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  transition: all .25s cubic-bezier(.4,0,.2,1);
+  margin: 0 0 5px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+  animation: tl-card-in .4s ease both;
+  animation-delay: var(--tl-delay, 0ms);
+}
+
+/* Rarity left strip for card */
+.tl-ach-card-strip {
+  position: absolute;
+  left: 0; top: 4px; bottom: 4px;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  transition: all .25s ease;
+}
+
+.tl-ach-card:hover {
+  transform: translateX(4px);
+  border-color: var(--card-hover-border);
+  box-shadow: var(--card-hover-shadow);
+}
+.tl-ach-card:hover .tl-ach-card-strip {
+  top: 0; bottom: 0;
+}
+
+.tl-ach-card-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  font-size: 16px;
+  line-height: 1;
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1), background .25s;
+}
+.tl-ach-card:hover .tl-ach-card-icon {
+  transform: scale(1.12);
+  background: var(--bg-card-hover);
+}
+
+.tl-ach-card-body {
+  flex: 1;
+  min-width: 0;
+}
+.tl-ach-card-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -.05px;
+}
+
+.tl-ach-card-rarity {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  opacity: .6;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* Card entrance animation */
+@keyframes tl-card-in {
+  0%   { opacity: 0; transform: translateX(-8px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+/* Same-day tag */
+.tl-sameday {
+  font-size: 10px;
+  color: var(--text-dim);
+  font-style: italic;
+  margin-top: 0;
+  padding: 4px 14px 2px;
+  text-align: right;
+}
+
+/* Milestone banners */
+.tl-milestone {
+  margin: 10px 0 5px;
+  padding: 8px 14px;
+  background: linear-gradient(135deg, rgba(255,183,77,.12), rgba(255,183,77,.04));
+  border-left: 3px solid #ffb74d;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #ffb74d;
+  animation: tl-card-in .4s ease both;
 }
 
 /* ── Insights ───────────────────────────────────────── */
@@ -1422,6 +1655,16 @@ body {
   margin-bottom: 8px; text-transform: uppercase; letter-spacing: .5px;
 }
 .insight-canvas { width: 100%; height: auto; border-radius: 8px; }
+
+/* Chart fade-in on first load */
+.insight-card canvas {
+  opacity: 0;
+  animation: chart-fade-in .6s ease .15s forwards;
+}
+@keyframes chart-fade-in {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
 .insight-empty {
   padding: 40px 20px; text-align: center;
   color: var(--text-dim); font-size: 14px;
@@ -3002,4 +3245,15 @@ body {
   70%  { transform: translate(-1px, -1px); }
   80%  { transform: translate(2px, 0); }
   90%  { transform: translate(-1px, 1px); }
+}
+
+/* ── Card icon hover wiggle ────────────────────────── */
+@keyframes icon-wiggle {
+  0%   { transform: rotate(0deg) scale(1); }
+  15%  { transform: rotate(-8deg) scale(1.1); }
+  30%  { transform: rotate(6deg) scale(1.12); }
+  45%  { transform: rotate(-4deg) scale(1.08); }
+  60%  { transform: rotate(2deg) scale(1.05); }
+  80%  { transform: rotate(-1deg) scale(1.02); }
+  100% { transform: rotate(0deg) scale(1); }
 }

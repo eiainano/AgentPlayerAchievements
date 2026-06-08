@@ -24,10 +24,16 @@
 - Emoji fallback 保留不变
 - 9 文件 +907/-12，35 文件 / 924 测试全绿，TS 编译零错误
 
-### 成就审计系统 Phase 1 + 3 Bug 修复 + YAML 重命名 — 2026-06-08
+### 成就审计系统 Phase 1 + 2 — 规则引擎 + LLM 审计脚本 — 2026-06-08
 
 - **审计规则引擎**：`src/verify/auditor.ts` — Layer A（数值/窗口/操作符一致性）+ Layer B（语义 type/event/window 匹配），EN + CN 描述双向核对
 - **审计测试**：`tests/verify/auditor.test.ts` — 51 测试，含全部 183 成就集成（0 error）
+- **LLM 审计脚本**：`scripts/audit-achievements.ts` — 双 Provider（Anthropic tool_use / OpenAI json_object），智能分批，与 Phase 1 联动（默认仅审计 102 个 flagged 成就），dry-run 模式，结构化 pass/warn/fail 报告
+- **LLM 审计测试**：`tests/scripts/audit-achievements.test.ts` — 38 测试（prompt 构建、schema 验证、分组合并、CLI 解析）
+- **手动 LLM 审计**：全部 183 成就人工语义核查 — 0 FAIL, 0 WARN
+- YAML 3 个历史 Bug（`marathon`/`iterative_refiner`/`the_all_nighter` 缺 `per_event`）已于 Phase 1 修复
+- 102 个 `needsLLMReview` 标记成就全部确认 — 描述与条件完全一致，无残留语义问题
+- Test: 924 → 962（+38），文件 35 → 36
 - **Bug `marathon`**：加 `per_event: true`（原 threshold 累加全部 session 的 duration，实际任何单 session 都不必 ≥ 3h 也能解锁）
 - **Bug `iterative_refiner`**：加 `per_event: true` + `>`→`>=`（同累加问题；"20+" = ≥20，原 `>` 要求 21+）
 - **Bug `the_all_nighter`**：加 `per_event: true`（同累加问题）

@@ -2,6 +2,21 @@
 
 ## [0.1.6] — 2026-06-08
 
+### Dashboard 视觉大修 — 字体/氛围/等级环/计数动画/卡片时间线/图表动效 — 2026-06-08
+
+- **字体升级**：Body → DM Sans、Display → Plus Jakarta Sans、Mono → JetBrains Mono，通过 Google Fonts 加载（`--font-display` 新增变量）
+- **背景氛围**：暗/亮双主题 body 叠加 ambient blue+purple radial-gradient 辉光 + 微点噪声纹理（24px 网格），主题切换自动适配
+- **等级进度环**：Level 统计替换为 gold conic-gradient 圆环（`--ring-pct` CSS 变量驱动），环形内衬与背景同色随主题变化
+- **统计数字计数动画**：首屏加载时 XP/Unlocked/Complete/Events 从 0 → 目标值滚动（requestAnimationFrame + ease-out cubic，1200ms），auto-poll 渲染跳过动画直接显示终值
+- **Showcase 增强**：稀有度专用呼吸辉光动画（Rare+ 3 种 `slot-glow-*` keyframes），悬停 icon scale 1.15 + rotate -3deg
+- **Section 交叠入场**：6 个 section(`<section>`) 依次 fade-in + translateY（偏移 0.06s 间隔）
+- **卡片 icon wiggle**：已解锁成就卡片 hover 时 icon 执行 400ms 弹性 wiggle 动画
+- **时间线卡片化**：移除旧 `tl-ach-row`/`tl-name`，改用于完整 `.tl-ach-card`（稀有度色左边条 + 圆角 icon 容器 + 彩色名称 + rarity badge），交叠入场动画（`--tl-delay` 逐项偏移 60ms），hover 时卡片右移 4px + 辉光 + strip 扩展 + icon scale 1.12
+- **时间线日期 badge**：原 `tl-time` 改为 `.tl-date-badge` pill（📅 图标 + 渐变背景），hover 时文字淡入
+- **图表绘制动画**：`drawLineChart()` 重构为 `drawStatic()` + `drawPartialLine(count)` 拆分，首屏 canvas 从左到右逐帧绘制折线+area fill（ease-out cubic），`canvas._animated` 标记防止重复动画
+- **图表 CSS fade-in**：所有 insight canvas opacity 0→1 渐入（`chart-fade-in` 0.6s 0.15s 延迟）
+- 845 测试全绿，3 文件 +450/-80 行
+
 ### CLI 大扩展 + Hook 测试覆盖 + 文档同步 — 2026-06-08
 
 - **4 新命令**：`agpa completion <bash|zsh|fish>`（Shell 自动补全）、`agpa upgrade [--check]`（版本检查+升级引导）、`agpa watch [--poll <sec>]`（实时成就监控，非 TTY 输出 JSON 快速退出）、`agpa history [--N] [--event] [--today] [--json]`（事件日志浏览，彩色表格式输出 + Top 5 事件类型统计）

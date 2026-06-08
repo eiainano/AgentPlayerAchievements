@@ -195,7 +195,7 @@ export function createServer(port: number, defaultProfile: string): http.Server 
         status: 'ok',
         uptime: Math.round((Date.now() - serverStartTime) / 1000),
         profile: resolvedProfile,
-        version: '0.1.7',
+        version: '0.1.8',
       }));
       return;
     }
@@ -352,7 +352,7 @@ export function createServer(port: number, defaultProfile: string): http.Server 
         const payload: Record<string, unknown> = {
           format_version: '1.0',
           exported_at: new Date().toISOString(),
-          source: { tool: 'agpa', version: '0.1.6', profile: resolvedProfile, profile_emoji: meta.emoji },
+          source: { tool: 'agpa', version: '0.1.8', profile: resolvedProfile, profile_emoji: meta.emoji },
           state: engine.state,
           stats: engine.toolStats(),
           showcase: loadShowcase(engine.stateDir),

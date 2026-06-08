@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.8] — 2026-06-09
+
+### Demo 体验功能 — CLI + Dashboard 双通道新手引导 — 2026-06-09
+
+- **CLI `agpa demo`**：`src/cli/demo.ts`（新建）— 模拟 1 天使用历史（3 sessions, 44 事件, 真实时间戳），精准解锁 5 个入门成就（Hello World / Prometheus / Hat Trick / Permission Granted / MCP Plug-in），终端彩色成就弹窗 + 统计总结，自动 spawn Dashboard `--profile _demo`
+- **`_demo` 系统 profile**：`src/utils/profile.ts` 新增系统 profile 支持 — 独立存储于 `profiles/_demo/`，不占 4 个用户 profile 上限，`listProfiles()` 隐藏，`createProfile()` 阻止手动创建
+- **Dashboard demo 模式**：导航栏紫色 `🔬 Demo 数据` badge + `切换到真实数据 →` 链接；紫色渐变引导 Banner（`👀 带我逛逛` + 关闭按钮，localStorage 持久化已关闭状态）
+- **4 步产品导览**：`src/dashboard/public/tour.js`（新建）— 纯 JS/CSS 遮罩层，第 1 步成就面板 → 第 2 步统计行 → 第 3 步时间线 → 第 4 步热力图，自动切换 Dashboard tab，金色脉冲高亮 + tooltip 卡片
+- **成就卡片金色辉光**：Demo 模式下已解锁卡片 `demo-glow` CSS 动画（2.5s 呼吸周期，金色 box-shadow）
+- **API 扩展**：`DashboardData.is_demo?: boolean`，`/api/profiles` 和 `/api/data` 排除 `_demo` profile
+- **移除旧版**：`src/cli/mvp.ts` 删除 `runDemo()` 函数，`index.ts` 的 `demo` command 指向新文件
+- **测试**：profile `_demo` 3 测试 + demo 事件生成 5 测试 + 全量 990 测试全绿（39 文件）
+- **Spec/Plan**：`docs/superpowers/specs/2026-06-08-demo-experience-design.md` / `docs/superpowers/plans/2026-06-08-demo-experience-implementation.md`
+
 ## [0.1.7] — 2026-06-08
 
 ### Dashboard 进程守护 — OS 级 daemon + health endpoint + Agent 感知 — 2026-06-08

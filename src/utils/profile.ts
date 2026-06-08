@@ -21,7 +21,7 @@ export const MAX_PROFILES = 3;
 const PROFILE_NAME_RE = /^[a-z][a-z0-9_-]{0,31}$/;
 
 /** Reserved names that cannot be used for profiles */
-const RESERVED_NAMES = new Set(['default', 'profiles', 'config']);
+const RESERVED_NAMES = new Set(['default', 'profiles', 'config', '_demo']);
 
 function getLegacyDir(): string {
   return path.join(homedir(), '.agent-achievements');
@@ -34,6 +34,8 @@ function getProfilesBaseDir(): string {
 /** Resolve a profile name to its on-disk stateDir */
 export function resolveProfileDir(name: string): string {
   if (name === DEFAULT_PROFILE) return getLegacyDir();
+  // System profiles: _demo uses its own dir under profiles/ but doesn't count toward limits
+  if (name === '_demo') return path.join(getProfilesBaseDir(), '_demo');
   // Reject traversal attempts and invalid names at the boundary
   if (!PROFILE_NAME_RE.test(name)) {
     throw new Error(`Invalid profile name: "${name}". Use lowercase letters, digits, dashes, underscores (1-32 chars).`);
@@ -117,10 +119,10 @@ export function validateProfileName(name: string): string | null {
   const trimmed = name.trim().toLowerCase();
   if (!trimmed) return 'Profile name is required';
   if (trimmed !== name) return 'Profile name must be lowercase with no leading/trailing spaces';
+  if (RESERVED_NAMES.has(name)) return `"${name}" is a reserved name`;
   if (!PROFILE_NAME_RE.test(name)) {
     return 'Profile name must be 1-32 chars, start with a letter, and contain only lowercase letters, digits, dashes, and underscores';
   }
-  if (RESERVED_NAMES.has(name)) return `"${name}" is a reserved name`;
   return null;
 }
 
@@ -133,6 +135,7 @@ export function listProfiles(): string[] {
     const entries = fs.readdirSync(baseDir, { withFileTypes: true });
     for (const entry of entries) {
       if (!entry.isDirectory()) continue;
+      if (entry.name === '_demo') continue;
       // A valid profile must contain state.json
       if (fs.existsSync(path.join(baseDir, entry.name, 'state.json'))) {
         profiles.push(entry.name);

@@ -3,6 +3,7 @@ import {
   validateProfileName,
   resolveProfileDir,
   DEFAULT_PROFILE, MAX_PROFILES,
+  createProfile,
 } from '../../src/utils/profile.js';
 
 describe('validateProfileName', () => {
@@ -86,5 +87,21 @@ describe('constants', () => {
 
   it('MAX_PROFILES is 3', () => {
     expect(MAX_PROFILES).toBe(3);
+  });
+});
+
+describe('_demo system profile', () => {
+  it('resolves _demo to profiles/_demo directory', () => {
+    const dir = resolveProfileDir('_demo');
+    expect(dir).toContain('profiles/_demo');
+    expect(dir).not.toContain('..');
+  });
+
+  it('rejects creating a profile named _demo', () => {
+    expect(() => createProfile('_demo')).toThrow(/reserved/i);
+  });
+
+  it('validateProfileName rejects _demo', () => {
+    expect(validateProfileName('_demo')).toBeTruthy();
   });
 });

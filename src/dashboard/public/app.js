@@ -704,7 +704,7 @@ function renderNav(data) {
     demoBadge.style.display = data.is_demo ? 'inline-block' : 'none';
   }
 
-  // Demo switch-to-real link
+  // Demo: show profile switcher link (opens dropdown, doesn't hardcode a target)
   const navControls = document.querySelector('.nav-controls');
   const existingSwitch = document.getElementById('demo-switch');
   if (existingSwitch) existingSwitch.remove();
@@ -713,10 +713,10 @@ function renderNav(data) {
     switchLink.id = 'demo-switch';
     switchLink.className = 'demo-switch-link';
     switchLink.href = '#';
-    switchLink.textContent = '切换到真实数据 →';
+    switchLink.textContent = '切换档案 →';
     switchLink.onclick = (e) => {
       e.preventDefault();
-      switchProfile('default');
+      toggleProfileDropdown();
     };
     navControls.appendChild(switchLink);
   }
@@ -741,7 +741,7 @@ function renderNav(data) {
 function renderProfileSelector(data) {
   const profiles = data.profiles || [{ name: 'default', emoji: '📂' }];
   const active = data.profile || currentProfile || 'default';
-  const activeMeta = profiles.find(p => p.name === active) || { name: active, emoji: active === 'default' ? '📂' : '👤' };
+  const activeMeta = profiles.find(p => p.name === active) || { name: active, emoji: active === '_demo' ? '🔬' : active === 'default' ? '📂' : '👤' };
   const maxProfiles = data.max_profiles || 3;
 
   // Update nav button with profile emoji + name

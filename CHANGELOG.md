@@ -2,6 +2,19 @@
 
 ## [0.1.8] — 2026-06-09
 
+### Dashboard UX 优化 — 语言下拉框、档案切换、分享剪贴板 — 2026-06-09
+
+- **语言选择器**：EN/中 toggle 开关 → 圆角 pill 下拉框，hover 金色边框+辉光，与 profile-btn 风格统一
+- **移除右上角解锁计数**（`nav-stats` 0/0 badge）— 精简导航栏
+- **移除"下一个目标"卡片**：删除 `renderNextAchievement()` / `scrollToAchievement()` / `.next-ach-*` CSS 共 ~100 行
+- **等级圆环移除**：5 个统计项统一为纯数字 counter-animate，删除 `.stat-ring-*` CSS 43 行
+- **Export 修复**：`apiUrl()` 始终追加 `?profile=`（默认档案不加导致跳回 demo）；export URL `?full=true` → `&full=true`
+- **Share/Export 按钮重叠修复**：第二个 `.share-btn` CSS 块改为 `#card-preview .share-btn`，仅作用于预览卡片
+- **📸 Share 按钮**：下载 PNG + `canvas.toBlob()` → `navigator.clipboard.write()` 复制到剪贴板，成功后左上角 toast "📋 Card image copied to clipboard"
+- **Toast 容器**：从右下角 `bottom: 28px; right: 28px` → 左上角 `top: 72px; left: 28px`（避开 GitHub Star 按钮）
+- **档案切换**：API 新增 `has_demo` 字段，档案下拉菜单始终显示 `🔬 Demo 数据` 条目（无论当前哪个档案）；切换时关闭下拉框、清除 URL hash
+- **测试**：990 测试全绿，TypeScript 编译干净
+
 ### Demo 体验功能 — CLI + Dashboard 双通道新手引导 — 2026-06-09
 
 - **CLI `agpa demo`**：`src/cli/demo.ts`（新建）— 模拟 1 天使用历史（3 sessions, 44 事件, 真实时间戳），精准解锁 5 个入门成就（Hello World / Prometheus / Hat Trick / Permission Granted / MCP Plug-in），终端彩色成就弹窗 + 统计总结，自动 spawn Dashboard `--profile _demo`

@@ -2,6 +2,16 @@
 
 ## [0.1.7] — 2026-06-08
 
+### Agent 成就感知 + 套装完成视觉奖励 — 2026-06-08
+
+- **`achievement_suggest` MCP 工具**：新 MCP tool，复用 `findNearUnlocks()` 返回近锁成就，包含 AI 友好 `hint` 字段（中英双语），Agent 可在对话中自然提及
+- **AGENTS.md 新增指令**：会话中适时调用 `achievement_suggest` 的指引
+- **Dashboard 称号行**：完成套装后 Profile hero 区域显示金色 title pill（Founder/Polyglot/Maker 等），hover 显示来源套装
+- **Dashboard 徽章 section**：Sets 下方新增 "🏅 Badges" section，展示 badge 型套装的收藏卡（streak_master/100% Complete），暗色渐变背景 + 金色呼吸辉光
+- **API 扩展**：`DashboardData` 新增 `titles: TitleItem[]` 和 `badges: BadgeItem[]` 字段，`buildTitlesAndBadges()` 按 reward type 自动分类
+- **测试**：suggest tool handler 13 测试 + 全量 975 测试全绿（37 文件）
+- **Spec**：`docs/superpowers/specs/2026-06-08-agent-proximity-set-rewards-design.md`
+
 ### GitHub Star 提示 — 5 个触点的自然增长引导 — 2026-06-08
 
 - **Dashboard 浮动按钮**：右下角 ⭐ "Star us on GitHub"，金色 hover 动效，移动端只显示图标

@@ -1619,6 +1619,97 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
   .sets-grid { grid-template-columns: 1fr; }
 }
 
+/* ── Titles Row ─────────────────────────────────────── */
+
+.titles-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  padding: 10px 0 4px;
+}
+
+.title-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-display);
+  letter-spacing: .2px;
+  background: linear-gradient(135deg, #b8860b18, #ffd70018);
+  border: 1px solid rgba(218, 165, 32, .3);
+  color: var(--gold);
+  transition: transform .2s, box-shadow .25s;
+  cursor: default;
+}
+.title-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 12px rgba(218, 165, 32, .15);
+}
+
+/* ── Badges Section ──────────────────────────────────── */
+
+.badges-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+}
+
+.badge-card {
+  width: 160px;
+  padding: 20px 14px 16px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, var(--stat-card-bg) 0%, var(--bg-surface) 100%);
+  border: 1.5px solid rgba(218, 165, 32, .35);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform .25s, box-shadow .3s, border-color .3s;
+  animation: card-in .35s ease both, set-complete-glow 3s ease-in-out infinite;
+}
+.badge-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 24px rgba(218, 165, 32, .15);
+  border-color: rgba(218, 165, 32, .6);
+}
+
+.badge-card .badge-icon {
+  font-size: 36px;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+.badge-card .badge-badge {
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--gold);
+  margin-bottom: 6px;
+  letter-spacing: .1px;
+}
+
+.badge-card .badge-set-name {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+.badge-card .badge-progress {
+  font-size: 10px;
+  color: var(--text-dim);
+  opacity: .7;
+  font-family: var(--font-mono);
+}
+
+@media (max-width: 760px) {
+  .badges-grid { gap: 12px; }
+  .badge-card { width: 140px; padding: 14px 10px 12px; }
+}
+
 /* ── Timeline ──────────────────────────────────────── */
 .timeline {
   position: relative;

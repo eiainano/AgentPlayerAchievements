@@ -230,6 +230,10 @@ const I18N = {
     profile_name_placeholder: 'New profile...',
     share_card: '📸 Share',
     export_data: '📦 Export',
+    section_badges: '🏅 Badges',
+    no_badges: 'No badges yet — complete sets to earn them.',
+    title_tooltip: 'From set: {set}',
+    badge_unlocked: '✓ {completed}/{total}',
   },
   zh: {
     nav_profile: '个人主页',
@@ -324,6 +328,10 @@ const I18N = {
     profile_name_placeholder: '新建档案...',
     share_card: '📸 分享',
     export_data: '📦 导出',
+    section_badges: '🏅 徽章',
+    no_badges: '暂无徽章——完成套装来获取。',
+    title_tooltip: '来自套装：{set}',
+    badge_unlocked: '✓ {completed}/{total}',
   },
 };
 
@@ -532,6 +540,7 @@ function renderAll(data) {
   renderSafe('onboarding', () => renderOnboardingGuide(data));
   renderSafe('achievements', () => renderAchievements(data));
   renderSafe('sets', () => renderSets(data));
+  renderSafe('badges', () => renderBadges(data));
   renderSafe('timeline', () => renderTimeline(data));
   renderSafe('insights', () => renderInsights(data));
 }
@@ -1096,6 +1105,7 @@ function renderProfile(data) {
 
   renderStreakCard(stats.streak);
   renderHeatmap(stats.heatmap);
+  renderTitlesRow(data);
 
   const showcase = document.getElementById('showcase');
   if (showcase) {
@@ -1683,6 +1693,53 @@ function renderSets(data) {
       </div>
       <div class="set-members">${membersHtml}</div>
       ${rewardHtml}
+    </div>`;
+  }).join('');
+}
+
+// ── Titles Row ────────────────────────────────────────
+
+function renderTitlesRow(data) {
+  const row = document.getElementById('titles-row');
+  if (!row) return;
+
+  const titles = data.titles || [];
+  if (titles.length === 0) {
+    row.style.display = 'none';
+    return;
+  }
+
+  row.style.display = 'flex';
+  row.innerHTML = titles.map(t => {
+    const setName = currentLang === 'zh' && t.set_name_cn ? t.set_name_cn : t.set_name;
+    return `<span class="title-pill" data-rarity="${t.rarity}" title="${t('title_tooltip', { set: setName })}">
+      ${iconHtml(t.icon, { size: 16 })} ${escHtml(t.title)}
+    </span>`;
+  }).join('');
+}
+
+// ── Badges Section ─────────────────────────────────────
+
+function renderBadges(data) {
+  const section = document.getElementById('badges');
+  const grid = document.getElementById('badges-grid');
+  if (!section || !grid) return;
+
+  const badges = data.badges || [];
+  if (badges.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = '';
+  grid.innerHTML = badges.map(b => {
+    const setName = currentLang === 'zh' && b.set_name_cn ? b.set_name_cn : b.set_name;
+    const unlockedLabel = t('badge_unlocked', { completed: b.completed, total: b.total });
+    return `<div class="badge-card">
+      <div class="badge-icon">${iconHtml(b.icon, { size: 36 })}</div>
+      <div class="badge-badge">${escHtml(b.badge)}</div>
+      <div class="badge-set-name">${escHtml(setName)}</div>
+      <div class="badge-progress">${unlockedLabel}</div>
     </div>`;
   }).join('');
 }

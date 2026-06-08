@@ -5,6 +5,7 @@ import { registerPollTool } from './poll.js';
 import { registerStatsTool } from './stats.js';
 import { registerShowcaseTool } from './showcase.js';
 import { registerConfigTool } from './config.js';
+import { registerSuggestTool } from './suggest.js';
 
 export function registerAllTools(server: McpServer, getEngine: () => AchievementEngine): void {
   registerTrackTool(server, getEngine);
@@ -12,4 +13,5 @@ export function registerAllTools(server: McpServer, getEngine: () => Achievement
   registerStatsTool(server, getEngine);
   registerShowcaseTool(server, getEngine);
   registerConfigTool(server);
+  registerSuggestTool(server, getEngine);
 }

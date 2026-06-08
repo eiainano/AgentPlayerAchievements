@@ -59,6 +59,15 @@ All tool calls, file operations, git commits/PRs, subagents, sessions, task comp
 | Tests pass during your execution | `test.pass` | `{ count }` |
 | Tests fail during your execution | `test.fail` | `{ count }` |
 
+## During the session — achievement suggestions
+
+When the user has completed a batch of meaningful work (several tool calls, edits,
+or tasks completed), call `achievement_suggest` to check for near-unlock achievements.
+If suggestions return with high completion (>75%), weave a natural mention into your
+next response — don't force it if the conversation flow doesn't suit it.
+
+Don't call every turn. After every 5-10 meaningful actions is a good cadence.
+
 ## Session end checklist
 
 At the end of every session:

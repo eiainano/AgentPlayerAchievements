@@ -56,12 +56,10 @@
         <a href="#insights" class="nav-link" data-section="insights" data-i18n="nav_insights">Insights</a>
       </div>
       <div class="nav-controls">
-        <label class="switch" title="Language">
-          <span class="switch-label">EN</span>
-          <input type="checkbox" id="lang-toggle">
-          <span class="switch-track"><span class="switch-knob"></span></span>
-          <span class="switch-label">中</span>
-        </label>
+        <select class="lang-select" id="lang-select" title="Language">
+          <option value="en">EN</option>
+          <option value="zh">中文</option>
+        </select>
         <label class="switch" title="Sound effects">
           <span class="switch-label">🔇</span>
           <input type="checkbox" id="sound-toggle" checked>
@@ -81,7 +79,6 @@
           <span class="switch-label">🌙</span>
         </label>
         <button id="dev-reset-btn" class="dev-reset-btn" title="Dev: clear all achievements" onclick="devReset()">🗑️</button>
-        <span class="nav-stats" id="nav-stats">0/0</span>
       </div>
     </div>
   </nav>
@@ -176,7 +173,6 @@
           </div>
         </div>
       </div>
-      <div id="next-ach-card" class="next-ach-card" style="display:none"></div>
       <div id="titles-row" class="titles-row" style="display:none"></div>
     </div>
   </section>

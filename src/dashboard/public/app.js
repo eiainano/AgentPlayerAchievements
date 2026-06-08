@@ -33,8 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const t = document.documentElement.getAttribute('data-theme');
     logo.src = t === 'dark' ? '/agpa-logo-dark-24.png' : '/agpa-logo-light-24.png';
   }
-  const langToggle = document.getElementById('lang-toggle');
-  if (langToggle) langToggle.addEventListener('change', toggleLang);
+  const langSelect = document.getElementById('lang-select');
+  if (langSelect) langSelect.addEventListener('change', toggleLang);
   const soundToggle = document.getElementById('sound-toggle');
   if (soundToggle) {
     soundToggle.addEventListener('change', toggleSound);
@@ -55,14 +55,14 @@ let currentLang = 'en';
 function initLang(configLang) {
   const saved = localStorage.getItem('agpa-lang');
   currentLang = saved || configLang || 'en';
-  const toggle = document.getElementById('lang-toggle');
-  if (toggle) toggle.checked = (currentLang === 'zh');
+  const select = document.getElementById('lang-select');
+  if (select) select.value = currentLang;
 }
 
 function toggleLang() {
-  const toggle = document.getElementById('lang-toggle');
-  if (!toggle) return;
-  currentLang = toggle.checked ? 'zh' : 'en';
+  const select = document.getElementById('lang-select');
+  if (!select) return;
+  currentLang = select.value;
   localStorage.setItem('agpa-lang', currentLang);
   if (dashboardData) renderAll(dashboardData);
 }
@@ -423,9 +423,7 @@ let currentProfile = 'default';
 /** Build API URL with current profile query param */
 function apiUrl(path) {
   const sep = path.includes('?') ? '&' : '?';
-  return currentProfile && currentProfile !== 'default'
-    ? `${path}${sep}profile=${encodeURIComponent(currentProfile)}`
-    : path;
+  return `${path}${sep}profile=${encodeURIComponent(currentProfile)}`;
 }
 
 // ── Icon render helper ─────────────────────────────────
@@ -537,7 +535,6 @@ function renderAll(data) {
   renderSafe('demo-banner', () => renderDemoBanner(data));
   renderSafe('profile', () => renderProfile(data));
   renderSafe('visit-tip', () => renderFirstVisitTip(data));
-  renderSafe('next-achievement', () => renderNextAchievement(data));
   renderSafe('onboarding', () => renderOnboardingGuide(data));
   renderSafe('achievements', () => renderAchievements(data));
   renderSafe('sets', () => renderSets(data));
@@ -692,9 +689,6 @@ window.__playAchievementSound = function(rarity) {
 // ── Navigation ───────────────────────────────────────
 
 function renderNav(data) {
-  const navStats = document.getElementById('nav-stats');
-  if (navStats) navStats.textContent = `${data.stats.unlocked}/${data.stats.total_achievements}`;
-
   renderProfileSelector(data);
   renderTrackedTools(data);
 
@@ -725,6 +719,7 @@ function renderProfileSelector(data) {
   const profiles = data.profiles || [{ name: 'default', emoji: '📂' }];
   const active = data.profile || currentProfile || 'default';
   const isDemo = data.is_demo;
+  const hasDemo = data.has_demo;
   const activeMeta = profiles.find(p => p.name === active) || { name: active, emoji: active === '_demo' ? '🔬' : active === 'default' ? '📂' : '👤' };
   const maxProfiles = data.max_profiles || 3;
 
@@ -738,10 +733,15 @@ function renderProfileSelector(data) {
   const list = document.getElementById('profile-list');
   if (!list) return;
 
-  // Build profile options — in demo mode, prepend a _demo entry so user can return
+  // Build profile options — always show _demo if data exists on disk
   let options = '';
-  if (isDemo) {
-    options += `<div class="profile-option active" onclick="switchProfile('_demo')">
+  if (hasDemo && !isDemo) {
+    options += `<div class="profile-option" onclick="event.stopPropagation();switchProfile('_demo')">
+      <span>🔬 Demo 数据（试用体验）</span>
+    </div>
+    <div class="profile-option-sep"></div>`;
+  } else if (isDemo) {
+    options += `<div class="profile-option active" onclick="event.stopPropagation();switchProfile('_demo')">
       <span>🔬 Demo 数据（试用体验）</span>
       <span class="profile-check">✓</span>
     </div>
@@ -749,7 +749,7 @@ function renderProfileSelector(data) {
   }
   options += profiles.map(p => `
     <div class="profile-option ${p.name === active ? 'active' : ''}"
-         onclick="switchProfile('${escAttr(p.name)}')">
+         onclick="event.stopPropagation();switchProfile('${escAttr(p.name)}')">
       <span>${escHtml(p.emoji || '👤')} ${escHtml(p.name)}</span>
       ${p.name === active ? '<span class="profile-check">✓</span>' : ''}
     </div>
@@ -831,6 +831,10 @@ function toggleProfileDropdown() {
 }
 
 async function switchProfile(profileName) {
+  // Close dropdown immediately for responsive UX
+  const dropdown = document.getElementById('profile-dropdown');
+  if (dropdown) dropdown.style.display = 'none';
+
   // _demo is a read-only system profile — don't persist as active
   if (profileName !== '_demo') {
     try {
@@ -844,6 +848,8 @@ async function switchProfile(profileName) {
 
   const url = new URL(window.location);
   url.searchParams.set('profile', profileName);
+  // Remove hash to avoid anchoring into a section on the new profile
+  url.hash = '';
   window.location = url.toString();
 }
 
@@ -1156,30 +1162,17 @@ function renderProfile(data) {
     const unlockedCount = data.achievements.filter(a => a.unlocked).length;
     const totalXp = stats.total_xp || 0;
     const lvl = stats.level || 1;
-    const xpPct = stats.xp_progress
-      ? Math.round((stats.xp_progress.current / stats.xp_progress.target) * 360)
-      : 360;
 
-    // Level + 4 numeric stats (first renders as ring, rest counter-animate)
+    // 5 numeric stats (all plain counter-animate, no ring)
     const statItems = [
-      { raw: lvl, label: t('stat_level'), isRing: true },
+      { raw: lvl, label: t('stat_level'), prefix: '', suffix: '' },
       { raw: totalXp, label: t('stat_xp'), prefix: '', suffix: '' },
       { raw: unlockedCount, label: t('stat_unlocked'), prefix: '', suffix: '' },
       { raw: stats.completion_pct, label: t('stat_complete'), prefix: '', suffix: '%' },
       { raw: (stats.total_events || 0), label: t('stat_events'), prefix: '', suffix: '' },
     ];
 
-    row.innerHTML = statItems.map((s, idx) => {
-      if (idx === 0) {
-        return `<div class="stat-big stat-ring-wrap">
-          <div class="stat-ring" style="--ring-pct:${xpPct}deg">
-            <div class="stat-ring-inner">
-              <span class="stat-ring-value">${lvl}</span>
-            </div>
-          </div>
-          <div class="stat-big-label">${s.label}</div>
-        </div>`;
-      }
+    row.innerHTML = statItems.map((s) => {
       return `<div class="stat-big">
         <div class="stat-big-value counter-value" data-target="${s.raw}" data-prefix="${s.prefix}" data-suffix="${s.suffix}">0</div>
         <div class="stat-big-label">${s.label}</div>
@@ -1289,77 +1282,6 @@ function dismissDemoBanner() {
     banner.style.transform = 'translateY(-8px)';
     setTimeout(function() { banner.style.display = 'none'; }, 300);
   }
-}
-
-// ── Next achievement recommendation (1-10 unlocked) ──
-
-function renderNextAchievement(data) {
-  const card = document.getElementById('next-ach-card');
-  if (!card) return;
-
-  const unlocked = data.stats.unlocked;
-  if (unlocked < 1 || unlocked > 10) {
-    card.style.display = 'none';
-    return;
-  }
-
-  // Find the locked achievement with highest progress ratio
-  let best = null, bestRatio = -1;
-  for (const ach of data.achievements) {
-    if (ach.unlocked) continue;
-    if (!ach.progress || ach.progress.target === 0) continue;
-    const ratio = ach.progress.current / ach.progress.target;
-    if (ratio > bestRatio) {
-      bestRatio = ratio;
-      best = ach;
-    }
-  }
-
-  if (!best || bestRatio <= 0) {
-    card.style.display = 'none';
-    return;
-  }
-
-  const name = displayName(best);
-  const desc = currentLang === 'zh' ? (best.description_cn || best.description) : (best.description || '');
-  const progressText = t('next_ach_progress', {
-    current: best.progress.current,
-    target: best.progress.target,
-  });
-
-  card.style.display = 'block';
-  card.innerHTML = `
-    <div class="next-ach-header">${t('next_ach_title')}</div>
-    <div class="next-ach-body" data-ach-id="${escHtml(best.id)}" title="${t('click_to_pick')}">
-      <span class="next-ach-icon">${iconHtml(best.icon, { size: 22, pixelArt: best.pixel_art_48 })}</span>
-      <div class="next-ach-info">
-        <span class="next-ach-name">${escHtml(name)}</span>
-        <span class="next-ach-desc">${escHtml(desc)}</span>
-        <div class="next-ach-bar"><div class="next-ach-bar-fill" style="width:${Math.min(bestRatio * 100, 100)}%"></div></div>
-        <span class="next-ach-pct">${progressText}</span>
-      </div>
-      <span class="next-ach-rarity">${escHtml(best.rarity)}</span>
-    </div>
-  `;
-  card.querySelector('.next-ach-body')?.addEventListener('click', () => {
-    scrollToAchievement(best.id);
-  });
-}
-
-function scrollToAchievement(id) {
-  // Switch to achievements tab if not active
-  const achSection = document.getElementById('achievements');
-  if (achSection) achSection.scrollIntoView({ behavior: 'smooth' });
-  // Find and highlight the card
-  setTimeout(() => {
-    const card = document.querySelector(`.ach-card[data-id="${CSS.escape(id)}"]`);
-    if (card) {
-      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      card.style.animation = 'none';
-      card.offsetHeight; // trigger reflow
-      card.style.animation = 'pulse-highlight .8s ease 2';
-    }
-  }, 300);
 }
 
 // ── Achievement Grid ────────────────────────────────
@@ -2296,10 +2218,26 @@ function generateCard() {
           }).then(function(canvas) {
             var date = new Date().toISOString().slice(0, 10);
             var profileName = data.profile || 'default';
+            var dataUrl = canvas.toDataURL('image/png');
+
+            // Download
             var link = document.createElement('a');
             link.download = 'agpa-card-' + profileName + '-' + date + '.png';
-            link.href = canvas.toDataURL('image/png');
+            link.href = dataUrl;
             link.click();
+
+            // Copy to clipboard on success, silently ignore on failure
+            canvas.toBlob(function(blob) {
+              if (blob && navigator.clipboard && navigator.clipboard.write) {
+                navigator.clipboard.write([
+                  new ClipboardItem({ 'image/png': blob })
+                ]).then(function() {
+                  showToast('📋 Card image copied to clipboard');
+                }).catch(function() {
+                  /* clipboard not available — image still downloaded */
+                });
+              }
+            }, 'image/png');
 
             preview.innerHTML = '';
             preview.style.visibility = 'hidden';
@@ -2335,7 +2273,7 @@ function exportData() {
   btn.disabled = true;
   btn.textContent = '⏳ Exporting...';
 
-  var url = apiUrl('/api/export') + '?full=true';
+  var url = apiUrl('/api/export') + '&full=true';
 
   fetch(url)
     .then(function(res) {

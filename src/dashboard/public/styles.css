@@ -409,21 +409,29 @@ body {
 .nav-link.active::after { width: 60%; }
 .nav-link:active { transform: scale(.96); }
 
-.nav-stats {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-dim);
-  font-variant-numeric: tabular-nums;
-  font-family: var(--font-mono);
-  padding: 3px 10px;
-  border-radius: 12px;
+/* Language select dropdown — pill style matching profile-btn */
+.lang-select {
+  appearance: none;
+  -webkit-appearance: none;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  transition: all .2s ease;
-}
-#top-nav:hover .nav-stats {
-  border-color: var(--border-strong);
+  border-radius: 20px;
   color: var(--text);
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: var(--font);
+  padding: 5px 26px 5px 12px;
+  cursor: pointer;
+  transition: all .25s cubic-bezier(.4,0,.2,1);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23888'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  line-height: 1.4;
+}
+.lang-select:hover {
+  border-color: var(--gold);
+  background: var(--bg-card);
+  box-shadow: 0 0 12px var(--gold-glow);
 }
 
 /* Dev reset button */
@@ -624,6 +632,7 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
 
 .hero-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   justify-content: center;
   margin-bottom: 4px;
@@ -1091,49 +1100,6 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
   text-transform: uppercase;
   letter-spacing: .5px;
   font-weight: 500;
-}
-
-/* ── Level Progress Ring ──────────────────────────── */
-.stat-ring-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.stat-ring {
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
-  background: conic-gradient(var(--gold) var(--ring-pct, 0deg), var(--border-strong) var(--ring-pct, 0deg));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  position: relative;
-  flex-shrink: 0;
-  transition: background-color .4s ease;
-}
-
-.stat-ring-inner {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: var(--bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color .4s ease;
-}
-
-.stat-ring-value {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--gold);
-  font-family: var(--font-display);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -.2px;
-  line-height: 1.2;
 }
 
 /* ── Counter animation ────────────────────────────── */
@@ -1968,8 +1934,8 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
 /* ── Toast ─────────────────────────────────────────── */
 #toast-container {
   position: fixed;
-  bottom: 28px;
-  right: 28px;
+  top: 72px;
+  left: 28px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -2732,104 +2698,7 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
    Next achievement card (1-10 achievements)
    ═══════════════════════════════════════════════════════════════════ */
 
-.next-ach-card {
-  max-width: 720px;
-  margin: 16px auto 0;
-  padding: 14px 20px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--card-base-shadow);
-  animation: card-in-next .4s ease both;
-}
-
-@keyframes card-in-next {
-  0% { opacity: 0; transform: translateY(6px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-.next-ach-header {
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  color: var(--text-dim);
-  margin-bottom: 10px;
-}
-
-.next-ach-body {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  cursor: pointer;
-  padding: 6px;
-  margin: -6px;
-  border-radius: var(--radius-md);
-  transition: background .15s;
-}
-
-.next-ach-body:hover {
-  background: rgba(255,255,255,0.03);
-}
-
-.next-ach-icon {
-  font-size: 22px;
-  flex-shrink: 0;
-}
-
-.next-ach-info {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.next-ach-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.next-ach-desc {
-  font-size: 12px;
-  color: var(--text-dim);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.next-ach-bar {
-  height: 5px;
-  background: var(--border);
-  border-radius: 3px;
-  overflow: hidden;
-  margin-top: 2px;
-}
-
-.next-ach-bar-fill {
-  height: 100%;
-  background: var(--gold);
-  border-radius: 3px;
-  transition: width .3s ease;
-}
-
-.next-ach-pct {
-  font-size: 11px;
-  color: var(--gold);
-  font-weight: 500;
-}
-
-.next-ach-rarity {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  opacity: .6;
-  flex-shrink: 0;
-}
-
-/* pulse highlight animation for linked scroll */
+/* pulse highlight animation — available for future use */
 @keyframes pulse-highlight {
   0%, 100% { box-shadow: 0 0 0 0 rgba(255, 200, 0, 0); }
   50% { box-shadow: 0 0 0 4px rgba(255, 200, 0, 0.3); }
@@ -2837,7 +2706,7 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
 
 /* ── Shareable Card Preview ───────────────────────────────────── */
 
-.share-btn {
+#card-preview .share-btn {
   position: absolute;
   top: 16px;
   right: 20px;
@@ -2852,8 +2721,8 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
   transition: background 0.2s, border-color 0.2s;
   font-family: inherit;
 }
-.share-btn:hover { background: rgba(102, 192, 244, 0.22); border-color: #66c0f4; }
-.share-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+#card-preview .share-btn:hover { background: rgba(102, 192, 244, 0.22); border-color: #66c0f4; }
+#card-preview .share-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 #card-preview {
   visibility: hidden;

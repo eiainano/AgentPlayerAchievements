@@ -21,6 +21,7 @@ import {
   listProfilesWithMeta,
   createProfile,
   validateProfileName,
+  profileExists,
   DEFAULT_PROFILE,
   MAX_PROFILES,
   getProfileMeta,
@@ -218,6 +219,7 @@ export function createServer(port: number, defaultProfile: string): http.Server 
       data.profile = resolvedProfile;
       data.profile_emoji = getProfileMeta(resolvedProfile).emoji;
       data.is_demo = (resolvedProfile as string) === '_demo';
+      data.has_demo = profileExists('_demo');
       data.profiles = listProfilesWithMeta()
         .filter(p => p.name !== '_demo')
         .map(p => ({ name: p.name, emoji: p.emoji, tracked_tools: p.tracked_tools }));

@@ -117,6 +117,7 @@ export interface DashboardData {
   titles: TitleItem[];
   badges: BadgeItem[];
   is_demo?: boolean;
+  has_demo?: boolean;
 }
 
 // ── Card API types ────────────────────────────────────────────────────

@@ -648,7 +648,18 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
   gap: 2px;
 }
 
-.streak-icon { font-size: 22px; line-height: 1; }
+.streak-icon {
+  font-size: 22px;
+  line-height: 1;
+  display: inline-block;
+  animation: streak-fire 2s ease-in-out infinite;
+}
+@keyframes streak-fire {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25%      { transform: scale(1.08) rotate(-3deg); }
+  50%      { transform: scale(1.12) rotate(0deg); }
+  75%      { transform: scale(1.06) rotate(2deg); }
+}
 
 .streak-count {
   font-size: 40px;
@@ -1326,8 +1337,19 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
 .ach-progress-fill {
   height: 100%;
   border-radius: 3px;
-  background: var(--accent);
+  background: linear-gradient(90deg, var(--accent), #6dd5a0);
   transition: width .5s ease;
+  position: relative;
+}
+
+/* Full progress: gold fill with breathing glow */
+.ach-progress-fill[style*="100%"] {
+  background: linear-gradient(90deg, var(--gold), #f59e0b);
+  animation: progress-full-glow 2s ease-in-out infinite;
+}
+@keyframes progress-full-glow {
+  0%, 100% { box-shadow: 0 0 4px var(--gold-glow); }
+  50%      { box-shadow: 0 0 10px var(--gold-glow); }
 }
 .ach-progress-text {
   display: none;

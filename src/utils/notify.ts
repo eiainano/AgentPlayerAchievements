@@ -38,14 +38,92 @@ export function ensureIcon(stateDir: string): string | null {
 
 // ── Platform-specific notifiers ─────────────────────────────────
 
+function sendJxaNotification(
+  title: string,
+  body: string,
+  dashboardUrl: string,
+  iconPath: string | null,
+): void {
+  // JXA (JavaScript for Automation) — built into macOS since 10.10.
+  // Uses NSUserNotification for rich notifications with click-to-open,
+  // sound, and optional contentImage. Auto-terminates after a 30 s
+  // timeout so the process doesnʼt linger.
+  const esc = (s: string) => s.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+
+  let iconBlock = '';
+  if (iconPath) {
+    iconBlock = `
+  var img = $.NSImage.alloc.initWithContentsOfFile($('${esc(iconPath)}'));
+  if (img) notification.contentImage = img;`;
+  }
+
+  const jxa = `
+ObjC.import('AppKit');
+var app = $.NSApplication.sharedApplication;
+
+// Delegate — fires when the user clicks the notification action button
+var Delegate = $.NSObject.extend('AGPANotifyDelegate');
+Delegate.addMethod(
+  'userNotificationCenter:didActivateNotification:',
+  'v@:@@',
+  function(_self, _cmd, _center, notif) {
+    var info = notif.userInfo;
+    if (info) {
+      var urlStr = info.objectForKey('url');
+      if (urlStr && urlStr.js) {
+        $.NSWorkspace.sharedWorkspace.openURL(
+          $.NSURL.URLWithString(urlStr.js)
+        );
+      }
+    }
+    app.terminate(null);
+  }
+);
+$.NSUserNotificationCenter.defaultUserNotificationCenter.delegate =
+  $.Delegate.alloc.init;
+
+var notification = $.NSUserNotification.alloc.init;
+notification.title = $('${esc(title)}');
+notification.informativeText = $('${esc(body)}');
+notification.soundName = $.NSUserNotificationDefaultSoundName;
+notification.hasActionButton = true;
+notification.actionButtonTitle = 'View Dashboard';
+notification.otherButtonTitle = 'Close';
+notification.userInfo = $.NSDictionary.dictionaryWithObjectForKey(
+  $('${esc(dashboardUrl)}'), $('url')
+);${iconBlock}
+
+$.NSUserNotificationCenter.defaultUserNotificationCenter
+  .deliverNotification(notification);
+
+// Auto-exit after 30 s if the user never clicks
+$.NSTimer.scheduledTimerWithTimeIntervalTargetSelectorUserInfoRepeats(
+  30, app, 'terminate:', null, false
+);
+
+app.run();
+`;
+
+  execFile('osascript', ['-l', 'JavaScript', '-e', jxa], (err) => {
+    if (err) {
+      // JXA failed — last-resort plain AppleScript
+      const escapedTitle = title.replace(/"/g, '\\"');
+      const escapedBody = body.replace(/"/g, '\\"');
+      const script = `display notification "${escapedBody}" with title "${escapedTitle}" sound name "Glass"`;
+      execFile('osascript', ['-e', script], (osErr) => {
+        if (osErr) process.stderr.write(`[AGPA] macOS notify failed: ${osErr.message}\n`);
+      });
+    }
+  });
+}
+
 function sendMacNotification(title: string, body: string, stateDir: string, profile?: string): void {
   const icon = ensureIcon(stateDir);
   const dashboardUrl = profile && profile !== 'default'
     ? `${DASHBOARD_URL}?profile=${encodeURIComponent(profile)}`
     : DASHBOARD_URL;
 
-  // Best effort: terminal-notifier (brew install terminal-notifier)
-  // Provides clickable URL + custom app icon. If unavailable, fall back to osascript.
+  // Tier 1: terminal-notifier — best experience (custom app icon, clickable, sound)
   const args = [
     '-title', title,
     '-message', body,
@@ -57,13 +135,8 @@ function sendMacNotification(title: string, body: string, stateDir: string, prof
 
   execFile('terminal-notifier', args, (err) => {
     if (!err) return;
-    // Fallback to built-in osascript (no icon, no clickable URL, but always available)
-    const escapedTitle = title.replace(/"/g, '\\"');
-    const escapedBody = body.replace(/"/g, '\\"');
-    const script = `display notification "${escapedBody}" with title "${escapedTitle}" sound name "Glass"`;
-    execFile('osascript', ['-e', script], (osErr) => {
-      if (osErr) process.stderr.write(`[AGPA] macOS notify failed: ${osErr.message}\n`);
-    });
+    // Tier 2: JXA (NSUserNotification) — clickable, sound, optional contentImage
+    sendJxaNotification(title, body, dashboardUrl, icon);
   });
 }
 

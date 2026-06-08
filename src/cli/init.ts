@@ -23,7 +23,7 @@ const AGPA_ROOT = path.resolve(import.meta.dirname, '../..');
 const TSX_BIN = path.resolve(import.meta.dirname, '../../node_modules/.bin/tsx');
 
 /** Build hook command with optional profile env var */
-function hookCmd(toolSourceEnv: string, mode: string, profile: string | null): string {
+export function hookCmd(toolSourceEnv: string, mode: string, profile: string | null): string {
   const profileEnv = profile ? `AGPA_PROFILE=${profile} ` : '';
   return `${profileEnv}${toolSourceEnv} ${TSX_BIN} ${AGPA_HOOK} ${mode}`;
 }
@@ -36,12 +36,12 @@ const HOOK_KILOCODE_ENV = 'AGPA_TOOL_SOURCE=kilocode';
 
 // ── Per-tool init data (mcpInject + instructionFiles) ──────────────────
 
-interface InitToolData {
+export interface InitToolData {
   mcpInject: (config: Record<string, unknown>) => Record<string, unknown>;
   instructionFiles: Array<{ path: string; marker: string }>;
 }
 
-const INIT_DATA: Record<string, InitToolData> = {
+export const INIT_DATA: Record<string, InitToolData> = {
   'claude-code': {
     mcpInject(cfg) {
       const mcps = (cfg.mcpServers as Record<string, unknown>) || {};
@@ -280,7 +280,7 @@ function writeJSON(filePath: string, data: Record<string, unknown>): void {
 
 // ── YAML config (text-based injection) ─────────────────────────────────
 
-function injectYamlMCPBlock(
+export function injectYamlMCPBlock(
   filePath: string,
   serverName: string,
   serverConfig: Record<string, unknown>,
@@ -391,7 +391,7 @@ function injectHermesHooks(filePath: string, hookCommands: {
 
 const OPENCLAW_PLUGIN_MARKER = '// agpa-openclaw-track';
 
-function generateOpenClawPlugin(profile: string | null): string {
+export function generateOpenClawPlugin(profile: string | null): string {
   const profileEnv = profile ? `AGPA_PROFILE: '${profile}', ` : '';
   return `${OPENCLAW_PLUGIN_MARKER}
 /**
@@ -463,7 +463,7 @@ function injectOpenClawPlugin(profile: string | null): boolean {
 
 const KILOCODE_PLUGIN_MARKER = '// agpa-kilocode-track';
 
-function generateKiloCodePlugin(profile: string | null, toolSource: 'kilocode' | 'opencode'): string {
+export function generateKiloCodePlugin(profile: string | null, toolSource: 'kilocode' | 'opencode'): string {
   const profileEnv = profile ? `AGPA_PROFILE: '${profile}', ` : '';
   return `${KILOCODE_PLUGIN_MARKER}
 /**
@@ -560,7 +560,7 @@ function injectKiloCodePlugin(toolId: string, profile: string | null): boolean {
 
 // ── Instruction file injection ─────────────────────────────────────────
 
-function injectInstructions(filePath: string, marker: string): boolean {
+export function injectInstructions(filePath: string, marker: string): boolean {
   const dir = path.dirname(filePath);
   fs.mkdirSync(dir, { recursive: true });
 
@@ -758,7 +758,7 @@ function promptTools(scanResults: ScanResult[]): Promise<string[]> {
 
 // ── CC Hook injector (merge-aware) ─────────────────────────────────────
 
-interface HookEntry {
+export interface HookEntry {
   type: string;
   command: string;
   async?: boolean;
@@ -770,7 +770,7 @@ interface HookEntry {
  * Merges with existing hook entries rather than overwriting.
  * Returns true if the command was newly injected, false if already present.
  */
-function injectHook(
+export function injectHook(
   hooks: Record<string, unknown>,
   key: string,
   command: string,
@@ -812,7 +812,7 @@ function injectHook(
 /**
  * All CC hook keys that AGPA needs, with their commands and settings.
  */
-function getHookKeys(profile: string | null): Array<{ key: string; command: string; async?: boolean; timeout?: number }> {
+export function getHookKeys(profile: string | null): Array<{ key: string; command: string; async?: boolean; timeout?: number }> {
   return [
     { key: 'SessionStart',       command: hookCmd(HOOK_ENV, 'track session.start', profile),               async: false },
     { key: 'UserPromptSubmit',   command: hookCmd(HOOK_ENV, 'auto', profile),                               async: false },
@@ -1350,6 +1350,8 @@ async function main(): Promise<void> {
   }
   console.log(`  \u{2502}    agpa dashboard     browse all 160 achievements \u{2502}`);
   console.log(`  \u{2502}                                                 \u{2502}`);
+  console.log(`  \u{2502}    \u{1F6AE} To remove:    agpa uninstall --all           \u{2502}`);
+  console.log(`  \u{2502}                                                 \u{2502}`);
   if (jsonCompiled) {
     console.log(`  \u{2502}  \u{1F4E6} 160 achievements compiled — /achievements ready  \u{2502}`);
     console.log(`  \u{2502}                                                 \u{2502}`);
@@ -1360,7 +1362,13 @@ async function main(): Promise<void> {
   console.log(`  \u{2514}${'\u{2500}'.repeat(W)}\u{2518}`);
 }
 
-main().catch((err: unknown) => {
-  console.error((err instanceof Error ? err.message : String(err)));
-  process.exit(1);
-});
+const isDirectlyExecuted = process.argv[1]
+  && (import.meta.url.endsWith(process.argv[1]!)
+      || process.argv[1]!.endsWith('init.ts')
+      || process.argv[1]!.endsWith('init.js'));
+if (isDirectlyExecuted) {
+  main().catch((err: unknown) => {
+    console.error((err instanceof Error ? err.message : String(err)));
+    process.exit(1);
+  });
+}

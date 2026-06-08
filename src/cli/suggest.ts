@@ -9,29 +9,12 @@
  *   agpa suggest --hidden     Include hidden achievements (spoilers!)
  */
 
-import { AchievementEngine } from '../engine/engine.js';
-import { loadConfig } from '../config.js';
-import { resolveProfileDir } from '../utils/profile.js';
+import { createEngine } from '../engine/factory.js';
 import { findNearUnlocks } from '../utils/progress-nudge.js';
 import type { NearUnlock } from '../utils/progress-nudge.js';
+import { R, B, D, RARITY_COLORS, RARITY_LABELS_EN } from '../utils/theme.js';
 
-const R = '\x1b[0m';
-const B = '\x1b[1m';
-const D = '\x1b[2m';
-
-const RARITY_COLORS: Record<string, string> = {
-  common: '\x1b[38;2;150;150;150m',
-  uncommon: '\x1b[38;2;100;200;100m',
-  rare: '\x1b[38;2;66;133;244m',
-  epic: '\x1b[38;2;180;70;240m',
-  legendary: '\x1b[38;2;255;140;0m',
-  mythic: '\x1b[38;2;255;50;50m',
-};
-
-const RARITY_LABELS: Record<string, string> = {
-  common: 'Common', uncommon: 'Uncommon', rare: 'Rare',
-  epic: 'Epic', legendary: 'Legendary', mythic: 'Mythic',
-};
+const RARITY_LABELS = RARITY_LABELS_EN;
 
 // ── Argument parsing ─────────────────────────────────────────────────
 
@@ -74,16 +57,6 @@ function parseArgs(args: string[]): SuggestOptions {
   }
 
   return opts;
-}
-
-// ── Engine helper ────────────────────────────────────────────────────
-
-function createEngine(): AchievementEngine {
-  const cfg = loadConfig();
-  const stateDir = cfg.active_profile !== 'default' ? resolveProfileDir(cfg.active_profile) : undefined;
-  const engine = new AchievementEngine(stateDir ? { stateDir } : {});
-  engine.init();
-  return engine;
 }
 
 // ── Rendering ────────────────────────────────────────────────────────

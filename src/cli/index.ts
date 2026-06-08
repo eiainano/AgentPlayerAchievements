@@ -38,6 +38,7 @@ interface Subcommand {
 
 const COMMANDS: Subcommand[] = [
   { name: 'init',       description: 'Auto-detect & configure AI coding tools for achievement tracking', usage: 'agpa init [--tool <name>] [--profile <name>]', module: './init.ts' },
+  { name: 'uninstall',  description: 'Cleanly remove AGPA from all configured tools',                     usage: 'agpa uninstall [--all] [--dry-run] [--keep-data]', module: './uninstall.ts' },
   { name: 'verify',     description: 'Verify AGPA setup — 7 health checks',                               usage: 'agpa verify',                               module: './verify.ts' },
   { name: 'doctor',     description: 'Full system diagnosis',                                              usage: 'agpa doctor [--check <id>] [--json]',       module: './doctor.ts' },
   { name: 'config',     description: 'View or change AGPA settings',                                      usage: 'agpa config [key] [value]',                 module: './config.ts' },

@@ -118,7 +118,7 @@ function evalPredicate(expr: string, ctx: Record<string, string | boolean | numb
     const fieldVal = Number(ctxValue(ctx, m[1]!));
     const rhs = Number(parseRhs(m[2]!));
     if (!isNaN(fieldVal) && !isNaN(rhs)) return fieldVal < rhs;
-    return true; // non-numeric → pass
+    return false; // non-numeric → fail-safe
   }
 
   // field > value  (numeric)
@@ -127,7 +127,7 @@ function evalPredicate(expr: string, ctx: Record<string, string | boolean | numb
     const fieldVal = Number(ctxValue(ctx, m[1]!));
     const rhs = Number(parseRhs(m[2]!));
     if (!isNaN(fieldVal) && !isNaN(rhs)) return fieldVal > rhs;
-    return true; // non-numeric → pass
+    return false; // non-numeric → fail-safe
   }
 
   // field contains 'substring'

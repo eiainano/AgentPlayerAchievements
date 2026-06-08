@@ -141,7 +141,25 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
         }
       }
       if (data.tool_name === 'Write') {
-        results.push({ event_type: 'file.create', payload: { ...base } });
+        // Determine whether this is truly a new file (create) vs overwrite.
+        // Post‑hook runs after the write completes, so we compare birthtime
+        // vs mtime: a freshly created file has birthtime ≈ mtime; an
+        // overwritten existing file retains its original birthtime.
+        let isCreate = false;
+        if (typeof ti.file_path === 'string') {
+          try {
+            const fp = ti.file_path as string;
+            const resolved = fp.startsWith('/') ? fp : path.resolve(data.cwd || process.cwd(), fp);
+            const stat = fs.statSync(resolved);
+            // On platforms without birthtime (very old Linux), birthtimeMs is 0
+            // (epoch). In that case we can't distinguish → skip create event.
+            isCreate = stat.birthtimeMs > 0 &&
+              Math.abs(stat.birthtimeMs - stat.mtimeMs) < 500;
+          } catch { /* stat failed — file may not exist, skip create */ }
+        }
+        if (isCreate) {
+          results.push({ event_type: 'file.create', payload: { ...base } });
+        }
         results.push({ event_type: 'file.write', payload: { ...base } });
         const writeLang = detectLanguage(ti.file_path as string || '');
         if (writeLang) {

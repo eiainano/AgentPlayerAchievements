@@ -10,40 +10,13 @@
  *   agpa showcase auto-fill            Auto-fill with rarest unlocked
  */
 
-import { AchievementEngine } from '../engine/engine.js';
+import { createEngine } from '../engine/factory.js';
 import { loadConfig } from '../config.js';
-import { resolveProfileDir } from '../utils/profile.js';
 import { loadShowcase, saveShowcase } from '../helpers.js';
 import type { AchievementDefinition } from '../engine/types.js';
-
-const R = '\x1b[0m';
-const B = '\x1b[1m';
-const D = '\x1b[2m';
-const C = '\x1b[36m';
-const G = '\x1b[32m';
-
-const RARITY_ORDER: Record<string, number> = {
-  mythic: 5, legendary: 4, epic: 3, rare: 2, uncommon: 1, common: 0,
-};
-
-const RARITY_COLORS: Record<string, string> = {
-  common: '\x1b[38;2;150;150;150m',
-  uncommon: '\x1b[38;2;100;200;100m',
-  rare: '\x1b[38;2;66;133;244m',
-  epic: '\x1b[38;2;180;70;240m',
-  legendary: '\x1b[38;2;255;140;0m',
-  mythic: '\x1b[38;2;255;50;50m',
-};
+import { R, B, D, C, G, RARITY_RANK, RARITY_COLORS } from '../utils/theme.js';
 
 const SLOT_EMOJIS = ['❶', '❷', '❸', '❹', '❺', '❻'];
-
-function createEngine(): AchievementEngine {
-  const cfg = loadConfig();
-  const stateDir = cfg.active_profile !== 'default' ? resolveProfileDir(cfg.active_profile) : undefined;
-  const engine = new AchievementEngine(stateDir ? { stateDir } : {});
-  engine.init();
-  return engine;
-}
 
 function formatSlot(slot: number, aid: string | null, definitions: AchievementDefinition[]): string {
   const emoji = SLOT_EMOJIS[slot]!;
@@ -142,7 +115,7 @@ function cmdAutoFill(): void {
   // Get unlocked achievements sorted by rarity descending (rarest first)
   const unlocked = engine.definitions
     .filter(d => engine.state.unlocked[d.id])
-    .sort((a, b) => (RARITY_ORDER[b.rarity] ?? 0) - (RARITY_ORDER[a.rarity] ?? 0));
+    .sort((a, b) => (RARITY_RANK[b.rarity] ?? 0) - (RARITY_RANK[a.rarity] ?? 0));
 
   // Fill empty slots
   let filled = 0;

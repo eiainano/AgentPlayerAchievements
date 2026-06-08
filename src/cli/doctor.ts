@@ -21,9 +21,9 @@ const DEFS_YAML = path.join(PROJECT_ROOT, '04-成就定义清单.yaml');
 
 // ── Types ─────────────────────────────────────────────────────────────
 
-type Status = 'ok' | 'warn' | 'error';
+export type Status = 'ok' | 'warn' | 'error';
 
-interface CheckResult {
+export interface CheckResult {
   id: string;
   label: string;
   status: Status;
@@ -32,11 +32,11 @@ interface CheckResult {
 
 // ── Helpers ───────────────────────────────────────────────────────────
 
-function statusIcon(s: Status): string {
+export function statusIcon(s: Status): string {
   return { ok: '✅', warn: '⚠️', error: '❌' }[s];
 }
 
-function ago(ms: number): string {
+export function ago(ms: number): string {
   const sec = Math.floor(ms / 1000);
   if (sec < 60) return `${sec}s ago`;
   const min = Math.floor(sec / 60);
@@ -48,13 +48,14 @@ function ago(ms: number): string {
 
 // ── Checks ────────────────────────────────────────────────────────────
 
-function checkDataDir(): CheckResult {
-  const exists = fs.existsSync(AGPA_DIR);
+export function checkDataDir(baseDir?: string): CheckResult {
+  const dir = baseDir || AGPA_DIR;
+  const exists = fs.existsSync(dir);
   if (!exists) {
     return { id: 'data-dir', label: 'Data directory', status: 'error',
-      detail: `${AGPA_DIR} does not exist. Run agpa init first.` };
+      detail: `${dir} does not exist. Run agpa init first.` };
   }
-  const files = fs.readdirSync(AGPA_DIR);
+  const files = fs.readdirSync(dir);
   const missing: string[] = [];
   if (!files.includes('event.log')) missing.push('event.log');
   if (!files.includes('state.json')) missing.push('state.json');
@@ -63,17 +64,18 @@ function checkDataDir(): CheckResult {
       detail: `Exists, missing: ${missing.join(', ')}` };
   }
   return { id: 'data-dir', label: 'Data directory', status: 'ok',
-    detail: `${AGPA_DIR} (${files.length} files)` };
+    detail: `${dir} (${files.length} files)` };
 }
 
-function checkEventLog(): CheckResult {
-  if (!fs.existsSync(EVENT_LOG)) {
+export function checkEventLog(baseDir?: string): CheckResult {
+  const logPath = baseDir ? path.join(baseDir, 'event.log') : EVENT_LOG;
+  if (!fs.existsSync(logPath)) {
     return { id: 'event-log', label: 'Event log', status: 'error',
-      detail: `${EVENT_LOG} does not exist` };
+      detail: `${logPath} does not exist` };
   }
   try {
-    const stat = fs.statSync(EVENT_LOG);
-    const lines = fs.readFileSync(EVENT_LOG, 'utf-8').trim().split('\n').filter(Boolean);
+    const stat = fs.statSync(logPath);
+    const lines = fs.readFileSync(logPath, 'utf-8').trim().split('\n').filter(Boolean);
     const mtime = Date.now() - stat.mtimeMs;
     let mtimeStatus = '';
     if (mtime < 300_000) mtimeStatus = `(last write ${ago(mtime)})`;
@@ -84,45 +86,46 @@ function checkEventLog(): CheckResult {
       detail: `${lines.length} lines, ${(stat.size / 1024).toFixed(1)}KB ${mtimeStatus}` };
   } catch {
     return { id: 'event-log', label: 'Event log', status: 'error',
-      detail: `Cannot read ${EVENT_LOG}` };
+      detail: `Cannot read ${logPath}` };
   }
 }
 
-function checkStateJson(): CheckResult {
-  if (!fs.existsSync(STATE_JSON)) {
+export function checkStateJson(baseDir?: string): CheckResult {
+  const statePath = baseDir ? path.join(baseDir, 'state.json') : STATE_JSON;
+  if (!fs.existsSync(statePath)) {
     return { id: 'state', label: 'State file', status: 'error',
-      detail: `${STATE_JSON} does not exist` };
+      detail: `${statePath} does not exist` };
   }
   try {
-    const raw = fs.readFileSync(STATE_JSON, 'utf-8');
+    const raw = fs.readFileSync(statePath, 'utf-8');
     const state = JSON.parse(raw);
     const unlocked = Object.keys(state.unlocked || {}).length;
     return { id: 'state', label: 'State file', status: 'ok',
       detail: `${unlocked} unlocked, valid JSON` };
   } catch {
     return { id: 'state', label: 'State file', status: 'error',
-      detail: `${STATE_JSON} is corrupt (invalid JSON)` };
+      detail: `${statePath} is corrupt (invalid JSON)` };
   }
 }
 
-function checkDefsYaml(): CheckResult {
-  if (!fs.existsSync(DEFS_YAML)) {
+export function checkDefsYaml(yamlPath?: string): CheckResult {
+  const defsPath = yamlPath || DEFS_YAML;
+  if (!fs.existsSync(defsPath)) {
     return { id: 'defs-yaml', label: 'Achievement definitions', status: 'error',
-      detail: `${DEFS_YAML} not found` };
+      detail: `${defsPath} not found` };
   }
   try {
-    const raw = fs.readFileSync(DEFS_YAML, 'utf-8');
-    // Quick parse check: count "- id:" entries
+    const raw = fs.readFileSync(defsPath, 'utf-8');
     const count = (raw.match(/^\s+- id:/gm) || []).length;
     return { id: 'defs-yaml', label: 'Achievement definitions', status: 'ok',
       detail: `${count} achievements defined` };
   } catch {
     return { id: 'defs-yaml', label: 'Achievement definitions', status: 'error',
-      detail: `Cannot read ${DEFS_YAML}` };
+      detail: `Cannot read ${defsPath}` };
   }
 }
 
-function checkMcpConfigs(): CheckResult[] {
+export function checkMcpConfigs(): CheckResult[] {
   return TOOLS.map(t => {
     if (!fs.existsSync(t.configPath)) {
       return { id: `mcp-${t.id}`,
@@ -147,7 +150,7 @@ function checkMcpConfigs(): CheckResult[] {
   });
 }
 
-function checkInstructionFiles(): CheckResult[] {
+export function checkInstructionFiles(): CheckResult[] {
   return INSTRUCTION_FILES.map(f => {
     if (!fs.existsSync(f.path)) {
       return { id: `instr-${f.name.toLowerCase()}`, label: `Instructions: ${f.name}`,
@@ -170,7 +173,7 @@ function checkInstructionFiles(): CheckResult[] {
 
 // ── Output ─────────────────────────────────────────────────────────────
 
-function renderReport(results: CheckResult[]): string {
+export function renderReport(results: CheckResult[]): string {
   const l: string[] = [];
   l.push('');
   for (const r of results) {
@@ -199,13 +202,14 @@ function renderReport(results: CheckResult[]): string {
   return l.join('\n');
 }
 
-function renderJson(results: CheckResult[]): string {
+export function renderJson(results: CheckResult[]): string {
   return JSON.stringify(results, null, 2);
 }
 
 // ── Main ───────────────────────────────────────────────────────────────
 
-const args = process.argv.slice(2);
+function main(): void {
+  const args = process.argv.slice(2);
 let jsonMode = false;
 let singleCheck: string | null = null;
 
@@ -263,5 +267,14 @@ if (jsonMode) {
   console.log(renderReport(results));
 }
 
-const hasErrors = results.some(r => r.status === 'error');
-process.exit(hasErrors ? 1 : 0);
+  const hasErrors = results.some(r => r.status === 'error');
+  process.exit(hasErrors ? 1 : 0);
+}
+
+const isDirectlyExecuted = process.argv[1]
+  && (import.meta.url.endsWith(process.argv[1]!)
+      || process.argv[1]!.endsWith('doctor.ts')
+      || process.argv[1]!.endsWith('doctor.js'));
+if (isDirectlyExecuted) {
+  main();
+}

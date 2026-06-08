@@ -27,7 +27,7 @@ function readPackageVersion(): string {
 
 type ImportStrategy = 'merge' | 'replace';
 
-function resolveImportConflict(
+export function resolveImportConflict(
   existing: AchievementState,
   incoming: AchievementState,
   strategy: ImportStrategy,

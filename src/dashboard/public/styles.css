@@ -2196,10 +2196,10 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--card-base-shadow);
-  animation: card-in .4s ease both;
+  animation: card-in-next .4s ease both;
 }
 
-@keyframes card-in {
+@keyframes card-in-next {
   0% { opacity: 0; transform: translateY(6px); }
   100% { opacity: 1; transform: translateY(0); }
 }

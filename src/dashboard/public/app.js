@@ -228,6 +228,8 @@ const I18N = {
     profile_create: '+',
     profile_max: 'Max 3 profiles',
     profile_name_placeholder: 'New profile...',
+    share_card: '📸 Share',
+    export_data: '📦 Export',
   },
   zh: {
     nav_profile: '个人主页',
@@ -320,6 +322,8 @@ const I18N = {
     profile_create: '+',
     profile_max: '最多3个档案',
     profile_name_placeholder: '新建档案...',
+    share_card: '📸 分享',
+    export_data: '📦 导出',
   },
 };
 
@@ -2038,6 +2042,41 @@ function generateCard() {
     btn.disabled = false;
     btn.textContent = '📸 Share';
   }
+}
+
+// ── Data Export ──────────────────────────────────────────────────────
+
+function exportData() {
+  var btn = document.getElementById('export-btn');
+  if (!btn) return;
+  btn.disabled = true;
+  btn.textContent = '⏳ Exporting...';
+
+  var url = apiUrl('/api/export') + '?full=true';
+
+  fetch(url)
+    .then(function(res) {
+      if (!res.ok) throw new Error('Export failed: ' + res.status);
+      return res.blob();
+    })
+    .then(function(blob) {
+      var date = new Date().toISOString().slice(0, 10);
+      var profile = window.__agpaProfile || 'default';
+      var link = document.createElement('a');
+      link.download = 'agpa-export-' + profile + '-' + date + '.json';
+      link.href = URL.createObjectURL(blob);
+      link.click();
+      URL.revokeObjectURL(link.href);
+      btn.disabled = false;
+      btn.textContent = '📦 Export';
+      showToast('✅ Export downloaded');
+    })
+    .catch(function(err) {
+      console.error('Export failed:', err);
+      alert('Export failed. Please try again.');
+      btn.disabled = false;
+      btn.textContent = '📦 Export';
+    });
 }
 
 function buildCardHTML(data) {

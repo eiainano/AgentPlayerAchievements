@@ -26,6 +26,12 @@ const TOOL_SOURCE_MAP: Record<string, string> = {
   'openclaw': 'openclaw',
 };
 
+function uuid(): string {
+  return crypto.randomUUID
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
 export class AchievementEngine {
   readonly stateDir: string;
   readonly defsPath: string;
@@ -91,7 +97,7 @@ export class AchievementEngine {
         const def = this.definitions.find(d => d.id === id);
         const evt: TrackedEvent = {
           protocol_version: '1.0',
-          event_id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+          event_id: uuid(),
           timestamp: unlockedAt as string,
           tool_source: this.toolSource,
           event_type: 'achievement.unlocked',

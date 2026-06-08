@@ -3,16 +3,11 @@ import type { ChildProcess } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import { isSoundEnabled } from '../config.js';
+import { RARITY_RANK } from './theme.js';
 
 export const DASHBOARD_URL = 'http://localhost:3867';
 
-// ── Rarity ranking (for dedup: highest rarity in a poll round) ──────────
-
 type RarityLevel = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';
-
-const RARITY_RANK: Record<RarityLevel, number> = {
-  common: 0, uncommon: 1, rare: 2, epic: 3, legendary: 4, mythic: 5,
-};
 
 // ── OS detection ────────────────────────────────────────────────
 
@@ -77,8 +72,13 @@ function sendLinuxNotification(title: string, body: string, stateDir: string): v
   const args = [
     ...(icon ? ['-i', icon] : ['-i', 'dialog-information']),
     '-a', 'AGPA',
+    '-u', 'normal',       // urgency: low / normal / critical
+    '-c', 'games',        // category (for notification center grouping)
     title,
     body,
+    // GNOME Shell supports clickable action buttons with --action.
+    // Label=command pairs; the command is executed when the action is clicked.
+    '--action', `Open Dashboard=xdg-open ${DASHBOARD_URL}`,
   ];
   execFile('notify-send', args, (err) => {
     if (err) {
@@ -88,29 +88,54 @@ function sendLinuxNotification(title: string, body: string, stateDir: string): v
 }
 
 function sendWindowsNotification(title: string, body: string): void {
-  // PowerShell MessageBox — fire and forget (detached child, non-blocking).
-  // Use single-quoted strings to prevent $() subexpression injection.
-  // Escape embedded single quotes by doubling them (PowerShell convention).
+  // Use PowerShell toast notification (Windows 10+) when available,
+  // falling back to a non-blocking MessageBox for older systems.
   const escapedTitle = title.replace(/'/g, "''");
   const escapedBody = body.replace(/'/g, "''");
-  const psScript =
-    `Add-Type -AssemblyName System.Windows.Forms; ` +
-    `[System.Windows.Forms.MessageBox]::Show('${escapedBody}','${escapedTitle}','OK','Information')`;
+
+  // Modern toast notification via PowerShell — non-blocking, native look.
+  // The Start-Sleep keeps the PS process alive just long enough for
+  // the toast to be delivered to the notification center (~500ms).
+  const psToastScript =
+    `[Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] > $null; ` +
+    `$template = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent(` +
+    `  [Windows.UI.Notifications.ToastTemplateType]::ToastText02); ` +
+    `$texts = $template.GetElementsByTagName('text'); ` +
+    `$texts.Item(0).AppendChild($template.CreateTextNode('${escapedTitle}')) > $null; ` +
+    `$texts.Item(1).AppendChild($template.CreateTextNode('${escapedBody}')) > $null; ` +
+    `$toast = [Windows.UI.Notifications.ToastNotification]::new($template); ` +
+    `[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier(` +
+    `  'AGPA Achievement').Show($toast); ` +
+    `Start-Sleep -Milliseconds 600`;
 
   let child: ChildProcess | null = null;
   try {
     child = execFile(
       'powershell',
-      ['-WindowStyle', 'Hidden', '-NoProfile', '-NonInteractive', '-Command', psScript],
+      ['-WindowStyle', 'Hidden', '-NoProfile', '-NonInteractive', '-Command', psToastScript],
       (err) => {
-        if (err) process.stderr.write(`[AGPA] Windows notify failed: ${err.message}\n`);
+        // If toast API fails (pre-Win10 or no notification center),
+        // fall back to the simpler MessageBox approach.
+        if (err) {
+          const mbScript =
+            `Add-Type -AssemblyName System.Windows.Forms; ` +
+            `[System.Windows.Forms.MessageBox]::Show('${escapedBody}','${escapedTitle}','OK','Information')`;
+          const mbChild = execFile(
+            'powershell',
+            ['-WindowStyle', 'Hidden', '-NoProfile', '-NonInteractive', '-Command', mbScript],
+            (mbErr) => {
+              if (mbErr) process.stderr.write(`[AGPA] Windows notify failed: ${mbErr.message}\n`);
+            },
+          );
+          if (mbChild) mbChild.unref();
+        }
       },
     );
   } catch {
     process.stderr.write(`[AGPA] Windows notify: PowerShell unavailable\n`);
     return;
   }
-  if (child) child.unref(); // don't block the parent process
+  if (child) child.unref();
 }
 
 /** Terminal fallback — always printed so TTY users never miss an unlock. */

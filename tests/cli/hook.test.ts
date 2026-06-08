@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import * as fs from 'fs';
 import { mapEvents, computePromptPayload, parseTranscriptJsonl, normalizeOpenClawStdin, OPENCLAW_EVENT_MAP, OPENCLAW_TOOL_MAP, normalizeKilocodeStdin, KILOCODE_EVENT_MAP, KILOCODE_TOOL_MAP } from '../../src/cli/hook.js';
 
 describe('mapEvents', () => {
@@ -39,11 +40,14 @@ describe('mapEvents', () => {
     });
 
     it('emits file.create + file.write for Write tool', () => {
-      const data = { hook_event_name: 'PostToolUse', tool_name: 'Write', tool_input: { file_path: '/tmp/b.ts' } };
+      const tmp = '/tmp/agpa-hook-test-create.ts';
+      fs.writeFileSync(tmp, '// test');
+      const data = { hook_event_name: 'PostToolUse', tool_name: 'Write', tool_input: { file_path: tmp } };
       const results = mapEvents('PostToolUse', data);
       const types = results.map(r => r.event_type);
       expect(types).toContain('file.create');
       expect(types).toContain('file.write');
+      fs.unlinkSync(tmp);
     });
 
     it('emits file.edit with edit_lines from old_string', () => {
@@ -357,15 +361,18 @@ describe('normalizeOpenClawStdin', () => {
     });
 
     it('after_tool_call with write_file → file.create + file.write', () => {
+      const tmp = '/tmp/agpa-hook-test-ocl-create.ts';
+      fs.writeFileSync(tmp, '// test');
       const data = normalizeOpenClawStdin({
         hook_event_name: 'after_tool_call',
         toolName: 'write_file',
-        params: { path: '/tmp/b.ts' },
+        params: { path: tmp },
       });
       const events = mapEvents(data.hook_event_name!, data);
       const types = events.map(e => e.event_type);
       expect(types).toContain('file.create');
       expect(types).toContain('file.write');
+      fs.unlinkSync(tmp);
     });
 
     it('after_tool_call with apply_patch → file.edit with edit_lines', () => {

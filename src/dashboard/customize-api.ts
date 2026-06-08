@@ -11,7 +11,8 @@ import * as YAML from 'yaml';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const YAML_PATH = path.resolve(__dirname, '..', '..', '04-成就定义清单.yaml');
+let yamlPath = path.resolve(__dirname, '..', '..', '04-成就定义清单.yaml');
+export function setYamlPathForTest(p: string): void { yamlPath = p; }
 
 // ── Types ────────────────────────────────────────────────────────────────
 
@@ -59,16 +60,16 @@ interface CustomizeResponse {
 // ── YAML Read / Write ────────────────────────────────────────────────────
 
 function loadYamlRaw(): Record<string, unknown> | null {
-  const text = fs.readFileSync(YAML_PATH, 'utf-8');
+  const text = fs.readFileSync(yamlPath, 'utf-8');
   return YAML.parse(text) as Record<string, unknown> | null;
 }
 
 function loadYamlText(): string {
-  return fs.readFileSync(YAML_PATH, 'utf-8');
+  return fs.readFileSync(yamlPath, 'utf-8');
 }
 
 function saveYamlText(text: string): void {
-  fs.writeFileSync(YAML_PATH, text, 'utf-8');
+  fs.writeFileSync(yamlPath, text, 'utf-8');
 }
 
 // ── Suggestion Engine ────────────────────────────────────────────────────

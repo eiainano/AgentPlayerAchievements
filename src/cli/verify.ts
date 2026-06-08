@@ -13,6 +13,7 @@ import * as os from 'node:os';
 import { homedir } from 'node:os';
 import { TOOLS, INSTRUCTION_FILES } from '../tool-registry.js';
 import { AchievementEngine } from '../engine/engine.js';
+import { ANSI_GREEN as GREEN, ANSI_RED as RED, ANSI_YELLOW as YELLOW, ANSI_BOLD as BOLD, ANSI_RESET as RESET, ANSI_DIM as DIM } from '../utils/theme.js';
 
 const AGPA_DIR = path.join(homedir(), '.agent-achievements');
 const PROJECT_ROOT = path.resolve(import.meta.dirname, '../..');
@@ -20,9 +21,9 @@ const DEFS_YAML = path.join(PROJECT_ROOT, '04-成就定义清单.yaml');
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
-type Status = 'ok' | 'warn' | 'error';
+export type Status = 'ok' | 'warn' | 'error';
 
-interface CheckResult {
+export interface CheckResult {
   id: string;
   label: string;
   status: Status;
@@ -32,21 +33,14 @@ interface CheckResult {
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 
-const GREEN = '\x1b[32m';
-const RED = '\x1b[31m';
-const YELLOW = '\x1b[33m';
-const BOLD = '\x1b[1m';
-const RESET = '\x1b[0m';
-const DIM = '\x1b[2m';
-
-function icon(s: Status): string {
+export function icon(s: Status): string {
   return { ok: `${GREEN}✅${RESET}`, warn: `${YELLOW}⚠️ ${RESET}`, error: `${RED}❌${RESET}` }[s];
 }
 
 // ── Checks ────────────────────────────────────────────────────────────────
 
-function checkDataDir(profile: string | null): CheckResult {
-  const dir = profile ? path.join(AGPA_DIR, 'profiles', profile) : AGPA_DIR;
+export function checkDataDir(baseDir: string, profile: string | null): CheckResult {
+  const dir = profile ? path.join(baseDir, 'profiles', profile) : baseDir;
   const exists = fs.existsSync(dir);
   if (!exists) {
     return {
@@ -74,10 +68,10 @@ function checkDataDir(profile: string | null): CheckResult {
   return { id: 'data-dir', label: 'Data directory', status: 'ok', detail };
 }
 
-function checkStateJson(profile: string | null): CheckResult {
+export function checkStateJson(baseDir: string, profile: string | null): CheckResult {
   const statePath = profile
-    ? path.join(AGPA_DIR, 'profiles', profile, 'state.json')
-    : path.join(AGPA_DIR, 'state.json');
+    ? path.join(baseDir, 'profiles', profile, 'state.json')
+    : path.join(baseDir, 'state.json');
   if (!fs.existsSync(statePath)) {
     return {
       id: 'state', label: 'State file', status: 'error',
@@ -101,15 +95,15 @@ function checkStateJson(profile: string | null): CheckResult {
   }
 }
 
-function checkDefsYaml(): CheckResult {
-  if (!fs.existsSync(DEFS_YAML)) {
+export function checkDefsYaml(yamlPath: string): CheckResult {
+  if (!fs.existsSync(yamlPath)) {
     return {
       id: 'defs-yaml', label: 'Achievement definitions', status: 'error',
-      detail: `${DEFS_YAML} not found`,
+      detail: `${yamlPath} not found`,
     };
   }
   try {
-    const raw = fs.readFileSync(DEFS_YAML, 'utf-8');
+    const raw = fs.readFileSync(yamlPath, 'utf-8');
     const count = (raw.match(/^\s+- id:/gm) || []).length;
     if (count < 100) {
       return {
@@ -124,12 +118,12 @@ function checkDefsYaml(): CheckResult {
   } catch {
     return {
       id: 'defs-yaml', label: 'Achievement definitions', status: 'error',
-      detail: `Cannot parse ${DEFS_YAML}`,
+      detail: `Cannot parse ${yamlPath}`,
     };
   }
 }
 
-function checkEngine(): CheckResult {
+export function checkEngine(): CheckResult {
   // Dry-run: initialize engine in a temp directory, track + poll
   const tmpDir = path.join(os.tmpdir(), `agpa-verify-${Date.now()}`);
   let clean = false;
@@ -174,7 +168,7 @@ function checkEngine(): CheckResult {
   }
 }
 
-function checkMcpConfigs(): CheckResult[] {
+export function checkMcpConfigs(): CheckResult[] {
   return TOOLS.map(t => {
     if (!fs.existsSync(t.configPath)) {
       return {
@@ -205,7 +199,7 @@ function checkMcpConfigs(): CheckResult[] {
   });
 }
 
-function checkInstructions(): CheckResult[] {
+export function checkInstructions(): CheckResult[] {
   return INSTRUCTION_FILES.map(f => {
     if (!fs.existsSync(f.path)) {
       return {
@@ -247,7 +241,7 @@ function printHeader(): void {
   console.log('');
 }
 
-function printResult(r: CheckResult): void {
+export function printResult(r: CheckResult): void {
   const statusIcon = icon(r.status);
   const line = `  ${statusIcon} ${r.label.padEnd(28)} ${r.detail}`;
   console.log(line);
@@ -256,7 +250,7 @@ function printResult(r: CheckResult): void {
   }
 }
 
-function printSummary(results: CheckResult[]): void {
+export function printSummary(results: CheckResult[]): void {
   const errors = results.filter(r => r.status === 'error');
   const warns = results.filter(r => r.status === 'warn');
   const oks = results.filter(r => r.status === 'ok');
@@ -288,7 +282,7 @@ function printSummary(results: CheckResult[]): void {
 
 // ── Main ───────────────────────────────────────────────────────────────────
 
-function parseArgs(): { profile: string | null } {
+export function parseArgs(): { profile: string | null } {
   const args = process.argv.slice(2);
   let profile: string | null = null;
   for (let i = 0; i < args.length; i++) {
@@ -312,9 +306,9 @@ function main(): void {
 
   // Core checks (always run)
   const core: CheckResult[] = [
-    checkDataDir(profile),
-    checkStateJson(profile),
-    checkDefsYaml(),
+    checkDataDir(AGPA_DIR, profile),
+    checkStateJson(AGPA_DIR, profile),
+    checkDefsYaml(DEFS_YAML),
     checkEngine(),
   ];
 
@@ -343,4 +337,10 @@ function main(): void {
   printSummary(allResults);
 }
 
-main();
+const isDirectlyExecuted = process.argv[1]
+  && (import.meta.url.endsWith(process.argv[1]!)
+      || process.argv[1]!.endsWith('verify.ts')
+      || process.argv[1]!.endsWith('verify.js'));
+if (isDirectlyExecuted) {
+  main();
+}

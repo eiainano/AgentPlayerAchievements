@@ -1,5 +1,5 @@
 import * as YAML from 'yaml';
-import type { AchievementDefinition, Condition, ConditionType, SetDefinition, SetRewardType } from './types.js';
+import type { AchievementDefinition, Condition, ConditionType, PixelArt, PixelArtSize, SetDefinition, SetRewardType } from './types.js';
 
 const VALID_REWARD_TYPES: Set<string> = new Set([
   'title', 'showcase_border', 'stat_counter', 'theme', 'animation', 'badge',
@@ -19,6 +19,60 @@ function parseIconField(raw: unknown): string {
     if (typeof obj.src === 'string') return obj.src;
   }
   return '\u{1F3C6}'; // 🏆
+}
+
+// ── Pixel Art parsing ──────────────────────────────────────────────────
+
+const VALID_PIXEL_RESOLUTIONS = new Set(['48', '128', '256']);
+const PIXEL_INDEX_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+/**
+ * Parse pixel_art YAML field. Validates palette + data format for each
+ * resolution (48, 128, 256). Skips invalid sizes individually; returns
+ * undefined only when ALL sizes are invalid or pixel_art is absent.
+ */
+function parsePixelArt(raw: unknown): PixelArt | undefined {
+  if (typeof raw !== 'object' || raw === null) return undefined;
+  const obj = raw as Record<string, unknown>;
+
+  const result: PixelArt = {};
+
+  for (const [key, sizeRaw] of Object.entries(obj)) {
+    if (!VALID_PIXEL_RESOLUTIONS.has(key)) continue;
+    if (typeof sizeRaw !== 'object' || sizeRaw === null) continue;
+
+    const parsed = parsePixelArtSize(sizeRaw as Record<string, unknown>, parseInt(key, 10));
+    if (parsed) {
+      result[key as '48' | '128' | '256'] = parsed;
+    }
+  }
+
+  return Object.keys(result).length > 0 ? result : undefined;
+}
+
+function parsePixelArtSize(raw: Record<string, unknown>, resolution: number): PixelArtSize | undefined {
+  const palette = Array.isArray(raw.palette) && raw.palette.every((c: unknown) => typeof c === 'string')
+    ? raw.palette as string[]
+    : null;
+  const data = Array.isArray(raw.data) && raw.data.every((r: unknown) => typeof r === 'string')
+    ? raw.data as string[]
+    : null;
+
+  if (!palette || !data) return undefined;
+
+  // palette[0] must be the transparent marker "⬛"
+  if (palette.length < 2 || palette.length > 36) return undefined;
+  if (palette[0] !== '⬛') return undefined;
+
+  // data must have exactly `resolution` rows, each of length `resolution`
+  if (data.length !== resolution) return undefined;
+  if (!data.every(row => row.length === resolution)) return undefined;
+
+  // Every data char must be a valid palette index
+  const validChars = new Set(PIXEL_INDEX_CHARS.slice(0, palette.length));
+  if (!data.every(row => row.split('').every(ch => validChars.has(ch)))) return undefined;
+
+  return { palette, data };
 }
 
 export function parseYAML(text: string): { definitions: AchievementDefinition[]; sets: SetDefinition[] } {
@@ -56,6 +110,7 @@ export function parseYAML(text: string): { definitions: AchievementDefinition[];
       hint_cn: typeof entry.hint_cn === 'string' ? entry.hint_cn : undefined,
       future: entry.future === true || undefined,
       challenge: entry.challenge === true || undefined,
+      pixel_art: parsePixelArt(entry.pixel_art),
     });
   }
 

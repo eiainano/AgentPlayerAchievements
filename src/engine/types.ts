@@ -132,6 +132,25 @@ export interface Condition {
 
 export type RarityLevel = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';
 
+/**
+ * Pixel art stored as palette + index-encoded data rows.
+ * Palette uses index characters 0-9A-Z (36 slots); index 0 (⬛) is transparent.
+ */
+export interface PixelArtSize {
+  palette: string[];  // ["⬛", "#ff6b35", "#ffd700", ...], max 36 entries
+  data: string[];     // ["0000111...", ...], each char is palette index, length = resolution
+}
+
+/**
+ * Multi-resolution pixel art. Each key is a numeric string ("48", "128", "256").
+ * All keys are optional — missing resolutions fall back to emoji icon.
+ */
+export interface PixelArt {
+  '48'?: PixelArtSize;
+  '128'?: PixelArtSize;
+  '256'?: PixelArtSize;
+}
+
 export interface AchievementDefinition {
   id: string;
   name: string;
@@ -149,7 +168,7 @@ export interface AchievementDefinition {
   tip_cn?: string;   // educational tip (Chinese)
   hint?: string;     // unlock clue for locked view (English), does NOT expose exact condition
   hint_cn?: string;  // unlock clue for locked view (Chinese)
-  pixel_art?: Record<string, unknown>;
+  pixel_art?: PixelArt;
   unlocked_at?: string;
   future?: boolean;  // pending event/hook support before reachable
   challenge?: boolean;  // requires user to actively attempt (opt-in challenge)

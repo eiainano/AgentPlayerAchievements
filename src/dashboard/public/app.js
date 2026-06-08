@@ -422,9 +422,65 @@ function apiUrl(path) {
 
 // ── Icon render helper ─────────────────────────────────
 
-/** Render achievement icon as emoji span or pixel-art img */
+// ── Pixel Art Renderer (browser) ─────────────────────────
+
+var PixelArtRenderer = (function() {
+  function charToIndex(ch) { return parseInt(ch, 36); }
+
+  function toDataURI(pa, cellSize) {
+    cellSize = cellSize || 2;
+    var data = pa.data, palette = pa.palette;
+    var h = data.length, w = data[0] ? data[0].length : 0;
+    var vw = w * cellSize, vh = h * cellSize;
+    var rects = '';
+    for (var y = 0; y < h; y++) {
+      var row = data[y];
+      for (var x = 0; x < w; x++) {
+        var idx = charToIndex(row[x]);
+        if (idx === 0) continue;
+        var c = palette[idx];
+        if (!c || c === '⬛') continue; // ⬛ transparent marker
+        rects += '<rect x="' + (x * cellSize) + '" y="' + (y * cellSize) + '" width="' + cellSize + '" height="' + cellSize + '" fill="' + c + '"/>';
+      }
+    }
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + vw + ' ' + vh + '" width="' + vw + '" height="' + vh + '" shape-rendering="crispEdges">' + rects + '</svg>';
+    return 'data:image/svg+xml,' + encodeURIComponent(svg);
+  }
+
+  function toSVGRaw(pa, cellSize) {
+    cellSize = cellSize || 2;
+    var data = pa.data, palette = pa.palette;
+    var h = data.length, w = data[0] ? data[0].length : 0;
+    var vw = w * cellSize, vh = h * cellSize;
+    var rects = '';
+    for (var y = 0; y < h; y++) {
+      var row = data[y];
+      for (var x = 0; x < w; x++) {
+        var idx = charToIndex(row[x]);
+        if (idx === 0) continue;
+        var c = palette[idx];
+        if (!c || c === '⬛') continue;
+        rects += '<rect x="' + (x * cellSize) + '" y="' + (y * cellSize) + '" width="' + cellSize + '" height="' + cellSize + '" fill="' + c + '"/>';
+      }
+    }
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + vw + ' ' + vh + '" shape-rendering="crispEdges">' + rects + '</svg>';
+  }
+
+  return { toDataURI: toDataURI, toSVGRaw: toSVGRaw };
+})();
+
+/** Render achievement icon as emoji span, pixel-art img, or file-path img */
 function iconHtml(icon, opts = {}) {
-  const { size = 20, className = '' } = opts;
+  const { size = 20, className = '', pixelArt } = opts;
+
+  // Pixel art data → inline SVG image (takes priority)
+  if (pixelArt && pixelArt.palette && pixelArt.data) {
+    const cellSize = Math.max(2, Math.round(size / 24)); // scale to ~target size
+    const svg = PixelArtRenderer.toDataURI(pixelArt, cellSize);
+    const sizeStyle = `width:${size}px;height:${size}px;object-fit:contain`;
+    return `<img src="${escAttr(svg)}" class="ach-icon-pixel ${className}" style="${sizeStyle}" alt="">`;
+  }
+
   // Image path (starts with /, has file extension)
   if (icon.startsWith('/') || /\.(png|svg|webp|jpg|gif)$/i.test(icon)) {
     const sizeStyle = `width:${size}px;height:${size}px;object-fit:contain`;
@@ -1049,7 +1105,7 @@ function renderProfile(data) {
         return `<div class="showcase-slot filled" data-rarity="${s.achievement.rarity}"
           title="${escHtml(nameDisplay)} — ${t('click_to_remove')}"
           onclick="clearSlot(${s.slot})">
-          ${iconHtml(s.achievement.icon, { size: 32, className: 'showcase-slot-icon' })}
+          ${iconHtml(s.achievement.icon, { size: 32, className: 'showcase-slot-icon', pixelArt: s.achievement.pixel_art_48 })}
         </div>`;
       }
       return `<div class="showcase-slot empty"
@@ -1211,7 +1267,7 @@ function renderNextAchievement(data) {
   card.innerHTML = `
     <div class="next-ach-header">${t('next_ach_title')}</div>
     <div class="next-ach-body" data-ach-id="${escHtml(best.id)}" title="${t('click_to_pick')}">
-      <span class="next-ach-icon">${iconHtml(best.icon, { size: 22 })}</span>
+      <span class="next-ach-icon">${iconHtml(best.icon, { size: 22, pixelArt: best.pixel_art_48 })}</span>
       <div class="next-ach-info">
         <span class="next-ach-name">${escHtml(name)}</span>
         <span class="next-ach-desc">${escHtml(desc)}</span>
@@ -1410,6 +1466,7 @@ function renderGrid(data) {
   grid.innerHTML = items.map((a, idx) => {
     const locked = !a.unlocked;
     const showIcon = locked && a.hidden ? '\u{1F512}' : a.icon;
+    const showPixelArt = locked && a.hidden ? undefined : a.pixel_art_48;
     const progressPct = a.progress && a.progress.target > 0
       ? Math.min((a.progress.current / a.progress.target) * 100, 100)
       : 0;
@@ -1435,7 +1492,7 @@ function renderGrid(data) {
     return `<div class="ach-card${lockedClass}${pickableClass}" data-rarity="${a.rarity}" data-id="${escAttr(a.id)}" style="${cardColor}--delay:${idx * 30}ms">
       <div class="ach-stripe"></div>
       ${pinBtn}
-      <div class="ach-icon-wrap">${iconHtml(showIcon)}</div>
+      <div class="ach-icon-wrap">${iconHtml(showIcon, { pixelArt: showPixelArt })}</div>
       <div class="ach-name">${escHtml(nameDisplay)}</div>
       ${unlockedLabel}
       <span class="ach-rarity-badge">${displayRarity(a.rarity)}</span>
@@ -1499,7 +1556,7 @@ function openModal(ach) {
   // THEN restart the animation from a clean frame for both locked & unlocked.
   container.innerHTML = `
     <div class="modal-header">
-      <span class="modal-icon-wrap">${iconHtml(locked && ach.hidden ? '\u{1F512}' : ach.icon, { size: 48, className: 'modal-icon' })}</span>
+      <span class="modal-icon-wrap">${iconHtml(locked && ach.hidden ? '\u{1F512}' : ach.icon, { size: 48, className: 'modal-icon', pixelArt: locked && ach.hidden ? undefined : ach.pixel_art_48 })}</span>
       <button class="modal-close" onclick="closeModal()" title="${t('modal_close')}">✕</button>
     </div>
     <div class="modal-body">
@@ -1607,7 +1664,7 @@ function renderSets(data) {
     }, 'common');
 
     const membersHtml = set.achievements.map(a =>
-      `<div class="set-member ${a.unlocked ? 'unlocked' : 'locked'}" title="${escHtml(displayName(a))}">${iconHtml(a.unlocked ? a.icon : '?', { size: 16 })}</div>`
+      `<div class="set-member ${a.unlocked ? 'unlocked' : 'locked'}" title="${escHtml(displayName(a))}">${iconHtml(a.unlocked ? a.icon : '?', { size: 16, pixelArt: a.unlocked ? a.pixel_art_48 : undefined })}</div>`
     ).join('');
 
     const complete = set.completed === set.total && set.total > 0;
@@ -1617,7 +1674,7 @@ function renderSets(data) {
 
     return `<div class="set-card ${complete ? 'complete' : ''}">
       <div class="set-header">
-        ${iconHtml(set.achievements.find(a => a.unlocked)?.icon || '\u{1F4E6}', { size: 24 })}
+        ${iconHtml(set.achievements.find(a => a.unlocked)?.icon || '\u{1F4E6}', { size: 24, pixelArt: set.achievements.find(a => a.unlocked)?.pixel_art_48 })}
         <span class="set-name">${escHtml(currentLang === 'zh' && set.name_cn ? set.name_cn : set.name)}</span>
       </div>
       <div class="set-count">${set.completed}/${set.total}</div>
@@ -1705,7 +1762,7 @@ function renderTimeline(data) {
       const achRarity = e.ach.rarity || 'common';
       const achColor = rarityColor(achRarity);
       const nameHtml = escHtml(displayName(e.ach));
-      const iconHtmlStr = iconHtml(e.ach.icon, { size: 16 });
+      const iconHtmlStr = iconHtml(e.ach.icon, { size: 16, pixelArt: e.ach.pixel_art_48 });
       return `<div class="tl-ach-card" data-rarity="${achRarity}" style="--tl-delay:${idx * 60}ms">
         <div class="tl-ach-card-strip" style="background:${achColor}"></div>
         <div class="tl-ach-card-icon">${iconHtmlStr}</div>

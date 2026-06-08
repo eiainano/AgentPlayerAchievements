@@ -529,6 +529,7 @@ function cmdPoll(): void {
       set_name: undefined,
       set_progress: undefined,
       progress,
+      pixel_art_48: ach.pixel_art?.['48'],
     };
   });
   const popup = renderPopup(popupData);

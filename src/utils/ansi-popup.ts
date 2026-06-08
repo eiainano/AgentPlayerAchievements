@@ -6,6 +6,9 @@
  * to plaintext [AGPA] poll: ... lines.
  */
 
+import type { PixelArtSize } from '../engine/types.js';
+import { renderPixelArtANSI } from './pixel-art.js';
+
 // ── Types ──────────────────────────────────────────────────────────
 
 export interface PopupAchievement {
@@ -17,6 +20,7 @@ export interface PopupAchievement {
   set_name?: string;
   set_progress?: string; // e.g. "1/4"
   progress?: { current: number; max: number };
+  pixel_art_48?: PixelArtSize;
 }
 
 // ── ANSI helpers ────────────────────────────────────────────────────
@@ -130,6 +134,20 @@ export function renderPopup(achievements: PopupAchievement[]): string {
     const rCode = RARITY_ANSI[ach.rarity] || WHITE;
 
     const lines: string[] = [];
+
+    // ── Pixel art banner (above card) ─────────────────────
+    if (ach.pixel_art_48) {
+      const art = renderPixelArtANSI(ach.pixel_art_48);
+      if (art) {
+        // Indent pixel art to align with card border
+        const artLines = art.split('\n');
+        for (const al of artLines) {
+          lines.push('  ' + al); // 2-space indent matching card border
+        }
+        lines.push(''); // blank separator before card
+      }
+    }
+
     lines.push(topBorder(rCode));
 
     // Title row

@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import type { AchievementEngine } from './engine/engine.js';
-import type { AchievementDefinition, RarityLevel } from './engine/types.js';
+import type { AchievementDefinition, PixelArtSize, RarityLevel } from './engine/types.js';
 import { safeParse, showcaseDataSchema } from './utils/validate.js';
 
 // ── Showcase storage ──────────────────────────────────────────────
@@ -37,6 +37,7 @@ export interface FormattedAchievement {
   set_id?: string;
   set_progress?: { current: number; total: number; members: string[] };
   hidden?: boolean;
+  pixel_art_48?: PixelArtSize;
 }
 
 export function formatAchievement(
@@ -55,6 +56,7 @@ export function formatAchievement(
     set_id: ach.set_id,
     set_progress: ach.set_id ? computeSetProgress(engine, ach.set_id) : undefined,
     hidden: ach.hidden,
+    pixel_art_48: ach.pixel_art?.['48'],
   };
 }
 

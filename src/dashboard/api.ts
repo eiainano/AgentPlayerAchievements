@@ -1,6 +1,7 @@
 import type {
   AchievementDefinition,
   AchievementState,
+  PixelArtSize,
   RarityLevel,
   TrackedEvent,
   Condition,
@@ -34,6 +35,7 @@ export interface AchievementItem {
   unlocked: boolean;
   unlocked_at?: string;
   progress?: { current: number; target: number };
+  pixel_art_48?: PixelArtSize;
 }
 
 export interface SetAchievementMember {
@@ -42,6 +44,7 @@ export interface SetAchievementMember {
   icon: string;
   rarity: RarityLevel;
   unlocked: boolean;
+  pixel_art_48?: PixelArtSize;
 }
 
 export interface SetItem {
@@ -141,6 +144,7 @@ export interface CardAchievement {
   in_progress?: boolean;
   progress_pct?: number;
   progress_text?: string;
+  pixel_art_48?: PixelArtSize;
 }
 
 export interface CardMilestone {
@@ -209,6 +213,7 @@ export function buildAchievementsResponse(
       unlocked,
       unlocked_at: unlockedAt,
       progress: unlocked ? undefined : computeProgress(def, opts.events || []),
+      pixel_art_48: def.pixel_art?.['48'],
     };
   });
 }
@@ -276,6 +281,7 @@ export function buildCardResponse(
       unlocked_at: state.unlocked[def.id],
       set_name: setDef ? (useZh ? (setDef.name_cn || setDef.name) : setDef.name) : undefined,
       set_progress: setDef ? `${setCompleted}/${setMembers.length}` : undefined,
+      pixel_art_48: def.pixel_art?.['48'],
     });
   }
 
@@ -305,6 +311,7 @@ export function buildCardResponse(
         in_progress: true,
         progress_pct: Math.round(x.ratio * 100),
         progress_text: `${x.result.progress} / ${x.result.target}`,
+        pixel_art_48: def.pixel_art?.['48'],
       });
     }
   }
@@ -389,6 +396,7 @@ export function buildSetsResponse(
         icon: m.icon || '🏆',
         rarity: m.rarity,
         unlocked: !!state.unlocked[m.id],
+        pixel_art_48: m.pixel_art?.['48'],
       })),
       completed: members.filter(m => state.unlocked[m.id]).length,
       total: members.length,

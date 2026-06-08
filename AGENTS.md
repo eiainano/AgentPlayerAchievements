@@ -76,3 +76,8 @@ At the end of every session:
 2. Call `achievement_poll` to check for newly unlocked achievements
 3. **If poll returns achievements**, display them proudly with icon + name + description
 4. Consider calling `achievement_stats` if the user seems interested in progress
+
+### Dashboard health
+
+If `achievement_stats` returns `dashboard_running: false`, tell the user:
+"Your Achievement Dashboard isn't running. Run `agpa web` to start it, or `agpa web --daemon` to auto-start on login."

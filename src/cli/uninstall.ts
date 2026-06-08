@@ -13,6 +13,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { homedir } from 'node:os';
 import { TOOLS, INSTRUCTION_FILES } from '../tool-registry.js';
+import { uninstallDaemon, isDaemonInstalled } from './daemon.js';
 
 const HOME = homedir();
 const AGPA_DIR = path.join(HOME, '.agent-achievements');
@@ -325,6 +326,7 @@ What this removes:
   • Instruction blocks from CLAUDE.md / AGENTS.md / TOOLS.md
   • Plugin files (openclaw/extensions, kilo/opencode/plugins)
   • /achievements and /achievements-settings slash commands
+  • Dashboard auto-start daemon (launchd plist / systemd unit)
   • ~/.agent-achievements/ data directory (unless --keep-data)
 `);
     process.exit(0);
@@ -351,6 +353,21 @@ What this removes:
     log(`  ${D}would remove${R} ${AGPA_DIR}`);
   } else if (keepData) {
     log(`\n  ${D}Data kept at${R} ${AGPA_DIR}`);
+  }
+
+  // ── Daemon cleanup ──────────────────────────────────────────────────
+  if (isDaemonInstalled()) {
+    if (dryRun) {
+      log(`  ${D}would remove${R} dashboard auto-start daemon`);
+    } else {
+      const { ok, message } = uninstallDaemon();
+      if (ok) {
+        log(`  ${G}✓${R} ${message}`);
+        removed++;
+      } else {
+        log(`  ${Y}⚠${R} ${message}`);
+      }
+    }
   }
 
   log(`\n${G}Done.${R} ${removed} item(s) removed.\n`);

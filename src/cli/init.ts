@@ -18,6 +18,7 @@ import { parseYAML } from '../engine/yaml-parser.js';
 import { setTrackedTools, getProfileMeta, createProfile, validateProfileName, DEFAULT_PROFILE } from '../utils/profile.js';
 import { loadConfig } from '../config.js';
 import { checkDataDir, checkStateJson, checkDefsYaml, checkMcpConfigs, checkInstructionFiles, statusIcon } from './doctor.js';
+import { installDaemon, isDaemonInstalled } from './daemon.js';
 
 const AGPA_DIR = path.join(homedir(), '.agent-achievements');
 const AGPA_MAIN = path.resolve(import.meta.dirname, '../main.ts');
@@ -1282,6 +1283,40 @@ function printPhase(num: number, total: number, label: string): void {
   console.log(`\n  ${CYN}${BLD}═══ Phase ${num}/${total}: ${label} ═══${RST}\n`);
 }
 
+// ── Dashboard daemon opt-in prompt ──────────────────────────────────────
+
+async function promptDaemon(lang: string, auto: boolean): Promise<void> {
+  if (!process.stdin.isTTY || auto) return;
+  if (isDaemonInstalled()) return; // already installed, skip
+
+  const isZh = lang === 'zh';
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
+  return new Promise(resolve => {
+    console.log('');
+    console.log(isZh
+      ? '  🎮 开机自动启动 Dashboard？(y/N)'
+      : '  🎮 Auto-start Dashboard on login? (y/N)');
+    console.log(isZh
+      ? '     （崩溃或重启后自动恢复，默认不开启）'
+      : '     (auto-restarts on crash/reboot, default: no)');
+    const question = isZh ? '  自动启动？(y/N) ' : '  Auto-start? (y/N) ';
+    rl.question(question, (answer: string) => {
+      rl.close();
+      const trimmed = answer.trim().toLowerCase();
+      if (trimmed === 'y' || trimmed === 'yes') {
+        const { ok, message } = installDaemon();
+        console.log(ok ? `  ✅ ${message}` : `  ⚠ ${message}`);
+      } else {
+        console.log(isZh
+          ? '  ⏭  跳过——随时可以用 agpa web --daemon 手动开启'
+          : '  ⏭  Skipped — enable anytime with agpa web --daemon');
+      }
+      resolve();
+    });
+  });
+}
+
 // ── Shell completion install prompt ──────────────────────────────────────
 
 async function promptCompletion(lang: string, auto: boolean): Promise<void> {
@@ -1647,6 +1682,9 @@ async function main(): Promise<void> {
   // ── Auto-verify after init ────────────────────────────────────────────
   const verifyResults = autoVerify(dataDir);
   if (verifyResults) console.log(verifyResults);
+
+  // ── Daemon opt-in ─────────────────────────────────────────────────────
+  await promptDaemon(lang, auto);
 
   // ── Shell completion prompt ───────────────────────────────────────────
   await promptCompletion(lang, auto);

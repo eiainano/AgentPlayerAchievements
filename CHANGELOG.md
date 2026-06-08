@@ -2,6 +2,15 @@
 
 ## [0.1.7] — 2026-06-08
 
+### Dashboard 进程守护 — OS 级 daemon + health endpoint + Agent 感知 — 2026-06-08
+
+- **Layer 1 — OS daemon（opt-in）**：`src/cli/daemon.ts`（新建）— macOS launchd plist / Linux systemd user unit，`KeepAlive` 崩溃重启 + `RunAtLoad` 开机自启，默认关闭，仅 `agpa init` 末尾询问
+- **Layer 2 — `/api/health` endpoint**：`server.ts` 新增 GET `/api/health`，返回 `{ status, uptime, profile, version }`，5 行代码
+- **Layer 3 — Agent 感知**：`achievement_stats` 返回 `dashboard_running: boolean`（fetch 127.0.0.1:3867/api/health, 500ms timeout）；AGENTS.md 新增 Dashboard health 指引
+- **CLI 扩展**：`agpa web --daemon` 手动安装守护进程，`agpa web --no-daemon` 卸载；`agpa uninstall` 自动清理 daemon 配置
+- **测试**：daemon 模块 8 测试 + `/api/health` endpoint 2 测试，全量 982 测试全绿（38 文件）
+- **Spec**：`docs/superpowers/specs/2026-06-08-dashboard-daemon-design.md`
+
 ### Agent 成就感知 + 套装完成视觉奖励 — 2026-06-08
 
 - **`achievement_suggest` MCP 工具**：新 MCP tool，复用 `findNearUnlocks()` 返回近锁成就，包含 AI 友好 `hint` 字段（中英双语），Agent 可在对话中自然提及

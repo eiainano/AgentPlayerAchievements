@@ -161,6 +161,7 @@ function serveStatic(res: http.ServerResponse, urlPath: string): void {
 export function createServer(port: number, defaultProfile: string): http.Server {
   // Cache engine instances per profile — shared across all requests
   const engineCache = new Map<string, AchievementEngine>();
+  const serverStartTime = Date.now();
 
   function getEngine(profileName: string): AchievementEngine {
     let cached = engineCache.get(profileName);
@@ -184,6 +185,18 @@ export function createServer(port: number, defaultProfile: string): http.Server 
     } catch {
       res.writeHead(400, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Invalid profile name' }));
+      return;
+    }
+
+    // ── GET /api/health ──────────────────────────────────────────────────
+    if (url.pathname === '/api/health' && req.method === 'GET') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        status: 'ok',
+        uptime: Math.round((Date.now() - serverStartTime) / 1000),
+        profile: resolvedProfile,
+        version: '0.1.7',
+      }));
       return;
     }
 
@@ -558,7 +571,8 @@ export function startDashboard(port = 3867, profile?: string): http.Server {
 
   const server = createServer(port, defaultProfile);
   server.listen(port, '127.0.0.1', () => {
-    process.stderr.write(`\n  🎮 AGPA Dashboard → http://localhost:${port}  (profile: ${defaultProfile})\n\n`);
+    process.stderr.write(`\n  🎮 AGPA Dashboard → http://localhost:${port}  (profile: ${defaultProfile})\n`);
+    process.stderr.write(`  Health check: curl http://localhost:${port}/api/health\n\n`);
   });
 
   return server;

@@ -182,6 +182,18 @@ describe('API routes', () => {
     expect(data).toHaveProperty('achievements');
   });
 
+  it('GET /api/health returns status, uptime, profile, version', async () => {
+    const res = await request('GET', '/api/health');
+    expect(res.status).toBe(200);
+    const data = JSON.parse(res.body);
+    expect(data).toHaveProperty('status', 'ok');
+    expect(data).toHaveProperty('uptime');
+    expect(typeof data.uptime).toBe('number');
+    expect(data.uptime).toBeGreaterThanOrEqual(0);
+    expect(data).toHaveProperty('profile');
+    expect(data).toHaveProperty('version');
+  });
+
   it('GET /api/data returns full dashboard payload', async () => {
     const res = await request('GET', '/api/data');
     expect(res.status).toBe(200);

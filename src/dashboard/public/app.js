@@ -1458,6 +1458,7 @@ function openModal(ach) {
 
   const locked = !ach.unlocked;
   const rarityColor = `var(--rarity-${ach.rarity})`;
+  const rarityHex = RARITY_COLORS[ach.rarity] || '#666';
 
   const name = currentLang === 'zh'
     ? (ach.name_cn || ach.name)
@@ -1525,13 +1526,13 @@ function openModal(ach) {
       ${bottomSections}
     </div>`;
 
-  // Apply card-color for unlocked glow — after innerHTML so it never
-  // interferes with layout during the DOM swap.
+  // Apply card-color for unlocked glow + rarity top bar — after innerHTML
   if (!locked) {
     container.style.setProperty('--card-color', rarityColor);
   } else {
     container.style.removeProperty('--card-color');
   }
+  container.style.setProperty('--modal-rarity-color', rarityHex);
 
   backdrop.style.display = 'flex';
 
@@ -1594,7 +1595,7 @@ function renderSets(data) {
   if (!grid) return;
 
   if (!data.sets || data.sets.length === 0) {
-    grid.innerHTML = `<p style="color:var(--text-dim);">${t('no_sets')}</p>`;
+    grid.innerHTML = `<div class="empty-state"><span class="empty-state-icon">📦</span><div class="empty-state-text">${t('no_sets')}</div></div>`;
     return;
   }
 
@@ -1636,7 +1637,7 @@ function renderTimeline(data) {
   if (!list) return;
 
   if (!data.timeline || data.timeline.length === 0) {
-    list.innerHTML = `<p style="color:var(--text-dim);">${t('no_timeline')}</p>`;
+    list.innerHTML = `<div class="empty-state"><span class="empty-state-icon">📅</span><div class="empty-state-text">${t('no_timeline')}</div></div>`;
     return;
   }
 

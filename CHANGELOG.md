@@ -2,6 +2,19 @@
 
 ## [0.1.6] — 2026-06-08
 
+### 全面审视 + 修复 — 2026-06-08
+
+- **Bug 修复**：`evalPredicate` `<`/`>` 非数字值改回 `false`（fail-safe）；`file.create` 仅在文件首次创建时触发（birthtime ≈ mtime 检测）；`crypto.randomUUID` 去重提取为 `uuid()`；CSS `card-in` keyframes 重名冲突修复
+- **测试覆盖率**：22 文件 550 测试 → 29 文件 722 测试，新增 init(54)、verify(25)、customize-api(19)、server(22)、doctor(26)、uninstall(17)、import(7) 共 7 个测试文件
+- **主题常量提取**：`src/utils/theme.ts` — 共享 ANSI/RARITY/RARITY_HEX/RARITY_RANK/RARITY_LABELS，showcase/search/suggest/verify/notify 全部改用该模块，消除 ~80 行重复
+- **`createEngine` 去重**：`src/engine/factory.ts`，showcase/search/suggest 3 个 CLI 文件各减少 10 行
+- **`agpa uninstall`**：新增卸载命令，支持 `--all`/`--dry-run`/`--keep-data`，清理 MCP 配置、CC hooks、Hermes hooks、指令块、插件文件、命令文件、数据目录，注册为第 20 个 CLI 命令
+- **跨平台通知增强**：Linux `notify-send` 增加点击跳转 Dashboard 的 action 按钮 + 分类分组；Windows 改用原生 ToastNotification API（含 MessageBox 回退）；notify.ts 改用共享 RARITY_RANK
+- **Dashboard 导出按钮**：Hero 标题旁新增 📦 Export 按钮，一键下载完整 JSON 备份（含事件日志）
+- **init.ts 完善**：summary 框新增 `agpa uninstall --all` 提示，纯函数导出供测试
+- **doctor.ts 完善**：导出所有检查函数 + 纯工具函数，checkDataDir/checkEventLog/checkStateJson/checkDefsYaml 接受 baseDir 参数，加执行守卫
+- 构建 + 722 测试全绿
+
 ### Dashboard UX 打磨 — 2026-06-08
 
 - **Error Boundary**：`renderSafe()` 包裹全部 10 个 render 函数，任意渲染崩溃不白屏，顶部红色 banner 显示错误详情可关闭

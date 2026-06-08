@@ -1,6 +1,6 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-07 | 总成就数: 183 | 条件类型: 11 | Tests: 549 ✅ | 0 不可达 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | Logo 像素画 + Dashboard 集成 ✅ | 语言自动检测 ✅ | CLI 19 命令 ✅
+> 最后更新: 2026-06-08 | 总成就数: 183 | 条件类型: 11 | Tests: 722 ✅ (29 files) | 0 不可达 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | Logo 像素画 + Dashboard 集成 ✅ | 语言自动检测 ✅ | CLI 20 命令 ✅ | agpa uninstall ✅ | 跨平台通知增强 ✅ | macOS JXA 通知 ✅ | Dashboard 导出按钮 ✅ | 共享主题常量 ✅
 
 ---
 

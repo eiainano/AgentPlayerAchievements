@@ -19,10 +19,10 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
-  <a href="#"><img src="https://img.shields.io/badge/achievements-171-blueviolet" alt="171 achievements"></a>
-  <a href="#"><img src="https://img.shields.io/badge/tests-519-green" alt="519 tests"></a>
+  <a href="#"><img src="https://img.shields.io/badge/achievements-183-blueviolet" alt="183 achievements"></a>
+  <a href="#"><img src="https://img.shields.io/badge/tests-722-green" alt="722 tests"></a>
   <a href="#"><img src="https://img.shields.io/badge/node-%E2%89%A518-brightgreen" alt="Node >= 18"></a>
-  <a href="#"><img src="https://img.shields.io/badge/CLI-19_commands-orange" alt="19 CLI commands"></a>
+  <a href="#"><img src="https://img.shields.io/badge/CLI-20_commands-orange" alt="20 CLI commands"></a>
 </p>
 
 <p align="center">
@@ -98,6 +98,7 @@ All five tools have full dual-channel coverage except Hermes (no hook API).
 
 ```bash
 agpa init             # auto-detect and register with your agent tools
+agpa uninstall        # cleanly remove AGPA from all configured tools
 agpa verify           # check installation correctness
 agpa doctor           # diagnose system state
 agpa dashboard        # start achievement dashboard (localhost:3867)
@@ -224,7 +225,7 @@ scripts/                     # dev tools (logo gen, pixel art gen, sounds)
 ```bash
 npm install          # install dependencies (3 runtime deps)
 npm run build        # tsc --noEmit
-npm test             # 519 tests, 23 files
+npm test             # 722 tests, 29 files
 npm run dashboard    # start dev dashboard
 npm run demo         # generate MVP data
 ```

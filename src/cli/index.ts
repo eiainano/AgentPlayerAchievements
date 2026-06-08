@@ -247,6 +247,7 @@ async function showTui(): Promise<void> {
   process.stdout.write(`    ${B}doctor${R}       ${D}Diagnose system health${R}\n`);
   process.stdout.write(`    ${B}help${R}         ${D}Show all commands${R}\n`);
   process.stdout.write(`\n  ${G}Type a command or press Enter for dashboard${R}\n`);
+  process.stdout.write(`  ${D}⭐ Star on GitHub → https://github.com/eiainano/AgentPlayerAchievements${R}\n`);
 
   const rl = readline.createInterface({
     input: process.stdin,

@@ -511,6 +511,17 @@ function cmdPoll(): void {
     sendNotification(`${icon} ${title}`, desc, ENGINE.stateDir, activeProfile, topRarity);
   }
 
+  // ── Star nudge: 10th unlock → desktop notification ────────────
+  const totalUnlocked: number = ENGINE.state.stats.total_unlocked || 0;
+  if (totalUnlocked === 10) {
+    sendNotification(
+      '⭐ You\'ve unlocked 10 achievements!',
+      'Enjoying AGPA? Star us on GitHub — it helps more people discover the project!  github.com/eiainano/AgentPlayerAchievements',
+      ENGINE.stateDir,
+      activeProfile,
+    );
+  }
+
   // ── ANSI popup (TTY only) ─────────────────────────────────────
   const popupData: PopupAchievement[] = newlyUnlocked.map(ach => {
     // Compute real progress from the first condition — AchievementDefinition
@@ -534,6 +545,11 @@ function cmdPoll(): void {
   });
   const popup = renderPopup(popupData);
   if (popup) process.stdout.write(popup + '\n');
+
+  // ── Star nudge: 3rd unlock → TUI footer ───────────────────────
+  if (process.stdout.isTTY && totalUnlocked === 3) {
+    process.stdout.write('\n  \x1b[38;5;178m⭐ Like AGPA? Star us on GitHub → \x1b[4mhttps://github.com/eiainano/AgentPlayerAchievements\x1b[0m\n\n');
+  }
 
   // ── Progress nudge (TTY only) ─────────────────────────────────
   if (process.stdout.isTTY) {

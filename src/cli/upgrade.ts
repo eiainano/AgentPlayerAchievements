@@ -161,7 +161,8 @@ Current version: ${getCurrentVersion()}
         process.exit(1);
       }
       console.log(`\n  ${G}✅ Upgraded to ${latest.version}!${R}`);
-      console.log(`  ${D}Run "agpa init --upgrade" to refresh hooks/configs.${R}\n`);
+      console.log(`  ${D}Run "agpa init --upgrade" to refresh hooks/configs.${R}`);
+      console.log(`\n  \x1b[38;5;178m⭐ Enjoying AGPA? Star us on GitHub → \x1b[4mhttps://github.com/eiainano/AgentPlayerAchievements\x1b[0m\n`);
     } else {
       console.log(`  ${D}npm update -g agpa...${R}`);
       const npmResult = spawnSync('npm', ['update', '-g', 'agpa'], { stdio: 'inherit' });
@@ -170,7 +171,8 @@ Current version: ${getCurrentVersion()}
         process.exit(1);
       }
       console.log(`\n  ${G}✅ Upgraded to ${latest.version}!${R}`);
-      console.log(`  ${D}Run "agpa init --auto" to refresh hooks/configs.${R}\n`);
+      console.log(`  ${D}Run "agpa init --auto" to refresh hooks/configs.${R}`);
+      console.log(`\n  \x1b[38;5;178m⭐ Enjoying AGPA? Star us on GitHub → \x1b[4mhttps://github.com/eiainano/AgentPlayerAchievements\x1b[0m\n`);
     }
     process.exit(0);
   }

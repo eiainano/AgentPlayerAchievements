@@ -3462,3 +3462,72 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
   80%  { transform: rotate(-1deg) scale(1.02); }
   100% { transform: rotate(0deg) scale(1); }
 }
+
+/* ── GitHub Star Floating Button ────────────────────────────── */
+
+.github-star-float {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--card-bg, #1a1a2e);
+  border: 1px solid var(--border-color, #333);
+  border-radius: 24px;
+  color: var(--text-secondary, #94a3b8);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: "DM Sans", system-ui, sans-serif;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  transition: all 0.25s ease;
+  z-index: 1000;
+  backdrop-filter: blur(12px);
+}
+
+.github-star-float:hover,
+.github-star-float:focus-visible {
+  color: #e0b020;
+  border-color: #e0b020;
+  box-shadow: 0 4px 28px rgba(224,176,32,0.25);
+  transform: translateY(-2px);
+}
+
+.github-star-icon {
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.github-star-float:hover .github-star-icon {
+  transform: rotate(-15deg) scale(1.15);
+  color: #fbbf24;
+}
+
+.github-star-label {
+  white-space: nowrap;
+}
+
+[data-theme="light"] .github-star-float {
+  background: rgba(255,255,255,0.92);
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+[data-theme="light"] .github-star-float:hover {
+  border-color: #b45309;
+  box-shadow: 0 4px 24px rgba(180,83,9,0.18);
+}
+
+@media (max-width: 640px) {
+  .github-star-float {
+    padding: 8px 12px;
+    bottom: 16px;
+    right: 12px;
+  }
+  .github-star-label {
+    display: none;
+  }
+}
+

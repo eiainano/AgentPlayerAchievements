@@ -3,7 +3,7 @@
 ## Commands
 
 ```
-npm run test       # vitest (845 tests, 33 files)
+npm run test       # vitest (990 tests, 39 files)
 npm run build      # tsc --noEmit
 npm run dashboard  # start on :3867, then open browser (supports --profile <name>)
 npm run demo       # generate MVP data + stats
@@ -11,7 +11,7 @@ npm run doctor     # diagnose system state
 npm run profile    # manage achievement profiles (create <name> | list)
 ```
 
-Unified CLI via `bin` field (npm link): 24 commands — `agpa init | uninstall | verify | doctor | config | dashboard | web | profile <create|list|switch|tools> | showcase | demo | stats | progress | reset | search | suggest | sound | activity | export | import | mcp | completion | upgrade | watch | history`
+Unified CLI via `bin` field (npm link): 24 commands — `agpa init | uninstall | verify | doctor | config | dashboard | web | profile <create|list|switch|softwares> | showcase | demo | stats | progress | reset | search | suggest | sound | activity | export | import | mcp | completion | upgrade | watch | history`
 
 ## Architecture
 
@@ -40,7 +40,7 @@ Three layers, **two channels**:
           └───────────┘          └─────────────┘
 ```
 
-- **MCP Server** (channel 1) — STDIO protocol, 5 tools (track/poll/stats/showcase/config). Agent **actively calls** these for semantic events that hooks can't capture (image.read, file.language_used, plan.mode_entered, etc.)
+- **MCP Server** (channel 1) — STDIO protocol, 6 tools (track/poll/stats/showcase/config/suggest). Agent **actively calls** these for semantic events that hooks can't capture (image.read, file.language_used, plan.mode_entered, etc.)
 - **Hook CLI** (channel 2) — Short-lived subprocess called by tool hooks. **Agent is unaware** — hooks fire automatically. Events: tool.complete, file.read/edit/write, session.start/end, task.complete, agent.spawn, git.commit, etc.
 - **Engine** — pure functions on in-memory data. `track()` appends to event.log via both channels. `poll()` evaluates and writes state.json. File I/O only in store.ts.
 - **Dashboard** — zero-framework HTML/CSS/JS, HTTP server in dashboard/server.ts, API layer in dashboard/api.ts.

@@ -114,7 +114,7 @@
 
 - **Kilo Code / OpenCode auto-track** — `hook.ts` 新增 `kilocode-auto` 模式（`KILOCODE_EVENT_MAP` + `KILOCODE_TOOL_MAP` + `normalizeKilocodeStdin()`），init.ts 生成 `Bun.spawn` 驱动的 TS 插件，监听 `tool.execute.before/after` + `event` 32+ 事件
 - **交互式安装** — 语言 → profile 创建 → 多选工具（↑↓ Space Enter），非 TTY 自动回退
-- **Profile-tracked_tools** — `agpa profile tools [name]` 交互式管理，`profile.json` 记录，Dashboard 5 工具官方 logo 徽章 + 暗亮主题双语
+- **Profile-tracked_tools** — `agpa profile softwares [name]` 交互式管理，`profile.json` 记录，Dashboard 5 工具官方 logo 徽章 + 暗亮主题双语
 - **CLI 扩展** — `agpa config` / `profile switch` / `showcase` / `search` / `suggest` / `web`，共 24 命令
 - **Share 卡片主题化** — 暗/亮 + 中/英跟随 Dashboard，480px 现代化设计
 - **Hero 布局** — 统计大字居中 → Streak(紧凑) + 热力图同行 → 展示柜独占行

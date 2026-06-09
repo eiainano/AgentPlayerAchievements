@@ -13,6 +13,7 @@ export function setConfigDir(dir?: string): void {
 }
 
 export type Lang = 'en' | 'zh';
+export type BannerTheme = 'Neon' | 'Arcade' | 'Gold';
 
 export interface AppConfig {
   lang: Lang;
@@ -23,6 +24,7 @@ export interface AppConfig {
   active_profile: string;
   sound_enabled: boolean;
   simple_animations: boolean;
+  banner_theme: BannerTheme;
 }
 
 const DEFAULTS: AppConfig = {
@@ -32,6 +34,7 @@ const DEFAULTS: AppConfig = {
   active_profile: 'default',
   sound_enabled: true,
   simple_animations: false,
+  banner_theme: 'Arcade',
 };
 
 /** Read config from file, then override with env vars */
@@ -74,6 +77,11 @@ export function loadConfig(): AppConfig {
     cfg.simple_animations = true;
   }
 
+  const bannerEnv = process.env.AGPA_BANNER_THEME?.trim();
+  if (bannerEnv === 'Neon' || bannerEnv === 'Arcade' || bannerEnv === 'Gold') {
+    cfg.banner_theme = bannerEnv;
+  }
+
   return cfg;
 }
 
@@ -111,4 +119,14 @@ export function isSimpleAnimations(): boolean {
 /** Toggle simplified animations on/off, persisted to config.json */
 export function setSimpleAnimations(enabled: boolean): void {
   saveConfig({ simple_animations: enabled });
+}
+
+/** Get current banner theme */
+export function getBannerTheme(): BannerTheme {
+  return loadConfig().banner_theme;
+}
+
+/** Set banner theme, persisted to config.json */
+export function setBannerTheme(theme: BannerTheme): void {
+  saveConfig({ banner_theme: theme });
 }

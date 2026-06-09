@@ -31,6 +31,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as readline from 'node:readline';
 import figlet from 'figlet';
+import { getBannerTheme } from '../config.js';
 
 // ── Subcommand definitions ──────────────────────────────────────────────
 
@@ -58,6 +59,7 @@ const COMMANDS: Subcommand[] = [
   { name: 'search',     description: 'Search achievements by keyword, rarity, or category',                usage: 'agpa search [query] [--rarity] [--category] [--unlocked|--locked] [--json] [--profile <name>]', module: './search.ts' },
   { name: 'suggest',    description: 'Show nearest unlockable achievements',                               usage: 'agpa suggest [--N <n>] [--all] [--hidden] [--json] [--profile <name>]', module: './suggest.ts' },
   { name: 'sound',      description: 'Toggle achievement sound effects (on | off)',                       usage: 'agpa sound <on|off>',                       module: './sound.ts' },
+  { name: 'banner',     description: 'Switch terminal banner color theme (Neon | Arcade | Gold)',         usage: 'agpa banner [Neon|Arcade|Gold]',             module: './banner.ts' },
   { name: 'activity',   description: 'View coding streak & activity heatmap in terminal',                  usage: 'agpa activity [--streak|--heatmap|--compact] [--json] [--profile <name>]', module: './activity.ts' },
   { name: 'export',     description: 'Export achievement data to a portable JSON file',                     usage: 'agpa export [profile] [--output <path>] [--full] [--migrate]', module: './export.ts' },
   { name: 'import',     description: 'Import achievement data from a backup file',                          usage: 'agpa import <file> [--profile <name>] [--dry-run] [--force]', module: './import.ts' },
@@ -76,7 +78,7 @@ const COMMAND_GROUPS: Array<{ title: string; names: string[] }> = [
   { title: 'View',      names: ['stats', 'progress', 'activity', 'search', 'suggest'] },
   { title: 'Profiles',  names: ['profile', 'showcase'] },
   { title: 'Data',      names: ['export', 'import', 'reset'] },
-  { title: 'Tools',     names: ['sound', 'mcp', 'completion', 'upgrade', 'watch', 'history'] },
+  { title: 'Tools',     names: ['sound', 'banner', 'mcp', 'completion', 'upgrade', 'watch', 'history'] },
 ];
 
 function printHelp(): void {
@@ -120,16 +122,62 @@ function printVersion(): void {
   }
 }
 
-// ── Banner (figlet Slant font + cyberpunk neon gradient) ──────────────
+// ── Banner (Larry 3D + 3 color themes) ────────────────────────────────────
 
-const NEON_GRADIENT = [
-  '\x1b[38;2;0;255;255m',   // #00FFFF cyan
-  '\x1b[38;2;0;220;255m',   // #00DCFF
-  '\x1b[38;2;77;180;255m',  // #4DB4FF
-  '\x1b[38;2;150;80;255m',  // #9650FF
-  '\x1b[38;2;220;50;220m',  // #DC32DC magenta
-  '\x1b[38;2;255;0;170m',   // #FF00AA hot pink
-] as const;
+const BANNER_THEMES = {
+  /** Cyan → magenta cyberpunk gradient (default) */
+  Neon: {
+    mode: 'gradient' as const,
+    colors: [
+      '\x1b[38;2;0;255;255m',   // #00FFFF cyan
+      '\x1b[38;2;0;220;255m',   // #00DCFF
+      '\x1b[38;2;77;180;255m',  // #4DB4FF
+      '\x1b[38;2;150;80;255m',  // #9650FF
+      '\x1b[38;2;220;50;220m',  // #DC32DC magenta
+      '\x1b[38;2;255;0;170m',   // #FF00AA
+      '\x1b[38;2;255;0;120m',   // #FF0078
+    ],
+    fallbackColor: '\x1b[38;2;0;255;255m',
+  },
+  /** PS4 controller △○×□: Green / Red / Blue / Pink — one color per letter */
+  Arcade: {
+    mode: 'per-letter' as const,
+    colors: [
+      '\x1b[38;2;0;179;44m',    // #00b32c Green  △ (A)
+      '\x1b[38;2;224;16;48m',   // #e01030 Red    ○ (G)
+      '\x1b[38;2;0;112;209m',   // #0070d1 Blue   × (P)
+      '\x1b[38;2;224;128;176m', // #e080b0 Pink   □ (A)
+    ],
+    fallbackColor: '\x1b[38;2;0;179;44m',
+  },
+  /** Gold gradient matching Dashboard hero title (#f5b800) */
+  Gold: {
+    mode: 'gradient' as const,
+    colors: [
+      '\x1b[38;2;255;224;138m', // #ffe08a light gold
+      '\x1b[38;2;255;213;79m',  // #ffd54f
+      '\x1b[38;2;255;202;40m',  // #ffca28
+      '\x1b[38;2;255;193;7m',   // #ffc107
+      '\x1b[38;2;245;184;0m',   // #f5b800 AGPA brand gold
+      '\x1b[38;2;224;168;0m',   // #e0a800
+      '\x1b[38;2;204;150;0m',   // #cc9600 dark gold
+    ],
+    fallbackColor: '\x1b[38;2;245;184;0m',
+  },
+} as const;
+
+type BannerTheme = keyof typeof BANNER_THEMES;
+
+/** Resolve banner theme: env takes priority, then config.json, default Arcade */
+function resolveBannerTheme(): BannerTheme {
+  const env = process.env.AGPA_BANNER_THEME?.trim();
+  if (env && env in BANNER_THEMES) return env as BannerTheme;
+  try {
+    const theme = getBannerTheme();
+    if (theme && theme in BANNER_THEMES) return theme as BannerTheme;
+  } catch { /* fall through to default */ }
+  return 'Arcade';
+}
 
 function visualWidth(s: string): number {
   return s.replace(/\x1b\[[0-9;]*m/g, '').length;
@@ -152,36 +200,58 @@ function termWidth(): number {
   return 80;
 }
 
+/**
+ * Render "AGPA" banner with Larry 3D font.
+ * Three color themes (env AGPA_BANNER_THEME):
+ *   Neon   — cyan→magenta cyberpunk gradient (default)
+ *   Arcade — PS4 △○×□ Green/Red/Blue/Pink per-letter
+ *   Gold   — gold gradient matching Dashboard brand
+ */
 function renderBanner(width: number, version: string): string {
   const DIM = '\x1b[2m';
   const RST = '\x1b[0m';
-
-  if (width < 60) {
-    return `\n\x1b[38;2;0;255;255m▸ AGPA — Agent Player Achievements\x1b[0m  ${DIM}v${version}${RST}\n`;
-  }
-
+  const theme = BANNER_THEMES[resolveBannerTheme()];
   const isCompact = width < 80;
 
-  // ── Art ──────────────────────────────────────────────────────────
-  let artRaw: string;
-  try {
-    artRaw = figlet.textSync('AGPA', {
-      font: isCompact ? 'Small' : 'Larry 3D',
-      horizontalLayout: 'full',
-    });
-  } catch {
-    return `\n\x1b[38;2;0;255;255m▸ AGPA — Agent Player Achievements\x1b[0m  ${DIM}v${version}${RST}\n`;
+  if (width < 60) {
+    return `\n${theme.fallbackColor}▸ AGPA — Agent Player Achievements\x1b[0m  ${DIM}v${version}${RST}\n`;
   }
 
-  const artLines = artRaw.split('\n').filter(l => l.trim().length > 0);
+  // ── Render art ──────────────────────────────────────────────────────
+  let artLines: string[];
+  try {
+    if (theme.mode === 'per-letter' && !isCompact) {
+      // Per-letter coloring — render each letter separately, join with gap
+      const LETTER_GAP = 2;
+      const letters = ['A', 'G', 'P', 'A'].map(ch => {
+        const raw = figlet.textSync(ch, { font: 'Larry 3D', horizontalLayout: 'full' });
+        return raw.split('\n').filter(l => l.trim().length > 0);
+      });
+      const spacer = ' '.repeat(LETTER_GAP);
+      artLines = [];
+      for (let r = 0; r < letters[0]!.length; r++) {
+        let row = '';
+        for (let li = 0; li < 4; li++) {
+          if (li > 0) row += spacer;
+          row += `${theme.colors[li]}${letters[li]![r]!}${RST}`;
+        }
+        artLines.push(row);
+      }
+    } else {
+      // Gradient per row
+      const font = isCompact ? 'Small' : 'Larry 3D';
+      const raw = figlet.textSync('AGPA', { font, horizontalLayout: 'full' });
+      artLines = raw.split('\n').filter(l => l.trim().length > 0);
+      artLines = artLines.map((line, i) => {
+        const c = theme.colors[Math.min(i, theme.colors.length - 1)]!;
+        return `${c}${line}${RST}`;
+      });
+    }
+  } catch {
+    return `\n${theme.fallbackColor}▸ AGPA — Agent Player Achievements\x1b[0m  ${DIM}v${version}${RST}\n`;
+  }
 
-  // ── Cyan → magenta gradient on art ───────────────────────────────
-  const coloredArt = artLines.map((line, i) => {
-    const c = NEON_GRADIENT[Math.min(i, NEON_GRADIENT.length - 1)]!;
-    return `${c}${line}${RST}`;
-  });
-
-  // ── Subtitle ─────────────────────────────────────────────────────
+  // ── Subtitle ────────────────────────────────────────────────────────
   const tagline = isCompact
     ? `${DIM}v${version}${RST}`
     : `${DIM}gamified achievement tracking for AI coding tools${RST}`;
@@ -189,16 +259,16 @@ function renderBanner(width: number, version: string): string {
     ? ''
     : `${DIM}github.com/eiainano/AgentPlayerAchievements  ·  v${version}${RST}`;
 
-  // ── Assemble ─────────────────────────────────────────────────────
+  // ── Assemble ────────────────────────────────────────────────────────
   const lines: string[] = [];
   lines.push('');
-  for (const al of coloredArt) lines.push(al);
+  for (const al of artLines) lines.push(al);
   lines.push('');
   lines.push(tagline);
   if (link) lines.push(link);
   lines.push('');
 
-  // ── Center in terminal ───────────────────────────────────────────
+  // ── Center in terminal ──────────────────────────────────────────────
   const maxW = Math.max(...lines.map(l => visualWidth(l)));
   const leftPad = Math.max(0, Math.floor((width - maxW) / 2));
   const centered = lines.map(l => ' '.repeat(leftPad) + l);
@@ -416,8 +486,18 @@ async function main(): Promise<void> {
 
 
 // Only run main() when this file is the entry point (not when imported by tests)
-const argv1 = process.argv[1] || '';
-if (argv1.endsWith('index.ts') || argv1.endsWith('index.js')) {
+// Uses import.meta.url which always resolves to the real file path (not symlinks).
+// This handles npm link scenarios where argv[1] is a symlink name (e.g. "agpa").
+const IS_ENTRY = process.argv[1] && (
+    process.argv[1]!.endsWith('index.ts') ||
+    process.argv[1]!.endsWith('index.js') ||
+    // npm link → argv[1] is a symlink; check resolved path instead
+    (import.meta.url && (
+        import.meta.url.endsWith('/index.ts') ||
+        import.meta.url.endsWith('/index.js')
+    ))
+);
+if (IS_ENTRY) {
   main().catch((err: unknown) => {
     console.error(err instanceof Error ? err.message : String(err));
     process.exit(1);

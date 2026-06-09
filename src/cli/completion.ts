@@ -38,6 +38,7 @@ const COMMANDS: CmdInfo[] = [
   { name: 'search',     description: 'Search achievements by keyword/rarity/category', flags: ['--rarity', '--category', '--unlocked', '--locked', '--json', '--profile', '--help'], takesValue: ['--rarity', '--category', '--profile'] },
   { name: 'suggest',    description: 'Show nearest unlockable achievements',          flags: ['--N', '--all', '--hidden', '--json', '--profile', '--help'], takesValue: ['--N', '--profile'] },
   { name: 'sound',      description: 'Toggle achievement sound effects',              subcommands: ['on', 'off'] },
+  { name: 'banner',     description: 'Switch banner color theme',                     subcommands: ['Neon', 'Arcade', 'Gold'] },
   { name: 'activity',   description: 'View coding streak & activity heatmap',        flags: ['--streak', '--heatmap', '--compact', '--json', '--profile', '--help'], takesValue: ['--profile'] },
   { name: 'export',     description: 'Export achievement data to JSON',               flags: ['--output', '--full', '--migrate', '--help'],          takesValue: ['--output'] },
   { name: 'import',     description: 'Import achievement data from backup',           flags: ['--profile', '--dry-run', '--force', '--help'],        takesValue: ['--profile'] },

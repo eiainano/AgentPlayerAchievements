@@ -54,6 +54,7 @@ export const appConfigSchema = z.object({
   active_profile: z.string().default('default'),
   sound_enabled: z.boolean().default(true),
   simple_animations: z.boolean().default(false),
+  banner_theme: z.enum(['Neon', 'Arcade', 'Gold']).default('Arcade'),
 });
 
 export function safeParse<T>(schema: z.ZodType<T>, data: unknown, fallback: T): T {

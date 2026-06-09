@@ -1,10 +1,46 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-08 | 总成就数: 183 | 条件类型: 11 | Tests: 962 ✅ (36 files) | 0 不可达 ✅ | 0 审计错误 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | Logo 像素画 + Dashboard 集成 ✅ | 语言自动检测 ✅ | CLI 24 命令 ✅ | agpa uninstall ✅ | 跨平台通知增强 ✅ | macOS JXA 通知 ✅ | Dashboard 导出按钮 ✅ | 共享主题常量 ✅ | LLM 审计脚本 ✅
+> 最后更新: 2026-06-09 | 总成就数: 183 | 条件类型: 11 | Tests: 962 ✅ (36 files) | 0 不可达 ✅ | 0 审计错误 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | Logo 像素画 + Dashboard 集成 ✅ | 语言自动检测 ✅ | CLI 24 命令 ✅ | agpa uninstall ✅ | 跨平台通知增强 ✅ | macOS JXA 通知 ✅ | Dashboard 导出按钮 ✅ | 共享主题常量 ✅ | LLM 审计脚本 ✅ | Legendary/Mythic 卡片动画 ✅ | 称号 & 徽章系统 ✅
 
 ---
 
-## 🆕 成就审计系统 Phase 1 + 2 (v0.1.6, 6/8)
+## 🆕 Legendary/Mythic 卡片动画 + 称号 & 徽章系统 (v0.1.8, 6/9)
+
+基于 Steam 调研（`12-Steam游戏成就设计调研.md`）和系统机制设计（`02-系统机制.md`）中已规划的称号/徽章系统，两项全部落地：
+
+### Legendary 呼吸光效
+- `.ach-card[data-rarity="legendary"]:not(.locked)` — 4s 边框 + box-shadow 呼吸脉冲
+- 使用 `var(--card-base-shadow)` + `var(--glow-legendary)` 叠加，与展示柜 glow 共用变量
+- `animation-delay` 级联：先播放入场 `card-in`（0.4s），再启动循环呼吸
+
+### Mythic 烟花粒子
+- `::before` 伪元素 3 个 `box-shadow` 粒子（金/橙/红），5 关键帧循环 2.5s
+- 子元素 `z-index: 1` 防止遮挡文字；`pointer-events: none` 不阻挡点击
+- `overflow: hidden` 裁剪溢出粒子
+
+### 简化模式兼容
+- `app.js` `syncSimpleAnim()` 写入 `<body data-simple-anim="true">`
+- CSS 通过 `body:not([data-simple-anim="true"])` 选择器精确控制
+- 关闭后 Legendary/Mythic 退回静态样式（仅保留 name-glow）
+
+### 称号 & 徽章
+- **零后端改动** — YAML `reward` 字段 → `buildSetsResponse()` → `SetItem.reward` 管道已有
+- `renderProfile()` 从 `data.sets` 提取 completed sets 的 title/badge
+- 称号：金色 pill 文字 `·` 分隔；徽章：圆角 pill 标签 + hover 辉光
+- 空态：0 称号且 0 徽章时显示 `hero_empty_msg` 中英双语引导文案
+- i18n：`hero_titles_label` / `hero_badges_label` / `hero_no_titles_badges` 中英文
+
+### 涉及文件
+- `src/dashboard/public/styles.css` — +146 行（动画 keyframes + 称号/徽章样式）
+- `src/dashboard/public/app.js` — +60 行（渲染逻辑 + i18n + syncSimpleAnim）
+- `src/dashboard/public/index.html` — +3 行（两个占位 div）
+
+### 设计对齐
+- ✅ PROGRESS.md v1.0 P1 "Legendary 呼吸光效 / Mythic 烟花动画" — 已标记完成
+- ✅ `02-系统机制.md` 设计的称号/徽章系统 — 落地
+- ✅ `12-Steam游戏成就设计调研.md` 6.3 开放问题 #3 "社区成就/稀有成就" — 通过套装奖励机制部分回应
+
+---
 
 混合方案（规则引擎 CI gate + LLM 按需审计）全部落地：
 

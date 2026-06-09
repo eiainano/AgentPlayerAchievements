@@ -2,6 +2,16 @@
 
 ## [0.1.8] — 2026-06-09
 
+### Legendary/Mythic 卡片动画 + 称号 & 徽章系统 — 2026-06-09
+
+- **Legendary 呼吸光效**：成就网格卡片 4s 边框光晕呼吸脉冲（`legendary-breathe` keyframe），与现有 `name-glow` 叠加，仅全动画模式下生效
+- **Mythic 烟花动画**：`::before` 伪元素 3 个 box-shadow 粒子循环闪烁 + `::after` 径向渐变底光，卡片子元素 `z-index: 1` 防止遮挡
+- **简化模式兼容**：`syncSimpleAnim()` 写入 `<body data-simple-anim="true">`，CSS 通过 `:not([data-simple-anim="true"])` 选择器自动关闭 Legendary/Mythic 特效
+- **称号系统**：从已完成套装的 `reward.type === 'title'` 提取称号，金色 pill 文字 · 分隔，渲染在 Hero 统计行上方
+- **徽章系统**：从已完成套装的 `reward.type === 'badge'` 提取徽章，圆角 pill 标签 + hover 金色辉光
+- **空态引导**：0 称号且 0 徽章时显示斜体提示文案（中英双语），鼓励继续 Vibe Coding
+- **数据管道**：零后端改动 — YAML reward 字段 → `buildSetsResponse()` → `SetItem.reward` 已有，纯前端渲染消费
+
 ### Dashboard UX 优化 — 语言下拉框、档案切换、分享剪贴板 — 2026-06-09
 
 - **语言选择器**：EN/中 toggle 开关 → 圆角 pill 下拉框，hover 金色边框+辉光，与 profile-btn 风格统一

@@ -1,12 +1,14 @@
 # Changelog
 
-### 终端 ASCII Banner — doom 风格 AGPA 像素大字 — 2026-06-09
+### 终端 ASCII Banner — figlet Slant 字体 + Unicode 面板 — 2026-06-09
 
-- **Doom 风格 block art**：Unicode block elements（█▀▄）手写 "AGPA" 5 行像素大字，金色渐变（亮金 `#FFD700` → 暗金 `#B8860B`），零依赖纯字符串常量
-- **3 级终端宽度自适应**：`renderBanner(width, version)` — 标准 ≥80 列（5 行 full block）、紧凑 60–79 列（3 行 ▀/▄ half block）、纯文本 <60 列（🏆 emoji 降级）
-- **集成点**：TUI 模式（`agpa` 无参数）替换老手写 ASCII art + `--help` 顶部显示
-- **`getVersion()` helper**：消除 `printHelp()` / `showTui()` 版本号读取重复
-- **测试**：10 个新测试覆盖宽度边界（80/79/60/59）、ANSI code 输出、版本号格式
+- **figlet Slant 字体**：引入 `figlet` 运行时依赖（MIT, 8.5k+ stars），与 TradingAgents 同款 Slant 字体渲染 "AGPA" 大字，金色渐变（亮金 `#FFD700` → 暗金 `#B8860B`）
+- **Unicode box-drawing 面板**：`┌─ 🏆 Agent Player Achievements ─┐` 标题栏 + 居中内容区 + `└┘` 底边，全终端居中显示
+- **3 级宽度自适应**：Slant ≥80 列（5 行全宽艺术字 + GitHub 链接）、Small 60–79 列（4 行紧凑字体）、纯文本 <60 列
+- **`termWidth()` helper**：读 `COLUMNS` 环境变量 + `process.stdout.columns`，pipe 时不自作聪明
+- **集成点**：TUI 模式（`agpa` 无参数）+ `--help` 顶部
+- **依赖**：`figlet` (+1 npm dep, 18MB 含全部字体，运行时 lazy load 单个 ~5KB 字体)
+- **测试**：16 个新测试覆盖 Slant/Small 字体选择、box-drawing 绘制、金色渐变、figlet 失败 fallback、宽度边界（80/79/60/59）
 
 ### Dashboard 交互控件全面美化 + profile tools → softwares — 2026-06-09
 

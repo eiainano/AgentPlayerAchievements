@@ -167,7 +167,7 @@ function renderBanner(width: number, version: string): string {
   try {
     artRaw = figlet.textSync('AGPA', {
       font: isCompact ? 'Small' : 'Larry 3D',
-      horizontalLayout: 'default',
+      horizontalLayout: 'full',
     });
   } catch {
     return `\n\x1b[38;2;0;255;255m▸ AGPA — Agent Player Achievements\x1b[0m  ${DIM}v${version}${RST}\n`;

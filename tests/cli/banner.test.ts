@@ -30,7 +30,7 @@ describe('renderBanner', () => {
   it('uses Larry 3D font for width >= 80', () => {
     mockTextSync.mockReturnValue(LARRY_3D_ART);
     renderBanner(80, '0.1.0');
-    expect(mockTextSync).toHaveBeenCalledWith('AGPA', expect.objectContaining({ font: 'Larry 3D' }));
+    expect(mockTextSync).toHaveBeenCalledWith('AGPA', expect.objectContaining({ font: 'Larry 3D', horizontalLayout: 'full' }));
   });
 
   it('uses Small font for width 60-79', () => {
@@ -89,7 +89,7 @@ describe('renderBanner', () => {
   it('uses Larry 3D at exactly 80', () => {
     mockTextSync.mockReturnValue(LARRY_3D_ART);
     renderBanner(80, '0.1.0');
-    expect(mockTextSync).toHaveBeenCalledWith('AGPA', expect.objectContaining({ font: 'Larry 3D' }));
+    expect(mockTextSync).toHaveBeenCalledWith('AGPA', expect.objectContaining({ font: 'Larry 3D', horizontalLayout: 'full' }));
   });
 
   it('uses Small at exactly 79', () => {

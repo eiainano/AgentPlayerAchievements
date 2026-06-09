@@ -1,5 +1,13 @@
 # Changelog
 
+### 终端 ASCII Banner — doom 风格 AGPA 像素大字 — 2026-06-09
+
+- **Doom 风格 block art**：Unicode block elements（█▀▄）手写 "AGPA" 5 行像素大字，金色渐变（亮金 `#FFD700` → 暗金 `#B8860B`），零依赖纯字符串常量
+- **3 级终端宽度自适应**：`renderBanner(width, version)` — 标准 ≥80 列（5 行 full block）、紧凑 60–79 列（3 行 ▀/▄ half block）、纯文本 <60 列（🏆 emoji 降级）
+- **集成点**：TUI 模式（`agpa` 无参数）替换老手写 ASCII art + `--help` 顶部显示
+- **`getVersion()` helper**：消除 `printHelp()` / `showTui()` 版本号读取重复
+- **测试**：10 个新测试覆盖宽度边界（80/79/60/59）、ANSI code 输出、版本号格式
+
 ### Dashboard 交互控件全面美化 + profile tools → softwares — 2026-06-09
 
 - **`agpa profile tools` → `agpa profile softwares`**：CLI 命令、shell 补全、文档同步重命名

@@ -11,10 +11,10 @@
     "reset": "tsx src/cli/mvp.ts reset",
     "init": "tsx src/cli/init.ts",
     "doctor": "tsx src/cli/doctor.ts",
-"hook-auto": "AGPA_TOOL_SOURCE=claude-code tsx src/cli/hook.ts auto",
-"hook-track": "AGPA_TOOL_SOURCE=claude-code tsx src/cli/hook.ts track",
-"hook-poll": "AGPA_TOOL_SOURCE=claude-code tsx src/cli/hook.ts poll",
-"hook-hermes-auto": "AGPA_TOOL_SOURCE=hermes tsx src/cli/hook.ts hermes-auto",
+    "hook-auto": "AGPA_TOOL_SOURCE=claude-code tsx src/cli/hook.ts auto",
+    "hook-track": "AGPA_TOOL_SOURCE=claude-code tsx src/cli/hook.ts track",
+    "hook-poll": "AGPA_TOOL_SOURCE=claude-code tsx src/cli/hook.ts poll",
+    "hook-hermes-auto": "AGPA_TOOL_SOURCE=hermes tsx src/cli/hook.ts hermes-auto",
     "dashboard": "tsx src/cli/dashboard.ts",
     "profile": "tsx src/cli/profile.ts",
     "mcp": "tsx src/main.ts",
@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
+    "figlet": "^1.11.0",
     "yaml": "^2.9.0",
     "zod": "^4.4.3"
   }

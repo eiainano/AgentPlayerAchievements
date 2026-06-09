@@ -30,6 +30,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as readline from 'node:readline';
+import figlet from 'figlet';
 
 // ── Subcommand definitions ──────────────────────────────────────────────
 
@@ -81,7 +82,7 @@ const COMMAND_GROUPS: Array<{ title: string; names: string[] }> = [
 function printHelp(): void {
   const nameWidth = Math.max(...COMMANDS.map(c => c.name.length)) + 2;
 
-  console.log(renderBanner(process.stdout.columns || 80, getVersion()));
+  console.log(renderBanner(termWidth(), getVersion()));
 
   console.log('Usage: agpa <command> [options]\n');
 
@@ -119,36 +120,20 @@ function printVersion(): void {
   }
 }
 
-// ── Banner (doom-style block-art "AGPA" with gold gradient) ────────────────
+// ── Banner (figlet Slant font + Unicode panel + gold gradient) ────────────
 
 const GOLD_COLORS = [
-  '\x1b[38;2;255;215;0m', // Row 0: bright gold #FFD700
-  '\x1b[38;2;238;180;0m', // Row 1: #EEB400
-  '\x1b[38;2;218;165;0m', // Row 2: #DAA500
-  '\x1b[38;2;198;150;0m', // Row 3: #C69600
-  '\x1b[38;2;184;134;11m', // Row 4: dark gold #B8860B
+  '\x1b[38;2;255;215;0m', // #FFD700 bright gold
+  '\x1b[38;2;238;180;0m', // #EEB400
+  '\x1b[38;2;218;165;0m', // #DAA500
+  '\x1b[38;2;198;150;0m', // #C69600
+  '\x1b[38;2;184;134;11m', // #B8860B dark gold
 ] as const;
 
-const GOLD_RESET = '\x1b[0m';
-
-const BANNER_STANDARD = GOLD_COLORS.map((c, i) => {
-  const rows = [
-    '  █████  █████  ██████   █████',
-    '  ██   ██ ██     ██   ██ ██   ██',
-    '  ███████ ██ ███ ██████  ███████',
-    '  ██   ██ ██   ██ ██      ██   ██',
-    '  ██   ██  ████  ██      ██   ██',
-  ];
-  return `${c}${rows[i]}${GOLD_RESET}`;
-}).join('\n');
-
-const BANNER_COMPACT = [
-  `\x1b[38;2;255;215;0m  ▀▀█▀▀  ▀▀█▀▀  ▀▀█▀▀▀  ▀▀█▀▀${GOLD_RESET}`,
-  `\x1b[38;2;218;165;0m  ▀▀▀▀▀  ██ ██  ▀▀▀▀▀  ▀▀▀▀▀${GOLD_RESET}`,
-  `\x1b[38;2;184;134;11m  ██  ██  ▀▀▀▀  ██      ██  ██${GOLD_RESET}`,
-].join('\n');
-
-const BANNER_TEXT = `\x1b[38;2;255;215;0m\x1b[1m🏆 AGPA — Agent Player Achievements\x1b[0m`;
+function visualWidth(s: string): number {
+  // Strip ANSI escape sequences to measure visible character count
+  return s.replace(/\x1b\[[0-9;]*m/g, '').length;
+}
 
 function getVersion(): string {
   try {
@@ -160,16 +145,95 @@ function getVersion(): string {
   }
 }
 
-function renderBanner(width: number, version: string): string {
-  const subtitle = `\x1b[2m\x1b[3m  Agent Player Achievements  v${version}\x1b[0m`;
+function termWidth(): number {
+  // Prefer TTY columns, fall back to COLUMNS env, then 80
+  if (process.stdout.columns) return process.stdout.columns;
+  const envCols = parseInt(process.env.COLUMNS || '', 10);
+  if (envCols > 0) return envCols;
+  return 80;
+}
 
-  if (width >= 80) {
-    return `\n${BANNER_STANDARD}\n\n${subtitle}\n`;
+function renderBanner(width: number, version: string): string {
+  const DIM = '\x1b[2m';
+  const RST = '\x1b[0m';
+
+  // ── Pick font / mode by terminal width ──────────────────────────
+  if (width < 60) {
+    return `\n\x1b[38;2;255;215;0m\x1b[1m🏆 AGPA — Agent Player Achievements\x1b[0m  ${DIM}v${version}${RST}\n`;
   }
-  if (width >= 60) {
-    return `\n${BANNER_COMPACT}\n\n${subtitle}\n`;
+
+  const isCompact = width < 80;
+
+  // ── Art (figlet) ─────────────────────────────────────────────────
+  let artRaw: string;
+  try {
+    artRaw = figlet.textSync('AGPA', {
+      font: isCompact ? 'Small' : 'Slant',
+      horizontalLayout: 'default',
+      width: width - 10, // leave room for box borders + centering
+    });
+  } catch {
+    return `\n\x1b[38;2;255;215;0m\x1b[1m🏆 AGPA — Agent Player Achievements\x1b[0m  ${DIM}v${version}${RST}\n`;
   }
-  return `\n${BANNER_TEXT}  \x1b[2mv${version}\x1b[0m\n`;
+
+  const artLines = artRaw.split('\n').filter(l => l.trim().length > 0);
+
+  // ── Apply gold gradient to art rows ──────────────────────────────
+  const coloredArt = artLines.map((line, i) => {
+    const colorIdx = Math.min(i, GOLD_COLORS.length - 1);
+    return `${GOLD_COLORS[colorIdx]}${line}${RST}`;
+  });
+
+  // ── Subtitle ─────────────────────────────────────────────────────
+  const subtitle = isCompact
+    ? `${DIM}🎮 AI coding achievements  v${version}${RST}`
+    : `${DIM}gamified achievement tracking for AI coding tools  v${version}${RST}`;
+
+  // ── Build content lines ──────────────────────────────────────────
+  const content: string[] = [];
+  for (const line of coloredArt) {
+    content.push(line);
+  }
+  content.push('');
+  content.push(subtitle);
+  if (!isCompact) {
+    content.push(`${DIM}⭐ github.com/eiainano/AgentPlayerAchievements${RST}`);
+  }
+  content.push(''); // bottom padding before first art row
+
+  // ── Compute box size, clamped to terminal width ──────────────────
+  const contentMaxW = Math.max(...content.map(l => visualWidth(l)));
+  const title = '🏆 Agent Player Achievements';
+  const minInnerW = visualWidth(title) + 8; // title + "┌─ ─┐" + breathing room
+  const rawInnerW = contentMaxW + 4; // 2 padding each side
+  const maxInnerW = width - 2; // leave 1-char margin on each side
+  const innerW = Math.max(minInnerW, Math.min(rawInnerW, maxInnerW));
+
+  // ── Draw panel ───────────────────────────────────────────────────
+  const lines: string[] = [];
+  // Top bar
+  const titlePart = `─ ${title} `;
+  const topRemaining = innerW - titlePart.length - 2;
+  lines.push(`┌${titlePart}${'─'.repeat(Math.max(0, topRemaining))}┐`);
+
+  // Content area width (between │ borders)
+  const availW = innerW - 4;
+
+  for (const cl of content) {
+    const vw = visualWidth(cl);
+    const leftPad = vw === 0 ? 0 : Math.max(0, Math.floor((availW - vw) / 2));
+    const rightPad = Math.max(0, availW - vw - leftPad);
+    lines.push(`│ ${' '.repeat(leftPad)}${cl}${' '.repeat(rightPad)} │`);
+  }
+
+  // Bottom bar
+  lines.push(`└${'─'.repeat(innerW - 2)}┘`);
+
+  // ── Center in terminal ──────────────────────────────────────────
+  const leftPad = Math.max(0, Math.floor((width - innerW) / 2));
+  const centered = lines.map(l => ' '.repeat(leftPad) + l);
+
+  return '\n' + centered.join('\n') + '\n';
 }
 
 // ── Dispatch ─────────────────────────────────────────────────────────────
@@ -269,7 +333,7 @@ async function showTui(): Promise<void> {
   } catch { /* no data yet */ }
 
   console.clear();
-  process.stdout.write(renderBanner(process.stdout.columns || 80, version));
+  process.stdout.write(renderBanner(termWidth(), version));
   if (statsLine) {
     process.stdout.write(`\n  ${statsLine}\n`);
   }
@@ -382,10 +446,14 @@ async function main(): Promise<void> {
 }
 
 
-main().catch((err: unknown) => {
-  console.error(err instanceof Error ? err.message : String(err));
-  process.exit(1);
-});
+// Only run main() when this file is the entry point (not when imported by tests)
+const argv1 = process.argv[1] || '';
+if (argv1.endsWith('index.ts') || argv1.endsWith('index.js')) {
+  main().catch((err: unknown) => {
+    console.error(err instanceof Error ? err.message : String(err));
+    process.exit(1);
+  });
+}
 
 // Exported for testing
 export { renderBanner, getVersion };

@@ -597,7 +597,79 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
   margin: -4px 0 2px;
 }
 
-/* Share / Export buttons — unified gold-accented pill */
+/* ── Titles & Badges (earned from completed sets) ── */
+
+.hero-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: var(--text-dim);
+  opacity: .55;
+}
+
+.hero-titles-row,
+.hero-badges-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.hero-titles-row { margin-top: 2px; }
+
+.hero-title-pill {
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-display);
+  color: var(--gold);
+  letter-spacing: -.1px;
+  transition: opacity .3s ease;
+}
+
+.hero-title-sep {
+  color: var(--text-dim);
+  opacity: .25;
+  font-size: 10px;
+  pointer-events: none;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text);
+  transition: all .3s ease;
+}
+
+.hero-badge:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 8px var(--gold-glow);
+  transform: translateY(-1px);
+}
+
+/* Empty titles/badges placeholder */
+.hero-empty-hint {
+  margin-top: 2px;
+}
+
+.hero-empty-msg {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--text-dim);
+  opacity: .45;
+  letter-spacing: .1px;
+}
+
+/* ── Share / Export buttons — unified gold-accented pill ── */
 .share-btn {
   z-index: 2;
   padding: 6px 16px;
@@ -1260,6 +1332,78 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
 @keyframes name-glow {
   0%, 100% { text-shadow: 0 0 4px var(--card-color); }
   50%      { text-shadow: 0 0 12px var(--card-color); }
+}
+
+/* ── Legendary breathing border glow ── */
+body:not([data-simple-anim="true"]) .ach-card[data-rarity="legendary"]:not(.locked) {
+  animation: card-in .4s ease both, legendary-breathe 4s ease-in-out infinite;
+  animation-delay: var(--delay, 0ms), calc(var(--delay, 0ms) + .4s);
+}
+
+@keyframes legendary-breathe {
+  0%, 100% {
+    border-color: rgba(168, 88, 240, .45);
+    box-shadow: var(--card-base-shadow), 0 0 8px var(--glow-legendary);
+  }
+  50% {
+    border-color: rgba(168, 88, 240, .85);
+    box-shadow: var(--card-base-shadow), 0 0 20px var(--glow-legendary);
+  }
+}
+
+/* ── Mythic firework sparkle (::before particles + ::after radial wash) ── */
+body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked) {
+  animation: card-in .4s ease both, mythic-breathe 3s ease-in-out infinite;
+  animation-delay: var(--delay, 0ms), calc(var(--delay, 0ms) + .4s);
+}
+
+body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: transparent;
+  animation: mythic-sparkle 2.5s ease-in-out infinite;
+}
+
+body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked) > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes mythic-breathe {
+  0%, 100% {
+    border-color: rgba(240, 64, 80, .5);
+    box-shadow: var(--card-base-shadow), 0 0 12px var(--glow-mythic);
+  }
+  50% {
+    border-color: rgba(240, 64, 80, .9);
+    box-shadow: var(--card-base-shadow), 0 0 28px var(--glow-mythic);
+  }
+}
+
+@keyframes mythic-sparkle {
+  0%   { box-shadow:
+    2px  10px 0 0 rgba(255,200,60,.7),
+    28px 6px  0 0 rgba(255,100,60,.55),
+    22px 24px 0 0 rgba(255,180,40,.5); }
+  25%  { box-shadow:
+    8px  4px  0 0 rgba(255,220,80,.35),
+    30px 14px 0 0 rgba(255,200,60,.75),
+    14px 28px 0 0 rgba(255,120,50,.5); }
+  50%  { box-shadow:
+    4px  16px 0 0 rgba(255,180,40,.65),
+    20px 2px  0 0 rgba(255,140,50,.45),
+    32px 18px 0 0 rgba(255,200,60,.6); }
+  75%  { box-shadow:
+    10px 8px  0 0 rgba(255,200,60,.7),
+    26px 22px 0 0 rgba(255,100,60,.45),
+    6px  20px 0 0 rgba(255,220,80,.55); }
+  100% { box-shadow:
+    2px  10px 0 0 rgba(255,200,60,.7),
+    28px 6px  0 0 rgba(255,100,60,.55),
+    22px 24px 0 0 rgba(255,180,40,.5); }
 }
 
 /* ── Modal title glow (unlocked) ── */

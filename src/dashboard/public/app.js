@@ -97,6 +97,14 @@ async function loadSoundState(toggle) {
 
 // ── Animation Toggle ────────────────────────────────────
 
+function syncSimpleAnim(enabled) {
+  if (enabled) {
+    document.body.setAttribute('data-simple-anim', 'true');
+  } else {
+    document.body.removeAttribute('data-simple-anim');
+  }
+}
+
 async function toggleAnimations() {
   const toggle = document.getElementById('anim-toggle');
   if (!toggle) return;
@@ -107,6 +115,7 @@ async function toggleAnimations() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ simple_animations: !enabled }),
     });
+    syncSimpleAnim(!enabled);
   } catch {
     toggle.checked = !enabled;
   }
@@ -118,7 +127,9 @@ async function loadAnimState(toggle) {
     if (res.ok) {
       const data = await res.json();
       // checked = full animations (toggle ON), unchecked = simple
-      toggle.checked = !data.simple_animations;
+      const simple = data.simple_animations;
+      toggle.checked = !simple;
+      syncSimpleAnim(simple);
     }
   } catch { /* use default (checked) */ }
 }
@@ -191,6 +202,9 @@ const I18N = {
     milestone_set: '🎯 Set complete: {name}',
     tl_sameday: 'on the same day',
     hidden_hint: '\u{1F512} Hidden',
+    hero_titles_label: 'Titles',
+    hero_badges_label: 'Badges',
+    hero_no_titles_badges: 'No titles or badges yet — keep vibing on your coding journey!',
     pin_title: 'Pin to showcase',
     rarity_common: 'Common',
     rarity_uncommon: 'Uncommon',
@@ -289,6 +303,9 @@ const I18N = {
     milestone_set: '🎯 套装完成: {name}',
     tl_sameday: '同一天',
     hidden_hint: '\u{1F512} 隐藏成就',
+    hero_titles_label: '称号',
+    hero_badges_label: '徽章',
+    hero_no_titles_badges: '还没有获得称号和徽章哦，继续你的 Vibe Coding 旅程吧！',
     pin_title: '放入展示柜',
     rarity_common: '普通',
     rarity_uncommon: '优秀',
@@ -1132,6 +1149,47 @@ function renderProfile(data) {
   renderStreakCard(stats.streak);
   renderHeatmap(stats.heatmap);
   renderTitlesRow(data);
+
+  // ── Titles & Badges (from completed set rewards) ──
+  {
+    const completedSets = (data.sets || []).filter(s => s.completed > 0 && s.completed === s.total && s.reward?.value);
+    const titles = completedSets.filter(s => s.reward.type === 'title').map(s => s.reward.value);
+    const badges = completedSets.filter(s => s.reward.type === 'badge').map(s => s.reward.value);
+
+    const titlesRow = document.getElementById('hero-titles-row');
+    const badgesRow = document.getElementById('hero-badges-row');
+
+    if (!titles.length && !badges.length) {
+      // Empty state — single friendly nudge
+      if (titlesRow) {
+        titlesRow.className = 'hero-titles-row hero-empty-hint';
+        titlesRow.innerHTML = `<span class="hero-empty-msg">${t('hero_no_titles_badges')}</span>`;
+        titlesRow.style.display = '';
+      }
+      if (badgesRow) badgesRow.style.display = 'none';
+    } else {
+      if (titlesRow) {
+        titlesRow.className = 'hero-titles-row';
+        if (titles.length) {
+          titlesRow.innerHTML = `<span class="hero-section-label titles-label">${t('hero_titles_label')}</span>` +
+            titles.map(t => `<span class="hero-title-pill">${escHtml(t)}</span>`).join('<span class="hero-title-sep">·</span>');
+          titlesRow.style.display = '';
+        } else {
+          titlesRow.style.display = 'none';
+        }
+      }
+
+      if (badgesRow) {
+        if (badges.length) {
+          badgesRow.innerHTML = `<span class="hero-section-label badges-label">${t('hero_badges_label')}</span>` +
+            badges.map(b => `<span class="hero-badge">${escHtml(b)}</span>`).join('');
+          badgesRow.style.display = '';
+        } else {
+          badgesRow.style.display = 'none';
+        }
+      }
+    }
+  }
 
   const showcase = document.getElementById('showcase');
   if (showcase) {

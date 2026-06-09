@@ -5,11 +5,12 @@
  * Usage:
  *   npx tsx src/cli/profile.ts create [name]   Create a new profile
  *   npx tsx src/cli/profile.ts list             List all profiles
+ *   npx tsx src/cli/profile.ts delete           Delete a profile (with confirmation)
  */
 
 import * as readline from 'node:readline';
 import { homedir } from 'node:os';
-import { createProfile, listProfiles, listProfilesWithMeta, getProfileMeta, setTrackedTools, validateProfileName, profileExists, DEFAULT_PROFILE, MAX_PROFILES } from '../utils/profile.js';
+import { createProfile, listProfiles, listProfilesWithMeta, getProfileMeta, setTrackedTools, validateProfileName, profileExists, deleteProfile, DEFAULT_PROFILE, MAX_PROFILES } from '../utils/profile.js';
 import { saveConfig } from '../config.js';
 import { TOOLS, scanTools } from '../tool-registry.js';
 
@@ -24,8 +25,10 @@ function printHelp() {
   console.log('  npx tsx src/cli/profile.ts list            List all profiles');
   console.log('  npx tsx src/cli/profile.ts switch <name>   Switch active profile');
   console.log('  npx tsx src/cli/profile.ts softwares [name]    Manage tracked software for a profile');
+  console.log('  npx tsx src/cli/profile.ts delete          Delete a named profile (interactive confirm)');
   console.log('');
   console.log(`Max ${MAX_PROFILES} named profiles + 1 default = ${MAX_PROFILES + 1} total.`);
+  console.log('  (default and _demo cannot be deleted)');
 }
 
 // ── Interactive tracked-tools picker ───────────────────────────────
@@ -197,6 +200,95 @@ switch (command) {
       process.exit(1);
     }
     promptTrackedTools(profileName).then(() => process.exit(0));
+    break;
+  }
+
+  case 'delete': {
+    const allProfiles = listProfilesWithMeta();
+    // Exclude default and _demo from deletable list
+    const deletable = allProfiles.filter(p => p.name !== 'default' && p.name !== '_demo');
+
+    if (deletable.length === 0) {
+      console.log('No named profiles to delete.');
+      console.log('  (default and _demo cannot be deleted)');
+      process.exit(0);
+    }
+
+    // Show deletable profiles
+    console.log('Select a profile to delete:\n');
+    for (let i = 0; i < deletable.length; i++) {
+      const p = deletable[i]!;
+      const meta = getProfileMeta(p.name);
+      const tools = (meta.tracked_tools || []).length > 0
+        ? ` (tracked tools: ${meta.tracked_tools!.join(', ')})`
+        : '';
+      const created = meta.created_at
+        ? ` · created ${meta.created_at.slice(0, 10)}`
+        : '';
+      console.log(`  ${i + 1}. ${p.emoji || '👤'} ${p.name}${created}${tools}`);
+    }
+
+    // Use simple readline prompts
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
+    const askName = (): Promise<string> => new Promise(resolve => {
+      rl.question('\nEnter the profile name to delete: ', resolve);
+    });
+
+    const askConfirm = (targetName: string): Promise<boolean> => new Promise(resolve => {
+      rl.question(`\n⚠️  WARNING: This will permanently delete all achievement data for "${targetName}".\nThis cannot be undone!\n\nType the profile name again to confirm: `, (answer) => {
+        resolve(answer.trim() === targetName);
+      });
+    });
+
+    const askDate = (): Promise<boolean> => new Promise(resolve => {
+      const today = new Date().toISOString().slice(0, 10);
+      rl.question(`Type today's date (YYYY-MM-DD) to confirm:\nExpected: ${today}\nEnter: `, (answer) => {
+        resolve(answer.trim() === today);
+      });
+    });
+
+    (async () => {
+      const targetRaw = await askName();
+      const target = targetRaw.trim();
+
+      if (!target || target === 'default' || target === '_demo') {
+        console.log(`\nCannot delete "${target}". Only named profiles can be deleted.`);
+        rl.close();
+        process.exit(1);
+      }
+
+      if (!profileExists(target)) {
+        console.log(`\nProfile "${target}" does not exist.`);
+        rl.close();
+        process.exit(1);
+      }
+
+      const nameOk = await askConfirm(target);
+      if (!nameOk) {
+        console.log('\nProfile name mismatch. Deletion cancelled.');
+        rl.close();
+        process.exit(0);
+      }
+
+      const dateOk = await askDate();
+      if (!dateOk) {
+        console.log('\nIncorrect date. Deletion cancelled.');
+        rl.close();
+        process.exit(0);
+      }
+
+      rl.close();
+
+      try {
+        deleteProfile(target);
+        console.log(`\n✅ Profile "${target}" has been permanently deleted.`);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        console.error(`\nFailed to delete profile: ${msg}`);
+        process.exit(1);
+      }
+    })();
     break;
   }
 

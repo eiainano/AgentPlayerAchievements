@@ -192,6 +192,25 @@ export function createProfile(name: string, emoji = NEW_PROFILE_DEFAULT_EMOJI): 
   return dir;
 }
 
+/**
+ * Delete a named profile (recursively removes its directory).
+ * Default profile and system profiles (_demo) cannot be deleted.
+ * Throws on invalid/unknown profile.
+ */
+export function deleteProfile(name: string): void {
+  if (name === DEFAULT_PROFILE) {
+    throw new Error('Cannot delete the default profile.');
+  }
+  if (name === '_demo') {
+    throw new Error('Cannot delete the system demo profile.');
+  }
+  if (!profileExists(name)) {
+    throw new Error(`Profile "${name}" does not exist.`);
+  }
+  const dir = resolveProfileDir(name);
+  fs.rmSync(dir, { recursive: true, force: true });
+}
+
 /** Ensure the legacy default directory exists (idempotent) */
 export function ensureDefaultProfile(): void {
   fs.mkdirSync(getLegacyDir(), { recursive: true });

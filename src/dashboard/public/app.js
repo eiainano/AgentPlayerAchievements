@@ -1080,11 +1080,6 @@ function renderProfileSelector(data) {
     limitHint.style.display = atLimit ? 'block' : 'none';
   }
 
-  // Dev reset only for default profile
-  const resetBtn = document.getElementById('dev-reset-btn');
-  if (resetBtn) {
-    resetBtn.style.display = active === 'default' ? '' : 'none';
-  }
 }
 
 // ── Tracked Tools Badges ─────────────────────────────
@@ -1316,20 +1311,6 @@ async function autoFillShowcase() {
   const res = await fetch('/api/showcase/auto', { method: 'POST' });
   if (!res.ok) return;
   await refreshData();
-}
-
-async function devReset() {
-  const meta = document.querySelector('meta[name="dev-token"]');
-  const token = meta?.getAttribute('content') || '';
-  const res = await fetch('/api/reset', {
-    method: 'POST',
-    headers: { 'x-dev-token': token },
-  });
-  if (!res.ok) return;
-  const json = await res.json();
-  dashboardData = json.data;
-  lastUnlockedIds = new Set();
-  renderAll(dashboardData);
 }
 
 async function refreshData() {

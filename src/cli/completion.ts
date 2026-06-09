@@ -29,7 +29,7 @@ const COMMANDS: CmdInfo[] = [
   { name: 'config',     description: 'View or change AGPA settings',                  flags: ['--help'] },
   { name: 'dashboard',  description: 'Start achievement dashboard',                   flags: ['--profile', '--help'],                                takesValue: ['--profile'] },
   { name: 'web',        description: 'Alias for dashboard',                           flags: ['--profile', '--help'],                                takesValue: ['--profile'] },
-  { name: 'profile',    description: 'Manage achievement profiles',                    subcommands: ['create', 'list', 'switch', 'softwares'] },
+  { name: 'profile',    description: 'Manage achievement profiles',                    subcommands: ['create', 'list', 'switch', 'softwares', 'delete'] },
   { name: 'showcase',   description: 'Manage achievement showcase',                    subcommands: ['list', 'pin', 'unpin', 'auto-fill'] },
   { name: 'demo',       description: 'Generate MVP demo data',                        flags: ['--help'] },
   { name: 'stats',      description: 'View achievement stats in terminal',            flags: ['--json', '--profile', '--help'],                     takesValue: ['--profile'] },

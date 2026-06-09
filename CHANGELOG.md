@@ -1,5 +1,12 @@
 # Changelog
 
+### `agpa profile delete` + Dashboard 移除 dev-reset — 2026-06-10
+
+- **`agpa profile delete`**：新子命令，交互式删除命名 profile（列出可删 profile → 输入名称 → 再次输入确认 → 输入当日日期确认 → 永久删除）
+- **`deleteProfile()`**：`src/utils/profile.ts` 新增，递归删除 profile 目录，`default` 和 `_demo` 受保护
+- **Dashboard 移除 dev-reset 按钮**：`index.html` 删除 🗑️ 按钮，`app.js` 删除 `devReset()` 函数及其引用
+- **CLI 整合**：`index.ts` 帮助描述 + `completion.ts` shell 补全都更新了 `delete` 子命令
+
 ### `agpa banner` CLI — 3 主题系统 (Neon/Arcade/Gold) — 2026-06-10
 
 - **`agpa banner [Neon|Arcade|Gold]`**：新 CLI 命令，运行时切换终端 banner 颜色主题，持久化到 config.json

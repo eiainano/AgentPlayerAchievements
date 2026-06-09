@@ -24,6 +24,46 @@ function toggleTheme() {
 
 initTheme();
 
+// ── Ambient Particles ───────────────────────────────────
+
+function initAmbientParticles() {
+  let container = document.getElementById('bg-particles');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'bg-particles';
+    // Insert as first child of body so it stays behind content
+    document.body.insertBefore(container, document.body.firstChild);
+  }
+  // Clear old particles
+  container.innerHTML = '';
+  const count = Math.min(30, Math.floor(window.innerWidth / 40));
+  for (let i = 0; i < count; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'bg-particle';
+    const size = 1.5 + Math.random() * 3;
+    dot.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random() * 100}%;
+      top:${Math.random() * 100}%;
+      background:${['rgba(79,195,247,0.4)','rgba(168,88,240,0.35)','rgba(245,184,0,0.3)','rgba(240,64,80,0.25)'][Math.floor(Math.random() * 4)]};
+      opacity:0;
+      transition: opacity 2s ease;
+    `;
+    container.appendChild(dot);
+    // Stagger reveal
+    setTimeout(() => { dot.style.opacity = (0.2 + Math.random() * 0.5).toString(); }, i * 120);
+  }
+}
+
+function updateAmbientIntensity(data) {
+  const total = data.achievements ? data.achievements.length : 1;
+  const unlocked = data.achievements ? data.achievements.filter(a => a.unlocked).length : 0;
+  const pct = Math.min(unlocked / total, 1);
+  // Map: 0% → 0.3, 50% → 0.55, 100% → 0.9
+  const intensity = 0.3 + pct * 0.6;
+  document.documentElement.style.setProperty('--ambient-intensity', String(intensity));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const themeToggle = document.getElementById('theme-toggle');
   if (themeToggle) themeToggle.addEventListener('change', toggleTheme);
@@ -33,8 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const t = document.documentElement.getAttribute('data-theme');
     logo.src = t === 'dark' ? '/agpa-logo-dark-24.png' : '/agpa-logo-light-24.png';
   }
-  const langSelect = document.getElementById('lang-select');
-  if (langSelect) langSelect.addEventListener('change', toggleLang);
+  initLangPicker();
   const soundToggle = document.getElementById('sound-toggle');
   if (soundToggle) {
     soundToggle.addEventListener('change', toggleSound);
@@ -55,16 +94,223 @@ let currentLang = 'en';
 function initLang(configLang) {
   const saved = localStorage.getItem('agpa-lang');
   currentLang = saved || configLang || 'en';
-  const select = document.getElementById('lang-select');
-  if (select) select.value = currentLang;
+  syncLangPicker();
+}
+
+function syncLangPicker() {
+  const trigger = document.getElementById('lang-trigger');
+  if (!trigger) return;
+
+  // Update trigger display
+  const globe = trigger.querySelector('.lang-globe');
+  const code = trigger.querySelector('.lang-code');
+  if (currentLang === 'zh') {
+    if (globe) globe.textContent = '🌐';
+    if (code) code.textContent = '中文';
+  } else {
+    if (globe) globe.textContent = '🌐';
+    if (code) code.textContent = 'EN';
+  }
+
+  // Update active option
+  document.querySelectorAll('.lang-option').forEach(opt => {
+    opt.classList.toggle('active', opt.dataset.value === currentLang);
+    opt.setAttribute('aria-selected', opt.dataset.value === currentLang ? 'true' : 'false');
+  });
 }
 
 function toggleLang() {
-  const select = document.getElementById('lang-select');
-  if (!select) return;
-  currentLang = select.value;
+  // stub — kept for backward compat, actual switching via pickLang()
+}
+
+function pickLang(value) {
+  if (value === currentLang) return;
+  currentLang = value;
   localStorage.setItem('agpa-lang', currentLang);
+  syncLangPicker();
   if (dashboardData) renderAll(dashboardData);
+}
+
+// ── Lang picker dropdown ─────────────────────────────────
+
+function initLangPicker() {
+  const trigger = document.getElementById('lang-trigger');
+  const dropdown = document.getElementById('lang-dropdown');
+  if (!trigger || !dropdown) return;
+
+  // Toggle open/close
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = trigger.getAttribute('aria-expanded') === 'true';
+    if (isOpen) {
+      closeLangPicker();
+    } else {
+      openLangPicker();
+    }
+  });
+
+  // Option clicks
+  dropdown.querySelectorAll('.lang-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      pickLang(opt.dataset.value);
+      closeLangPicker();
+    });
+    // Keyboard: Enter/Space to select
+    opt.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        pickLang(opt.dataset.value);
+        closeLangPicker();
+        trigger.focus();
+      }
+      if (e.key === 'Escape') {
+        closeLangPicker();
+        trigger.focus();
+      }
+    });
+  });
+
+  // Click outside to close
+  document.addEventListener('click', (e) => {
+    const picker = document.getElementById('lang-picker');
+    if (picker && !picker.contains(e.target)) {
+      closeLangPicker();
+    }
+  });
+
+  // Keyboard: Escape on trigger
+  trigger.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeLangPicker();
+    }
+    if (e.key === 'ArrowDown' && trigger.getAttribute('aria-expanded') !== 'true') {
+      e.preventDefault();
+      openLangPicker();
+      const first = dropdown.querySelector('.lang-option');
+      if (first) first.focus();
+    }
+  });
+}
+
+function openLangPicker() {
+  const trigger = document.getElementById('lang-trigger');
+  const dropdown = document.getElementById('lang-dropdown');
+  if (!trigger || !dropdown) return;
+  trigger.setAttribute('aria-expanded', 'true');
+  dropdown.classList.add('open');
+}
+
+function closeLangPicker() {
+  const trigger = document.getElementById('lang-trigger');
+  const dropdown = document.getElementById('lang-dropdown');
+  if (!trigger) return;
+  trigger.setAttribute('aria-expanded', 'false');
+  if (dropdown) dropdown.classList.remove('open');
+}
+
+// ── Sort picker ──────────────────────────────────────────
+
+const SORT_OPTIONS = [
+  { value: 'default', icon: '📋' },
+  { value: 'rarity',  icon: '💎' },
+  { value: 'recent',  icon: '🕐' },
+  { value: 'name',    icon: '🔤' },
+];
+
+function initSortPicker(data) {
+  const trigger = document.getElementById('sort-trigger');
+  const dropdown = document.getElementById('sort-dropdown');
+  if (!trigger || !dropdown) return;
+
+  // Toggle open/close
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = trigger.getAttribute('aria-expanded') === 'true';
+    if (isOpen) closeSortPicker(); else openSortPicker();
+  });
+
+  // Option clicks — delegated
+  dropdown.addEventListener('click', (e) => {
+    const opt = e.target.closest('.sort-option');
+    if (!opt) return;
+    currentSort = opt.dataset.value;
+    syncSortPicker();
+    closeSortPicker();
+    if (data || dashboardData) renderGrid(data || dashboardData);
+  });
+
+  // Keyboard
+  dropdown.addEventListener('keydown', (e) => {
+    const opt = e.target.closest('.sort-option');
+    if (!opt) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      currentSort = opt.dataset.value;
+      syncSortPicker();
+      closeSortPicker();
+      trigger.focus();
+      if (dashboardData) renderGrid(dashboardData);
+    }
+    if (e.key === 'Escape') { closeSortPicker(); trigger.focus(); }
+  });
+
+  trigger.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSortPicker();
+    if (e.key === 'ArrowDown' && trigger.getAttribute('aria-expanded') !== 'true') {
+      e.preventDefault();
+      openSortPicker();
+      const first = dropdown.querySelector('.sort-option');
+      if (first) first.focus();
+    }
+  });
+
+  // Click outside to close
+  document.addEventListener('click', (e) => {
+    const picker = document.getElementById('sort-picker');
+    if (picker && !picker.contains(e.target)) closeSortPicker();
+  });
+}
+
+function populateSortPicker() {
+  const dropdown = document.getElementById('sort-dropdown');
+  if (!dropdown) return;
+  dropdown.innerHTML = SORT_OPTIONS.map(opt =>
+    `<div class="sort-option${currentSort === opt.value ? ' active' : ''}" role="option" data-value="${opt.value}" tabindex="0">
+      <span class="sort-opt-icon">${opt.icon}</span>
+      <span class="sort-opt-label">${t('sort_' + opt.value)}</span>
+    </div>`
+  ).join('');
+  syncSortPicker();
+}
+
+function syncSortPicker() {
+  const trigger = document.getElementById('sort-trigger');
+  const label = document.getElementById('sort-label');
+  if (!trigger || !label) return;
+
+  const opt = SORT_OPTIONS.find(o => o.value === currentSort) || SORT_OPTIONS[0];
+  if (label) label.textContent = t('sort_' + currentSort);
+
+  document.querySelectorAll('#sort-dropdown .sort-option').forEach(el => {
+    el.classList.toggle('active', el.dataset.value === currentSort);
+    el.setAttribute('aria-selected', el.dataset.value === currentSort ? 'true' : 'false');
+  });
+}
+
+function openSortPicker() {
+  const trigger = document.getElementById('sort-trigger');
+  const dropdown = document.getElementById('sort-dropdown');
+  if (!trigger || !dropdown) return;
+  trigger.setAttribute('aria-expanded', 'true');
+  dropdown.classList.add('open');
+}
+
+function closeSortPicker() {
+  const trigger = document.getElementById('sort-trigger');
+  const dropdown = document.getElementById('sort-dropdown');
+  if (!trigger) return;
+  trigger.setAttribute('aria-expanded', 'false');
+  if (dropdown) dropdown.classList.remove('open');
 }
 
 // ── Sound Toggle ───────────────────────────────────────
@@ -248,6 +494,7 @@ const I18N = {
     no_badges: 'No badges yet — complete sets to earn them.',
     title_tooltip: 'From set: {set}',
     badge_unlocked: '✓ {completed}/{total}',
+    tools_hint: '💡 Use "agpa profile softwares" in your terminal to change which tools are tracked.',
   },
   zh: {
     nav_profile: '个人主页',
@@ -349,6 +596,7 @@ const I18N = {
     no_badges: '暂无徽章——完成套装来获取。',
     title_tooltip: '来自套装：{set}',
     badge_unlocked: '✓ {completed}/{total}',
+    tools_hint: '💡 在终端中使用 "agpa profile softwares" 来更改要追踪的工具。',
   },
 };
 
@@ -569,12 +817,48 @@ function setupGlobalHandlers() {
     grid.addEventListener('click', e => {
       if (pickSlot !== null) return; // suppress during showcase pick
       if (isModalOpen) return;
+
+      // Click ripple
       const card = e.target.closest('.ach-card');
-      if (!card) return;
-      const achId = card.dataset.id;
+      if (card) {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const ripple = document.createElement('span');
+        ripple.className = 'ach-ripple';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        card.appendChild(ripple);
+        ripple.addEventListener('animationend', () => ripple.remove());
+      }
+
+      const achId = card?.dataset.id;
       if (!achId) return;
       const ach = dashboardData?.achievements.find(a => a.id === achId);
       if (ach) openModal(ach);
+    });
+
+    // 3D tilt on card hover — inline style to override animation
+    let tiltRAF = null;
+    grid.addEventListener('mousemove', e => {
+      if (tiltRAF) return;
+      tiltRAF = requestAnimationFrame(() => {
+        tiltRAF = null;
+        const card = e.target.closest('.ach-card');
+        if (!card || card.classList.contains('locked')) return;
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width;
+        const y = (e.clientY - rect.top) / rect.height;
+        const rx = (y - 0.5) * -12;
+        const ry = (x - 0.5) * 12;
+        card.style.transform = 'rotateX(' + rx + 'deg) rotateY(' + ry + 'deg) translateY(-3px)';
+      });
+    });
+    grid.addEventListener('mouseleave', () => {
+      const cards = grid.querySelectorAll('.ach-card');
+      for (const c of cards) {
+        c.style.transform = '';
+      }
     });
   }
 
@@ -622,6 +906,10 @@ function setupGlobalHandlers() {
 
   renderAll(data);
 
+  // Ambient background effects
+  initAmbientParticles();
+  updateAmbientIntensity(data);
+
   // Gacha reveal for recently unlocked (within 5 min)
   const now = Date.now();
   const recentAchs = [];
@@ -662,7 +950,7 @@ function startAutoPoll() {
 
       if (hasNewUnlocks || statsChanged) {
         dashboardData = newData;
-
+        updateAmbientIntensity(newData);
         // Gacha reveal for new unlocks
         const freshAchs = [];
         for (const id of freshIds) {
@@ -671,6 +959,7 @@ function startAutoPoll() {
         }
 
         if (freshAchs.length > 0) {
+          triggerHeroBurst();
           window.gachaQueue.enqueue(freshAchs, {
             onDrain: function() {
               if (!isModalOpen) renderAll(newData);
@@ -686,6 +975,15 @@ function startAutoPoll() {
 }
 
 // ── Helpers ──────────────────────────────────────────
+
+function triggerHeroBurst() {
+  const hero = document.querySelector('.hero-section');
+  if (!hero) return;
+  const burst = document.createElement('div');
+  burst.className = 'hero-burst';
+  hero.appendChild(burst);
+  burst.addEventListener('animationend', () => burst.remove());
+}
 
 const RARITY_COLORS = {
   common: '#969696', uncommon: '#64C864', rare: '#4285F4',
@@ -826,6 +1124,8 @@ function renderTrackedTools(data) {
   };
 
   bar.style.display = '';
+  bar.style.cursor = 'pointer';
+  bar.onclick = () => showHintToast(t('tools_hint'));
   bar.innerHTML = allTracked.map(id => {
     const meta = TOOL_META[id];
     const name = toolNames[id] || id;
@@ -843,14 +1143,25 @@ function renderTrackedTools(data) {
 function toggleProfileDropdown() {
   const dropdown = document.getElementById('profile-dropdown');
   if (!dropdown) return;
-  const visible = dropdown.style.display !== 'none';
-  dropdown.style.display = visible ? 'none' : 'block';
+  dropdown.classList.toggle('open');
 }
 
-async function switchProfile(profileName) {
-  // Close dropdown immediately for responsive UX
+function closeProfileDropdown() {
   const dropdown = document.getElementById('profile-dropdown');
-  if (dropdown) dropdown.style.display = 'none';
+  if (dropdown) dropdown.classList.remove('open');
+}
+
+// Close profile dropdown on outside click
+document.addEventListener('click', (e) => {
+  const selector = document.getElementById('profile-selector') || document.querySelector('.profile-selector');
+  const dropdown = document.getElementById('profile-dropdown');
+  if (selector && dropdown && !selector.contains(e.target) && dropdown.classList.contains('open')) {
+    closeProfileDropdown();
+  }
+});
+
+async function switchProfile(profileName) {
+  closeProfileDropdown();
 
   // _demo is a read-only system profile — don't persist as active
   if (profileName !== '_demo') {
@@ -945,15 +1256,6 @@ async function confirmCreateProfile() {
 function handleProfileInputKey(event) {
   if (event.key === 'Enter') openProfileModal();
 }
-
-// Close profile dropdown on outside click
-document.addEventListener('click', (e) => {
-  const selector = document.querySelector('.profile-selector');
-  const dropdown = document.getElementById('profile-dropdown');
-  if (selector && dropdown && !selector.contains(e.target) && dropdown.style.display !== 'none') {
-    dropdown.style.display = 'none';
-  }
-});
 
 // ── Showcase management ──────────────────────────────
 
@@ -1364,13 +1666,7 @@ function renderAchievements(data) {
       });
     }
 
-    const sortSelect = document.getElementById('sort-select');
-    if (sortSelect) {
-      sortSelect.addEventListener('change', () => {
-        currentSort = sortSelect.value;
-        renderGrid(data);
-      });
-    }
+    initSortPicker(data);
 
     controlsSetup = true;
   }
@@ -1380,15 +1676,7 @@ function renderAchievements(data) {
   if (searchInput) searchInput.placeholder = t('search_placeholder');
 
   // ── Populate sort options (i18n) ──
-  const sortSelect = document.getElementById('sort-select');
-  if (sortSelect) {
-    sortSelect.innerHTML = `
-      <option value="default" ${currentSort === 'default' ? 'selected' : ''}>${t('sort_default')}</option>
-      <option value="rarity" ${currentSort === 'rarity' ? 'selected' : ''}>${t('sort_rarity')}</option>
-      <option value="recent" ${currentSort === 'recent' ? 'selected' : ''}>${t('sort_recent')}</option>
-      <option value="name" ${currentSort === 'name' ? 'selected' : ''}>${t('sort_name')}</option>
-    `;
-  }
+  populateSortPicker();
 
   // ── Category nav ──
   const catNav = document.getElementById('category-nav');
@@ -1534,8 +1822,10 @@ function renderGrid(data) {
     const demoClass = (dashboardData?.is_demo && !locked) ? ' demo-unlocked' : '';
 
     const cardColor = locked ? '' : `--card-color:var(--rarity-${a.rarity});`;
+    const cornerOrnament = !locked && (a.rarity === 'mythic') ? '<span class="ach-corner-mythic">✦</span>' : '';
     return `<div class="ach-card${lockedClass}${pickableClass}${demoClass}" data-rarity="${a.rarity}" data-id="${escAttr(a.id)}" style="${cardColor}--delay:${idx * 30}ms">
       <div class="ach-stripe"></div>
+      ${cornerOrnament}
       ${pinBtn}
       <div class="ach-icon-wrap">${iconHtml(showIcon, { pixelArt: showPixelArt })}</div>
       <div class="ach-name">${escHtml(nameDisplay)}</div>
@@ -2194,6 +2484,24 @@ function showToast(icon, name, rarity) {
     toast.classList.add('out');
     setTimeout(() => toast.remove(), 300);
   }, 3000);
+}
+
+function showHintToast(message) {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+
+  // Dedupe: don't stack identical hints
+  if (container.querySelector('.hint-toast')) return;
+
+  const toast = document.createElement('div');
+  toast.className = 'toast hint-toast';
+  toast.innerHTML = `<span class="toast-text">${escHtml(message)}</span>`;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add('out');
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
 }
 
 // ── Counter animation ──────────────────────────────

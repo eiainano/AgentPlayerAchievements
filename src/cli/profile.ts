@@ -23,7 +23,7 @@ function printHelp() {
   console.log('  npx tsx src/cli/profile.ts create [name]  Create a new profile (default: profile0)');
   console.log('  npx tsx src/cli/profile.ts list            List all profiles');
   console.log('  npx tsx src/cli/profile.ts switch <name>   Switch active profile');
-  console.log('  npx tsx src/cli/profile.ts tools [name]    Manage tracked tools for a profile');
+  console.log('  npx tsx src/cli/profile.ts softwares [name]    Manage tracked software for a profile');
   console.log('');
   console.log(`Max ${MAX_PROFILES} named profiles + 1 default = ${MAX_PROFILES + 1} total.`);
 }
@@ -190,7 +190,7 @@ switch (command) {
     break;
   }
 
-  case 'tools': {
+  case 'softwares': {
     const profileName = args[1]?.trim() || DEFAULT_PROFILE;
     if (profileName !== DEFAULT_PROFILE && !profileExists(profileName)) {
       console.error(`Profile "${profileName}" does not exist. Use "agpa profile create ${profileName}" first.`);

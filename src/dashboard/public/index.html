@@ -17,7 +17,7 @@
   <script src="/lib/html2canvas.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Space+Mono:wght@400;700&family=Lexend:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
   <!-- Navigation -->
@@ -56,10 +56,25 @@
         <a href="#insights" class="nav-link" data-section="insights" data-i18n="nav_insights">Insights</a>
       </div>
       <div class="nav-controls">
-        <select class="lang-select" id="lang-select" title="Language">
-          <option value="en">EN</option>
-          <option value="zh">中文</option>
-        </select>
+        <div class="lang-picker" id="lang-picker">
+          <button class="lang-trigger" id="lang-trigger" aria-haspopup="listbox" aria-expanded="false">
+            <span class="lang-globe">🌐</span>
+            <span class="lang-code">EN</span>
+            <svg class="lang-chevron" width="10" height="6" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z"/></svg>
+          </button>
+          <div class="lang-dropdown" id="lang-dropdown" role="listbox">
+            <div class="lang-option active" role="option" data-value="en" tabindex="0">
+              <span class="lang-flag">🇺🇸</span>
+              <span class="lang-label">English</span>
+              <span class="lang-short">EN</span>
+            </div>
+            <div class="lang-option" role="option" data-value="zh" tabindex="0">
+              <span class="lang-flag">🇨🇳</span>
+              <span class="lang-label">中文</span>
+              <span class="lang-short">中文</span>
+            </div>
+          </div>
+        </div>
         <label class="switch" title="Sound effects">
           <span class="switch-label">🔇</span>
           <input type="checkbox" id="sound-toggle" checked>
@@ -214,7 +229,15 @@
         <input type="text" id="search-input" class="search-input" data-i18n-placeholder="search_placeholder" placeholder="Search...">
         <button class="search-clear" id="search-clear" style="display:none" aria-label="Clear">✕</button>
       </div>
-      <select id="sort-select" class="sort-select"></select>
+      <select id="sort-select" class="sort-select" style="display:none"></select>
+      <div class="sort-picker" id="sort-picker">
+        <button class="sort-trigger" id="sort-trigger" aria-haspopup="listbox" aria-expanded="false">
+          <span class="sort-icon">↕</span>
+          <span class="sort-label" id="sort-label">Default</span>
+          <svg class="sort-chevron" width="10" height="6" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z"/></svg>
+        </button>
+        <div class="sort-dropdown" id="sort-dropdown" role="listbox"></div>
+      </div>
     </div>
     <div class="category-nav" id="category-nav"></div>
     <div class="rarity-nav" id="rarity-nav"></div>

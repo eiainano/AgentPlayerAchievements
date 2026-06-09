@@ -1,5 +1,19 @@
 # Changelog
 
+### Dashboard 交互控件全面美化 + profile tools → softwares — 2026-06-09
+
+- **`agpa profile tools` → `agpa profile softwares`**：CLI 命令、shell 补全、文档同步重命名
+- **Tracked-tools bar 点击提示**：Dashboard 软件图标点击 → i18n toast "使用 agpa profile softwares 更改追踪工具"
+- **语言选择器美化**：原生 `<select>` → 自定义 dropdown（🌐 地球图标 + chevron 翻转动画 + 玻璃感面板 + 国旗 emoji）
+- **排序选择器美化**：原生 `<select>` → 自定义 dropdown（↕ 图标 + emoji 选项图标 + 同款动画模式）
+- **三档开关重设计**：轨道 40px 加宽、凹槽内阴影、选中态金橙渐变 + 外发光、18px 旋钮弹性过渡、hover 金色边框
+- **Profile 下拉动画化**：`display:none` → `opacity/visibility/transform` + `backdrop-filter` 玻璃感 + `scale(0.96)` 弹出
+- **搜索框增强**：focus 金色发光（`0 0 16px`）、图标弹跳缩放、placeholder 提亮
+- **Filter tabs**：凹槽容器 + 内阴影、active tab 金色渐变底部指示线
+- **Category pills**：active 加强金色 glow + 外圈光晕 + hover scale(1.02)
+- **Rarity pills**：active 各稀有度对应颜色 glow（6 种）
+- **Share/Export 按钮**：hover emoji 弹跳 keyframe 动画 + 按压 inset shadow
+
 ## [0.1.8] — 2026-06-09
 
 ### Legendary/Mythic 卡片动画 + 称号 & 徽章系统 — 2026-06-09

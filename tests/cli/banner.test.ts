@@ -2,132 +2,122 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderBanner, getVersion } from '../../src/cli/index.js';
 
 vi.mock('figlet', () => ({
-  default: {
-    textSync: vi.fn(),
-  },
+  default: { textSync: vi.fn() },
 }));
 
 import figlet from 'figlet';
 const mockTextSync = vi.mocked(figlet.textSync);
 
-const ANSI_SHADOW_ART = ` █████╗  ██████╗ ██████╗  █████╗ \n██╔══██╗██╔════╝ ██╔══██╗██╔══██╗\n███████║██║  ███╗██████╔╝███████║\n██╔══██║██║   ██║██╔═══╝ ██╔══██║\n██║  ██║╚██████╔╝██║     ██║  ██║\n╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚═╝  ╚═╝\n                                 `;
+const SLANT_ART = `    ___   __________  ___ \n   /   | / ____/ __ \\/   |\n  / /| |/ / __/ /_/ / /| |\n / ___ / /_/ / ____/ ___ |\n/_/  |_\\____/_/   /_/  |_|\n                           `;
 
-const SMALL_ART = `    _   ___ ___  _   \n   /_\\ / __| _ \\/_\\  \n  / _ \\ (_ |  _/ _ \\ \n /_/ \\_\\___|_|/_/ \\_\\`;
+const ITALIC_ART = `  _   __  __  _  \n /_| / _ /__)/_| \n(  |(__)/   (  | `;
 
 describe('renderBanner', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  // ── Text fallback (< 60 cols) ───────────────────────────────────
+  // ── Text fallback ───────────────────────────────────────────────
 
-  it('returns text-only fallback when width < 60 (no figlet call)', () => {
+  it('returns text fallback when width < 60', () => {
     const result = renderBanner(50, '0.1.0');
-    expect(result).toContain('🏆');
-    expect(result).toContain('AGPA');
+    expect(result).toContain('▸ AGPA');
     expect(result).toContain('v0.1.0');
-    expect(result).not.toContain('╔');
-    expect(result).not.toContain('╚');
+    expect(result).toContain('\x1b[38;2;0;255;255m'); // cyan
     expect(mockTextSync).not.toHaveBeenCalled();
   });
 
-  // ── Figlet font selection ───────────────────────────────────────
+  // ── Font selection ──────────────────────────────────────────────
 
-  it('uses ANSI Shadow font for width >= 80', () => {
-    mockTextSync.mockReturnValue(ANSI_SHADOW_ART);
-    renderBanner(80, '0.1.0');
-    expect(mockTextSync).toHaveBeenCalledWith('AGPA', expect.objectContaining({ font: 'ANSI Shadow' }));
+  it('uses Slant font for width >= 85', () => {
+    mockTextSync.mockReturnValue(SLANT_ART);
+    renderBanner(85, '0.1.0');
+    expect(mockTextSync).toHaveBeenCalledWith('AGPA', expect.objectContaining({ font: 'Slant' }));
   });
 
-  it('uses Small font for width 60-79', () => {
-    mockTextSync.mockReturnValue(SMALL_ART);
+  it('uses Italic font for width 60-84', () => {
+    mockTextSync.mockReturnValue(ITALIC_ART);
     renderBanner(70, '0.1.0');
-    expect(mockTextSync).toHaveBeenCalledWith('AGPA', expect.objectContaining({ font: 'Small' }));
+    expect(mockTextSync).toHaveBeenCalledWith('AGPA', expect.objectContaining({ font: 'Italic' }));
   });
 
-  // ── Double-line box-drawing panel ───────────────────────────────
+  // ── Neon gradient ───────────────────────────────────────────────
 
-  it('draws double-line Unicode box around art', () => {
-    mockTextSync.mockReturnValue(ANSI_SHADOW_ART);
+  it('applies cyan→magenta gradient to art rows', () => {
+    mockTextSync.mockReturnValue(SLANT_ART);
     const result = renderBanner(100, '0.1.0');
-    expect(result).toContain('╔');
-    expect(result).toContain('╗');
-    expect(result).toContain('╚');
-    expect(result).toContain('╝');
-    expect(result).toContain('║');
-    expect(result).toContain('═');
+    expect(result).toContain('\x1b[38;2;0;255;255m');   // cyan
+    expect(result).toContain('\x1b[38;2;255;0;170m');    // hot magenta
   });
 
-  it('includes "AGPA · Agent Player Achievements" in top bar', () => {
-    mockTextSync.mockReturnValue(ANSI_SHADOW_ART);
+  // ── Accent bars ─────────────────────────────────────────────────
+
+  it('draws cyan accent bar on top, magenta on bottom', () => {
+    mockTextSync.mockReturnValue(SLANT_ART);
     const result = renderBanner(100, '0.1.0');
-    expect(result).toContain('AGPA · Agent Player Achievements');
+    // First colored bar is cyan
+    const bars = result.match(/━{10,}/g);
+    expect(bars).not.toBeNull();
+    expect(bars!.length).toBeGreaterThanOrEqual(2);
+    // Cyan bar appears before magenta
+    const cyanIdx = result.indexOf('\x1b[38;2;0;255;255m━');
+    const magIdx = result.indexOf('\x1b[38;2;255;0;170m━');
+    expect(cyanIdx).toBeLessThan(magIdx);
   });
 
-  // ── Gold gradient ───────────────────────────────────────────────
+  // ── Content ─────────────────────────────────────────────────────
 
-  it('applies gold gradient ANSI codes to art rows', () => {
-    mockTextSync.mockReturnValue(ANSI_SHADOW_ART);
-    const result = renderBanner(100, '0.1.0');
-    expect(result).toContain('\x1b[38;2;255;215;0m'); // bright gold
-    expect(result).toContain('\x1b[38;2;184;134;11m'); // dark gold
-  });
-
-  // ── Version ─────────────────────────────────────────────────────
-
-  it('includes version in star line (standard mode)', () => {
-    mockTextSync.mockReturnValue(ANSI_SHADOW_ART);
+  it('includes version', () => {
+    mockTextSync.mockReturnValue(SLANT_ART);
     const result = renderBanner(100, '9.9.9');
     expect(result).toContain('v9.9.9');
   });
 
-  // ── GitHub link ─────────────────────────────────────────────────
-
-  it('includes GitHub link in standard mode (>= 80)', () => {
-    mockTextSync.mockReturnValue(ANSI_SHADOW_ART);
+  it('includes GitHub link in standard mode', () => {
+    mockTextSync.mockReturnValue(SLANT_ART);
     const result = renderBanner(100, '0.1.0');
     expect(result).toContain('github.com/eiainano/AgentPlayerAchievements');
   });
 
-  it('omits GitHub link in compact mode (< 80)', () => {
-    mockTextSync.mockReturnValue(SMALL_ART);
+  it('omits GitHub link in compact mode', () => {
+    mockTextSync.mockReturnValue(ITALIC_ART);
     const result = renderBanner(70, '0.1.0');
     expect(result).not.toContain('github.com');
   });
 
-  // ── Figlet failure fallback ─────────────────────────────────────
+  // ── Fallback ────────────────────────────────────────────────────
 
   it('returns text fallback when figlet throws', () => {
     mockTextSync.mockImplementation(() => { throw new Error('font not found'); });
     const result = renderBanner(100, '0.1.0');
-    expect(result).toContain('🏆');
-    expect(result).not.toContain('╔');
+    expect(result).toContain('▸ AGPA');
+    expect(result).not.toContain('━');
   });
 
-  // ── Boundary values ─────────────────────────────────────────────
+  // ── Boundaries ──────────────────────────────────────────────────
 
-  it('uses ANSI Shadow at exactly 80', () => {
-    mockTextSync.mockReturnValue(ANSI_SHADOW_ART);
-    renderBanner(80, '0.1.0');
-    expect(mockTextSync).toHaveBeenCalledWith('AGPA', expect.objectContaining({ font: 'ANSI Shadow' }));
+  it('uses Slant at exactly 85', () => {
+    mockTextSync.mockReturnValue(SLANT_ART);
+    renderBanner(85, '0.1.0');
+    expect(mockTextSync).toHaveBeenCalledWith('AGPA', expect.objectContaining({ font: 'Slant' }));
   });
 
-  it('uses Small at exactly 79', () => {
-    mockTextSync.mockReturnValue(SMALL_ART);
-    renderBanner(79, '0.1.0');
-    expect(mockTextSync).toHaveBeenCalledWith('AGPA', expect.objectContaining({ font: 'Small' }));
+  it('uses Italic at exactly 84', () => {
+    mockTextSync.mockReturnValue(ITALIC_ART);
+    renderBanner(84, '0.1.0');
+    expect(mockTextSync).toHaveBeenCalledWith('AGPA', expect.objectContaining({ font: 'Italic' }));
   });
 
-  it('uses Small at exactly 60', () => {
-    mockTextSync.mockReturnValue(SMALL_ART);
+  it('uses Italic at exactly 60', () => {
+    mockTextSync.mockReturnValue(ITALIC_ART);
     renderBanner(60, '0.1.0');
-    expect(mockTextSync).toHaveBeenCalledWith('AGPA', expect.objectContaining({ font: 'Small' }));
+    expect(mockTextSync).toHaveBeenCalledWith('AGPA', expect.objectContaining({ font: 'Italic' }));
   });
 
   it('uses text fallback at exactly 59', () => {
     const result = renderBanner(59, '0.1.0');
-    expect(result).toContain('🏆');
-    expect(result).not.toContain('╔');
+    expect(result).toContain('▸ AGPA');
+    expect(result).not.toContain('━');
     expect(mockTextSync).not.toHaveBeenCalled();
   });
 });

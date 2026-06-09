@@ -120,18 +120,18 @@ function printVersion(): void {
   }
 }
 
-// ── Banner (figlet Slant font + Unicode panel + gold gradient) ────────────
+// ── Banner (figlet Slant font + cyberpunk neon gradient) ──────────────
 
-const GOLD_COLORS = [
-  '\x1b[38;2;255;215;0m', // #FFD700 bright gold
-  '\x1b[38;2;238;180;0m', // #EEB400
-  '\x1b[38;2;218;165;0m', // #DAA500
-  '\x1b[38;2;198;150;0m', // #C69600
-  '\x1b[38;2;184;134;11m', // #B8860B dark gold
+const NEON_GRADIENT = [
+  '\x1b[38;2;0;255;255m',   // #00FFFF cyan
+  '\x1b[38;2;0;220;255m',   // #00DCFF
+  '\x1b[38;2;77;180;255m',  // #4DB4FF
+  '\x1b[38;2;150;80;255m',  // #9650FF
+  '\x1b[38;2;220;50;220m',  // #DC32DC magenta
+  '\x1b[38;2;255;0;170m',   // #FF00AA hot pink
 ] as const;
 
 function visualWidth(s: string): number {
-  // Strip ANSI escape sequences to measure visible character count
   return s.replace(/\x1b\[[0-9;]*m/g, '').length;
 }
 
@@ -146,7 +146,6 @@ function getVersion(): string {
 }
 
 function termWidth(): number {
-  // Prefer TTY columns, fall back to COLUMNS env, then 80
   if (process.stdout.columns) return process.stdout.columns;
   const envCols = parseInt(process.env.COLUMNS || '', 10);
   if (envCols > 0) return envCols;
@@ -155,91 +154,75 @@ function termWidth(): number {
 
 function renderBanner(width: number, version: string): string {
   const DIM = '\x1b[2m';
-  const BLD = '\x1b[1m';
   const RST = '\x1b[0m';
+  const CY = '\x1b[38;2;0;255;255m';  // electric cyan
+  const MG = '\x1b[38;2;255;0;170m';   // hot magenta
 
   if (width < 60) {
-    return `\n\x1b[38;2;255;215;0m\x1b[1m🏆 AGPA — Agent Player Achievements\x1b[0m  ${DIM}v${version}${RST}\n`;
+    return `\n${CY}▸ AGPA — Agent Player Achievements${RST}  ${DIM}v${version}${RST}\n`;
   }
 
-  const isCompact = width < 80;
+  const isCompact = width < 85;
 
-  // ── Art (figlet) ─────────────────────────────────────────────────
+  // ── Figlet art ───────────────────────────────────────────────────
   let artRaw: string;
   try {
     artRaw = figlet.textSync('AGPA', {
-      font: isCompact ? 'Small' : 'ANSI Shadow',
+      font: isCompact ? 'Italic' : 'Slant',
       horizontalLayout: 'default',
     });
   } catch {
-    return `\n\x1b[38;2;255;215;0m\x1b[1m🏆 AGPA — Agent Player Achievements\x1b[0m  ${DIM}v${version}${RST}\n`;
+    return `\n${CY}▸ AGPA — Agent Player Achievements${RST}  ${DIM}v${version}${RST}\n`;
   }
 
   const artLines = artRaw.split('\n').filter(l => l.trim().length > 0);
 
-  // ── Apply gold gradient to art rows ──────────────────────────────
+  // ── Neon gradient on art ─────────────────────────────────────────
   const coloredArt = artLines.map((line, i) => {
-    const colorIdx = Math.min(i, GOLD_COLORS.length - 1);
-    return `${GOLD_COLORS[colorIdx]}${line}${RST}`;
+    const colorIdx = Math.min(i, NEON_GRADIENT.length - 1);
+    return `${NEON_GRADIENT[colorIdx]}${line}${RST}`;
   });
 
-  // ── Subtitle ─────────────────────────────────────────────────────
-  const subLine = isCompact
-    ? `${DIM}🎮 AI coding achievements  v${version}${RST}`
-    : `${DIM}gamified achievement tracking for AI coding tools${RST}`;
+  // ── Subtitle lines ───────────────────────────────────────────────
+  const desc = !isCompact
+    ? `${DIM}gamified achievement tracking for AI coding tools  ·  ${CY}v${version}${RST}`
+    : `${DIM}v${version}${RST}`;
+  const repo = !isCompact
+    ? `${DIM}github.com/eiainano/AgentPlayerAchievements${RST}`
+    : '';
 
-  const starLine = isCompact
-    ? ''
-    : `${DIM}⭐  github.com/eiainano/AgentPlayerAchievements  ·  v${version}  ⭐${RST}`;
+  // ── Accent bars ──────────────────────────────────────────────────
+  const artW = Math.max(...coloredArt.map(l => visualWidth(l)));
+  const textW = Math.max(visualWidth(desc), repo ? visualWidth(repo) : 0);
+  const contentW = Math.max(artW, textW);
+  const barW = Math.min(contentW + 6, width - 6);
 
-  // ── Build content ────────────────────────────────────────────────
-  const content: string[] = [];
-  content.push(''); // top padding
-  for (const line of coloredArt) {
-    content.push(line);
-  }
-  content.push('');
-  content.push(subLine);
-  if (starLine) {
-    content.push('');
-    content.push(starLine);
-  }
-  content.push(''); // bottom padding
-
-  // ── Box size, target ~75% of terminal width in standard mode ─────
-  const contentMaxW = Math.max(...content.map(l => visualWidth(l)));
-  const title = 'AGPA · Agent Player Achievements';
-  const minInnerW = visualWidth(title) + 8;
-
-  // Standard mode: box targets 80% terminal width, with generous padding
-  const targetW = isCompact ? contentMaxW + 8 : Math.max(contentMaxW + 16, Math.floor(width * 0.82));
-  const rawInnerW = Math.max(minInnerW, targetW);
-  const maxInnerW = width - 2;
-  const innerW = Math.min(rawInnerW, maxInnerW);
-
-  // ── Draw double-line panel ╔═╗║╚═╝ ────────────────────────────────
+  // ── Assemble ─────────────────────────────────────────────────────
   const lines: string[] = [];
+  lines.push('');
 
-  // Top bar with title
-  const titleMin = `╔═ ${title} `;
-  const topRemaining = innerW - visualWidth(titleMin) - 1; // -1 for ╗
-  lines.push(`${titleMin}${'═'.repeat(Math.max(0, topRemaining))}╗`);
+  // Top: cyan accent bar
+  lines.push(`  ${CY}${'━'.repeat(barW)}${RST}`);
+  lines.push('');
 
-  // Available width inside borders
-  const availW = innerW - 3; // 3 = ║ + space on both sides
-
-  for (const cl of content) {
-    const vw = visualWidth(cl);
-    const leftPad = vw === 0 ? 0 : Math.max(0, Math.floor((availW - vw) / 2));
-    const rightPad = Math.max(0, availW - vw - leftPad);
-    lines.push(`║ ${' '.repeat(leftPad)}${cl}${' '.repeat(rightPad)}║`);
+  // Art
+  for (const al of coloredArt) {
+    lines.push(`  ${al}`);
   }
 
-  // Bottom bar
-  lines.push(`╚${'═'.repeat(innerW - 2)}╝`);
+  // Spacer + subtitle
+  lines.push('');
+  lines.push(`   ${desc}`);
+  if (repo) lines.push(`   ${repo}`);
 
-  // ── Center in terminal ──────────────────────────────────────────
-  const leftPad = Math.max(0, Math.floor((width - innerW) / 2));
+  // Bottom: magenta accent bar
+  lines.push('');
+  lines.push(`  ${MG}${'━'.repeat(barW)}${RST}`);
+  lines.push('');
+
+  // ── Center block in terminal ─────────────────────────────────────
+  const maxW = Math.max(...lines.map(l => visualWidth(l)));
+  const leftPad = Math.max(0, Math.floor((width - maxW) / 2));
   const centered = lines.map(l => ' '.repeat(leftPad) + l);
 
   return '\n' + centered.join('\n') + '\n';

@@ -8,7 +8,8 @@ vi.mock('figlet', () => ({
 import figlet from 'figlet';
 const mockTextSync = vi.mocked(figlet.textSync);
 
-const SLANT_ART = `    ___   __________  ___ \n   /   | / ____/ __ \\/   |\n  / /| |/ / __/ /_/ / /| |\n / ___ / /_/ / ____/ ___ |\n/_/  |_\\____/_/   /_/  |_|\n                           `;
+// Test art fixtures (text content doesn't matter — we mock figlet.textSync)
+const LARRY_3D_ART = ` ______  ____    ____    ______     \n/\\  _  \\/\\  _\`\\ /\\  _\`\\ /\\  _  \\    \n\\ \\ \\L\\ \\ \\ \\L\\_\\ \\ \\L\\ \\ \\ \\L\\ \\   \n \\ \\  __ \\ \\ \\L_L\\ \\ ,__/\\ \\  __ \\  \n  \\ \\ \\/\\ \\ \\ \\/, \\ \\ \\/  \\ \\ \\/\\ \\ \n   \\ \\_\\ \\_\\ \\____/\\ \\_\\   \\ \\_\\ \\_\\\n    \\/_/\\/_/\\/___/  \\/_/    \\/_/\\/_/`;
 
 const SMALL_ART = `    _   ___ ___  _   \n   /_\\ / __| _ \\/_\\  \n  / _ \\ (_ |  _/ _ \\ \n /_/ \\_\\___|_|/_/ \\_\\`;
 
@@ -26,10 +27,10 @@ describe('renderBanner', () => {
 
   // ── Font selection ──────────────────────────────────────────────
 
-  it('uses Slant font for width >= 80', () => {
-    mockTextSync.mockReturnValue(SLANT_ART);
+  it('uses Larry 3D font for width >= 80', () => {
+    mockTextSync.mockReturnValue(LARRY_3D_ART);
     renderBanner(80, '0.1.0');
-    expect(mockTextSync).toHaveBeenCalledWith('AGPA', expect.objectContaining({ font: 'Slant' }));
+    expect(mockTextSync).toHaveBeenCalledWith('AGPA', expect.objectContaining({ font: 'Larry 3D' }));
   });
 
   it('uses Small font for width 60-79', () => {
@@ -41,7 +42,7 @@ describe('renderBanner', () => {
   // ── Neon gradient ───────────────────────────────────────────────
 
   it('applies cyan→magenta gradient to art rows', () => {
-    mockTextSync.mockReturnValue(SLANT_ART);
+    mockTextSync.mockReturnValue(LARRY_3D_ART);
     const result = renderBanner(100, '0.1.0');
     expect(result).toContain('\x1b[38;2;0;255;255m');   // cyan
     expect(result).toContain('\x1b[38;2;220;50;220m');  // purple
@@ -50,7 +51,7 @@ describe('renderBanner', () => {
   // ── No decorations ──────────────────────────────────────────────
 
   it('has no box-drawing characters (borderless)', () => {
-    mockTextSync.mockReturnValue(SLANT_ART);
+    mockTextSync.mockReturnValue(LARRY_3D_ART);
     const result = renderBanner(100, '0.1.0');
     expect(result).not.toContain('┌'); expect(result).not.toContain('┐');
     expect(result).not.toContain('╔'); expect(result).not.toContain('╗');
@@ -60,12 +61,12 @@ describe('renderBanner', () => {
   // ── Content ─────────────────────────────────────────────────────
 
   it('includes version in subtitle', () => {
-    mockTextSync.mockReturnValue(SLANT_ART);
+    mockTextSync.mockReturnValue(LARRY_3D_ART);
     expect(renderBanner(100, '9.9.9')).toContain('v9.9.9');
   });
 
   it('includes GitHub link in standard mode', () => {
-    mockTextSync.mockReturnValue(SLANT_ART);
+    mockTextSync.mockReturnValue(LARRY_3D_ART);
     expect(renderBanner(100, '0.1.0')).toContain('github.com/eiainano/AgentPlayerAchievements');
   });
 
@@ -85,10 +86,10 @@ describe('renderBanner', () => {
 
   // ── Boundaries ──────────────────────────────────────────────────
 
-  it('uses Slant at exactly 80', () => {
-    mockTextSync.mockReturnValue(SLANT_ART);
+  it('uses Larry 3D at exactly 80', () => {
+    mockTextSync.mockReturnValue(LARRY_3D_ART);
     renderBanner(80, '0.1.0');
-    expect(mockTextSync).toHaveBeenCalledWith('AGPA', expect.objectContaining({ font: 'Slant' }));
+    expect(mockTextSync).toHaveBeenCalledWith('AGPA', expect.objectContaining({ font: 'Larry 3D' }));
   });
 
   it('uses Small at exactly 79', () => {

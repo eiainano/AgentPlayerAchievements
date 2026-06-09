@@ -166,7 +166,7 @@ function renderBanner(width: number, version: string): string {
   let artRaw: string;
   try {
     artRaw = figlet.textSync('AGPA', {
-      font: isCompact ? 'Small' : 'Slant',
+      font: isCompact ? 'Small' : 'Larry 3D',
       horizontalLayout: 'default',
     });
   } catch {

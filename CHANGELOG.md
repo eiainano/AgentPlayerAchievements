@@ -1,14 +1,14 @@
 # Changelog
 
-### 终端 ASCII Banner — figlet Slant 字体 + Unicode 面板 — 2026-06-09
+### 终端 ASCII Banner — figlet ANSI Shadow 游戏标题大字 — 2026-06-09
 
-- **figlet Slant 字体**：引入 `figlet` 运行时依赖（MIT, 8.5k+ stars），与 TradingAgents 同款 Slant 字体渲染 "AGPA" 大字，金色渐变（亮金 `#FFD700` → 暗金 `#B8860B`）
-- **Unicode box-drawing 面板**：`┌─ 🏆 Agent Player Achievements ─┐` 标题栏 + 居中内容区 + `└┘` 底边，全终端居中显示
-- **3 级宽度自适应**：Slant ≥80 列（5 行全宽艺术字 + GitHub 链接）、Small 60–79 列（4 行紧凑字体）、纯文本 <60 列
-- **`termWidth()` helper**：读 `COLUMNS` 环境变量 + `process.stdout.columns`，pipe 时不自作聪明
-- **集成点**：TUI 模式（`agpa` 无参数）+ `--help` 顶部
-- **依赖**：`figlet` (+1 npm dep, 18MB 含全部字体，运行时 lazy load 单个 ~5KB 字体)
-- **测试**：16 个新测试覆盖 Slant/Small 字体选择、box-drawing 绘制、金色渐变、figlet 失败 fallback、宽度边界（80/79/60/59）
+- **ANSI Shadow 字体**：街机/主机游戏标题风格，Unicode half-block 字符（█╔╗╚╝║═），33×6 大字 "AGPA"，金色渐变（亮金 → 暗金 5 级）
+- **双层线面板**：`╔═╗║╚═╝` double-line box-drawing 替代单线，标题栏 `╔═ AGPA · Agent Player Achievements ══╗`，全终端居中
+- **宽度膨胀**：标准模式框体占终端 82% 宽度，比原来大一圈
+- **装饰底栏**：`⭐ github.com/... · v0.1.8 ⭐` 星号装饰版本号行
+- **3 级自适应**：ANSI Shadow ≥80 列（6 行）、Small ≥60 列（4 行 compact）、纯文本 <60 列
+- **依赖**：`figlet`（MIT, 8.5k+ stars），字体 lazy load ~5KB
+- **测试**：16 个新测试覆盖 ANSI Shadow/Small 字体选择、双层线边框、边界值
 
 ### Dashboard 交互控件全面美化 + profile tools → softwares — 2026-06-09
 

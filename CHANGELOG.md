@@ -1,5 +1,15 @@
 # Changelog
 
+### `agpa banner` CLI — 3 主题系统 (Neon/Arcade/Gold) — 2026-06-10
+
+- **`agpa banner [Neon|Arcade|Gold]`**：新 CLI 命令，运行时切换终端 banner 颜色主题，持久化到 config.json
+- **config.ts**：新增 `BannerTheme` 类型、`banner_theme` 配置字段、`AGPA_BANNER_THEME` 环境变量覆盖
+- **validate.ts**：Zod schema 新增 `banner_theme` enum 校验
+- **index.ts**：CLI 命令注册 + 3 主题动态渐变渲染（Neon 青→紫、Arcade PS4 四色、Gold 品牌金色渐变）
+- **completion.ts**：shell 补全添加 banner 子命令
+- **banner.ts (新)**：`agpa banner` 运行时切换实现（展示当前主题 / 切换 / 显示色板）
+- **scripts/**：5 个 banner 设计对比/预览工具
+
 ### 终端 ASCII Banner — figlet ANSI Shadow 游戏标题大字 — 2026-06-09
 
 - **ANSI Shadow 字体**：街机/主机游戏标题风格，Unicode half-block 字符（█╔╗╚╝║═），33×6 大字 "AGPA"，金色渐变（亮金 → 暗金 5 级）

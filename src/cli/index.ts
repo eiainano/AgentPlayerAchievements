@@ -81,8 +81,8 @@ const COMMAND_GROUPS: Array<{ title: string; names: string[] }> = [
 function printHelp(): void {
   const nameWidth = Math.max(...COMMANDS.map(c => c.name.length)) + 2;
 
-  console.log('🏆 AGPA — Agent Player Achievements');
-  console.log('   gamified achievement tracking for AI coding tools\n');
+  console.log(renderBanner(process.stdout.columns || 80, getVersion()));
+
   console.log('Usage: agpa <command> [options]\n');
 
   for (const group of COMMAND_GROUPS) {
@@ -102,14 +102,7 @@ function printHelp(): void {
   console.log('  --version, -v  Print version');
   console.log('  (no args)       Interactive TUI mode\n');
 
-  // Show version if we can read it
-  try {
-    const pkgPath = path.resolve(import.meta.dirname, '../../package.json');
-    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
-    console.log(`Version: ${pkg.version}`);
-  } catch {
-    // package.json not readable — skip version
-  }
+  console.log(`Version: ${getVersion()}`);
 
   console.log('\nGet started:  agpa init');
   console.log('Quick check:  agpa verify (alias for doctor --quick)');
@@ -124,6 +117,59 @@ function printVersion(): void {
   } catch {
     console.log('unknown');
   }
+}
+
+// ── Banner (doom-style block-art "AGPA" with gold gradient) ────────────────
+
+const GOLD_COLORS = [
+  '\x1b[38;2;255;215;0m', // Row 0: bright gold #FFD700
+  '\x1b[38;2;238;180;0m', // Row 1: #EEB400
+  '\x1b[38;2;218;165;0m', // Row 2: #DAA500
+  '\x1b[38;2;198;150;0m', // Row 3: #C69600
+  '\x1b[38;2;184;134;11m', // Row 4: dark gold #B8860B
+] as const;
+
+const GOLD_RESET = '\x1b[0m';
+
+const BANNER_STANDARD = GOLD_COLORS.map((c, i) => {
+  const rows = [
+    '  █████  █████  ██████   █████',
+    '  ██   ██ ██     ██   ██ ██   ██',
+    '  ███████ ██ ███ ██████  ███████',
+    '  ██   ██ ██   ██ ██      ██   ██',
+    '  ██   ██  ████  ██      ██   ██',
+  ];
+  return `${c}${rows[i]}${GOLD_RESET}`;
+}).join('\n');
+
+const BANNER_COMPACT = [
+  `\x1b[38;2;255;215;0m  ▀▀█▀▀  ▀▀█▀▀  ▀▀█▀▀▀  ▀▀█▀▀${GOLD_RESET}`,
+  `\x1b[38;2;218;165;0m  ▀▀▀▀▀  ██ ██  ▀▀▀▀▀  ▀▀▀▀▀${GOLD_RESET}`,
+  `\x1b[38;2;184;134;11m  ██  ██  ▀▀▀▀  ██      ██  ██${GOLD_RESET}`,
+].join('\n');
+
+const BANNER_TEXT = `\x1b[38;2;255;215;0m\x1b[1m🏆 AGPA — Agent Player Achievements\x1b[0m`;
+
+function getVersion(): string {
+  try {
+    const pkgPath = path.resolve(import.meta.dirname, '../../package.json');
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+    return pkg.version;
+  } catch {
+    return '0.1.x';
+  }
+}
+
+function renderBanner(width: number, version: string): string {
+  const subtitle = `\x1b[2m\x1b[3m  Agent Player Achievements  v${version}\x1b[0m`;
+
+  if (width >= 80) {
+    return `\n${BANNER_STANDARD}\n\n${subtitle}\n`;
+  }
+  if (width >= 60) {
+    return `\n${BANNER_COMPACT}\n\n${subtitle}\n`;
+  }
+  return `\n${BANNER_TEXT}  \x1b[2mv${version}\x1b[0m\n`;
 }
 
 // ── Dispatch ─────────────────────────────────────────────────────────────
@@ -208,16 +254,9 @@ async function showTui(): Promise<void> {
   const B = '\x1b[1m';
   const G = '\x1b[32m';
   const C = '\x1b[36m';
-  const Y = '\x1b[38;2;255;200;0m';
   const R = '\x1b[0m';
 
-  // Read version
-  let version = '0.1.x';
-  try {
-    const pkgPath = path.resolve(import.meta.dirname, '../../package.json');
-    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
-    version = pkg.version;
-  } catch { /* ok */ }
+  const version = getVersion();
 
   // Quick stats from default profile (best-effort)
   let statsLine = '';
@@ -230,13 +269,7 @@ async function showTui(): Promise<void> {
   } catch { /* no data yet */ }
 
   console.clear();
-  process.stdout.write(`\n  ${Y}${B}    __ _  __ _ _ __   ___  __ _ _ __   ___    ${R}\n`);
-  process.stdout.write(`  ${Y}${B}   / _\` |/ _\` | '_ \\ / _ \\/ _\` | '_ \\ / __|${R}\n`);
-  process.stdout.write(`  ${Y}${B}  | (_| | (_| | |_) |  __/ (_| | | | | (__ ${R}\n`);
-  process.stdout.write(`  ${Y}${B}   \\__, |\\__, | .__/ \\___|\\__,_|_| |_|\\___|${R}\n`);
-  process.stdout.write(`  ${Y}${B}   __/ | __/ | |                           ${R}\n`);
-  process.stdout.write(`  ${Y}${B}  |___/ |___/|_|                           ${R}\n`);
-  process.stdout.write(`\n  ${D}Achievement tracking for AI coding agents  v${version}${R}\n`);
+  process.stdout.write(renderBanner(process.stdout.columns || 80, version));
   if (statsLine) {
     process.stdout.write(`\n  ${statsLine}\n`);
   }
@@ -353,3 +386,6 @@ main().catch((err: unknown) => {
   console.error(err instanceof Error ? err.message : String(err));
   process.exit(1);
 });
+
+// Exported for testing
+export { renderBanner, getVersion };

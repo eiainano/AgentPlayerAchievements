@@ -3813,3 +3813,197 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
   0%, 100% { box-shadow: 0 0 4px rgba(250,204,21,.4); }
   50%      { box-shadow: 0 0 12px rgba(250,204,21,.7); }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   Responsive Layout
+   Breakpoints: 900 (tablet L), 760 (tablet), 600 (phone L), 440 (phone)
+   Desktop-first: all base styles are desktop; these override DOWN.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Tablet landscape (≤900px) ───────────────────── */
+@media (max-width: 900px) {
+  /* Nav — tighter spacing */
+  .nav-inner { gap: 12px; padding: 0 20px; }
+  .nav-link { padding: 5px 10px; font-size: 12.5px; }
+  .nav-controls { gap: 12px; }
+
+  /* Hero — smaller title, less padding */
+  .hero-section { padding: 20px 20px 28px; }
+  .hero-title { font-size: 23px; }
+
+  /* Stats row — allow wrap + tighter gap */
+  .stats-row { gap: 18px; }
+
+  /* Hero cards — stack vertically */
+  .hero-cards-row { flex-direction: column; }
+  .hero-cards-row .streak-card { max-width: none; min-width: 0; }
+  .hero-cards-row .showcase-card { width: 100%; }
+  .hero-cards-row .heatmap-card { min-width: 0; }
+
+  /* Achievements grid — smaller gap */
+  .achievement-grid { gap: 10px; }
+
+  /* Section controls — allow wrap */
+  .section-controls { gap: 8px; }
+  .search-box { max-width: 280px; }
+
+  /* Timeline — reduce left indent */
+  .timeline { padding-left: 28px; }
+
+  /* Toast — avoid overlap with edge */
+  #toast-container { left: 16px; top: 60px; }
+}
+
+/* ── Tablet portrait (≤760px) ───────────────────── */
+@media (max-width: 760px) {
+  html, body { overflow-x: hidden; }
+
+  /* Nav — compact controls, scrollable links if needed */
+  .nav-inner { gap: 8px; padding: 0 14px; height: 48px; }
+  .nav-links { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-shrink: 1; }
+  .nav-link { font-size: 11.5px; padding: 4px 8px; white-space: nowrap; }
+  .nav-controls { gap: 6px; flex-shrink: 0; }
+  .lang-select { font-size: 11.5px; padding: 4px 10px; }
+  .switch { gap: 2px; }
+  .switch-label { font-size: 10px; }
+  .switch-track { width: 36px; height: 20px; }
+  .switch-knob { width: 16px; height: 16px; }
+
+  /* Hero */
+  .hero-section { padding: 18px 16px 24px; }
+  .hero-title { font-size: 20px; }
+  .hero-inner { gap: 12px; }
+
+  /* Stats — wrap to 3+2 layout */
+  .stats-row { gap: 12px; }
+  .stat-big { min-width: 80px; flex: 1 1 auto; }
+  .stat-big-value { font-size: 28px; }
+  .stat-ring-value { font-size: 28px; }
+  .stat-big-label { font-size: 10.5px; }
+
+  /* Achievement card — tighter padding */
+  .ach-card { padding: 10px 10px 8px; gap: 6px; }
+
+  /* Section */
+  .section { padding: 22px 16px 30px; }
+  .section-header h2 { font-size: 18px; }
+
+  /* Timeline — compact */
+  .timeline { padding-left: 22px; }
+  .tl-ach-card { padding: 6px 10px; gap: 8px; }
+  .tl-ach-card-name { font-size: 12px; }
+  .tl-ach-card-rarity { font-size: 9.5px; }
+  .tl-date-badge { font-size: 10px; }
+
+  /* Modal — near fullscreen */
+  .modal-container { width: calc(100vw - 32px); max-width: none; padding: 20px; }
+  .modal-title { font-size: 18px; }
+
+  /* Section controls — stack search + sort */
+  .section-controls { flex-direction: column; align-items: stretch; }
+  .search-box { max-width: none; }
+
+  /* Toast — compact */
+  .toast { padding: 10px 14px; font-size: 12px; }
+  .toast .toast-icon { font-size: 18px; }
+}
+
+/* ── Large phone (≤600px) ────────────────────────── */
+@media (max-width: 600px) {
+  /* Prevent horizontal scroll */
+  html, body { overflow-x: hidden; }
+
+  /* Nav — compact: scrollable links, reduced controls */
+  .nav-inner { gap: 6px; padding: 0 10px; }
+  .nav-brand-text { display: none; }
+  .nav-links { gap: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; flex-shrink: 1; }
+  .nav-link { font-size: 11px; padding: 4px 6px; white-space: nowrap; }
+  .nav-controls { gap: 4px; flex-shrink: 0; }
+  .switch-label { font-size: 11px; }
+  .lang-select { font-size: 11px; padding: 3px 6px; }
+  .profile-btn { font-size: 11px; padding: 4px 8px; }
+  #profile-name-display { max-width: 60px; overflow: hidden; text-overflow: ellipsis; }
+  #dev-reset-btn { font-size: 12px; padding: 2px 4px; }
+  .switch { gap: 1px; }
+  .switch-track { width: 32px; height: 18px; }
+  .switch-knob { width: 14px; height: 14px; }
+
+  /* Hero */
+  .hero-title { font-size: 18px; }
+  .hero-section { padding: 14px 12px 20px; }
+
+  /* Stats — 2 per row */
+  .stats-row { gap: 10px; }
+  .stat-big { flex: 1 1 40%; min-width: 0; }
+  .stat-big-value { font-size: 24px; }
+  .stat-ring-value { font-size: 24px; }
+
+  /* Hero titles/badges */
+  .hero-title-pill { font-size: 12px; }
+  .hero-badge { font-size: 10px; padding: 3px 10px; }
+
+  /* Showcase slots — smaller */
+  .showcase-grid { gap: 8px; }
+  .showcase-slot { width: 52px; height: 52px; }
+  .showcase-slot-icon { font-size: 22px; }
+
+  /* Heatmap — allow horizontal scroll */
+  .heatmap-card { padding: 12px 14px; }
+  .heatmap-grid-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* Insights — single column + prevent canvas overflow */
+  .insights-grid { grid-template-columns: 1fr; }
+  .insight-card { overflow: hidden; }
+  .insight-card canvas { max-width: 100%; }
+
+  /* Section controls */
+  .filter-btn { font-size: 11px; padding: 5px 10px; }
+  .sort-select { font-size: 11px; }
+
+  /* Timeline — extra compact */
+  .timeline { padding-left: 16px; }
+  .timeline::before { left: 8px; }
+  .timeline-entry { padding: 4px 0 4px 14px; }
+  .timeline-entry::before { left: -17px; top: 14px; width: 10px; height: 10px; }
+  .tl-ach-card { padding: 5px 8px; gap: 6px; flex-wrap: wrap; }
+
+  /* Sets */
+  .set-card { padding: 14px; }
+
+  /* Modal — fullscreen */
+  .modal-container { width: 100vw; height: 100vh; border-radius: 0; padding: 16px; overflow-y: auto; }
+  .modal-icon-wrap { font-size: 40px; }
+
+  /* Onboarding guide */
+  .onboarding-guide-section { padding: 16px 12px; }
+
+  /* Toast */
+  #toast-container { left: 8px; right: 8px; top: 52px; }
+  .toast { padding: 8px 12px; font-size: 11.5px; border-radius: var(--radius-sm); }
+}
+
+/* ── Small phone (≤440px) ────────────────────────── */
+@media (max-width: 440px) {
+  /* Nav — hide non-essential links */
+  .nav-links { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-shrink: 1; }
+  .nav-link { white-space: nowrap; }
+  .nav-controls { gap: 4px; }
+  .switch-label { display: none; }
+  .demo-badge { font-size: 9px; padding: 2px 6px; }
+
+  /* Stats — all full-width stacked */
+  .stat-big { flex: 1 1 100%; }
+
+  /* Tracked tools — scrollable row */
+  .tracked-tools-bar { overflow-x: auto; -webkit-overflow-scrolling: touch; justify-content: flex-start; flex-wrap: nowrap; padding-bottom: 4px; }
+
+  /* Showcase — 3×2 grid */
+  .showcase-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+
+  /* Card tighter */
+  .ach-card { padding: 8px 8px 6px; }
+  .ach-name { font-size: 11.5px; }
+
+  /* Timeline dot edge */
+  .timeline-entry::before { top: 12px; }
+}

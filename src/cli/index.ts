@@ -155,74 +155,53 @@ function termWidth(): number {
 function renderBanner(width: number, version: string): string {
   const DIM = '\x1b[2m';
   const RST = '\x1b[0m';
-  const CY = '\x1b[38;2;0;255;255m';
-  const MG = '\x1b[38;2;255;0;170m';
-  const W = '\x1b[38;2;230;240;255m';   // off-white (neon tube glow)
 
   if (width < 60) {
-    return `\n${CY}▸ AGPA — Agent Player Achievements${RST}  ${DIM}v${version}${RST}\n`;
+    return `\n\x1b[38;2;0;255;255m▸ AGPA — Agent Player Achievements\x1b[0m  ${DIM}v${version}${RST}\n`;
   }
 
-  const isCompact = width < 85;
+  const isCompact = width < 80;
 
-  // ── Figlet art ───────────────────────────────────────────────────
+  // ── Art ──────────────────────────────────────────────────────────
   let artRaw: string;
   try {
     artRaw = figlet.textSync('AGPA', {
-      font: isCompact ? 'Italic' : 'Slant',
+      font: isCompact ? 'Small' : 'Slant',
       horizontalLayout: 'default',
     });
   } catch {
-    return `\n${CY}▸ AGPA — Agent Player Achievements${RST}  ${DIM}v${version}${RST}\n`;
+    return `\n\x1b[38;2;0;255;255m▸ AGPA — Agent Player Achievements\x1b[0m  ${DIM}v${version}${RST}\n`;
   }
 
   const artLines = artRaw.split('\n').filter(l => l.trim().length > 0);
 
-  // ── Neon reflection effect ───────────────────────────────────────
-  // Primary: off-white (neon tube glow)
-  // Reflection below: dim colored copy (light spilling on wet asphalt)
-  const artW = Math.max(...artLines.map(l => l.length));
-  const reflection = artLines.map((line, i) => {
-    const colorIdx = Math.min(i, NEON_GRADIENT.length - 1);
-    return {
-      glow: `${W}${line}${RST}`,
-      refl: `${DIM}${NEON_GRADIENT[colorIdx]}${line}${RST}`,
-    };
+  // ── Cyan → magenta gradient on art ───────────────────────────────
+  const coloredArt = artLines.map((line, i) => {
+    const c = NEON_GRADIENT[Math.min(i, NEON_GRADIENT.length - 1)]!;
+    return `${c}${line}${RST}`;
   });
 
-  // Separator: thin sparkle line matching art width
-  const sepLine = `${DIM}${CY}${'▁'.repeat(artW)}${RST}`;
-
   // ── Subtitle ─────────────────────────────────────────────────────
-  const desc = !isCompact
-    ? `  ${DIM}gamified achievement tracking for AI coding tools${RST}  ${CY}▸ ${DIM}v${version}${RST}`
-    : `  ${DIM}v${version}${RST}`;
-  const repo = !isCompact
-    ? `  ${DIM}github.com/eiainano/AgentPlayerAchievements${RST}`
-    : '';
+  const tagline = isCompact
+    ? `${DIM}v${version}${RST}`
+    : `${DIM}gamified achievement tracking for AI coding tools${RST}`;
+  const link = isCompact
+    ? ''
+    : `${DIM}github.com/eiainano/AgentPlayerAchievements  ·  v${version}${RST}`;
 
   // ── Assemble ─────────────────────────────────────────────────────
   const lines: string[] = [];
   lines.push('');
-
-  // Glow
-  for (const rl of reflection) lines.push(`  ${rl.glow}`);
-
-  // Separator + reflection
-  lines.push(`  ${sepLine}`);
-  for (const rl of reflection) lines.push(`  ${rl.refl}`);
-
-  // Subtitle
+  for (const al of coloredArt) lines.push(al);
   lines.push('');
-  lines.push(desc);
-  if (repo) lines.push(repo);
+  lines.push(tagline);
+  if (link) lines.push(link);
   lines.push('');
 
   // ── Center in terminal ───────────────────────────────────────────
   const maxW = Math.max(...lines.map(l => visualWidth(l)));
   const leftPad = Math.max(0, Math.floor((width - maxW) / 2));
   const centered = lines.map(l => ' '.repeat(leftPad) + l);
-
   return '\n' + centered.join('\n') + '\n';
 }
 

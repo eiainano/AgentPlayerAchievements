@@ -12,6 +12,15 @@
 - **空态引导**：0 称号且 0 徽章时显示斜体提示文案（中英双语），鼓励继续 Vibe Coding
 - **数据管道**：零后端改动 — YAML reward 字段 → `buildSetsResponse()` → `SetItem.reward` 已有，纯前端渲染消费
 
+### Dashboard 响应式布局 — 2026-06-09
+
+- **4 个断点**（desktop-first，仅追加 194 行 CSS）：900px / 760px / 600px / 440px
+- **平板横屏 (≤900px)**：Hero 标题缩小、Hero 卡片竖排堆叠、导航间距压缩、toast 位置调整
+- **平板竖屏 (≤760px)**：导航链接可横向滑动、统计数字缩小、Section controls 竖排、Modal 近全屏、overflow-x 防护
+- **大屏手机 (≤600px)**：品牌文字隐藏、Insights 单列、统计 2×2+1 布局、展示柜格子缩小、Insight canvas max-width 防溢出
+- **小屏手机 (≤440px)**：统计全竖排、开关标签隐藏、时间线最小缩进、tracked tools 横向滚动
+- **桌面端完全不受影响**：所有 `@media` CSS 在 >900px 不激活，现有样式一字未动
+
 ### Dashboard UX 优化 — 语言下拉框、档案切换、分享剪贴板 — 2026-06-09
 
 - **语言选择器**：EN/中 toggle 开关 → 圆角 pill 下拉框，hover 金色边框+辉光，与 profile-btn 风格统一

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   removeMcpFromJson, removeCcHooks, removeHermesHooks, removeInstructionBlock,
+  removeYamlMcpBlock,
 } from '../../src/cli/uninstall.js';
 
 // ── removeMcpFromJson ───────────────────────────────────────────────────────
@@ -161,6 +162,114 @@ describe('removeHermesHooks', () => {
     const input = 'some: config\nother: value\n';
     const result = removeHermesHooks(input);
     expect(result.removed).toBe(false);
+  });
+});
+
+// ── removeYamlMcpBlock ──────────────────────────────────────────────────────
+
+describe('removeYamlMcpBlock', () => {
+  it('removes agent-achievements from YAML mcp_servers', () => {
+    const input = [
+      'some: setting',
+      'mcp_servers:',
+      '  other-server:',
+      '    command: echo',
+      '  agent-achievements:',
+      '    command: "tsx"',
+      '    args: ["/path/to/main.ts"]',
+      '    enabled: true',
+      'other: value',
+    ].join('\n');
+    const result = removeYamlMcpBlock(input);
+    expect(result.removed).toBe(true);
+    expect(result.cleaned).not.toContain('agent-achievements');
+    expect(result.cleaned).toContain('other-server');
+    expect(result.cleaned).toContain('mcp_servers:');
+    expect(result.cleaned).toContain('some: setting');
+    expect(result.cleaned).toContain('other: value');
+  });
+
+  it('cleans up empty mcp_servers after removing last entry', () => {
+    const input = [
+      'some: setting',
+      'mcp_servers:',
+      '  agent-achievements:',
+      '    command: "tsx"',
+      '    enabled: true',
+      'other: value',
+    ].join('\n');
+    const result = removeYamlMcpBlock(input);
+    expect(result.removed).toBe(true);
+    expect(result.cleaned).not.toContain('agent-achievements');
+    expect(result.cleaned).not.toContain('mcp_servers:');
+    expect(result.cleaned).toContain('some: setting');
+    expect(result.cleaned).toContain('other: value');
+  });
+
+  it('removes agent-achievements block with env sub-keys', () => {
+    const input = [
+      'mcp_servers:',
+      '  agent-achievements:',
+      '    command: "tsx"',
+      '    args: ["/path"]',
+      '    enabled: true',
+      '    env:',
+      '      AGPA_TOOL_SOURCE: hermes',
+      '      AGPA_LANG: zh',
+      'other: value',
+    ].join('\n');
+    const result = removeYamlMcpBlock(input);
+    expect(result.removed).toBe(true);
+    expect(result.cleaned).not.toContain('agent-achievements');
+    expect(result.cleaned).not.toContain('AGPA_TOOL_SOURCE');
+    // mcp_servers should be removed (no children left)
+    expect(result.cleaned).not.toContain('mcp_servers:');
+  });
+
+  it('returns removed=false when no agent-achievements in YAML', () => {
+    const input = [
+      'mcp_servers:',
+      '  other-server:',
+      '    command: echo',
+    ].join('\n');
+    const result = removeYamlMcpBlock(input);
+    expect(result.removed).toBe(false);
+    expect(result.cleaned).toBe(input);
+  });
+
+  it('returns removed=false for non-YAML content', () => {
+    const input = JSON.stringify({ nothing: 'here' });
+    const result = removeYamlMcpBlock(input);
+    expect(result.removed).toBe(false);
+  });
+
+  it('handles empty string', () => {
+    const result = removeYamlMcpBlock('');
+    expect(result.removed).toBe(false);
+  });
+
+  it('preserves surrounding YAML structure when removing block', () => {
+    const input = [
+      '# My Hermes Config',
+      '',
+      'version: 1',
+      'mcp_servers:',
+      '  agent-achievements:',
+      '    command: "tsx"',
+      '    args: ["/path"]',
+      '    enabled: true',
+      '',
+      'other_top_level:',
+      '  nested: true',
+    ].join('\n');
+    const result = removeYamlMcpBlock(input);
+    expect(result.removed).toBe(true);
+    expect(result.cleaned).toContain('# My Hermes Config');
+    expect(result.cleaned).toContain('version: 1');
+    expect(result.cleaned).toContain('other_top_level:');
+    expect(result.cleaned).toContain('nested: true');
+    expect(result.cleaned).not.toContain('agent-achievements');
+    expect(result.cleaned).not.toContain('mcp_servers:');
   });
 });
 

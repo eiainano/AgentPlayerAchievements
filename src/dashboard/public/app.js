@@ -486,6 +486,7 @@ const I18N = {
     next_ach_progress: '{current}/{target}',
     profile_switch: 'Switch Profile',
     profile_create: '+',
+    profile_demo: '🔬 Demo Data (try it out)',
     profile_max: 'Max 3 profiles',
     profile_name_placeholder: 'New profile...',
     share_card: '📸 Share',
@@ -588,6 +589,7 @@ const I18N = {
     next_ach_progress: '{current}/{target}',
     profile_switch: '切换档案',
     profile_create: '+',
+    profile_demo: '🔬 Demo 数据（试用体验）',
     profile_max: '最多3个档案',
     profile_name_placeholder: '新建档案...',
     share_card: '📸 分享',
@@ -1038,26 +1040,31 @@ function renderProfileSelector(data) {
   const activeMeta = profiles.find(p => p.name === active) || { name: active, emoji: active === '_demo' ? '🔬' : active === 'default' ? '📂' : '👤' };
   const maxProfiles = data.max_profiles || 3;
 
-  // Update nav button — _demo uses readable "Demo" label
+  // Update nav button
   const display = document.getElementById('profile-name-display');
   if (display) display.textContent = active === '_demo' ? 'Demo' : active;
 
   const emojiEl = document.getElementById('profile-emoji');
   if (emojiEl) emojiEl.textContent = active === '_demo' ? '🔬' : (activeMeta.emoji || '📂');
 
+  // Preserve create-input value across re-renders
+  const existingInput = document.getElementById('new-profile-input');
+  const savedInputValue = existingInput ? existingInput.value : '';
+
   const list = document.getElementById('profile-list');
   if (!list) return;
 
-  // Build profile options — always show _demo if data exists on disk
+  // Build profile options
   let options = '';
+  const demoLabel = t('profile_demo');
   if (hasDemo && !isDemo) {
     options += `<div class="profile-option" onclick="event.stopPropagation();switchProfile('_demo')">
-      <span>🔬 Demo 数据（试用体验）</span>
+      <span>${escHtml(demoLabel)}</span>
     </div>
     <div class="profile-option-sep"></div>`;
   } else if (isDemo) {
     options += `<div class="profile-option active" onclick="event.stopPropagation();switchProfile('_demo')">
-      <span>🔬 Demo 数据（试用体验）</span>
+      <span>${escHtml(demoLabel)}</span>
       <span class="profile-check">✓</span>
     </div>
     <div class="profile-option-sep"></div>`;
@@ -1069,9 +1076,13 @@ function renderProfileSelector(data) {
       ${p.name === active ? '<span class="profile-check">✓</span>' : ''}
     </div>
   `).join('');
-  list.innerHTML = options;
 
-  // Show/hide create section based on limit (named profiles only, excluding default)
+  // Only rebuild list content if it actually changed (avoid flicker on auto-poll)
+  if (list.innerHTML !== options) {
+    list.innerHTML = options;
+  }
+
+  // Show/hide create section
   const createSection = document.getElementById('profile-create-section');
   const limitHint = document.getElementById('profile-limit-hint');
   if (createSection && limitHint) {
@@ -1080,6 +1091,10 @@ function renderProfileSelector(data) {
     limitHint.style.display = atLimit ? 'block' : 'none';
   }
 
+  // Restore create-input value (the input element is outside #profile-list so it survives)
+  if (existingInput && existingInput !== document.activeElement) {
+    existingInput.value = savedInputValue;
+  }
 }
 
 // ── Tracked Tools Badges ─────────────────────────────
@@ -1146,9 +1161,9 @@ function closeProfileDropdown() {
   if (dropdown) dropdown.classList.remove('open');
 }
 
-// Close profile dropdown on outside click
+// Close profile dropdown on outside click (delegated)
 document.addEventListener('click', (e) => {
-  const selector = document.getElementById('profile-selector') || document.querySelector('.profile-selector');
+  const selector = document.querySelector('.profile-selector');
   const dropdown = document.getElementById('profile-dropdown');
   if (selector && dropdown && !selector.contains(e.target) && dropdown.classList.contains('open')) {
     closeProfileDropdown();

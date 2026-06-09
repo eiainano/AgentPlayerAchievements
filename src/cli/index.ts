@@ -155,9 +155,9 @@ function termWidth(): number {
 
 function renderBanner(width: number, version: string): string {
   const DIM = '\x1b[2m';
+  const BLD = '\x1b[1m';
   const RST = '\x1b[0m';
 
-  // ── Pick font / mode by terminal width ──────────────────────────
   if (width < 60) {
     return `\n\x1b[38;2;255;215;0m\x1b[1m🏆 AGPA — Agent Player Achievements\x1b[0m  ${DIM}v${version}${RST}\n`;
   }
@@ -168,9 +168,8 @@ function renderBanner(width: number, version: string): string {
   let artRaw: string;
   try {
     artRaw = figlet.textSync('AGPA', {
-      font: isCompact ? 'Small' : 'Slant',
+      font: isCompact ? 'Small' : 'ANSI Shadow',
       horizontalLayout: 'default',
-      width: width - 10, // leave room for box borders + centering
     });
   } catch {
     return `\n\x1b[38;2;255;215;0m\x1b[1m🏆 AGPA — Agent Player Achievements\x1b[0m  ${DIM}v${version}${RST}\n`;
@@ -185,49 +184,59 @@ function renderBanner(width: number, version: string): string {
   });
 
   // ── Subtitle ─────────────────────────────────────────────────────
-  const subtitle = isCompact
+  const subLine = isCompact
     ? `${DIM}🎮 AI coding achievements  v${version}${RST}`
-    : `${DIM}gamified achievement tracking for AI coding tools  v${version}${RST}`;
+    : `${DIM}gamified achievement tracking for AI coding tools${RST}`;
 
-  // ── Build content lines ──────────────────────────────────────────
+  const starLine = isCompact
+    ? ''
+    : `${DIM}⭐  github.com/eiainano/AgentPlayerAchievements  ·  v${version}  ⭐${RST}`;
+
+  // ── Build content ────────────────────────────────────────────────
   const content: string[] = [];
+  content.push(''); // top padding
   for (const line of coloredArt) {
     content.push(line);
   }
   content.push('');
-  content.push(subtitle);
-  if (!isCompact) {
-    content.push(`${DIM}⭐ github.com/eiainano/AgentPlayerAchievements${RST}`);
+  content.push(subLine);
+  if (starLine) {
+    content.push('');
+    content.push(starLine);
   }
-  content.push(''); // bottom padding before first art row
+  content.push(''); // bottom padding
 
-  // ── Compute box size, clamped to terminal width ──────────────────
+  // ── Box size, target ~75% of terminal width in standard mode ─────
   const contentMaxW = Math.max(...content.map(l => visualWidth(l)));
-  const title = '🏆 Agent Player Achievements';
-  const minInnerW = visualWidth(title) + 8; // title + "┌─ ─┐" + breathing room
-  const rawInnerW = contentMaxW + 4; // 2 padding each side
-  const maxInnerW = width - 2; // leave 1-char margin on each side
-  const innerW = Math.max(minInnerW, Math.min(rawInnerW, maxInnerW));
+  const title = 'AGPA · Agent Player Achievements';
+  const minInnerW = visualWidth(title) + 8;
 
-  // ── Draw panel ───────────────────────────────────────────────────
+  // Standard mode: box targets 80% terminal width, with generous padding
+  const targetW = isCompact ? contentMaxW + 8 : Math.max(contentMaxW + 16, Math.floor(width * 0.82));
+  const rawInnerW = Math.max(minInnerW, targetW);
+  const maxInnerW = width - 2;
+  const innerW = Math.min(rawInnerW, maxInnerW);
+
+  // ── Draw double-line panel ╔═╗║╚═╝ ────────────────────────────────
   const lines: string[] = [];
-  // Top bar
-  const titlePart = `─ ${title} `;
-  const topRemaining = innerW - titlePart.length - 2;
-  lines.push(`┌${titlePart}${'─'.repeat(Math.max(0, topRemaining))}┐`);
 
-  // Content area width (between │ borders)
-  const availW = innerW - 4;
+  // Top bar with title
+  const titleMin = `╔═ ${title} `;
+  const topRemaining = innerW - visualWidth(titleMin) - 1; // -1 for ╗
+  lines.push(`${titleMin}${'═'.repeat(Math.max(0, topRemaining))}╗`);
+
+  // Available width inside borders
+  const availW = innerW - 3; // 3 = ║ + space on both sides
 
   for (const cl of content) {
     const vw = visualWidth(cl);
     const leftPad = vw === 0 ? 0 : Math.max(0, Math.floor((availW - vw) / 2));
     const rightPad = Math.max(0, availW - vw - leftPad);
-    lines.push(`│ ${' '.repeat(leftPad)}${cl}${' '.repeat(rightPad)} │`);
+    lines.push(`║ ${' '.repeat(leftPad)}${cl}${' '.repeat(rightPad)}║`);
   }
 
   // Bottom bar
-  lines.push(`└${'─'.repeat(innerW - 2)}┘`);
+  lines.push(`╚${'═'.repeat(innerW - 2)}╝`);
 
   // ── Center in terminal ──────────────────────────────────────────
   const leftPad = Math.max(0, Math.floor((width - innerW) / 2));

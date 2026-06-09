@@ -155,8 +155,9 @@ function termWidth(): number {
 function renderBanner(width: number, version: string): string {
   const DIM = '\x1b[2m';
   const RST = '\x1b[0m';
-  const CY = '\x1b[38;2;0;255;255m';  // electric cyan
-  const MG = '\x1b[38;2;255;0;170m';   // hot magenta
+  const CY = '\x1b[38;2;0;255;255m';
+  const MG = '\x1b[38;2;255;0;170m';
+  const W = '\x1b[38;2;230;240;255m';   // off-white (neon tube glow)
 
   if (width < 60) {
     return `\n${CY}▸ AGPA — Agent Player Achievements${RST}  ${DIM}v${version}${RST}\n`;
@@ -177,50 +178,47 @@ function renderBanner(width: number, version: string): string {
 
   const artLines = artRaw.split('\n').filter(l => l.trim().length > 0);
 
-  // ── Neon gradient on art ─────────────────────────────────────────
-  const coloredArt = artLines.map((line, i) => {
+  // ── Neon reflection effect ───────────────────────────────────────
+  // Primary: off-white (neon tube glow)
+  // Reflection below: dim colored copy (light spilling on wet asphalt)
+  const artW = Math.max(...artLines.map(l => l.length));
+  const reflection = artLines.map((line, i) => {
     const colorIdx = Math.min(i, NEON_GRADIENT.length - 1);
-    return `${NEON_GRADIENT[colorIdx]}${line}${RST}`;
+    return {
+      glow: `${W}${line}${RST}`,
+      refl: `${DIM}${NEON_GRADIENT[colorIdx]}${line}${RST}`,
+    };
   });
 
-  // ── Subtitle lines ───────────────────────────────────────────────
-  const desc = !isCompact
-    ? `${DIM}gamified achievement tracking for AI coding tools  ·  ${CY}v${version}${RST}`
-    : `${DIM}v${version}${RST}`;
-  const repo = !isCompact
-    ? `${DIM}github.com/eiainano/AgentPlayerAchievements${RST}`
-    : '';
+  // Separator: thin sparkle line matching art width
+  const sepLine = `${DIM}${CY}${'▁'.repeat(artW)}${RST}`;
 
-  // ── Accent bars ──────────────────────────────────────────────────
-  const artW = Math.max(...coloredArt.map(l => visualWidth(l)));
-  const textW = Math.max(visualWidth(desc), repo ? visualWidth(repo) : 0);
-  const contentW = Math.max(artW, textW);
-  const barW = Math.min(contentW + 6, width - 6);
+  // ── Subtitle ─────────────────────────────────────────────────────
+  const desc = !isCompact
+    ? `  ${DIM}gamified achievement tracking for AI coding tools${RST}  ${CY}▸ ${DIM}v${version}${RST}`
+    : `  ${DIM}v${version}${RST}`;
+  const repo = !isCompact
+    ? `  ${DIM}github.com/eiainano/AgentPlayerAchievements${RST}`
+    : '';
 
   // ── Assemble ─────────────────────────────────────────────────────
   const lines: string[] = [];
   lines.push('');
 
-  // Top: cyan accent bar
-  lines.push(`  ${CY}${'━'.repeat(barW)}${RST}`);
+  // Glow
+  for (const rl of reflection) lines.push(`  ${rl.glow}`);
+
+  // Separator + reflection
+  lines.push(`  ${sepLine}`);
+  for (const rl of reflection) lines.push(`  ${rl.refl}`);
+
+  // Subtitle
+  lines.push('');
+  lines.push(desc);
+  if (repo) lines.push(repo);
   lines.push('');
 
-  // Art
-  for (const al of coloredArt) {
-    lines.push(`  ${al}`);
-  }
-
-  // Spacer + subtitle
-  lines.push('');
-  lines.push(`   ${desc}`);
-  if (repo) lines.push(`   ${repo}`);
-
-  // Bottom: magenta accent bar
-  lines.push('');
-  lines.push(`  ${MG}${'━'.repeat(barW)}${RST}`);
-  lines.push('');
-
-  // ── Center block in terminal ─────────────────────────────────────
+  // ── Center in terminal ───────────────────────────────────────────
   const maxW = Math.max(...lines.map(l => visualWidth(l)));
   const leftPad = Math.max(0, Math.floor((width - maxW) / 2));
   const centered = lines.map(l => ' '.repeat(leftPad) + l);

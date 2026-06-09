@@ -43,26 +43,27 @@ describe('renderBanner', () => {
 
   // ── Neon gradient ───────────────────────────────────────────────
 
-  it('applies cyan→magenta gradient to art rows', () => {
+  it('applies cyan→magenta gradient to reflection rows', () => {
     mockTextSync.mockReturnValue(SLANT_ART);
     const result = renderBanner(100, '0.1.0');
     expect(result).toContain('\x1b[38;2;0;255;255m');   // cyan
-    expect(result).toContain('\x1b[38;2;255;0;170m');    // hot magenta
+    expect(result).toContain('\x1b[38;2;220;50;220m');  // purple
   });
 
-  // ── Accent bars ─────────────────────────────────────────────────
+  // ── Neon reflection ─────────────────────────────────────────────
 
-  it('draws cyan accent bar on top, magenta on bottom', () => {
+  it('draws neon reflection: white glow above dim colored copy', () => {
     mockTextSync.mockReturnValue(SLANT_ART);
     const result = renderBanner(100, '0.1.0');
-    // First colored bar is cyan
-    const bars = result.match(/━{10,}/g);
-    expect(bars).not.toBeNull();
-    expect(bars!.length).toBeGreaterThanOrEqual(2);
-    // Cyan bar appears before magenta
-    const cyanIdx = result.indexOf('\x1b[38;2;0;255;255m━');
-    const magIdx = result.indexOf('\x1b[38;2;255;0;170m━');
-    expect(cyanIdx).toBeLessThan(magIdx);
+    // White glow text
+    expect(result).toContain('\x1b[38;2;230;240;255m');
+    // Dim separator line
+    expect(result).toContain('\x1b[2m');
+    expect(result).toContain('▁');
+    // Reflection should contain dim colored art
+    const dimCount = (result.match(/\x1b\[2m/g) || []).length;
+    // One per reflection row + separator
+    expect(dimCount).toBeGreaterThanOrEqual(6);
   });
 
   // ── Content ─────────────────────────────────────────────────────

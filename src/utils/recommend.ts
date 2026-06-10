@@ -136,3 +136,45 @@ export function getRecommendResponse(
     session_id: sessionId,
   };
 }
+
+export const DISCOVERY_REASON_MAP: Record<string, { en: string; zh: string }> = {
+  'agent.spawn':   { en: "You haven't tried Agent mode yet", zh: '你还没用过 Agent 模式' },
+  'skill.invoke':  { en: "You haven't used Custom Skills yet", zh: '你还没用过自定义技能' },
+  'mcp.connect':   { en: "You haven't connected an MCP server", zh: '你还没连接过 MCP 服务器' },
+  'plan.enter':    { en: "You haven't used Plan Mode yet", zh: '你还没用过计划模式' },
+  'plan.exit':     { en: "You haven't used Plan Mode yet", zh: '你还没用过计划模式' },
+  'file.create':   { en: "You haven't created any files yet", zh: '你还没创建过文件' },
+  'file.edit':     { en: "You haven't edited any files yet", zh: '你还没编辑过文件' },
+  'file.delete':   { en: "You haven't deleted any files yet", zh: '你还没删除过文件' },
+  'image.upload':  { en: "You haven't uploaded any images yet", zh: '你还没上传过图片' },
+  'command.run':   { en: "You haven't run any commands yet", zh: '你还没运行过命令' },
+  'task.create':   { en: "You haven't created any tasks yet", zh: '你还没创建过任务' },
+  'task.update':   { en: "You haven't updated any tasks yet", zh: '你还没更新过任务' },
+};
+
+export function getDiscoveryReason(eventType: string, lang: 'en' | 'zh'): string {
+  const entry = DISCOVERY_REASON_MAP[eventType];
+  if (!entry) return lang === 'zh' ? '一个你未曾尝试过的新功能' : 'a new feature';
+  return entry[lang];
+}
+
+export function buildRecommendationPrompt(
+  item: import('../engine/types.js').RecommendItem,
+  lang: 'en' | 'zh',
+): string {
+  if (item.category === 'surprise') {
+    return lang === 'zh'
+      ? `🎲 探索提示: ${item.hint_cn || item.hint}\n\n在回复结尾，用一句自然的话引导用户注意这条线索。不要暴露成就名称或具体条件——保持神秘感。`
+      : `🎲 Discovery hint: ${item.hint}\n\nAt the end of your reply, naturally guide the user toward this clue. Do NOT reveal the achievement name or unlock conditions — keep it mysterious.`;
+  }
+  if (item.category === 'discovery') {
+    const reason = getDiscoveryReason(item.discovery_event!, lang);
+    return lang === 'zh'
+      ? `💡 新功能推荐: ${item.name_cn || item.name} — ${reason}\n\n在回复结尾，用一句自然的话引导用户尝试这个他们还没用过的功能。`
+      : `💡 Feature discovery: ${item.name} — ${reason}\n\nAt the end of your reply, naturally suggest the user try this feature they haven't explored yet.`;
+  }
+  const pct = item.progress?.pct ?? 0;
+  return lang === 'zh'
+    ? `🎯 近在咫尺: ${item.name_cn || item.name}（已完成 ${pct}%）\n\n在回复结尾，用一句自然的话提醒用户这个成就近在眼前，鼓励加把劲解锁它。`
+    : `🎯 Near win: ${item.name}（${pct}% complete）\n\nAt the end of your reply, naturally remind the user this achievement is close and encourage them to push for it.`;
+}

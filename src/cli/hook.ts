@@ -187,7 +187,17 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
             try {
               const content = fs.readFileSync(resolved, 'utf-8');
               editPayload.total_file_lines = content.split('\n').length;
-              editPayload.text_content = content.slice(0, 200).toLowerCase();
+              // Boolean feature flags for achievement conditions (no raw content stored in event log)
+              // Multi-Head Attention pattern: "attention" + at least 2 QKV/softmax indicators
+              const lower = content.toLowerCase();
+              const attnIndicators = [
+                lower.includes('query'),
+                lower.includes('key'),
+                lower.includes('softmax'),
+                lower.includes('multihead') || lower.includes('multi_head') || lower.includes('multi-head'),
+                lower.includes('scaled_dot'),
+              ].filter(Boolean).length;
+              editPayload.has_attention_pattern = lower.includes('attention') && attnIndicators >= 2;
             } catch { /* file gone */ }
           }
         }

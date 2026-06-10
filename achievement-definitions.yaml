@@ -3671,7 +3671,7 @@ definitions:
     conditions:
       - type: counter
         event: file.edit
-        filter: file_path matches '*.py' && text_content contains 'attention'
+        filter: file_path matches '*.py' && has_attention_pattern == true
         operator: ">="
         value: 1
   - id: full_spectrum

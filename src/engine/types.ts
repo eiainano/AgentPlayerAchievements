@@ -243,6 +243,26 @@ export interface EngineOptions {
   sessionId?: string;
 }
 
+// ── Questline types ──────────────────────────────────────────
+
+export interface StageDefinition {
+  stage: number;
+  name: string;
+  name_cn: string;
+  achievements: string[];
+}
+
+export interface QuestlineDefinition {
+  id: string;
+  name: string;
+  name_cn: string;
+  icon: string;
+  description: string;
+  description_cn: string;
+  stages: StageDefinition[];
+  reward: SetReward;
+}
+
 // ── Recommendation types ───────────────────────────────────────
 
 export type RecommendCategory = 'near_win' | 'discovery' | 'surprise';

@@ -16,13 +16,14 @@
 | **Discovery** | 发现尚未用过的功能 | 事件盲区法：找未触发的事件类型 → 推荐关联成就 |
 | **Surprise** | 隐藏成就的模糊线索 | 未解锁 + 有 hint 字段 + session 确定性选取 |
 
-### 接触点（3 个）
+### 接触点（4 个）
 
-| 接触点 | 方式 | 改动 |
-|------|------|------|
-| MCP `achievement_suggest` | 升级返回结构 | `src/tools/suggest.ts` |
-| CLI `agpa suggest` | 按类别分组输出 | `src/cli/suggest.ts` |
-| Dashboard 浮动 widget | 右下角脉冲徽章 + 轮播大卡片 | `app.js` + `styles.css` + `index.html` |
+| 接触点 | 方式 | 触发时机 |
+|------|------|---------|
+| MCP `achievement_suggest` | Agent 主动调用，返回 3 类推荐 | Agent 决定 |
+| CLI `agpa suggest` | 用户手动运行，按类别分组输出 | 用户主动 |
+| Dashboard 浮动 widget | 右下角脉冲徽章 + 轮播大卡片 | 打开 Dashboard |
+| `achievement_poll` 推荐 prompt | 解锁成就后概率注入一段自然语言推荐指令 | 成就解锁时自动 (p=0.2) |
 
 ---
 
@@ -146,6 +147,106 @@ GET /api/data?profile=default
 ```
 
 **设计决定**：内嵌进主 `/api/data` 响应中。因为 widget 同时需要解锁数（红点计数），两个数据一次拿到更高效。加 `include_recommend` 字段，前端按需请求。
+
+### 4.5 `achievement_poll` 解锁后推荐 prompt（第 4 接触点）
+
+**触发条件**（双重门控）：
+1. 本轮 poll 有新解锁成就（`newly_unlocked.length > 0`）
+2. 概率命中：`Math.random() < p`（p 默认为 0.2，可通过 `agpa config` 配置）
+
+**机制**：`achievement_poll` 返回体中新增 `recommendation_prompt` 字段。当双重门控同时满足时，该字段包含一段预写的自然语言 prompt 指令。**Agent 不需要理解推荐系统语义**，只需遵循 `recommendation_prompt` 的指示在回复结尾自然融入推荐。
+
+**`recommendation_prompt` 生成流程**：
+
+```
+poll() 返回 newly_unlocked[]
+  │
+  ├── newly_unlocked.length === 0 → 跳过，返 null
+  │
+  ├── 概率门控：Math.random() >= config.recommend_probability → 跳过，返 null
+  │   (config.recommend_probability 默认 0.2)
+  │
+  └── 通过 → 调用 recommend.ts 获取 3 类推荐
+          │
+          ├── 按优先级选 1 条推荐内容：
+          │   1. Surprise（最优先——解锁后正是探索的好时机）
+          │   2. Discovery（次优先——刚解锁一个，试试新功能）
+          │   3. Near Win top 1（兜底——告诉用户下一个近在眼前）
+          │
+          └── 根据类别 + 语言生成预写 prompt
+```
+
+**预写 prompt 模板**：
+
+```typescript
+function buildRecommendationPrompt(
+  item: RecommendItem,
+  lang: 'en' | 'zh',
+): string {
+  if (item.category === 'surprise') {
+    return lang === 'zh'
+      ? `🎲 探索提示: ${item.hint_cn || item.hint}\n\n在回复结尾，用一句自然的话引导用户注意这条线索。不要暴露成就名称或具体条件——保持神秘感。`
+      : `🎲 Discovery hint: ${item.hint}\n\nAt the end of your reply, naturally guide the user toward this clue. Do NOT reveal the achievement name or unlock conditions — keep it mysterious.`;
+  }
+  if (item.category === 'discovery') {
+    const reason = getDiscoveryReason(item.discovery_event!, lang);
+    return lang === 'zh'
+      ? `💡 新功能推荐: ${item.name_cn || item.name} — ${reason}\n\n在回复结尾，用一句自然的话引导用户尝试这个他们还没用过的功能。`
+      : `💡 Feature discovery: ${item.name} — ${reason}\n\nAt the end of your reply, naturally suggest the user try this feature they haven't explored yet.`;
+  }
+  // near_win
+  const pct = item.progress?.pct ?? 0;
+  return lang === 'zh'
+    ? `🎯 近在咫尺: ${item.name_cn || item.name}（已完成 ${pct}%）\n\n在回复结尾，用一句自然的话提醒用户这个成就近在眼前，鼓励加把劲解锁它。`
+    : `🎯 Near win: ${item.name}（${pct}% complete）\n\nAt the end of your reply, naturally remind the user this achievement is close and encourage them to push for it.`;
+}
+```
+
+**`achievement_poll` 返回体变更**：
+
+```json
+// 现有（无推荐时）
+{
+  "newly_unlocked": [...],
+  "progress": {...}
+}
+
+// 新增字段（概率命中时）
+{
+  "newly_unlocked": [...],
+  "progress": {...},
+  "recommendation_prompt": "💡 Feature discovery: MCP Explorer — You haven't tried MCP tools yet...\n\nAt the end of your reply, naturally suggest..."
+}
+```
+
+**概率 p 配置**：
+
+```json
+// ~/.agent-achievements/config.json
+{
+  "recommend_probability": 0.2   // 0.0 = 关闭，1.0 = 每次解锁都推
+}
+```
+
+- `agpa config set recommend_probability 0.3` — CLI 修改
+- 默认值在 `src/config.ts` 中定义：`RECOMMEND_PROBABILITY_DEFAULT = 0.2`
+- 不在 YAML 中定义——这是用户偏好，不是成就定义
+
+**文件改动**：
+
+| 文件 | 改动 |
+|------|------|
+| `src/config.ts` | 新增 `recommend_probability` 配置项 + 默认值 |
+| `src/engine/types.ts` | `PollResponse` 新增 `recommendation_prompt?: string` |
+| `src/utils/recommend.ts` | 新增 `buildRecommendationPrompt()` + `getDiscoveryReason()` |
+| `src/tools/poll.ts` | `achievement_poll` 集成概率门控 + prompt 生成 |
+| `src/cli/config.ts` | 支持 `recommend_probability` 配置项读写 |
+
+**降级与空态**：
+- 3 类推荐全部为 `null`（如 Surprise pool 已空，Discovery 无候选，Near Win 无进度）→ `recommendation_prompt` 不返回
+- 概率门控未命中 → 不返回
+- 本轮无新解锁 → 不返回
+- **完全不骚扰**：用户解锁密度低时基本不触发
 
 ---
 
@@ -407,7 +508,7 @@ function stopCarousel() {
 | 文件 | 改动类型 | 说明 |
 |------|---------|------|
 | `src/utils/progress-nudge.ts` | 改 | +3 种类型进度计算 (sequence / pattern_match / ratio) |
-| `src/utils/recommend.ts` | **新** | 推荐总控：3 个推荐函数 + hashString |
+| `src/utils/recommend.ts` | **新** | 推荐总控：3 个推荐函数 + hashString + buildRecommendationPrompt |
 | `src/tools/suggest.ts` | 改 | MCP tool 升级，返回 3 类推荐 |
 | `src/cli/suggest.ts` | 改 | CLI 按类别分组输出 + 新 flag (--near/--discover/--surprise) |
 | `src/dashboard/api.ts` | 改 | 主数据响应加 `include_recommend` 字段 |
@@ -415,9 +516,13 @@ function stopCarousel() {
 | `src/dashboard/public/index.html` | 改 | widget DOM 结构 |
 | `src/dashboard/public/app.js` | 改 | widget 初始化 + 轮播逻辑 + 数据获取 |
 | `src/dashboard/public/styles.css` | 改 | widget 样式 + 脉冲动画 + 响应式 |
-| `src/engine/types.ts` | 改 | 新增 RecommendItem / RecommendResponse 类型 |
+| `src/engine/types.ts` | 改 | 新增 RecommendItem / RecommendResponse / PollResponse.recommendation_prompt |
+| `src/config.ts` | 改 | 新增 `recommend_probability` 配置项 (默认 0.2) |
+| `src/tools/poll.ts` | 改 | 集成概率门控 + prompt 生成，poll 返回体新增字段 |
+| `src/cli/config.ts` | 改 | 支持 `recommend_probability` 读写 |
 | `tests/utils/progress-nudge.test.ts` | 改 | 新增 3 种类型测试 |
 | `tests/utils/recommend.test.ts` | **新** | 推荐算法单元测试 |
+| `tests/tools/poll.test.ts` | 改 | recommendation_prompt 触发/不触发场景 |
 
 **不改的文件**:
 - `achievement-definitions.yaml` — 已有 hint 数据，无需修改
@@ -450,7 +555,22 @@ function stopCarousel() {
 - CLI `agpa suggest` 三类分组输出
 - Dashboard API `GET /api/data?include_recommend=true` 返回推荐数据
 
-### 8.3 Dashboard 前端验证
+### 8.3 poll 推荐 prompt 测试
+
+| 测试场景 | 说明 |
+|------|------|
+| 无新解锁 → 不返回 prompt | newly_unlocked=[] 时 recommendation_prompt 为 null |
+| 有解锁 + 概率命中 → 返回 prompt | 模拟 Math.random < p，验证 prompt 内容正确 |
+| 有解锁 + 概率未命中 → 不返回 | 模拟 Math.random >= p |
+| Surprise 优先选择 | 当 3 类都有候选时，选 Surprise |
+| Discovery 次选 | Surprise=null 时选 Discovery |
+| Near Win 兜底 | Surprise+Discovery 都为 null 时选 Near Win top1 |
+| 全空 → 不返回 | 3 类全 null 时不返回 prompt |
+| prompt i18n | 中/英 prompt 模板语言正确 |
+| config.recommend_probability=0 → 永关闭 | p=0 时永不触发 |
+| config.recommend_probability=1 → 必触发 | p=1 时每次解锁都推 |
+
+### 8.4 Dashboard 前端验证
 
 - widget 渲染在 `position: fixed; bottom: 24px; right: 24px`
 - 折叠态脉冲动画运行
@@ -472,10 +592,14 @@ Phase 1: 核心算法 + 类型
 ├── recommend.ts 三个推荐函数 + hashString
 └── tests/utils/recommend.test.ts
 
-Phase 2: MCP + CLI
+Phase 2: MCP + CLI + poll 推荐 prompt
 ├── src/tools/suggest.ts 升级
 ├── src/cli/suggest.ts 升级 + 新 flag
-└── 手动验证: agpa suggest + MCP 调用
+├── src/config.ts 新增 recommend_probability
+├── src/cli/config.ts 支持 recommend_probability 读写
+├── src/tools/poll.ts 集成概率门控 + buildRecommendationPrompt
+├── src/engine/types.ts PollResponse 新增字段
+└── 手动验证: agpa suggest + MCP 调用 + poll 输出
 
 Phase 3: Dashboard
 ├── api.ts 内嵌 recommend 到主响应

@@ -199,6 +199,9 @@ function buildCondition(type: ConditionType, cond: Record<string, unknown>): Con
     max_value: typeof cond.max_value === 'number' ? cond.max_value : undefined,
     unit: str(cond, 'unit'),
     group_by: str(cond, 'group_by'),
+    from_filter: str(cond, 'from_filter'),
+    to_filter: str(cond, 'to_filter'),
+    cross_day: cond.cross_day === true || undefined,
   } satisfies Condition;
 }
 

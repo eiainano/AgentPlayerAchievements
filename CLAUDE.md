@@ -3,7 +3,7 @@
 ## Commands
 
 ```
-npm run test       # vitest (1034 tests, 42 files)
+npm run test       # vitest (1043 tests, 42 files)
 npm run build      # tsc --noEmit
 npm run dashboard  # start on :3867, then open browser (supports --profile <name>)
 npm run demo       # generate MVP data + stats

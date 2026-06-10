@@ -131,6 +131,12 @@ export interface Condition {
   max_value?: number;
   // ratio: deduplicate events by this field before computing ratio
   group_by?: string;
+  // time_gap: filter the first event in the pair
+  from_filter?: string;
+  // time_gap: filter the second event in the pair
+  to_filter?: string;
+  // time_gap: require the pair to span different calendar days
+  cross_day?: boolean;
 }
 
 export type RarityLevel = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';

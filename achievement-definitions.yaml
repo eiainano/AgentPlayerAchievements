@@ -3747,6 +3747,28 @@ definitions:
         window: 30m
         operator: ">="
         value: 6
+  - id: wake_up_samurai
+    name: Wake Up, Samurai
+    name_cn: 醒醒，武士
+    description: Ended a session before midnight and returned after 7am the next day. We've got a city to burn.
+    description_cn: 深夜离去，清晨归来。我们有一座城市要烧。
+    icon: 🔥
+    category: hidden
+    rarity: rare
+    hidden: true
+    progress_trackable: true
+    hint: Go quiet before midnight, then wake up early and get back to coding
+    hint_cn: 深夜离去，清晨归来继续 coding
+    tip: "Wake up, Samurai. We've got a city to burn — and a codebase to refactor."
+    tip_cn: "醒醒，武士。我们有一座城市要烧——和一个代码库要重构。"
+    conditions:
+      - type: time_gap
+        event: user.message
+        window: single_session
+        cross_day: true
+        to_filter: "hour >= 7"
+        operator: ">="
+        value: 1
   - id: full_spectrum
     name: Full Spectrum
     name_cn: 全光谱

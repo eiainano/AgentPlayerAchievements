@@ -395,7 +395,15 @@ function genEvents(cond: Condition): TrackedEvent[] {
       const gapHrs = cond.unit === 'm' ? 1 : cond.unit === 's' ? 1 / 3600 : cond.value;
       const gapMs = gapHrs * 3600000 + 1000; // just over the threshold
       const t1 = new Date();
-      const t2 = new Date(t1.getTime() + gapMs);
+      // When cross_day is set, push t2 to the next calendar day
+      let t2: Date;
+      if (cond.cross_day) {
+        t2 = new Date(t1);
+        t2.setDate(t2.getDate() + 1);
+        t2.setHours(8, 0, 0, 0); // 8am next day — satisfies hour >= 7
+      } else {
+        t2 = new Date(t1.getTime() + gapMs);
+      }
       return [
         evt(cond.event || 'user.message', payload, { timestamp: t1.toISOString(), context: { session_id: 'test-session', model: 'auto', ...ctx } }),
         evt(cond.event || 'user.message', payload, { timestamp: t2.toISOString(), context: { session_id: 'test-session', model: 'auto', ...ctx } }),

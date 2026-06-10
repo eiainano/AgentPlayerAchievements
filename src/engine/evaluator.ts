@@ -29,7 +29,8 @@ export function matchFilter(event: TrackedEvent, filter: string): boolean {
     issues_found: event.payload?.issues_found || 0,
     day_of_week: event.payload?.day_of_week != null ? Number(event.payload.day_of_week) : -1,
     duration_ms: event.payload?.duration_ms != null ? Number(event.payload.duration_ms) : 0,
-    hour: event.payload?.hour != null ? Number(event.payload.hour) : -1,
+    hour: event.payload?.hour != null ? Number(event.payload.hour)
+      : event.timestamp ? new Date(event.timestamp).getHours() : -1,
     model: event.context?.model || '',
     word_count: event.payload?.word_count != null ? Number(event.payload.word_count) : 0,
     has_code_block: event.payload?.has_code_block === true || event.payload?.has_code_block === 'true',
@@ -720,15 +721,42 @@ function evalTimeGap(events: TrackedEvent[], cond: Condition): EvaluationResult 
 
   if (matching.length < 2) return { met: false, progress: 0, target: cond.value };
 
+  const op: ConditionOperator = cond.operator || '>=';
+  const fromFilter = cond.from_filter || null;
+  const toFilter = cond.to_filter || null;
+  const crossDay = cond.cross_day === true;
+
   let maxGapMs = 0;
+  let pairCount = 0;
   for (let i = 1; i < matching.length; i++) {
-    const t1 = new Date(matching[i - 1]!.timestamp).getTime();
-    const t2 = new Date(matching[i]!.timestamp).getTime();
+    const prev = matching[i - 1]!;
+    const curr = matching[i]!;
+    const t1 = new Date(prev.timestamp).getTime();
+    const t2 = new Date(curr.timestamp).getTime();
     const gap = t2 - t1;
+
+    // Apply pairwise filters if configured
+    if (fromFilter && !matchFilter(prev, fromFilter)) continue;
+    if (toFilter && !matchFilter(curr, toFilter)) continue;
+    if (crossDay) {
+      const d1 = prev.timestamp ? new Date(prev.timestamp).toISOString().slice(0, 10) : '';
+      const d2 = curr.timestamp ? new Date(curr.timestamp).toISOString().slice(0, 10) : '';
+      if (d1 === d2) continue;
+    }
+
+    pairCount++;
     if (gap > maxGapMs) maxGapMs = gap;
   }
 
-  const op: ConditionOperator = cond.operator || '>=';
+  // When using pairwise filters, evaluate by pair count instead of gap duration
+  if (fromFilter || toFilter || crossDay) {
+    return {
+      met: evalOp(op, pairCount, cond.value),
+      progress: pairCount,
+      target: cond.value,
+    };
+  }
+
   const maxGapInUnit = maxGapMs / (targetMs / cond.value); // convert back to display unit
   return {
     met: evalOp(op, maxGapMs, targetMs),

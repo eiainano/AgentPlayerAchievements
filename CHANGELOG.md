@@ -1,5 +1,16 @@
 # Changelog
 
+### Wake Up, Samurai 成就 + time_gap 成对过滤扩展 — 2026-06-10
+
+- **新成就 `wake_up_samurai`** — "Wake Up, Samurai" / 醒醒，武士 🔥，hidden rare，单 session 内跨天回归：深夜离去（任意时间），次日 7am 后发第一条消息。We've got a city to burn.
+- **`time_gap` 扩展 — 成对过滤**：新增三个可选字段支持事件对的精确匹配：
+  - `from_filter`：对配对中的**前一条**事件做 filter 过滤
+  - `to_filter`：对配对中的**后一条**事件做 filter 过滤
+  - `cross_day`：要求前后两条事件跨越不同的日历日（`date_str` 不同）
+  - 当启用成对过滤时，评估模式从"最大时间间隔"切换为"符合条件的配对计数"
+- **`matchFilter` 增强**：`hour` 字段现在从 timestamp 中自动推导（当 payload 未设置时），不再依赖 hook 端显式注入
+- **测试更新**：auditor 成就计数 202→203；every-achievement 新增 wake_up_samurai 测试，time_gap 生成器支持 `cross_day` 跨日事件
+
 ### Gwent 成就 + session_duration_ms + dashboard 事件增强 — 2026-06-10
 
 - **新成就 `how_bout_a_round_of_gwent`** — "How 'Bout a Round of Gwent?" / 来局昆特牌吗 ♠️，hidden rare，同一 session 中写代码 + 狂聊 + 打开 Dashboard 查看成就，且 session 已持续 ≥30min。不务正业的猎魔人。

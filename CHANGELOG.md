@@ -2,7 +2,7 @@
 
 ### 关键词匹配成就 + user.message text_content + filter 增强 — 2026-06-10
 
-- **`user.message` 事件新增 text_content**：hook.ts 在 `UserPromptSubmit` 时将用户消息截取前 200 字符存入 payload.text_content（防密码/密钥泄露），pattern_match 和 counter+filter 可以直接匹配关键词
+- **`user.message` 事件新增 text_content**：hook.ts 在 `UserPromptSubmit` 时将用户消息经 `redactSecrets()` 脱敏（strip API key/Bearer/JWT/GitHub token/AWS key/SSH key/内联密码）后截取前 200 字符存入 payload.text_content，pattern_match 和 counter+filter 可以直接匹配关键词，同时防止凭据泄露
 - **matchFilter 上下文扩展**：`evaluator.ts` 添加 text_content 字段，filter 表达式支持 `text_content contains 'keyword'` 语法
 - **6 个关键词触发成就**：`please_maybe`（说"请"）、`say_please`（5次礼貌）、`magic_word`（说咒语）、`swear_jar`（说了脏话）、`tl_dr`（让 agent 总结）
 - **移除** `rewrite_king`（"One More Time" 成就）

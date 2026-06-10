@@ -1,5 +1,27 @@
 # Changelog
 
+### 推荐系统 2.0 全面实施 — 2026-06-11
+
+- **设计 spec**：`docs/superpowers/specs/2026-06-10-recommendation-system-2.0-design.md`（630 行完整设计）
+- **实施计划**：`docs/superpowers/plans/2026-06-10-recommendation-system-2.0.md`（16 任务，3 阶段）
+- **4 个接触点全部落地**：
+
+| 接触点 | 功能 |
+|------|------|
+| `achievement_suggest` MCP tool | 返回 near_win + discovery + surprise 三类推荐，支持 `categories` 过滤 |
+| `agpa suggest` CLI | 按类别分组终端输出，新增 `--near`/`--discover`/`--surprise` flags |
+| Dashboard 浮动 widget | 左下角脉冲徽章（p=0.2 概率出现），点击展开 3 帧轮播大卡片，ESC/点击外部关闭 |
+| `achievement_poll` prompt 注入 | 解锁成就后概率（默认 p=0.2）注入 `recommendation_prompt` 字段，Agent 在回复中自然推荐 |
+
+- **推荐算法**：
+  - **Near Win**：`progress-nudge.ts` 从 5 种扩展到 8 种 condition type（新增 sequence / pattern_match / ratio），top 5 按进度排序
+  - **Discovery**：事件盲区法 — 扫描用户从未触发的事件类型，推荐关联成就（Common 优先）
+  - **Surprise**：未解锁 hidden 成就 + 有 hint + session 确定性选取（djb2 hash，不依赖 Math.random）
+- **新文件**：`src/utils/recommend.ts`（~240 行，8 个导出函数）+ `tests/utils/recommend.test.ts`（18 测试）
+- **配置**：`recommend_probability` 通过 `agpa config recommend_probability <0.0-1.0>` 可调，默认 0.2，存储在 config.json
+- **UI 决策**（通过 visual companion 确定）：浮动 widget + 脉冲光环徽章 + 轮播大卡片（5s 自动切换，hover 暂停）
+- **修复**：widget `var(--surface)` → `var(--bg-surface)` 透明背景修复；rarity 字段 XSS escape
+
 ### Embed recommend data into Dashboard API response — 2026-06-11
 
 - **新功能**：Dashboard API `/api/data?include_recommend=true` 现在返回 `recommend` 字段，包含以下三类推荐数据：

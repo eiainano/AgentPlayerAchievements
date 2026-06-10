@@ -3591,6 +3591,31 @@ definitions:
         operator: ">="
         value: 30
         window: all
+  - id: breath_of_the_wild
+    name: Breath of the Wild
+    name_cn: 旷野之息
+    description: Used 4+ tools and 4+ MCP servers in a single session. You're ready to take on Ganon.
+    description_cn: 同一次 session 中使用 4 种以上工具和 4 个以上 MCP 服务器。准备好去打盖侬了。
+    icon: 🗡️
+    category: challenge
+    rarity: legendary
+    hidden: true
+    hint: Try using a variety of tools and connecting to multiple MCP servers in one session
+    hint_cn: 尝试在一次 session 中使用多种工具并连接多个 MCP 服务器
+    challenge: true
+    conditions:
+      - type: distinct_count
+        event: tool.complete
+        field: tool_name
+        window: single_session
+        operator: ">="
+        value: 4
+      - type: distinct_count
+        event: mcp.tool_call
+        field: server_name
+        window: single_session
+        operator: ">="
+        value: 4
   - id: full_spectrum
     name: Full Spectrum
     name_cn: 全光谱

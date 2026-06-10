@@ -219,9 +219,12 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
           results.push({ event_type: 'file.delete', payload: { ...base } });
         }
       }
-      // MCP tool call
+      // MCP tool call — extract server name from tool_name format: mcp__serverName__toolName
       if (data.tool_name?.startsWith('mcp__')) {
-        results.push({ event_type: 'mcp.tool_call', payload: { ...base } });
+        const parts = data.tool_name.split('__');
+        const mcpPayload = { ...base };
+        if (parts.length >= 3) mcpPayload.server_name = parts[1]; // e.g. "figma" from "mcp__figma__toolName"
+        results.push({ event_type: 'mcp.tool_call', payload: mcpPayload });
       }
       // Task management tools (CC deferred tools TaskCreate / TaskUpdate)
       if (data.tool_name === 'TaskCreate') {

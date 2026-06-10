@@ -2726,6 +2726,22 @@ definitions:
         operator: ">="
         value: 1
         window: all
+  - id: spring_festival
+    name: Lunar New Year
+    name_cn: 新春大吉
+    description: Sent a message during Spring Festival. Your agent doesn't need red envelopes — just clean code.
+    description_cn: 春节期间给 agent 发了消息。你的 agent 不要红包，只要干净的代码。
+    icon: 🧧
+    category: hidden
+    rarity: epic
+    hidden: true
+    conditions:
+      - type: counter
+        event: user.message
+        filter: month == 1 && day > 20 || month == 2 && day < 21
+        operator: ">="
+        value: 1
+        window: all
   - id: silent_night
     name: Silent Night
     name_cn: 静夜思

@@ -3716,6 +3716,37 @@ definitions:
         filter: has_doubled_lines == true
         operator: ">="
         value: 1
+  - id: how_bout_a_round_of_gwent
+    name: How 'Bout a Round of Gwent?
+    name_cn: 来局昆特牌吗
+    description: Busy editing code in a heated session, then… opened the dashboard. Priorities, witcher.
+    description_cn: 正忙着改代码呢，然后……打开了成就面板。当代猎魔人的优先级。
+    icon: ♠️
+    category: hidden
+    rarity: rare
+    hidden: true
+    progress_trackable: true
+    hint: Get deep into a coding session, then check your achievements
+    hint_cn: 全身心投入 coding 之后，去看看自己的成就面板
+    tip: "Gwent? How about a round of — *checks achievements* — Gwent?"
+    tip_cn: "来局昆特——*查看成就面板* ——牌吗？"
+    conditions:
+      - type: counter
+        event: file.edit
+        window: single_session
+        operator: ">="
+        value: 1
+      - type: counter
+        event: dashboard.opened
+        window: single_session
+        filter: session_duration_ms >= 1800000
+        operator: ">="
+        value: 1
+      - type: counter
+        event: user.message
+        window: single_session
+        operator: ">="
+        value: 7
   - id: full_spectrum
     name: Full Spectrum
     name_cn: 全光谱

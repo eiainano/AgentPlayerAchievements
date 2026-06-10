@@ -203,7 +203,26 @@ export function createServer(port: number, defaultProfile: string): http.Server 
 
     // ── GET /api/data ──────────────────────────────────────────────────
     if (url.pathname === '/api/data' && req.method === 'GET') {
-      engine.track('dashboard.opened', {});
+      // Compute current session duration: find last session.start with no trailing session.end
+      let sessDurationMs = 0;
+      const events = engine.events;
+      if (events.length > 0) {
+        let lastStartIdx = -1;
+        for (let i = events.length - 1; i >= 0; i--) {
+          if (events[i]!.event_type === 'session.start') {
+            lastStartIdx = i;
+            break;
+          }
+        }
+        if (lastStartIdx >= 0) {
+          const lastStartTime = new Date(events[lastStartIdx]!.timestamp).getTime();
+          const hasEnd = events.slice(lastStartIdx + 1).some(e => e.event_type === 'session.end');
+          if (!hasEnd) {
+            sessDurationMs = Date.now() - lastStartTime;
+          }
+        }
+      }
+      engine.track('dashboard.opened', { session_duration_ms: sessDurationMs });
       engine.reload();
       engine.reloadDefinitions();
       const showcaseData = buildShowcaseResponse(engine);

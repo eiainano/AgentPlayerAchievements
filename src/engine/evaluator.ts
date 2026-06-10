@@ -45,6 +45,7 @@ export function matchFilter(event: TrackedEvent, filter: string): boolean {
       : '',
     on_battery: event.payload?.on_battery === true || event.payload?.on_battery === 'true',
     battery_pct: event.payload?.battery_pct != null ? Number(event.payload.battery_pct) : -1,
+    session_duration_ms: event.payload?.session_duration_ms != null ? Number(event.payload.session_duration_ms) : 0,
   };
   try {
     return evalFilter(filter, ctx);

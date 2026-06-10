@@ -840,7 +840,6 @@ function renderAll(data) {
   renderSafe('visit-tip', () => renderFirstVisitTip(data));
   renderSafe('onboarding', () => renderOnboardingGuide(data));
   renderSafe('achievements', () => renderAchievements(data));
-  renderSafe('questlines', () => renderQuestlines(data));
   renderSafe('sets', () => renderSets(data));
   renderSafe('badges', () => renderBadges(data));
   renderSafe('timeline', () => renderTimeline(data));
@@ -1053,7 +1052,7 @@ function renderNav(data) {
   }
 
   const links = document.querySelectorAll('.nav-link');
-  const sections = ['profile', 'achievements', 'questlines', 'sets', 'timeline', 'insights'];
+  const sections = ['profile', 'achievements', 'sets', 'timeline', 'insights'];
   const observer = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (e.isIntersecting) {
@@ -2052,6 +2051,9 @@ function closeModal() {
 function renderSets(data) {
   const grid = document.getElementById('sets-grid');
   if (!grid) return;
+
+  // Render questlines at top of sets tab
+  renderQuestlines(data);
 
   if (!data.sets || data.sets.length === 0) {
     grid.innerHTML = `<div class="empty-state"><span class="empty-state-icon">📦</span><div class="empty-state-text">${t('no_sets')}</div></div>`;

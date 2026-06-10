@@ -3570,6 +3570,27 @@ definitions:
         operator: ">="
         value: 6
     set: linguist
+  - id: sisyphus
+    name: Myth of Sisyphus
+    name_cn: 西西弗斯神话
+    description: Edited the same file 30 times. Push the boulder up, watch it roll down, push again.
+    description_cn: 同一个文件改了 30 次。石头推上去，滚下来，再推上去。
+    icon: 🪨
+    category: challenge
+    rarity: epic
+    hidden: false
+    challenge: true
+    hint: Keep revisiting and refining the same file — persistence pays off
+    hint_cn: 反复回到同一个文件打磨完善——坚持就有回报
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: file.edit
+        same_target: true
+        field: file_path
+        operator: ">="
+        value: 30
+        window: all
   - id: full_spectrum
     name: Full Spectrum
     name_cn: 全光谱

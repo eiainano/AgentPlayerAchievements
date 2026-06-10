@@ -99,3 +99,76 @@ definitions:
     expect(result.definitions).toHaveLength(1);
   });
 });
+
+describe('questlines parsing', () => {
+  it('parses questlines with stages and achievements', () => {
+    const yaml = `
+definitions:
+  - id: test_ach
+    name: Test
+    icon: "🧪"
+    category: test
+    rarity: common
+    conditions:
+      - type: counter
+        event: tool.complete
+        value: 1
+
+questlines:
+  - id: test_quest
+    name: "Test Quest"
+    icon: "🐛"
+    description: "A test questline"
+    stages:
+      - stage: 1
+        name: "Stage One"
+        achievements: [test_ach]
+      - stage: 2
+        name: "Stage Two"
+        achievements: []
+    reward:
+      type: title
+      value: "Test Title"
+`;
+    const result = parseYAML(yaml);
+    expect(result.questlines).toHaveLength(1);
+    const q = result.questlines[0]!;
+    expect(q.id).toBe('test_quest');
+    expect(q.name).toBe('Test Quest');
+    expect(q.icon).toBe('🐛');
+    expect(q.stages).toHaveLength(2);
+    expect(q.stages[0]!.stage).toBe(1);
+    expect(q.stages[0]!.achievements).toEqual(['test_ach']);
+    expect(q.reward.type).toBe('title');
+    expect(q.reward.value).toBe('Test Title');
+  });
+
+  it('returns empty questlines array when YAML has no questlines block', () => {
+    const yaml = `
+definitions:
+  - id: test_ach
+    name: Test
+    icon: "🧪"
+    category: test
+    rarity: common
+    conditions:
+      - type: counter
+        event: tool.complete
+        value: 1
+`;
+    const result = parseYAML(yaml);
+    expect(result.questlines).toEqual([]);
+  });
+
+  it('validates real achievement-definitions.yaml has 5 questlines', () => {
+    const fs = require('fs');
+    const yaml = fs.readFileSync('achievement-definitions.yaml', 'utf-8');
+    const result = parseYAML(yaml);
+    expect(result.questlines).toHaveLength(5);
+    for (const q of result.questlines) {
+      expect(q.stages.length).toBe(3);
+      const totalAchs = q.stages.reduce((s, st) => s + st.achievements.length, 0);
+      expect(totalAchs).toBeGreaterThan(0);
+    }
+  });
+});

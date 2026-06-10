@@ -252,7 +252,7 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
           payload: {
             char_count: pp.char_count,
             word_count: pp.word_count,
-            text_content: promptText,
+            text_content: promptText.slice(0, 200), // truncated — enough for keyword matching, limits secret exposure
             source: 'hook_auto',
           },
         });

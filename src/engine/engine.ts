@@ -9,7 +9,7 @@ import type { AgentToolStats } from './stats.js';
 import type {
   TrackedEvent, EventType, EventPayload,
   AchievementDefinition, AchievementState, AchievementStats,
-  EngineOptions, SetDefinition,
+  EngineOptions, SetDefinition, QuestlineDefinition,
 } from './types.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -39,6 +39,7 @@ export class AchievementEngine {
 
   definitions: AchievementDefinition[] = [];
   setDefinitions: SetDefinition[] = [];
+  questlineDefinitions: QuestlineDefinition[] = [];
   events: TrackedEvent[] = [];
   state: AchievementState = { unlocked: {}, stats: { total_unlocked: 0 } };
   unlockedThisPoll: AchievementDefinition[] = [];
@@ -79,6 +80,7 @@ export class AchievementEngine {
     if (parsed.definitions.length === 0) throw new Error('No achievement definitions loaded');
 
     this.setDefinitions = parsed.sets;
+    this.questlineDefinitions = parsed.questlines;
 
     // Filter by enabled categories if set
     this.definitions = this.enabledCategories
@@ -281,6 +283,7 @@ export class AchievementEngine {
     const parsed = parseYAML(yaml);
     if (parsed.definitions.length === 0) throw new Error('No achievement definitions loaded');
     this.setDefinitions = parsed.sets;
+    this.questlineDefinitions = parsed.questlines;
     this.definitions = this.enabledCategories
       ? parsed.definitions.filter(d => this.enabledCategories!.includes(d.category))
       : parsed.definitions;

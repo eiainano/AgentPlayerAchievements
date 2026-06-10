@@ -1,5 +1,10 @@
 # Changelog
 
+### 春节成就 — 2026-06-10
+
+- **新增 `spring_festival`** — "Lunar New Year" / 新春大吉 🧧，隐藏 epic。使用 `month == 1 && day > 20 || month == 2 && day < 21` 范围覆盖农历新年浮动日期（1月21日~2月20日）
+- **测试更新**：auditor 成就计数 191→192
+
 ### 节日成就（圣诞/元旦/情人节）+ month/day filter 支持 — 2026-06-10
 
 - **matchFilter 增加 month/day**：从 `event.timestamp` 提取月份和日期，filter 表达式支持 `month == 12 && day == 25` 的语法

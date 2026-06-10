@@ -252,6 +252,7 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
           payload: {
             char_count: pp.char_count,
             word_count: pp.word_count,
+            text_content: promptText,
             source: 'hook_auto',
           },
         });

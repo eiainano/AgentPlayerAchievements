@@ -35,6 +35,7 @@ export function matchFilter(event: TrackedEvent, filter: string): boolean {
     has_code_block: event.payload?.has_code_block === true || event.payload?.has_code_block === 'true',
     has_question_mark: event.payload?.has_question_mark === true || event.payload?.has_question_mark === 'true',
     language: typeof event.payload?.language === 'string' ? event.payload.language : '',
+    text_content: typeof event.payload?.text_content === 'string' ? event.payload.text_content : '',
   };
   try {
     return evalFilter(filter, ctx);

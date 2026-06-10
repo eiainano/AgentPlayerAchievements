@@ -2228,6 +2228,80 @@ definitions:
         event: conversation.message
         pattern: I'm sorry.*can't.*|I'm afraid.*can't.*|抱歉.*无法.*
         window: single_session
+  - id: please_maybe
+    name: Pretty Please?
+    name_cn: 说"请"
+    description: Said "please" in a prompt — and the agent actually listened.
+    description_cn: 在 prompt 中说了"请"——agent 居然真的听了。
+    icon: 🙏
+    category: hidden
+    rarity: uncommon
+    hidden: true
+    conditions:
+      - type: pattern_match
+        event: user.message
+        pattern: please|pls|plz|求你了|拜托
+  - id: say_please
+    name: Mind Your Manners
+    name_cn: 讲礼貌
+    description: Said "please" 5 times. Your agent appreciates the courtesy.
+    description_cn: 说了 5 次"请"。你的 agent 欣赏你的礼貌。
+    icon: 🎩
+    category: style
+    rarity: rare
+    hidden: true
+    conditions:
+      - type: counter
+        event: user.message
+        filter: text_content contains 'please' || text_content contains 'pls' || text_content contains 'plz'
+        operator: ">="
+        value: 5
+        window: all
+  - id: magic_word
+    name: Abracadabra
+    name_cn: 急急如律令
+    description: Said "abracadabra" or "open sesame" in a prompt. Is that a magic word?
+    description_cn: 在 prompt 中说了"急急如律令"或"芝麻开门"。咒语真的有用吗？
+    icon: ✨
+    category: hidden
+    rarity: epic
+    hidden: true
+    conditions:
+      - type: pattern_match
+        event: user.message
+        pattern: abracadabra|open sesame|急急如律令|芝麻开门
+  - id: swear_jar
+    name: Swear Jar
+    name_cn: 脏话罐
+    description: Dropped a swear word in a prompt. That'll be $1 in the jar.
+    description_cn: 在 prompt 里说了脏话。往罐子里交 1 块钱。
+    icon: 🏺
+    category: hidden
+    rarity: uncommon
+    hidden: true
+    conditions:
+      - type: pattern_match
+        event: user.message
+        pattern: damn|shit|fuck|crap|bloody|damnit|what the hell|靠|妈的|卧槽|操
+  - id: tl_dr
+    name: TL;DR
+    name_cn: 太长不看
+    description: Asked the agent to summarize something. Classic.
+    description_cn: 让 agent 摘要什么东西。经典操作。
+    icon: 📋
+    category: style
+    rarity: common
+    hidden: false
+    hint: Try asking the agent to summarize a document or conversation
+    hint_cn: 试试让 agent 帮你总结一个文档或对话
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: user.message
+        filter: text_content contains 'summar' || text_content contains 'tldr' || text_content contains 'tl;dr' || text_content contains '总结'
+        operator: ">="
+        value: 3
+        window: all
   - id: early_bird
     name: Early Bird
     name_cn: 早起的鸟儿有虫吃

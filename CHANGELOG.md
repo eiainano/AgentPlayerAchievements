@@ -1,5 +1,12 @@
 # Changelog
 
+### Gwent 成就 + session_duration_ms + dashboard 事件增强 — 2026-06-10
+
+- **新成就 `how_bout_a_round_of_gwent`** — "How 'Bout a Round of Gwent?" / 来局昆特牌吗 ♠️，hidden rare，同一 session 中写代码 + 狂聊 + 打开 Dashboard 查看成就，且 session 已持续 ≥30min。不务正业的猎魔人。
+- **Dashboard 事件增强**：`/api/data` 被访问时自动计算当前持续中的 session 时长（找最后一个 `session.start` 且无后继 `session.end`），附加 `session_duration_ms` 字段到 `dashboard.opened` 事件的 payload
+- **evaluator 上下文扩展**：新增 `session_duration_ms` 数值字段，filter 表达式支持 `session_duration_ms >= 1800000` 类似语法
+- **测试更新**：auditor 成就计数 201→202；every-achievement 新增 gwent 测试
+
 ### 有丝分裂成就 + has_doubled_lines boolean flag — 2026-06-10
 
 - **新成就 `mitosis`** — "Mitosis" / 有丝分裂 🧬，hidden rare，一次编辑让文件行数恰好翻倍。细胞分裂了。

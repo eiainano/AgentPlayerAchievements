@@ -244,10 +244,21 @@ function genEvents(cond: Condition): TrackedEvent[] {
       }
 
       // No field: count events in window
+      // If filter references boolean flags, set them to satisfy "== true" conditions
+      const filterPld: Record<string, unknown> = { ...payload };
+      if (cond.filter) {
+        const boolFlags = cond.filter.match(/(\w+)\s*==\s*true/g);
+        if (boolFlags) {
+          for (const flag of boolFlags) {
+            const m = flag.match(/^(\w+)\s*==\s*true$/);
+            if (m) filterPld[m[1]!] = true;
+          }
+        }
+      }
       const count = Math.max(cond.value, 1);
       const result: TrackedEvent[] = [];
       for (let i = 0; i < count; i++) {
-        result.push(evt(cond.event || 'tool.complete', payload, { ...tsOverride, context: { session_id: 'test-session', model: 'auto', ...ctx } }));
+        result.push(evt(cond.event || 'tool.complete', filterPld, { ...tsOverride, context: { session_id: 'test-session', model: 'auto', ...ctx } }));
       }
       return result;
     }

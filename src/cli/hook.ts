@@ -196,6 +196,9 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
               editPayload.before_lines = tLines - nLines + eLines;
               editPayload.delta_lines = nLines - eLines;
               // Boolean feature flags for achievement conditions (no raw content stored in event log)
+              // Mitosis: file exactly doubled in size (total_file_lines == 2 * before_lines)
+              editPayload.has_doubled_lines = editPayload.before_lines > 0 &&
+                editPayload.total_file_lines === editPayload.before_lines * 2;
               // Detect Transformer Multi-Head Attention code patterns:
               //   PyTorch:  nn.MultiheadAttention, F.scaled_dot_product_attention
               //   TF/Keras: MultiHeadAttention

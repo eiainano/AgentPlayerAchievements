@@ -1,5 +1,11 @@
 # Changelog
 
+### 有丝分裂成就 + has_doubled_lines boolean flag — 2026-06-10
+
+- **新成就 `mitosis`** — "Mitosis" / 有丝分裂 🧬，hidden rare，一次编辑让文件行数恰好翻倍。细胞分裂了。
+- **新 boolean flag `has_doubled_lines`** — hook.ts 在 `file.edit` 事件中本地计算 `total_file_lines === before_lines * 2`，evaluator 上下文新增对应字段，无内容泄露
+- **测试更新**：auditor 成就计数 200→201；every-achievement 新增 mitosis 测试，counter 生成器支持从 filter 中提取 `== true` 布尔标志
+
 ### 灭霸成就 + ratio group_by + 行数变更追踪 — 2026-06-10
 
 - **新成就 `thanos`** — "Thanos" / 灭霸 🧤，hidden epic，单 session 中所有修改文件的最终行数总和恰好等于修改前的一半。完美平衡。

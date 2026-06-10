@@ -3697,6 +3697,25 @@ definitions:
         group_by: file_path
         operator: "=="
         value: 0.5
+  - id: mitosis
+    name: Mitosis
+    name_cn: 有丝分裂
+    description: Edited a file to exactly double its line count. The cell divides.
+    description_cn: 编辑了一个文件，行数恰好翻倍。细胞开始分裂了。
+    icon: 🧬
+    category: hidden
+    rarity: rare
+    hidden: true
+    tip: Ever copy-pasted your own code and called it a refactor? We've all been there.
+    tip_cn: 把自己的代码复制粘贴一遍然后叫重构？大家都干过。
+    hint: Double the code in a file in a single edit
+    hint_cn: 一次编辑让文件代码量翻倍
+    conditions:
+      - type: counter
+        event: file.edit
+        filter: has_doubled_lines == true
+        operator: ">="
+        value: 1
   - id: full_spectrum
     name: Full Spectrum
     name_cn: 全光谱

@@ -2937,14 +2937,14 @@ function createFrame(cfg) {
     itemHTML = '<div class="frame-item surprise">' +
       '<div style="font-size:1.5rem;margin-bottom:4px">❓</div>' +
       '<div style="color:var(--text-primary);font-size:0.82rem;font-style:italic">' + escHtml(item.name) + '</div>' +
-      '<div class="frame-ach-rarity ' + item.rarity + '" style="margin-top:4px">' + item.rarity + '</div>' +
+      '<div class="frame-ach-rarity ' + escHtml(item.rarity) + '" style="margin-top:4px">' + escHtml(item.rarity) + '</div>' +
       '</div>';
   } else if (item.progress) {
     const pct = item.progress.pct || 0;
     itemHTML = '<div class="frame-item">' +
       '<div class="frame-ach-icon">' + escHtml(item.icon) + '</div>' +
       '<div class="frame-ach-name">' + escHtml(item.name) + '</div>' +
-      '<div class="frame-ach-rarity ' + item.rarity + '">' + item.rarity + '</div>' +
+      '<div class="frame-ach-rarity ' + escHtml(item.rarity) + '">' + escHtml(item.rarity) + '</div>' +
       '<div class="frame-ach-progress">' +
         '<div class="progress-bar-bg"><div class="progress-bar-fill" style="width:' + pct + '%"></div></div>' +
         '<span>' + pct + '%</span>' +
@@ -2953,7 +2953,7 @@ function createFrame(cfg) {
     itemHTML = '<div class="frame-item">' +
       '<div class="frame-ach-icon">' + escHtml(item.icon) + '</div>' +
       '<div class="frame-ach-name">' + escHtml(item.name) + '</div>' +
-      '<div class="frame-ach-rarity ' + item.rarity + '">' + item.rarity + '</div></div>';
+      '<div class="frame-ach-rarity ' + escHtml(item.rarity) + '">' + escHtml(item.rarity) + '</div></div>';
   }
   frame.innerHTML = '<div class="frame-icon">' + cfg.icon + '</div>' +
     '<div class="frame-category">' + escHtml(cfg.category) + '</div>' +

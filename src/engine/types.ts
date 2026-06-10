@@ -243,3 +243,36 @@ export interface EngineOptions {
   sessionId?: string;
 }
 
+// ── Recommendation types ───────────────────────────────────────
+
+export type RecommendCategory = 'near_win' | 'discovery' | 'surprise';
+
+export interface RecommendItem {
+  category: RecommendCategory;
+  achievement_id: string;
+  name: string;
+  name_cn?: string;
+  icon: string;
+  rarity: RarityLevel;
+
+  // Near Win 专用
+  progress?: { current: number; target: number; pct: number };
+  unit_label?: string;
+
+  // Discovery 专用
+  discovery_event?: string;
+  discovery_reason?: string;
+
+  // Surprise 专用
+  hint?: string | null;
+  hint_cn?: string | null;
+}
+
+export interface RecommendResponse {
+  near_win: RecommendItem[];
+  discovery: RecommendItem | null;
+  surprise: RecommendItem | null;
+  generated_at: string;
+  session_id?: string;
+}
+

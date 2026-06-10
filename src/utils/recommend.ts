@@ -4,6 +4,7 @@ import type {
   RecommendItem,
   TrackedEvent,
 } from '../engine/types.js';
+import { findNearUnlocks, type NearUnlock } from './progress-nudge.js';
 
 const RARITY_ORDER: Record<string, number> = {
   common: 0,
@@ -63,5 +64,74 @@ export function recommendDiscovery(
     icon: pick.icon || '🔍',
     rarity: pick.rarity,
     discovery_event: cond.event,
+  };
+}
+
+export function hashString(s: string): number {
+  let hash = 5381;
+  for (let i = 0; i < s.length; i++) {
+    hash = ((hash << 5) + hash + s.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
+}
+
+export function recommendSurprise(
+  definitions: AchievementDefinition[],
+  state: AchievementState,
+  sessionId: string,
+): RecommendItem | null {
+  const pool = definitions.filter(d =>
+    d.hidden === true
+    && d.future !== true
+    && !state.unlocked[d.id]
+    && !!(d.hint_cn || d.hint),
+  );
+
+  if (pool.length === 0) return null;
+
+  const index = hashString(sessionId) % pool.length;
+  const pick = pool[index]!;
+
+  return {
+    category: 'surprise',
+    achievement_id: pick.id,
+    name: '',
+    name_cn: '',
+    icon: '?',
+    rarity: pick.rarity,
+    hint: pick.hint ?? null,
+    hint_cn: pick.hint_cn ?? null,
+  };
+}
+
+export function recommendNearWin(
+  definitions: AchievementDefinition[],
+  events: TrackedEvent[],
+  state: AchievementState,
+): RecommendItem[] {
+  const near = findNearUnlocks(definitions, events, state, { maxResults: 5, minProgress: 0.01 });
+  return near.map((n: NearUnlock) => ({
+    category: 'near_win' as const,
+    achievement_id: n.achievement_id,
+    name: n.name,
+    icon: n.icon,
+    rarity: n.rarity,
+    progress: { current: n.current, target: n.target, pct: n.target > 0 ? Math.round((n.current / n.target) * 100) : 0 },
+    unit_label: n.unit_label,
+  }));
+}
+
+export function getRecommendResponse(
+  definitions: AchievementDefinition[],
+  events: TrackedEvent[],
+  state: AchievementState,
+  sessionId: string,
+): import('../engine/types.js').RecommendResponse {
+  return {
+    near_win: recommendNearWin(definitions, events, state),
+    discovery: recommendDiscovery(definitions, events, state),
+    surprise: recommendSurprise(definitions, state, sessionId),
+    generated_at: new Date().toISOString(),
+    session_id: sessionId,
   };
 }

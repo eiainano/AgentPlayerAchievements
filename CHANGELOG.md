@@ -2,7 +2,7 @@
 
 ### 春节成就 — 2026-06-10
 
-- **新增 `spring_festival`** — "Lunar New Year" / 新春大吉 🧧，隐藏 epic。使用 `month == 1 && day > 20 || month == 2 && day < 21` 范围覆盖农历新年浮动日期（1月21日~2月20日）
+- **修正 `spring_festival`** — 从浮动范围改为精确查表（2020-2035 共 16 个精确公历日期），新增 `date_str`（`MM-DD`）filter 上下文配合 `in [list]` 语法实现
 - **测试更新**：auditor 成就计数 191→192
 
 ### 节日成就（圣诞/元旦/情人节）+ month/day filter 支持 — 2026-06-10

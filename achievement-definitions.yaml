@@ -3746,7 +3746,7 @@ definitions:
         event: user.message
         window: 30m
         operator: ">="
-        value: 7
+        value: 6
   - id: full_spectrum
     name: Full Spectrum
     name_cn: 全光谱

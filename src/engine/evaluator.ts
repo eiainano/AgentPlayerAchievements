@@ -36,6 +36,8 @@ export function matchFilter(event: TrackedEvent, filter: string): boolean {
     has_question_mark: event.payload?.has_question_mark === true || event.payload?.has_question_mark === 'true',
     language: typeof event.payload?.language === 'string' ? event.payload.language : '',
     text_content: typeof event.payload?.text_content === 'string' ? event.payload.text_content : '',
+    month: event.timestamp ? new Date(event.timestamp).getMonth() + 1 : -1,
+    day: event.timestamp ? new Date(event.timestamp).getDate() : -1,
   };
   try {
     return evalFilter(filter, ctx);

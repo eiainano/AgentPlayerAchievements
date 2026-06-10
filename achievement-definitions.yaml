@@ -2678,6 +2678,54 @@ definitions:
         window: single_session
         operator: ">="
         value: 5
+  - id: merry_christmas
+    name: Silent Night, Code Bright
+    name_cn: 平安夜，代码明
+    description: Messaged the agent on Christmas Day. Even AI deserves a holiday glow.
+    description_cn: 在圣诞日给 agent 发了消息。AI 也需要节日氛围。 🎄
+    icon: 🎄
+    category: hidden
+    rarity: epic
+    hidden: true
+    conditions:
+      - type: counter
+        event: user.message
+        filter: month == 12 && day == 25
+        operator: ">="
+        value: 1
+        window: all
+  - id: new_year_code
+    name: First Dispatch of the Year
+    name_cn: 新年第一令
+    description: Sent the first prompt of the new year. Your agent is ready for 365 more.
+    description_cn: 在新年第一天发出了第一条 prompt。你的 agent 准备好迎接接下来 365 条了。
+    icon: 🎆
+    category: hidden
+    rarity: epic
+    hidden: true
+    conditions:
+      - type: counter
+        event: user.message
+        filter: month == 1 && day == 1
+        operator: ">="
+        value: 1
+        window: all
+  - id: code_valentine
+    name: Be My Code Valentine
+    name_cn: 代码情人
+    description: Spent Valentine's Day with your agent. Who needs roses when you have a terminal?
+    description_cn: 在情人节和 agent 一起度过。有 terminal 还要什么玫瑰花。
+    icon: 💘
+    category: hidden
+    rarity: epic
+    hidden: true
+    conditions:
+      - type: counter
+        event: user.message
+        filter: month == 2 && day == 14
+        operator: ">="
+        value: 1
+        window: all
   - id: silent_night
     name: Silent Night
     name_cn: 静夜思

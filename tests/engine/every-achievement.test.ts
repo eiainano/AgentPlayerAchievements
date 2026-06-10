@@ -392,9 +392,12 @@ function genEvents(cond: Condition): TrackedEvent[] {
 
     // ── time_gap ────────────────────────────────────────────
     case 'time_gap': {
-      const gapHrs = cond.unit === 'm' ? 1 : cond.unit === 's' ? 1 / 3600 : cond.value;
-      const gapMs = gapHrs * 3600000 + 1000; // just over the threshold
       const t1 = new Date();
+      // When from_filter has hour constraint, set t1 to satisfy it
+      if (cond.from_filter && cond.from_filter.includes('hour >=')) {
+        const m = cond.from_filter.match(/hour\s*>=\s*(\d+)/);
+        t1.setHours(m ? Number(m[1]) : 21, 0, 0, 0);
+      }
       // When cross_day is set, push t2 to the next calendar day
       let t2: Date;
       if (cond.cross_day) {
@@ -402,6 +405,8 @@ function genEvents(cond: Condition): TrackedEvent[] {
         t2.setDate(t2.getDate() + 1);
         t2.setHours(8, 0, 0, 0); // 8am next day — satisfies hour >= 7
       } else {
+        const gapHrs = cond.unit === 'm' ? 1 : cond.unit === 's' ? 1 / 3600 : cond.value;
+        const gapMs = gapHrs * 3600000 + 1000;
         t2 = new Date(t1.getTime() + gapMs);
       }
       return [

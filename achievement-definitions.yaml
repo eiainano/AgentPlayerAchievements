@@ -3750,8 +3750,8 @@ definitions:
   - id: wake_up_samurai
     name: Wake Up, Samurai
     name_cn: 醒醒，武士
-    description: Ended a session before midnight and returned after 7am the next day. We've got a city to burn.
-    description_cn: 深夜离去，清晨归来。我们有一座城市要烧。
+    description: From 9pm to midnight you coded, then returned after 7am. We've got a city to burn.
+    description_cn: 深夜码到 9 点后，清晨 7 点继续回来烧城。
     icon: 🔥
     category: hidden
     rarity: rare
@@ -3766,6 +3766,7 @@ definitions:
         event: user.message
         window: single_session
         cross_day: true
+        from_filter: "hour >= 21"
         to_filter: "hour >= 7"
         operator: ">="
         value: 1

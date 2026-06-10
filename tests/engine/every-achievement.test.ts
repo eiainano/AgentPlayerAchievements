@@ -346,9 +346,18 @@ function genEvents(cond: Condition): TrackedEvent[] {
     // ── ratio ────────────────────────────────────────────────
     case 'ratio': {
       const pld: Record<string, unknown> = { ...payload };
-      // Add buffer to ensure strict operators (> / <) pass
-      if (typeof cond.numerator === 'string') pld[cond.numerator] = Math.ceil(cond.value * 100) + 1;
-      if (typeof cond.denominator === 'string') pld[cond.denominator] = 100;
+      const DEN = 100;
+      if (typeof cond.denominator === 'string') pld[cond.denominator] = DEN;
+      if (typeof cond.numerator === 'string') {
+        // For ==, generate exact match; for others, add buffer for strict operators
+        pld[cond.numerator] = cond.operator === '=='
+          ? Math.round(cond.value * DEN)
+          : Math.ceil(cond.value * DEN) + 1;
+      }
+      // For group_by conditions, include the grouping field so events aren't discarded
+      if (cond.group_by) {
+        pld[cond.group_by] = 'trigger_file';
+      }
       return [evt(cond.event || 'test.event', pld, { ...tsOverride, context: { session_id: 'test-session', model: 'auto', ...ctx } })];
     }
 

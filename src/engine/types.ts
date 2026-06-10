@@ -129,6 +129,8 @@ export interface Condition {
   per_event?: boolean;
   // threshold: upper bound for per_event range checks (exclusive)
   max_value?: number;
+  // ratio: deduplicate events by this field before computing ratio
+  group_by?: string;
 }
 
 export type RarityLevel = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';

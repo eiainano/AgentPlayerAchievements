@@ -1,5 +1,13 @@
 # Changelog
 
+### 灭霸成就 + ratio group_by + 行数变更追踪 — 2026-06-10
+
+- **新成就 `thanos`** — "Thanos" / 灭霸 🧤，hidden epic，单 session 中所有修改文件的最终行数总和恰好等于修改前的一半。完美平衡。
+- **新 condition 字段 `group_by`** — `ratio` 类型新增可选 `group_by` 字段，按指定字段（如 `file_path`）去重后再计算比率。每组取第一个事件的 denominator（初始状态）和最后一个事件的 numerator（最终状态），避免同一文件多次编辑的权重被重复计算
+- **line-delta 追踪**：`file.edit` 事件新增 `new_lines`（新代码行数）、`before_lines`（编辑前文件行数）、`delta_lines`（净变化行数）三个字段，为代码增减分析打基础。使用 existing `ti.new_string` 在 hook 端本地计算，无内容泄露
+- **yaml-parser / types 扩展**：`Condition` 接口和 `buildCondition()` 增加 `group_by` 字段透传
+- **测试更新**：auditor 成就计数 199→200；every-achievement 新增 thanos 测试，ratio 生成器支持 `==` 精确匹配和 `group_by` payload
+
 ### Attention 判定优化 — 三档位打分：内建 API / matmul+softmax / QKV 投影层 — 2026-06-10
 
 - **改写 `has_attention_pattern`** 检测逻辑：移除泛化的 `query`/`key`（太容易误匹配），改用三级打分制：

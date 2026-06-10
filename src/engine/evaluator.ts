@@ -784,13 +784,35 @@ function evalRatio(events: TrackedEvent[], cond: Condition): EvaluationResult {
 
   let numerator = 0;
   let denominator = 0;
-  for (const e of events) {
-    if (cond.event && e.event_type !== cond.event) continue;
-    if (!sessionWindow && now - new Date(e.timestamp).getTime() > windowMs) continue;
-    if (cond.filter && !matchFilter(e, cond.filter)) continue;
-    if (!matchRole(e, cond.role)) continue;
-    numerator += Number(e.payload?.[numField]) || 0;
-    denominator += Number(e.payload?.[denField]) || 0;
+
+  if (cond.group_by) {
+    // Deduplicate by group_by field: for each unique group, take the first
+    // event's denominator (initial state) and the last event's numerator (final state).
+    // This handles e.g. multiple edits to the same file — only initial vs final counts.
+    const groups = new Map<string, { first: TrackedEvent; last: TrackedEvent }>();
+    for (const e of events) {
+      if (cond.event && e.event_type !== cond.event) continue;
+      if (!sessionWindow && now - new Date(e.timestamp).getTime() > windowMs) continue;
+      if (cond.filter && !matchFilter(e, cond.filter)) continue;
+      if (!matchRole(e, cond.role)) continue;
+      const key = String(e.payload?.[cond.group_by] ?? '');
+      if (!key) continue;
+      if (!groups.has(key)) groups.set(key, { first: e, last: e });
+      else groups.get(key)!.last = e;
+    }
+    for (const { first, last } of groups.values()) {
+      denominator += Number(first.payload?.[denField]) || 0;
+      numerator += Number(last.payload?.[numField]) || 0;
+    }
+  } else {
+    for (const e of events) {
+      if (cond.event && e.event_type !== cond.event) continue;
+      if (!sessionWindow && now - new Date(e.timestamp).getTime() > windowMs) continue;
+      if (cond.filter && !matchFilter(e, cond.filter)) continue;
+      if (!matchRole(e, cond.role)) continue;
+      numerator += Number(e.payload?.[numField]) || 0;
+      denominator += Number(e.payload?.[denField]) || 0;
+    }
   }
 
   if (denominator === 0) return { met: false, progress: 0, target: cond.value };

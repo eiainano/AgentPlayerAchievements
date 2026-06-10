@@ -198,6 +198,7 @@ function buildCondition(type: ConditionType, cond: Record<string, unknown>): Con
     per_event: cond.per_event === true || undefined,
     max_value: typeof cond.max_value === 'number' ? cond.max_value : undefined,
     unit: str(cond, 'unit'),
+    group_by: str(cond, 'group_by'),
   } satisfies Condition;
 }
 

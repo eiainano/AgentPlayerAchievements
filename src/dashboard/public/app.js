@@ -436,6 +436,8 @@ const I18N = {
     nav_insights: 'Insights',
     section_insights: 'Insights',
     recommend_title: 'Explore',
+    recommend_cat_discovery: 'Discovery',
+    recommend_cat_surprise: 'Surprise',
     recommend_near_win: 'These are closest to unlocking',
     recommend_discovery: 'A feature you haven\'t tried yet',
     recommend_surprise: 'A mysterious clue awaits...',
@@ -549,6 +551,8 @@ const I18N = {
     showcase_auto_title: '自动填充(最稀有)',
     no_sets: '暂无套装定义。',
     recommend_title: '探索',
+    recommend_cat_discovery: '探索发现',
+    recommend_cat_surprise: '神秘彩蛋',
     recommend_near_win: '这些成就近在咫尺',
     recommend_discovery: '一个你未曾尝试的功能',
     recommend_surprise: '一条神秘的线索在等你...',
@@ -2867,6 +2871,22 @@ function initRecommendWidget() {
       .then(data => { if (data.recommend) startCarousel(data.recommend); })
       .catch(() => {});
   });
+
+  // ESC key closes the panel
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeRecommendWidget(); }
+  });
+
+  // Click outside panel closes it
+  document.addEventListener('click', e => {
+    const panel = document.getElementById('recommend-panel');
+    const toggle = document.getElementById('recommend-toggle');
+    const widget = document.getElementById('recommend-widget');
+    if (!panel || !toggle || !widget) return;
+    if (widget.classList.contains('collapsed')) return; // already closed
+    if (panel.contains(e.target) || toggle.contains(e.target)) return; // click inside panel or on toggle
+    closeRecommendWidget();
+  });
 }
 
 function closeRecommendWidget() {
@@ -2914,13 +2934,13 @@ function buildCarouselFrames(data) {
 
   if (data.discovery) {
     const d = data.discovery;
-    frames.push(createFrame({ icon: '🔍', category: 'Discovery', reason: t('recommend_discovery'),
+    frames.push(createFrame({ icon: '🔍', category: t('recommend_cat_discovery'), reason: t('recommend_discovery'),
       item: { icon: d.icon || '🔌', name: d.name_cn || d.name, rarity: d.rarity, progress: null } }));
   }
 
   if (data.surprise) {
     const s = data.surprise;
-    frames.push(createFrame({ icon: '🎲', category: 'Surprise', reason: t('recommend_surprise'),
+    frames.push(createFrame({ icon: '🎲', category: t('recommend_cat_surprise'), reason: t('recommend_surprise'),
       item: { icon: '?', name: (s.hint_cn || s.hint || '???'), rarity: s.rarity, progress: null, isSurprise: true } }));
   }
 

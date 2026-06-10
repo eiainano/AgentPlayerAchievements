@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { buildAchievementsResponse, buildSetsResponse } from '../../src/dashboard/api.js';
-import type { AchievementDefinition, AchievementState } from '../../src/engine/types.js';
+import { buildAchievementsResponse, buildSetsResponse, buildQuestlinesResponse } from '../../src/dashboard/api.js';
+import type { AchievementDefinition, AchievementState, QuestlineDefinition } from '../../src/engine/types.js';
 
 function makeDef(overrides: Partial<AchievementDefinition>): AchievementDefinition {
   return {
@@ -67,5 +67,39 @@ describe('buildSetsResponse', () => {
     const setA = result.find(s => s.id === 'set_a')!;
     expect(setA.total).toBe(2);
     expect(setA.completed).toBe(0); // none of set_a members are in state.unlocked
+  });
+});
+
+describe('buildQuestlinesResponse', () => {
+  it('builds questline items with stage progress', () => {
+    const defs: any[] = [
+      { id: 'ach_a', name: 'A', description: '', icon: '🌟', category: 'test', rarity: 'common', conditions: [] },
+      { id: 'ach_b', name: 'B', description: '', icon: '🌟', category: 'test', rarity: 'common', conditions: [] },
+      { id: 'ach_c', name: 'C', description: '', icon: '🌟', category: 'test', rarity: 'common', conditions: [] },
+    ];
+    const qDefs: QuestlineDefinition[] = [{
+      id: 'test_quest',
+      name: 'Test Quest',
+      icon: '🐛',
+      description: 'A test',
+      description_cn: '测试',
+      stages: [
+        { stage: 1, name: 'S1', name_cn: 'S1阶段', achievements: ['ach_a', 'ach_b'] },
+        { stage: 2, name: 'S2', name_cn: 'S2阶段', achievements: ['ach_c'] },
+      ],
+      reward: { type: 'title', value: 'Winner' },
+    }];
+    const state: any = { unlocked: { ach_a: '2026-01-01T00:00:00Z' } };
+    const result = buildQuestlinesResponse(qDefs, defs as any, state);
+    expect(result).toHaveLength(1);
+    expect(result[0]!.unlocked_count).toBe(1);
+    expect(result[0]!.total_count).toBe(3);
+    expect(result[0]!.current_stage).toBe(1);
+    expect(result[0]!.completed).toBe(false);
+  });
+
+  it('returns empty array when no questline definitions', () => {
+    const result = buildQuestlinesResponse([], [], {} as any);
+    expect(result).toEqual([]);
   });
 });

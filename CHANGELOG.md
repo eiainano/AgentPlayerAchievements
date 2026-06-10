@@ -1,5 +1,13 @@
 # Changelog
 
+### 关键词匹配成就 + user.message text_content + filter 增强 — 2026-06-10
+
+- **`user.message` 事件新增 text_content**：hook.ts 在 `UserPromptSubmit` 时将用户消息原文存入 payload.text_content，pattern_match 和 counter+filter 可以直接匹配关键词
+- **matchFilter 上下文扩展**：`evaluator.ts` 添加 text_content 字段，filter 表达式支持 `text_content contains 'keyword'` 语法
+- **6 个关键词触发成就**：`please_maybe`（说"请"）、`say_please`（5次礼貌）、`magic_word`（说咒语）、`swear_jar`（说了脏话）、`tl_dr`（让 agent 总结）
+- **移除** `rewrite_king`（"One More Time" 成就）
+- **测试更新**：auditor 成就计数 183→188，全量 1025/1028 测试通过（3 个 banner 测试为已有失败）
+
 ### 数据迁移框架 + XP 系统调优 + Streak 乘法 + /achievements 命令增强 — 2026-06-10
 
 - **数据迁移框架**：`src/engine/migrate.ts` 新建，`migrateState()` 在 `store.load()` 入口自动执行增量迁移链。只补字段不删不改，失败熔断，幂等。`AchievementState` 新增 `schema_version` + `migration_history`

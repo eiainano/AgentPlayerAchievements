@@ -201,21 +201,28 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
                 lower.includes('multiheadattention');
 
               let attnScore = 0;
-              if (lower.includes('softmax')) attnScore++;                         // attention normalization
+              // Ops (strict — specific math operations)
+              if (lower.includes('softmax')) attnScore++;
               if (lower.includes('matmul') || lower.includes('.transpose') ||
-                  lower.includes('.permute')) attnScore++;                        // Q @ K^T
-              if (lower.includes('multihead') || lower.includes('multi_head') ||
-                  lower.includes('multi-head')) attnScore++;                      // multi-head naming
-              if (lower.includes('num_heads') || lower.includes('nhead')) attnScore++;  // head config
-              if (lower.includes('scaled_dot')) attnScore++;                      // scaled dot-product
-              if (lower.includes('qkv') || lower.includes('q_proj') ||
-                  lower.includes('k_proj') || lower.includes('v_proj') ||
-                  lower.includes('w_q') || lower.includes('w_k') ||
-                  lower.includes('w_v')) attnScore++;                             // QKV projection layers
-              if (lower.includes('attn_weights') ||
-                  lower.includes('attention_weights')) attnScore++;               // weight matrices
+                  lower.includes('.permute')) attnScore++;
+              if (lower.includes('scaled_dot')) attnScore++;
               if (lower.includes('sqrt') && (lower.includes('d_k') ||
-                  lower.includes('d_model'))) attnScore++;                        // scaling factor
+                  lower.includes('d_model') || lower.includes('head_dim'))) attnScore++;
+              // Variable / API names (relaxed — broad coverage)
+              if (lower.includes('multi_head') || lower.includes('multi-head') ||
+                  lower.includes('multihead') || lower.includes('n_head') ||
+                  lower.includes('nhead') || lower.includes('num_head') ||
+                  lower.includes('head_dim')) attnScore++;
+              if (lower.includes('qkv') || lower.includes('wqkv') ||
+                  lower.includes('q_proj') || lower.includes('k_proj') || lower.includes('v_proj') ||
+                  lower.includes('w_q') || lower.includes('w_k') || lower.includes('w_v') ||
+                  lower.includes('q_linear') || lower.includes('k_linear') || lower.includes('v_linear') ||
+                  lower.includes('in_proj') || lower.includes('out_proj') || lower.includes('o_proj')) attnScore++;
+              if (lower.includes('attn_weight') || lower.includes('attention_weight') ||
+                  lower.includes('attn_score') || lower.includes('attention_score') ||
+                  lower.includes('attn_output') || lower.includes('attention_output') ||
+                  lower.includes('attn_drop') || lower.includes('attn_mask') ||
+                  lower.includes('attention_mask') || lower.includes('causal_mask')) attnScore++;
 
               editPayload.has_attention_pattern =
                 lower.includes('attention') && (isBuiltin || attnScore >= 1);

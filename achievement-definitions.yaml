@@ -2738,7 +2738,7 @@ definitions:
     conditions:
       - type: counter
         event: user.message
-        filter: month == 1 && day > 20 || month == 2 && day < 21
+        filter: date_str in ['01-22','01-23','01-25','01-26','01-29','01-31','02-01','02-03','02-06','02-08','02-10','02-11','02-12','02-13','02-17','02-19']
         operator: ">="
         value: 1
         window: all

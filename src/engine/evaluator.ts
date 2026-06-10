@@ -38,6 +38,9 @@ export function matchFilter(event: TrackedEvent, filter: string): boolean {
     text_content: typeof event.payload?.text_content === 'string' ? event.payload.text_content : '',
     month: event.timestamp ? new Date(event.timestamp).getMonth() + 1 : -1,
     day: event.timestamp ? new Date(event.timestamp).getDate() : -1,
+    date_str: event.timestamp
+      ? String(new Date(event.timestamp).getMonth() + 1).padStart(2, '0') + '-' + String(new Date(event.timestamp).getDate()).padStart(2, '0')
+      : '',
   };
   try {
     return evalFilter(filter, ctx);

@@ -3361,6 +3361,24 @@ definitions:
     tip: Sub-agents let you parallelize work. Each agent works independently on its task — one can refactor while another
       writes tests. Great for large migrations, multi-file changes, and code review.
     tip_cn: 子 agent 让你并行工作。每个 agent 独立处理自己的任务——一个重构代码，另一个写测试。适合大规模迁移、多文件修改和代码审查。
+  - id: ultraman_8
+    name: Ultraman 8 Brothers
+    name_cn: 超奥特曼8兄弟
+    description: Spawned exactly 8 sub-agents in a single session. Eight heroes, one light.
+    description_cn: 同一 session 中恰好 spawn 了 8 个子 agent。八位英雄，一束光。
+    icon: 🦸
+    category: workflow
+    rarity: rare
+    hidden: false
+    hint: Assemble a full team — eight agents, synchronized
+    hint_cn: 召集满编队伍——八个 agent，协同作战
+    conditions:
+      - type: counter
+        event: agent.spawn
+        window: single_session
+        operator: ==
+        value: 8
+    set: agent_commander
   - id: avengers_assemble
     name: Avengers Assemble
     name_cn: 复仇者集结

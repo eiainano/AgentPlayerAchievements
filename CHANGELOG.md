@@ -1,6 +1,18 @@
 # Changelog
 
-### 新增 time_gap 条件类型 + "时光裂缝"成就 — 2026-06-10
+### Attention 判定优化 — 三档位打分：内建 API / matmul+softmax / QKV 投影层 — 2026-06-10
+
+- **改写 `has_attention_pattern`** 检测逻辑：移除泛化的 `query`/`key`（太容易误匹配），改用三级打分制：
+  - **Level A（内建 API，自带满分）**：`F.scaled_dot_product_attention`、`nn.MultiheadAttention`、`MultiHeadAttention` → 任一命中直接判 true
+  - **Level B（中频指标）**：`softmax`、`matmul`/`transpose`、`multi_head`、`num_heads`/`nhead`、`scaled_dot`、`attn_weights`、`qkv`/`q_proj`/`k_proj`/`v_proj` → 命中 ≥ 2 即 true
+  - **Level C（弱信号）**：`sqrt` + (`d_k` 或 `d_model`) → 仅在有 B 级指标时计为辅助分
+- **要点**：`attention` 关键字仍是必要条件，然后 `isBuiltin || attnScore >= 2`
+
+- **新成就 `matrix`** — "The Matrix" / 黑客帝国 💊，hidden rare，编辑一个 `.m` (MATLAB) 文件触发。红药丸还是蓝药丸？
+- **新成就 `attention_is_all_you_need`** — "Attention Is All You Need" / 变形金刚 🚚，hidden rare，编辑包含 Transformer 经典 Multi-Head Attention 代码的 `.py` 文件触发。汽车人，变形出发！
+- **安全增强**：`file.edit` 事件不再将原始文件内容写入事件日志。改用本地计算的 boolean 特征标志 `has_attention_pattern`，仅当文件中包含 "attention" + ≥2 个 QKV/softmax/multihead/scaled_dot 指标时才设为 true
+- **evaluator 上下文扩展**：新增 `has_attention_pattern` 布尔字段
+- **测试更新**：auditor 成就计数 197→199（两次累加），hook file.edit 新增 `has_attention_pattern` 测试覆盖
 
 - **新增条件类型 `time_gap`**：检查同一窗口内连续两个同类型事件的时间间隔，支持 `unit` 字段（ms/s/m/h/d，默认 h）。在 `types.ts`、`evaluator.ts`（`evalTimeGap()`）、`yaml-parser.ts`（白名单）全链路实现
 - **Filter DSL 增强**：`evaluator.ts` 新增 `<=` 和 `>=` 运算符支持；test 中新增 `time_gap` 用例（生成间隔>2h 的两个事件）

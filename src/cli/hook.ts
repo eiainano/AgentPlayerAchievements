@@ -188,16 +188,37 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
               const content = fs.readFileSync(resolved, 'utf-8');
               editPayload.total_file_lines = content.split('\n').length;
               // Boolean feature flags for achievement conditions (no raw content stored in event log)
-              // Multi-Head Attention pattern: "attention" + at least 2 QKV/softmax indicators
+              // Detect Transformer Multi-Head Attention code patterns:
+              //   PyTorch:  nn.MultiheadAttention, F.scaled_dot_product_attention
+              //   TF/Keras: MultiHeadAttention
+              //   Manual:   matmul(Q, K^T) / sqrt(d_k), softmax, scaled_dot
+              //   Proj:     q_proj, k_proj, v_proj, w_q, w_k
               const lower = content.toLowerCase();
-              const attnIndicators = [
-                lower.includes('query'),
-                lower.includes('key'),
-                lower.includes('softmax'),
-                lower.includes('multihead') || lower.includes('multi_head') || lower.includes('multi-head'),
-                lower.includes('scaled_dot'),
-              ].filter(Boolean).length;
-              editPayload.has_attention_pattern = lower.includes('attention') && attnIndicators >= 2;
+
+              // Built-in attention APIs — highly specific, instant match
+              const isBuiltin = lower.includes('scaled_dot_product_attention') ||
+                lower.includes('nn.multiheadattention') ||
+                lower.includes('multiheadattention');
+
+              let attnScore = 0;
+              if (lower.includes('softmax')) attnScore++;                         // attention normalization
+              if (lower.includes('matmul') || lower.includes('.transpose') ||
+                  lower.includes('.permute')) attnScore++;                        // Q @ K^T
+              if (lower.includes('multihead') || lower.includes('multi_head') ||
+                  lower.includes('multi-head')) attnScore++;                      // multi-head naming
+              if (lower.includes('num_heads') || lower.includes('nhead')) attnScore++;  // head config
+              if (lower.includes('scaled_dot')) attnScore++;                      // scaled dot-product
+              if (lower.includes('qkv') || lower.includes('q_proj') ||
+                  lower.includes('k_proj') || lower.includes('v_proj') ||
+                  lower.includes('w_q') || lower.includes('w_k') ||
+                  lower.includes('w_v')) attnScore++;                             // QKV projection layers
+              if (lower.includes('attn_weights') ||
+                  lower.includes('attention_weights')) attnScore++;               // weight matrices
+              if (lower.includes('sqrt') && (lower.includes('d_k') ||
+                  lower.includes('d_model'))) attnScore++;                        // scaling factor
+
+              editPayload.has_attention_pattern =
+                lower.includes('attention') && (isBuiltin || attnScore >= 2);
             } catch { /* file gone */ }
           }
         }

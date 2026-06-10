@@ -2759,11 +2759,11 @@ definitions:
         value: 1
         window: all
   - id: mind_the_gap
-    name: Mind the Gap
-    name_cn: 时光裂缝
-    description: Over 2 hours between two messages in the same session. You were so deep in thought the AI wondered if you'd left.
-    description_cn: 同一次 session 中两次消息间隔超过 2 小时。AI 差点以为你人没了。
-    icon: ⏳
+    name: Movie Ticket
+    name_cn: 电影票
+    description: Over 2 hours between two messages in the same session. Did you go watch a movie?
+    description_cn: 同一次 session 中两次消息间隔超过 2 小时。你是去看电影了吗？
+    icon: 🎬
     category: hidden
     rarity: epic
     hidden: true

@@ -2116,7 +2116,7 @@ function renderQuestlines(data) {
         '</div>';
       }).join('');
       return '<div class="questline-stage">' +
-        '<div class="questline-stage-header">' + t('questlines_stage') + ' ' + s.stage + ': ' + escHtml(stageNameStr) + ' — ' + s.completed + '/' + s.total + '</div>' +
+        '<div class="questline-stage-header">' + t('questlines_stage') + ' ' + escHtml(String(s.stage)) + ': ' + escHtml(stageNameStr) + ' — ' + escHtml(String(s.completed)) + '/' + escHtml(String(s.total)) + '</div>' +
         '<div class="questline-stage-achs">' + achsHtml + '</div>' +
       '</div>';
     }).join('');
@@ -2133,12 +2133,12 @@ function renderQuestlines(data) {
           '<div class="questline-card-desc">' + escHtml(displayDesc) + '</div>' +
         '</div>' +
         '<div class="questline-card-meta">' +
-          '<div class="questline-card-stage">' + t('questlines_stage') + ' ' + ql.current_stage + ': ' + escHtml(stageName) + '</div>' +
-          '<div class="questline-card-progress">' + ql.unlocked_count + '/' + ql.total_count + '</div>' +
+          '<div class="questline-card-stage">' + t('questlines_stage') + ' ' + escHtml(String(ql.current_stage)) + ': ' + escHtml(stageName) + '</div>' +
+          '<div class="questline-card-progress">' + escHtml(String(ql.unlocked_count)) + '/' + escHtml(String(ql.total_count)) + '</div>' +
         '</div>' +
       '</div>' +
       '<div class="questline-card-bar">' +
-        '<div class="questline-card-bar-fill" style="width:' + pct + '%"></div>' +
+        '<div class="questline-card-bar-fill" style="width:' + escHtml(String(pct)) + '%"></div>' +
       '</div>' +
       '<div class="questline-stages">' + stagesHtml + rewardHtml + '</div>' +
     '</div>';

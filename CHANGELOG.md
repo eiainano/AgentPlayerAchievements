@@ -1,5 +1,13 @@
 # Changelog
 
+### buildQuestlinesResponse API — 2026-06-11
+
+- **`src/dashboard/api.ts`**：新增 `buildQuestlinesResponse()` 函数，将 `QuestlineDefinition[]` 转换为带阶段进度、当前阶段和完成状态的响应数据；按完成百分比降序排列
+- 新增 `QuestlineStageItem` 和 `QuestlineItem` 接口作为响应类型
+- `DashboardData` 新增可选字段 `questlines?: QuestlineItem[]`
+- `buildApiResponse()` 新增参数 `questlineDefinitions?: QuestlineDefinition[]`
+- **`src/dashboard/server.ts`**：两处 `buildApiResponse()` 调用均传入 `engine.questlineDefinitions`
+
 ### 推荐系统 2.0 全面实施 — 2026-06-11
 
 - **设计 spec**：`docs/superpowers/specs/2026-06-10-recommendation-system-2.0-design.md`（630 行完整设计）

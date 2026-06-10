@@ -183,6 +183,36 @@ function sequenceCountProgress(events: TrackedEvent[], cond: Condition): number 
   return count;
 }
 
+/** Compute partial match progress for ordered sequence conditions */
+function sequenceProgress(events: TrackedEvent[], cond: Condition): number | null {
+  const pattern = Array.isArray(cond.pattern) ? (cond.pattern as string[]) : null;
+  if (!pattern || pattern.length === 0) return null;
+  let matched = 0;
+  for (const e of events) {
+    if (e.event_type === pattern[matched]) {
+      matched++;
+      if (matched >= pattern.length) return pattern.length; // fully matched
+    }
+  }
+  return matched; // partial match steps
+}
+
+/** Estimate progress for pattern_match conditions — count matching events */
+function patternMatchProgress(events: TrackedEvent[], cond: Condition): number | null {
+  if (!cond.pattern) return null;
+  const scoped = scopedEvents(events, cond);
+  const hits = scoped.filter(e => matchFilter(e, { pattern: cond.pattern })).length;
+  return Math.min(hits, cond.value);
+}
+
+/** Progress for ratio conditions — current numerator value (denominator handled by evaluator) */
+function ratioProgress(events: TrackedEvent[], cond: Condition): number | null {
+  if (!cond.metric) return null;
+  const val = evaluateMetric(cond.metric, events);
+  if (val === null || val === undefined) return null;
+  return Math.round(val * 1000) / 1000;
+}
+
 // ── Main calculator ────────────────────────────────────────────────
 
 /**
@@ -249,8 +279,32 @@ export function findNearUnlocks(
         unitLabel = cond.unit || 'cycles';
         break;
       }
+      case 'sequence': {
+        const val = sequenceProgress(events, cond);
+        if (val === null) continue;
+        current = val;
+        target = cond.value;
+        unitLabel = cond.unit || 'events';
+        break;
+      }
+      case 'pattern_match': {
+        const val = patternMatchProgress(events, cond);
+        if (val === null) continue;
+        current = val;
+        target = cond.value;
+        unitLabel = cond.unit || 'events';
+        break;
+      }
+      case 'ratio': {
+        const val = ratioProgress(events, cond);
+        if (val === null) continue;
+        current = val;
+        target = cond.value;
+        unitLabel = cond.unit || cond.metric || 'ratio';
+        break;
+      }
       default:
-        // sequence, event, mode, pattern_match, ratio — skip
+        // event, mode — skip
         continue;
     }
 

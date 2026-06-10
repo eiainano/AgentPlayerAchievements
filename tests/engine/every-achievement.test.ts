@@ -49,6 +49,17 @@ function evt(
 interface FilterReqs {
   payload: Record<string, unknown>;
   context: Record<string, unknown>;
+  timestampMonth?: number;  // 1-12
+  timestampDay?: number;    // 1-31
+}
+
+/** Helper: build ISO timestamp string for the given month/day in the current year */
+function buildTimestamp(month: number, day: number): string {
+  const now = new Date();
+  const d = new Date(now.getFullYear(), month - 1, day);
+  // If the date has already passed this year, use next year
+  if (d < now) d.setFullYear(d.getFullYear() + 1);
+  return d.toISOString();
 }
 
 /** Parse AND-chained filters by extracting each atomic predicate */
@@ -56,8 +67,12 @@ function parseFilter(filter: string | undefined): FilterReqs {
   const req: FilterReqs = { payload: {}, context: {} };
   if (!filter) return req;
 
+  // If filter uses ||, parse the first branch (enough to trigger unlock)
+  const orBranches = filter.split('||').map(s => s.trim());
+  const effective = orBranches.length > 1 ? orBranches[0]! : filter;
+
   // Split on && — process each part
-  const parts = filter.split('&&').map(s => s.trim());
+  const parts = effective.split('&&').map(s => s.trim());
   for (const part of parts) {
     applyPredicate(part, req);
   }
@@ -72,6 +87,25 @@ function applyPredicate(expr: string, req: FilterReqs): void {
   // model == 'xxx'
   m = expr.match(/model\s*==\s*'([^']+)'/);
   if (m) { req.context.model = m[1]!; return; }
+
+  // month == N (timestamp-derived, not payload)
+  m = expr.match(/month\s*==\s*(\d+)/);
+  if (m) { req.timestampMonth = Number(m[1]); return; }
+
+  // day == N (timestamp-derived, not payload)
+  m = expr.match(/day\s*==\s*(\d+)/);
+  if (m) { req.timestampDay = Number(m[1]); return; }
+
+  // date_str in ['MM-DD', ...] — pick first and extract month/day
+  m = expr.match(/date_str\s+in\s+\[(.+?)\]/);
+  if (m) {
+    const items = m[1]!.split(',').map(s => s.trim().replace(/^'/, '').replace(/'$/, ''));
+    const first = items[0] || '01-01';
+    const [mo, dy] = first.split('-').map(Number);
+    req.timestampMonth = mo;
+    req.timestampDay = dy;
+    return;
+  }
 
   // field == true/false (unquoted)
   m = expr.match(/(\w+)\s*==\s*(true|false)\b/);
@@ -89,7 +123,7 @@ function applyPredicate(expr: string, req: FilterReqs): void {
   m = expr.match(/(\w+)\s*!=\s*'([^']+)'/);
   if (m) { req.payload[m[1]!] = 'not-' + m[2]!; return; }
 
-  // field in [v1, v2, ...]
+  // field in [v1, v2, ...] — for non-date_str fields
   m = expr.match(/(\w+)\s+in\s+\[(.+?)\]/);
   if (m) {
     const items = m[2]!.split(',').map(s => s.trim().replace(/^'/, '').replace(/'$/, ''));
@@ -126,6 +160,12 @@ function genEvents(cond: Condition): TrackedEvent[] {
   const ctx: Partial<TrackedEvent['context']> = {};
   if (fr.context.model) ctx.model = fr.context.model as string;
 
+  // Build timestamp override if filter specifies month/day or date_str
+  const tsOverride: Partial<TrackedEvent> = {};
+  if (fr.timestampMonth != null && fr.timestampDay != null) {
+    tsOverride.timestamp = buildTimestamp(fr.timestampMonth, fr.timestampDay);
+  }
+
   // Add role to payload if condition specifies it
   if (cond.role) payload.role = cond.role;
 
@@ -133,7 +173,7 @@ function genEvents(cond: Condition): TrackedEvent[] {
 
     // ── event: just needs one event of given type ────────────
     case 'event':
-      return [evt(cond.event || 'test.event', payload, { context: { session_id: 'test-session', model: 'auto', ...ctx } })];
+      return [evt(cond.event || 'test.event', payload, { ...tsOverride, context: { session_id: 'test-session', model: 'auto', ...ctx } })];
 
     // ── counter: needs N matching events ─────────────────────
     case 'counter': {
@@ -149,13 +189,13 @@ function genEvents(cond: Condition): TrackedEvent[] {
       // same_target with field: generate target events all with the SAME field value
       if (cond.same_target && cond.field) {
         for (let i = 0; i < target; i++) {
-          result.push(evt(cond.event || 'tool.complete', { ...payload, [cond.field]: 'same-val' }, { context: { session_id: 'test-session', model: 'auto', ...ctx } }));
+          result.push(evt(cond.event || 'tool.complete', { ...payload, [cond.field]: 'same-val' }, { ...tsOverride, context: { session_id: 'test-session', model: 'auto', ...ctx } }));
         }
         return result;
       }
 
       for (let i = 0; i < target; i++) {
-        result.push(evt(cond.event || 'tool.complete', payload, { context: { session_id: 'test-session', model: 'auto', ...ctx } }));
+        result.push(evt(cond.event || 'tool.complete', payload, { ...tsOverride, context: { session_id: 'test-session', model: 'auto', ...ctx } }));
       }
       return result;
     }
@@ -170,7 +210,7 @@ function genEvents(cond: Condition): TrackedEvent[] {
           : cond.operator === '>=' ? cond.value
           : cond.value;
         const eventPayload = { ...payload, [cond.field]: adjusted };
-        return [evt(cond.event || 'task.complete', eventPayload, { context: { session_id: 'test-session', model: 'auto', ...ctx } })];
+        return [evt(cond.event || 'task.complete', eventPayload, { ...tsOverride, context: { session_id: 'test-session', model: 'auto', ...ctx } })];
       }
 
       if (cond.metric) {
@@ -183,7 +223,7 @@ function genEvents(cond: Condition): TrackedEvent[] {
           ? Math.max(1, Math.floor(cond.value * 100) - 1)
           : Math.ceil(cond.value * 100) + 1;
         const eventPayload = { ...payload, [numF]: numVal, [denF]: 100 };
-        return [evt(cond.event || 'file.edit', eventPayload, { context: { session_id: 'test-session', model: 'auto', ...ctx } })];
+        return [evt(cond.event || 'file.edit', eventPayload, { ...tsOverride, context: { session_id: 'test-session', model: 'auto', ...ctx } })];
       }
 
       if (cond.field) {
@@ -192,14 +232,14 @@ function genEvents(cond: Condition): TrackedEvent[] {
           : cond.operator === '>=' ? cond.value
           : cond.value;
         const eventPayload = { ...payload, [cond.field]: adjusted };
-        return [evt(cond.event || 'tool.complete', eventPayload, { context: { session_id: 'test-session', model: 'auto', ...ctx } })];
+        return [evt(cond.event || 'tool.complete', eventPayload, { ...tsOverride, context: { session_id: 'test-session', model: 'auto', ...ctx } })];
       }
 
       // No field: count events in window
       const count = Math.max(cond.value, 1);
       const result: TrackedEvent[] = [];
       for (let i = 0; i < count; i++) {
-        result.push(evt(cond.event || 'tool.complete', payload, { context: { session_id: 'test-session', model: 'auto', ...ctx } }));
+        result.push(evt(cond.event || 'tool.complete', payload, { ...tsOverride, context: { session_id: 'test-session', model: 'auto', ...ctx } }));
       }
       return result;
     }
@@ -210,7 +250,7 @@ function genEvents(cond: Condition): TrackedEvent[] {
       if (cond.event_level) {
         const result: TrackedEvent[] = [];
         for (let i = 0; i < target; i++) {
-          result.push(evt(cond.event || 'session.start', payload, { context: { session_id: 'test-session', model: 'auto', ...ctx } }));
+          result.push(evt(cond.event || 'session.start', payload, { ...tsOverride, context: { session_id: 'test-session', model: 'auto', ...ctx } }));
         }
         return result;
       }
@@ -234,13 +274,13 @@ function genEvents(cond: Condition): TrackedEvent[] {
         const count = cond.count.value || 1;
         const result: TrackedEvent[] = [];
         for (let i = 0; i < count; i++) {
-          result.push(evt(cond.event || 'tool.complete', payload, { context: { session_id: 'test-session', model: 'auto', ...ctx } }));
+          result.push(evt(cond.event || 'tool.complete', payload, { ...tsOverride, context: { session_id: 'test-session', model: 'auto', ...ctx } }));
         }
         return result;
       }
       // Standard ordered sequence
       return (cond.sequence || []).map(et =>
-        evt(et, payload, { context: { session_id: 'test-session', model: 'auto', ...ctx } }),
+        evt(et, payload, { ...tsOverride, context: { session_id: 'test-session', model: 'auto', ...ctx } }),
       );
     }
 
@@ -257,7 +297,7 @@ function genEvents(cond: Condition): TrackedEvent[] {
       const result: TrackedEvent[] = [];
       for (let i = 0; i < target; i++) {
         const val = wl ? wl[i % wl.length]! : `v${i}`;
-        result.push(evt(cond.event || 'tool.complete', { ...payload, [field]: val }, { context: { session_id: 'test-session', model: 'auto', ...ctx } }));
+        result.push(evt(cond.event || 'tool.complete', { ...payload, [field]: val }, { ...tsOverride, context: { session_id: 'test-session', model: 'auto', ...ctx } }));
       }
       return result;
     }
@@ -269,7 +309,7 @@ function genEvents(cond: Condition): TrackedEvent[] {
       const result: TrackedEvent[] = [];
       for (let r = 0; r < target; r++) {
         for (const et of pattern) {
-          result.push(evt(et, payload, { context: { session_id: 'test-session', model: 'auto', ...ctx } }));
+          result.push(evt(et, payload, { ...tsOverride, context: { session_id: 'test-session', model: 'auto', ...ctx } }));
         }
       }
       return result;
@@ -292,7 +332,7 @@ function genEvents(cond: Condition): TrackedEvent[] {
           if (words && words.length > 0) content = words[0]!;
         }
       }
-      return [evt(cond.event || 'conversation.message', { ...payload, content }, { context: { session_id: 'test-session', model: 'auto', ...ctx } })];
+      return [evt(cond.event || 'conversation.message', { ...payload, content }, { ...tsOverride, context: { session_id: 'test-session', model: 'auto', ...ctx } })];
     }
 
     // ── ratio ────────────────────────────────────────────────
@@ -301,7 +341,7 @@ function genEvents(cond: Condition): TrackedEvent[] {
       // Add buffer to ensure strict operators (> / <) pass
       if (typeof cond.numerator === 'string') pld[cond.numerator] = Math.ceil(cond.value * 100) + 1;
       if (typeof cond.denominator === 'string') pld[cond.denominator] = 100;
-      return [evt(cond.event || 'test.event', pld, { context: { session_id: 'test-session', model: 'auto', ...ctx } })];
+      return [evt(cond.event || 'test.event', pld, { ...tsOverride, context: { session_id: 'test-session', model: 'auto', ...ctx } })];
     }
 
     // ── mode ─────────────────────────────────────────────────
@@ -312,11 +352,11 @@ function genEvents(cond: Condition): TrackedEvent[] {
       const evtField = cond.event || 'session.start';
       const result: TrackedEvent[] = [];
       for (let i = 0; i < 10; i++) {
-        result.push(evt(evtField, { ...payload, [field]: String(inVal) }, { context: { session_id: 'test-session', model: 'auto', ...ctx } }));
+        result.push(evt(evtField, { ...payload, [field]: String(inVal) }, { ...tsOverride, context: { session_id: 'test-session', model: 'auto', ...ctx } }));
       }
       if (ir[1]! + 1 !== ir[0]!) {
         for (let i = 0; i < 2; i++) {
-          result.push(evt(evtField, { ...payload, [field]: String(ir[1]! + 1) }, { context: { session_id: 'test-session', model: 'auto', ...ctx } }));
+          result.push(evt(evtField, { ...payload, [field]: String(ir[1]! + 1) }, { ...tsOverride, context: { session_id: 'test-session', model: 'auto', ...ctx } }));
         }
       }
       return result;

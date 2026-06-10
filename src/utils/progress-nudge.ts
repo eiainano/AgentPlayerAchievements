@@ -198,12 +198,11 @@ function sequenceProgress(events: TrackedEvent[], cond: Condition): number | nul
   return matched; // partial match steps
 }
 
-/** Estimate progress for pattern_match conditions — count matching events */
+/** Estimate progress for pattern_match conditions — count scoped events */
 function patternMatchProgress(events: TrackedEvent[], cond: Condition): number | null {
   if (!cond.pattern) return null;
   const scoped = scopedEvents(events, cond);
-  const hits = scoped.filter(e => matchFilter(e, { pattern: cond.pattern })).length;
-  return Math.min(hits, cond.value);
+  return Math.min(scoped.length, cond.value);
 }
 
 /** Progress for ratio conditions — current numerator value (denominator handled by evaluator) */

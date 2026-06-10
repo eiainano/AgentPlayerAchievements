@@ -2742,6 +2742,22 @@ definitions:
         operator: ">="
         value: 1
         window: all
+  - id: last_stand
+    name: Last Stand
+    name_cn: 背水一战
+    description: Used the Agent while running on battery with barely any juice left. A true warrior doesn't need a charger.
+    description_cn: 电池快没电了还在用 Agent。真正的战士不需要充电器。
+    icon: 🪫
+    category: hidden
+    rarity: rare
+    hidden: true
+    conditions:
+      - type: counter
+        event: user.message
+        filter: on_battery == true && battery_pct <= 15
+        operator: ">="
+        value: 1
+        window: all
   - id: silent_night
     name: Silent Night
     name_cn: 静夜思

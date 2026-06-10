@@ -41,6 +41,8 @@ export function matchFilter(event: TrackedEvent, filter: string): boolean {
     date_str: event.timestamp
       ? String(new Date(event.timestamp).getMonth() + 1).padStart(2, '0') + '-' + String(new Date(event.timestamp).getDate()).padStart(2, '0')
       : '',
+    on_battery: event.payload?.on_battery === true || event.payload?.on_battery === 'true',
+    battery_pct: event.payload?.battery_pct != null ? Number(event.payload.battery_pct) : -1,
   };
   try {
     return evalFilter(filter, ctx);
@@ -117,6 +119,24 @@ function evalPredicate(expr: string, ctx: Record<string, string | boolean | numb
   // field matches 'glob'
   m = expr.match(/^(\w+)\s+matches\s+'(.+)'$/);
   if (m) return globMatch(m[2]!, String(ctxValue(ctx, m[1]!)));
+
+  // field <= value  (numeric) — must precede < to avoid greedy match
+  m = expr.match(/^(\w+)\s+<=\s+(.+)$/);
+  if (m) {
+    const fieldVal = Number(ctxValue(ctx, m[1]!));
+    const rhs = Number(parseRhs(m[2]!));
+    if (!isNaN(fieldVal) && !isNaN(rhs)) return fieldVal <= rhs;
+    return false; // non-numeric → fail-safe
+  }
+
+  // field >= value  (numeric) — must precede > to avoid greedy match
+  m = expr.match(/^(\w+)\s+>=\s+(.+)$/);
+  if (m) {
+    const fieldVal = Number(ctxValue(ctx, m[1]!));
+    const rhs = Number(parseRhs(m[2]!));
+    if (!isNaN(fieldVal) && !isNaN(rhs)) return fieldVal >= rhs;
+    return false; // non-numeric → fail-safe
+  }
 
   // field < value  (numeric)
   m = expr.match(/^(\w+)\s+<\s+(.+)$/);

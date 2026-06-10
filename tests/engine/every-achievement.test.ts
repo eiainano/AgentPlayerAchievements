@@ -143,6 +143,14 @@ function applyPredicate(expr: string, req: FilterReqs): void {
   m = expr.match(/^contains\s+'([^']+)'$/);
   if (m) { req.payload.event_type = m[1]!; return; }
 
+  // field >= value (numeric) — set to the value (meets threshold)
+  m = expr.match(/(\w+)\s+>=\s*(\d+)/);
+  if (m) { req.payload[m[1]!] = Number(m[2]); return; }
+
+  // field <= value (numeric) — set to the value (meets threshold)
+  m = expr.match(/(\w+)\s+<=\s*(\d+)/);
+  if (m) { req.payload[m[1]!] = Number(m[2]); return; }
+
   // field > value (numeric) — set field just above threshold
   m = expr.match(/(\w+)\s+>\s*(\d+)/);
   if (m) { req.payload[m[1]!] = Number(m[2]) + 1; return; }

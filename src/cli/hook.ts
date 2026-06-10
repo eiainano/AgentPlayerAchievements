@@ -52,6 +52,7 @@ import { resolveProfileDir, DEFAULT_PROFILE } from '../utils/profile.js';
 import { renderPopup, type PopupAchievement } from '../utils/ansi-popup.js';
 import { findNearUnlocks } from '../utils/progress-nudge.js';
 import { detectLanguage } from '../utils/lang-detect.js';
+import { getBatteryStatus } from '../utils/battery.js';
 import { evaluateCondition } from '../engine/evaluator.js';
 import { computeSessionReport, renderSessionReport, shouldReport, findLastSessionId } from '../utils/session-report.js';
 
@@ -247,6 +248,8 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
           event_type: 'user.prompt',
           payload: { ...base, ...pp },
         });
+        // Check battery status (best-effort, null on desktop or non-macOS)
+        const battery = getBatteryStatus();
         results.push({
           event_type: 'user.message',
           payload: {
@@ -254,6 +257,7 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
             word_count: pp.word_count,
             text_content: redactSecrets(promptText).slice(0, 200), // truncated — enough for keyword matching, secrets redacted before persist
             source: 'hook_auto',
+            ...(battery ? { on_battery: battery.on_battery, battery_pct: battery.battery_pct } : {}),
           },
         });
       }

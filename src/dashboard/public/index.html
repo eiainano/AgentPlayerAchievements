@@ -336,6 +336,24 @@
   <script src="/app.js?v=0.1.8"></script>
   <div id="card-preview"></div>
 
+  <!-- Recommendation floating widget -->
+  <div id="recommend-widget" class="recommend-widget collapsed">
+    <button id="recommend-toggle" class="recommend-toggle" aria-label="Open recommendations" title="Explore recommendations">
+      ✨
+    </button>
+    <div id="recommend-panel" class="recommend-panel" style="display:none">
+      <div class="recommend-header">
+        <span class="recommend-title" data-i18n="recommend_title">探索</span>
+        <button class="recommend-close" aria-label="Close" onclick="closeRecommendWidget()">✕</button>
+      </div>
+      <div class="recommend-carousel">
+        <div class="carousel-track" id="carousel-track">
+        </div>
+      </div>
+      <div class="carousel-dots" id="carousel-dots"></div>
+    </div>
+  </div>
+
   <!-- ★ GitHub Star floating button -->
   <a href="https://github.com/eiainano/AgentPlayerAchievements" target="_blank" rel="noopener" class="github-star-float" id="github-star-float" title="⭐ Star us on GitHub!">
     <svg class="github-star-icon" viewBox="0 0 24 24" width="18" height="18"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/></svg>

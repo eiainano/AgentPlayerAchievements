@@ -435,6 +435,13 @@ const I18N = {
     no_sets: 'No achievement sets defined.',
     nav_insights: 'Insights',
     section_insights: 'Insights',
+    recommend_title: 'Explore',
+    recommend_near_win: 'These are closest to unlocking',
+    recommend_discovery: 'A feature you haven\'t tried yet',
+    recommend_surprise: 'A mysterious clue awaits...',
+    recommend_no_near: 'No near-unlock achievements yet',
+    recommend_no_discovery: 'You\'ve tried all features!',
+    recommend_no_surprise: 'No hidden hints right now',
     no_timeline: 'No achievements unlocked yet.',
     load_error: 'Failed to load dashboard data: {status}',
     insight_sessions: 'Daily Sessions',
@@ -541,6 +548,13 @@ const I18N = {
     showcase_auto: '⚡',
     showcase_auto_title: '自动填充(最稀有)',
     no_sets: '暂无套装定义。',
+    recommend_title: '探索',
+    recommend_near_win: '这些成就近在咫尺',
+    recommend_discovery: '一个你未曾尝试的功能',
+    recommend_surprise: '一条神秘的线索在等你...',
+    recommend_no_near: '暂无接近解锁的成就',
+    recommend_no_discovery: '你已体验过所有功能！',
+    recommend_no_surprise: '暂时没有神秘线索',
     no_timeline: '还没有解锁任何成就。',
     load_error: '加载仪表盘数据失败: {status}',
     insight_sessions: '每日会话',
@@ -2814,3 +2828,159 @@ function buildCardHTML(data) {
 
   return h;
 }
+
+// ── Recommendation Widget ──────────────────────────────
+
+const CAROUSEL_INTERVAL = 5000;
+let carouselIndex = 0;
+let carouselTimer = null;
+let carouselFrameCount = 0;
+
+function escHtml(s) {
+  if (typeof escHtml._cache === 'undefined') {
+    escHtml._cache = true;
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function initRecommendWidget() {
+  const toggle = document.getElementById('recommend-toggle');
+  const panel = document.getElementById('recommend-panel');
+  if (!toggle || !panel) return;
+
+  toggle.addEventListener('click', () => {
+    const widget = document.getElementById('recommend-widget');
+    widget.classList.remove('collapsed');
+    panel.style.display = 'block';
+    toggle.style.display = 'none';
+    fetch('/api/data?include_recommend=true&profile=' + (currentProfile || 'default'))
+      .then(r => r.json())
+      .then(data => { if (data.recommend) startCarousel(data.recommend); })
+      .catch(() => {});
+  });
+}
+
+function closeRecommendWidget() {
+  const widget = document.getElementById('recommend-widget');
+  const panel = document.getElementById('recommend-panel');
+  const toggle = document.getElementById('recommend-toggle');
+  if (!widget || !panel || !toggle) return;
+  stopCarousel();
+  widget.classList.add('collapsed');
+  panel.style.display = 'none';
+  toggle.style.display = 'flex';
+}
+
+function startCarousel(recommendData) {
+  stopCarousel();
+  buildCarouselFrames(recommendData);
+  carouselIndex = 0;
+  showFrame(0);
+  if (carouselFrameCount > 1) {
+    carouselTimer = setInterval(() => {
+      carouselIndex = (carouselIndex + 1) % carouselFrameCount;
+      showFrame(carouselIndex);
+    }, CAROUSEL_INTERVAL);
+  }
+}
+
+function stopCarousel() {
+  if (carouselTimer) { clearInterval(carouselTimer); carouselTimer = null; }
+}
+
+function buildCarouselFrames(data) {
+  const track = document.getElementById('carousel-track');
+  const dots = document.getElementById('carousel-dots');
+  if (!track || !dots) return;
+  track.innerHTML = '';
+  dots.innerHTML = '';
+  carouselFrameCount = 0;
+  const frames = [];
+
+  if (data.near_win && data.near_win.length > 0) {
+    const top = data.near_win[0];
+    frames.push(createFrame({ icon: '🎯', category: t('recommend_near_win'), reason: t('recommend_near_win'),
+      item: { icon: top.icon || '🏆', name: top.name_cn || top.name, rarity: top.rarity, progress: top.progress } }));
+  }
+
+  if (data.discovery) {
+    const d = data.discovery;
+    frames.push(createFrame({ icon: '🔍', category: 'Discovery', reason: t('recommend_discovery'),
+      item: { icon: d.icon || '🔌', name: d.name_cn || d.name, rarity: d.rarity, progress: null } }));
+  }
+
+  if (data.surprise) {
+    const s = data.surprise;
+    frames.push(createFrame({ icon: '🎲', category: 'Surprise', reason: t('recommend_surprise'),
+      item: { icon: '?', name: (s.hint_cn || s.hint || '???'), rarity: s.rarity, progress: null, isSurprise: true } }));
+  }
+
+  frames.forEach((f, i) => {
+    f.dataset.index = i;
+    track.appendChild(f);
+    const dot = document.createElement('button');
+    dot.className = 'carousel-dot';
+    dot.setAttribute('aria-label', 'Frame ' + (i + 1));
+    dot.addEventListener('click', () => { carouselIndex = i; showFrame(i); });
+    dots.appendChild(dot);
+  });
+  carouselFrameCount = frames.length;
+}
+
+function createFrame(cfg) {
+  const frame = document.createElement('div');
+  frame.className = 'carousel-frame';
+  let itemHTML = '';
+  const item = cfg.item;
+  if (item.isSurprise) {
+    itemHTML = '<div class="frame-item surprise">' +
+      '<div style="font-size:1.5rem;margin-bottom:4px">❓</div>' +
+      '<div style="color:var(--text-primary);font-size:0.82rem;font-style:italic">' + escHtml(item.name) + '</div>' +
+      '<div class="frame-ach-rarity ' + item.rarity + '" style="margin-top:4px">' + item.rarity + '</div>' +
+      '</div>';
+  } else if (item.progress) {
+    const pct = item.progress.pct || 0;
+    itemHTML = '<div class="frame-item">' +
+      '<div class="frame-ach-icon">' + escHtml(item.icon) + '</div>' +
+      '<div class="frame-ach-name">' + escHtml(item.name) + '</div>' +
+      '<div class="frame-ach-rarity ' + item.rarity + '">' + item.rarity + '</div>' +
+      '<div class="frame-ach-progress">' +
+        '<div class="progress-bar-bg"><div class="progress-bar-fill" style="width:' + pct + '%"></div></div>' +
+        '<span>' + pct + '%</span>' +
+      '</div></div>';
+  } else {
+    itemHTML = '<div class="frame-item">' +
+      '<div class="frame-ach-icon">' + escHtml(item.icon) + '</div>' +
+      '<div class="frame-ach-name">' + escHtml(item.name) + '</div>' +
+      '<div class="frame-ach-rarity ' + item.rarity + '">' + item.rarity + '</div></div>';
+  }
+  frame.innerHTML = '<div class="frame-icon">' + cfg.icon + '</div>' +
+    '<div class="frame-category">' + escHtml(cfg.category) + '</div>' +
+    '<div class="frame-reason">' + escHtml(cfg.reason) + '</div>' + itemHTML;
+  return frame;
+}
+
+function showFrame(index) {
+  const track = document.getElementById('carousel-track');
+  const dots = document.querySelectorAll('.carousel-dot');
+  if (!track) return;
+  track.style.transform = 'translateX(-' + (index * 100) + '%)';
+  dots.forEach((d, i) => d.classList.toggle('active', i === index));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initRecommendWidget();
+  const panel = document.getElementById('recommend-panel');
+  if (panel) {
+    panel.addEventListener('mouseenter', () => stopCarousel());
+    panel.addEventListener('mouseleave', () => {
+      if (carouselFrameCount > 1 && carouselIndex >= 0) {
+        carouselTimer = setInterval(() => {
+          carouselIndex = (carouselIndex + 1) % carouselFrameCount;
+          showFrame(carouselIndex);
+        }, CAROUSEL_INTERVAL);
+      }
+    });
+  }
+});

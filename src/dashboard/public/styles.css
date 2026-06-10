@@ -4125,6 +4125,207 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
   100% { transform: rotate(0deg) scale(1); }
 }
 
+/* ── Recommendation Floating Widget ────────────────────────────── */
+
+#recommend-widget {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999;
+}
+
+.recommend-toggle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: recommend-pulse 2s ease-in-out infinite;
+  transition: transform 0.15s ease;
+  line-height: 1;
+  padding: 0;
+}
+
+.recommend-toggle:hover {
+  transform: scale(1.08);
+}
+
+@keyframes recommend-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(79, 195, 247, 0.5); }
+  50%      { box-shadow: 0 0 0 12px rgba(79, 195, 247, 0); }
+}
+
+.recommend-panel {
+  position: absolute;
+  bottom: 60px;
+  right: 0;
+  width: 280px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  animation: panel-in 0.2s ease-out;
+}
+
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.recommend-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.recommend-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-family: 'Lexend', 'Plus Jakarta Sans', sans-serif;
+}
+
+.recommend-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.recommend-close:hover { color: var(--text-primary); }
+
+.recommend-carousel {
+  overflow: hidden;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.35s ease;
+}
+
+.carousel-frame {
+  min-width: 100%;
+  padding: 14px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.frame-icon { font-size: 2rem; margin-bottom: 4px; }
+
+.frame-category {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-family: 'Lexend', 'Plus Jakarta Sans', sans-serif;
+  margin-bottom: 2px;
+}
+
+.frame-reason {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.frame-item {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  text-align: left;
+}
+
+.frame-ach-icon { font-size: 1.2rem; margin-bottom: 2px; }
+
+.frame-ach-name {
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.frame-ach-rarity {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.frame-ach-rarity.common    { color: var(--rarity-common); }
+.frame-ach-rarity.uncommon  { color: var(--rarity-uncommon); }
+.frame-ach-rarity.rare      { color: var(--rarity-rare); }
+.frame-ach-rarity.epic      { color: var(--rarity-epic); }
+.frame-ach-rarity.legendary { color: var(--rarity-legendary); }
+.frame-ach-rarity.mythic    { color: var(--rarity-mythic); }
+
+.frame-ach-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.frame-ach-progress .progress-bar-bg {
+  flex: 1;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.frame-ach-progress .progress-bar-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.frame-ach-progress span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  min-width: 32px;
+  text-align: right;
+}
+
+.frame-item.surprise {
+  text-align: center;
+  font-style: italic;
+}
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 0 12px;
+}
+
+.carousel-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s;
+}
+
+.carousel-dot.active { background: var(--primary); }
+
+@media (max-width: 480px) {
+  #recommend-widget { bottom: 12px; right: 12px; }
+  .recommend-panel { width: 260px; }
+}
+
 /* ── GitHub Star Floating Button ────────────────────────────── */
 
 .github-star-float {

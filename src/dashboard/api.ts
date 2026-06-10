@@ -18,6 +18,8 @@ import { loadConfig } from '../config.js';
 import type { AppConfig } from '../config.js';
 import type { StreakData, HeatmapData, DayActivity } from '../utils/activity.js';
 import { calcStreak, computeHeatmap, computeHeatmapFromDaily, calcStreakFromDaily } from '../utils/activity.js';
+import { getRecommendResponse } from '../utils/recommend.js';
+import type { RecommendResponse } from '../engine/types.js';
 
 // ── Response types ────────────────────────────────────────────────────
 
@@ -123,6 +125,7 @@ export interface DashboardData {
   badges: BadgeItem[];
   is_demo?: boolean;
   has_demo?: boolean;
+  recommend?: RecommendResponse;
 }
 
 // ── Card API types ────────────────────────────────────────────────────
@@ -493,6 +496,7 @@ export function buildApiResponse(
   engineStats: { total_events: number; by_category: Record<string, { total: number; unlocked: number }>; by_rarity: Record<string, { total: number; unlocked: number }> },
   setDefinitions: SetDefinition[],
   toolStats?: AgentToolStats,
+  opts?: { includeRecommend?: boolean },
 ): DashboardData {
   const taskCount = events.filter(e => e.event_type === 'task.complete').length;
   const achievements = buildAchievementsResponse(definitions, state, { events, taskCount });
@@ -530,6 +534,10 @@ export function buildApiResponse(
   const setItems = buildSetsResponse(definitions, state, setDefinitions);
   const { titles, badges } = buildTitlesAndBadges(setItems, definitions);
 
+  const recommend = (opts?.includeRecommend)
+    ? getRecommendResponse(definitions, events, state, 'dashboard')
+    : undefined;
+
   return {
     achievements,
     stats: {
@@ -558,5 +566,6 @@ export function buildApiResponse(
     titles,
     badges,
     config: { lang: loadConfig().lang },
+    ...(recommend ? { recommend } : {}),
   };
 }

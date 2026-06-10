@@ -226,6 +226,7 @@ export function createServer(port: number, defaultProfile: string): http.Server 
       engine.reload();
       engine.reloadDefinitions();
       const showcaseData = buildShowcaseResponse(engine);
+      const includeRecommend = url.searchParams.get('include_recommend') === 'true';
       const data = buildApiResponse(
         engine.definitions,
         engine.state,
@@ -234,6 +235,7 @@ export function createServer(port: number, defaultProfile: string): http.Server 
         engine.stats(),
         engine.setDefinitions,
         engine.toolStats(),
+        { includeRecommend },
       );
       data.profile = resolvedProfile;
       data.profile_emoji = getProfileMeta(resolvedProfile).emoji;

@@ -4771,3 +4771,174 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
   /* Timeline dot edge */
   .timeline-entry::before { top: 12px; }
 }
+
+/* ── Questlines ─────────────────────────────────────────────── */
+
+.questlines-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.questline-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.questline-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 12px rgba(79, 195, 247, 0.15);
+}
+
+.questline-card.complete {
+  border-color: var(--gold);
+}
+
+.questline-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.questline-card-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.questline-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.questline-card-name {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+  font-family: 'Lexend', 'Plus Jakarta Sans', sans-serif;
+}
+
+.questline-card-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.questline-card-meta {
+  text-align: right;
+  flex-shrink: 0;
+  min-width: 120px;
+}
+
+.questline-card-stage {
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+}
+
+.questline-card-progress {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.questline-card-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.questline-card-bar-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.questline-card.complete .questline-card-bar-fill {
+  background: var(--gold);
+}
+
+/* Expanded stages */
+.questline-stages {
+  display: none;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.questline-card.expanded .questline-stages {
+  display: block;
+}
+
+.questline-stage {
+  margin-bottom: 10px;
+}
+
+.questline-stage-header {
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.questline-stage-achs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.questline-ach-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.questline-ach-badge.unlocked {
+  border-color: var(--primary);
+  opacity: 1;
+}
+
+.questline-ach-badge.locked {
+  opacity: 0.45;
+}
+
+.questline-ach-badge .ach-icon {
+  font-size: 0.85rem;
+}
+
+/* Reward display (completed only) */
+.questline-reward {
+  margin-top: 10px;
+  padding: 6px 10px;
+  background: linear-gradient(135deg, rgba(255,200,0,0.1), rgba(168,88,240,0.05));
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: var(--gold);
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .questline-card-header {
+    flex-direction: column;
+  }
+  .questline-card-meta {
+    text-align: left;
+    min-width: auto;
+  }
+}

@@ -3634,6 +3634,26 @@ definitions:
         window: single_session
         operator: "=="
         value: 4
+  - id: matrix
+    name: The Matrix
+    name_cn: 黑客帝国
+    description: Edited a .m file. Red pill or blue pill?
+    description_cn: 修改了一个 .m 文件。红色药丸还是蓝色药丸？
+    icon: 💊
+    category: hidden
+    rarity: rare
+    hidden: true
+    progress_trackable: true
+    hint: Try editing a MATLAB (.m) file — follow the white rabbit
+    hint_cn: 试试修改一个 .m (MATLAB) 文件——跟着白兔走
+    tip: "Do you think that's air you're breathing now? You're in the Matrix."
+    tip_cn: "你以为那是空气？你在黑客帝国里。"
+    conditions:
+      - type: counter
+        event: file.edit
+        filter: file_path matches '*.m'
+        operator: ">="
+        value: 1
   - id: full_spectrum
     name: Full Spectrum
     name_cn: 全光谱

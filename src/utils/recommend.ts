@@ -1,6 +1,7 @@
 import type {
   AchievementDefinition,
   AchievementState,
+  RarityLevel,
   RecommendItem,
   TrackedEvent,
 } from '../engine/types.js';
@@ -115,7 +116,7 @@ export function recommendNearWin(
     achievement_id: n.achievement_id,
     name: n.name,
     icon: n.icon,
-    rarity: n.rarity,
+    rarity: n.rarity as RarityLevel,
     progress: { current: n.current, target: n.target, pct: n.target > 0 ? Math.round((n.current / n.target) * 100) : 0 },
     unit_label: n.unit_label,
   }));

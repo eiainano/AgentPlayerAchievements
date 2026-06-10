@@ -3594,8 +3594,8 @@ definitions:
   - id: breath_of_the_wild
     name: Breath of the Wild
     name_cn: 旷野之息
-    description: Used 4+ tools and 4+ MCP servers in a single session. You're ready to take on Ganon.
-    description_cn: 同一次 session 中使用 4 种以上工具和 4 个以上 MCP 服务器。准备好去打盖侬了。
+    description: Used exactly 4 tools and 4 MCP servers in a single session. The perfect loadout to take on Ganon.
+    description_cn: 一次 session 中恰巧用了 4 种工具和 4 个 MCP 服务器。天选之人的完美装备。
     icon: 🗡️
     category: challenge
     rarity: legendary
@@ -3608,13 +3608,13 @@ definitions:
         event: tool.complete
         field: tool_name
         window: single_session
-        operator: ">="
+        operator: "=="
         value: 4
       - type: distinct_count
         event: mcp.tool_call
         field: server_name
         window: single_session
-        operator: ">="
+        operator: "=="
         value: 4
   - id: full_spectrum
     name: Full Spectrum

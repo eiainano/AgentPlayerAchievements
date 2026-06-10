@@ -170,10 +170,12 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
         }
       }
       if (data.tool_name === 'Edit') {
-        // Extract edit_lines from old_string, total_file_lines from file on disk (for surgeon metric)
         const editPayload = { ...base };
         if (typeof ti.old_string === 'string') {
           editPayload.edit_lines = ti.old_string.split('\n').length;
+        }
+        if (typeof ti.new_string === 'string') {
+          editPayload.new_lines = ti.new_string.split('\n').length;
         }
         if (typeof ti.file_path === 'string') {
           // Guard: only read files within cwd or home, no traversal
@@ -187,6 +189,12 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
             try {
               const content = fs.readFileSync(resolved, 'utf-8');
               editPayload.total_file_lines = content.split('\n').length;
+              // Line delta tracking: before_lines (file size before edit), delta_lines (net change)
+              const eLines = (editPayload.edit_lines as number) || 0;
+              const nLines = (editPayload.new_lines as number) || 0;
+              const tLines = editPayload.total_file_lines as number;
+              editPayload.before_lines = tLines - nLines + eLines;
+              editPayload.delta_lines = nLines - eLines;
               // Boolean feature flags for achievement conditions (no raw content stored in event log)
               // Detect Transformer Multi-Head Attention code patterns:
               //   PyTorch:  nn.MultiheadAttention, F.scaled_dot_product_attention

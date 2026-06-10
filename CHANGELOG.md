@@ -1,5 +1,13 @@
 # Changelog
 
+### Top 10 下一阶段 TODO 路线文档 — 2026-06-10
+
+- **新增产品路线文档**：`docs/top10-next-todos-2026-06-10.md`
+- **内容定位**：基于当前项目状态、设计文档与 Steam 成就调研，总结 AGPA 下一阶段最有价值的 10 个方向
+- **核心结论**：项目重心应从“继续补底层可用性”转向“Discovery / Structure / Collectibility / Trust”四个产品层面
+- **Top 10 覆盖**：推荐系统 2.0、Questline/旅程线、成就作者工具链、像素画高价值试点、Profile Cosmetics、可解释层、精品内容扩展、Daily/Weekly Challenges、叙事化分享、文档真相源治理
+- **附带结论**：明确不建议当前优先投入的方向，包括继续机械扩容成就数量、过早推进全球社区稀有度、以及继续将主要精力投向更多工具接入
+
 ### Wake Up, Samurai 成就 + time_gap 成对过滤扩展 — 2026-06-10
 
 - **新成就 `wake_up_samurai`** — "Wake Up, Samurai" / 醒醒，武士 🔥，hidden rare，单 session 内跨天回归：深夜离去（任意时间），次日 7am 后发第一条消息。We've got a city to burn.

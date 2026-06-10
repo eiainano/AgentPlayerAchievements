@@ -4001,3 +4001,133 @@ sets:
     reward:
       type: title
       value: Polyglot
+
+# ═══════════════════════════════════════════════════════════════
+# Questlines — 5 RPG growth paths, 3 stages each
+# ═══════════════════════════════════════════════════════════════
+
+questlines:
+  # ── Bug Hunter ──────────────────────────────────────────────
+  - id: bug_hunter
+    name: "Bug Hunter"
+    name_cn: "除虫大师"
+    icon: "🐛"
+    description: "From your first bug to debugging mastery"
+    description_cn: "从第一只 bug 到调试艺术的掌控者"
+    reward:
+      type: title
+      value: "Elite Bug Hunter"
+      value_cn: "精英除虫师"
+    stages:
+      - stage: 1
+        name: "Rookie Exterminator"
+        name_cn: "实习除虫员"
+        achievements: [error_resilient, the_debugger, diagnostic_detective]
+      - stage: 2
+        name: "Seasoned Hunter"
+        name_cn: "老练猎手"
+        achievements: [self_healer, sisyphus, mitosis, chain_reaction]
+      - stage: 3
+        name: "Debugging Legend"
+        name_cn: "调试传说"
+        achievements: [surgeon, iterative_refiner, power_session]
+
+  # ── Toolsmith ───────────────────────────────────────────────
+  - id: toolsmith
+    name: "Toolsmith"
+    name_cn: "工具匠人"
+    icon: "🔧"
+    description: "Master the tools that shape your workflow"
+    description_cn: "精进工具，塑造你的工作流"
+    reward:
+      type: title
+      value: "Master Toolsmith"
+      value_cn: "工具大师"
+    stages:
+      - stage: 1
+        name: "Apprentice"
+        name_cn: "学徒"
+        achievements: [mcp_first_contact, task_creator, permission_granted]
+      - stage: 2
+        name: "Journeyman"
+        name_cn: "熟练工"
+        achievements: [mcp_first_connect, task_updater, automode_first, dashboard_visitor]
+      - stage: 3
+        name: "Master Craftsman"
+        name_cn: "匠人大师"
+        achievements: [full_auto, the_scheduler, architect]
+
+  # ── Builder ─────────────────────────────────────────────────
+  - id: builder
+    name: "Builder"
+    name_cn: "建造大师"
+    icon: "🏗️"
+    description: "From hello world to shipping production code"
+    description_cn: "从 Hello World 到交付生产代码"
+    reward:
+      type: title
+      value: "Master Builder"
+      value_cn: "建造大师"
+    stages:
+      - stage: 1
+        name: "Apprentice Builder"
+        name_cn: "建造学徒"
+        achievements: [tool_time, file_centurion, first_shot]
+      - stage: 2
+        name: "Journeyman Builder"
+        name_cn: "建造熟手"
+        achievements: [dual_wielder, double_digits, century, multi_image_day]
+      - stage: 3
+        name: "Master Builder"
+        name_cn: "建造大师"
+        achievements: [millennium, marathon, test_centurion, polyglot]
+
+  # ── Night Shift ─────────────────────────────────────────────
+  - id: night_shift
+    name: "Night Shift"
+    name_cn: "夜行者"
+    icon: "🌙"
+    description: "Burn the midnight oil, push through the long sessions"
+    description_cn: "熬夜奋战，马拉松式编码之旅"
+    reward:
+      type: title
+      value: "Night Owl"
+      value_cn: "暗夜猫头鹰"
+    stages:
+      - stage: 1
+        name: "After Hours"
+        name_cn: "深夜初探"
+        achievements: [first_sunrise, model_hopper]
+      - stage: 2
+        name: "Night Owl"
+        name_cn: "夜猫子"
+        achievements: [streak_3, streak_7, half_century]
+      - stage: 3
+        name: "Nocturnal Legend"
+        name_cn: "暗夜传说"
+        achievements: [streak_30, token_1m, wake_up_samurai]
+
+  # ── Polyglot ────────────────────────────────────────────────
+  - id: polyglot
+    name: "Polyglot"
+    name_cn: "语言通才"
+    icon: "🌐"
+    description: "Speak every language the machine understands"
+    description_cn: "通晓机器语言的万国之民"
+    reward:
+      type: title
+      value: "True Polyglot"
+      value_cn: "语言通才"
+    stages:
+      - stage: 1
+        name: "Hello World"
+        name_cn: "初识世界"
+        achievements: [first_contact, three_company, read_manual]
+      - stage: 2
+        name: "Code Explorer"
+        name_cn: "代码探索者"
+        achievements: [visual_prompt, worktree_trial, seeker]
+      - stage: 3
+        name: "Linguistic Master"
+        name_cn: "语言大师"
+        achievements: [full_spectrum, attention_is_all_you_need, test_champion]

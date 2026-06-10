@@ -1,5 +1,14 @@
 # Changelog
 
+### Tip/Hint 覆盖 + Dashboard 渲染 + Session Mini Report + Hook launcher — 2026-06-10
+
+- **Tip/Hint 内容**：81 tips (14→81, 85 个 Common/Uncommon 非隐藏)，143 hints (93→143, 147 个非隐藏)，hidden 0 tips。`scripts/generate-tip-hint-content.ts` 一键生成
+- **Dashboard tip/hint 渲染**：`AchievementItem` 新增 tip/hint 字段；locked 卡片显示 💡 线索；unlocked modal 显示 💡 小贴士；中英双语标签；CSS `.ach-hint` + `.modal-tip-section`
+- **Session Mini Report**：`src/utils/session-report.ts`，Fibonacci 间隔 (1,2,3,5,8,13,21...) 显示 session 总结（tasks、files、tool calls、tokens、duration）
+- **Hook launcher 解耦路径**：`~/.agent-achievements/run-hook.sh` 替代 CC/Hermes hooks 中的绝对路径。项目移动后 `npm run init --upgrade` 重生 launcher，无需编辑 settings.json
+- **`session_count` 字段**：`AchievementState.stats` 新增可选字段，供 Fibonacci 间隔计数
+- **测试更新**：`tests/cli/init.test.ts` hookCmd 预期改为 `run-hook.sh`
+
 ### `agpa profile delete` + Dashboard 移除 dev-reset + 修复 Profile 下拉菜单 — 2026-06-10
 
 - **`agpa profile delete`**：新子命令，交互式删除命名 profile（列出可删 profile → 输入名称 → 再次输入确认 → 输入当日日期确认 → 永久删除）

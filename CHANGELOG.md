@@ -1,5 +1,14 @@
 # Changelog
 
+### 低电量成就（Last Stand）+ battery 检测 + filter DSL 扩展 — 2026-06-10
+
+- **电池检测模块**：`src/utils/battery.ts`，通过 `pmset -g batt` (execFileSync) 在 macOS 上检测电池状态，返回 `on_battery` + `battery_pct`
+- **Hook 集成**：每次 `UserPromptSubmit` 自动检测电池状态，注入 `on_battery`/`battery_pct` 到 `user.message` payload
+- **matchFilter 上下文扩展**：evaluator.ts 新增 `on_battery` (boolean) 和 `battery_pct` (number) 字段
+- **Filter DSL 扩展**：新增 `<=` 和 `>=` 运算符支持（此前只有 `<` 和 `>`）
+- **新成就 `last_stand`** — "Last Stand" / 背水一战 🪫，隐藏 rare，电池≤15% 时使用 Agent 触发
+- **测试更新**：auditor 192→193，every-achievement 193/193 通过（含 battery_pct filter 解析），全量 1029/1032 通过
+
 ### 春节成就 — 2026-06-10
 
 - **修正 `spring_festival`** — 从浮动范围改为精确查表（2020-2035 共 16 个精确公历日期），新增 `date_str`（`MM-DD`）filter 上下文配合 `in [list]` 语法实现

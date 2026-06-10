@@ -4130,7 +4130,7 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
 #recommend-widget {
   position: fixed;
   bottom: 24px;
-  right: 24px;
+  left: 24px;
   z-index: 999;
 }
 
@@ -4163,7 +4163,7 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
 .recommend-panel {
   position: absolute;
   bottom: 60px;
-  right: 0;
+  left: 0;
   width: 280px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -4322,7 +4322,7 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
 .carousel-dot.active { background: var(--primary); }
 
 @media (max-width: 480px) {
-  #recommend-widget { bottom: 12px; right: 12px; }
+  #recommend-widget { bottom: 12px; left: 12px; }
   .recommend-panel { width: 260px; }
 }
 

@@ -2849,6 +2849,14 @@ function initRecommendWidget() {
   const panel = document.getElementById('recommend-panel');
   if (!toggle || !panel) return;
 
+  // Probability gate — badge only appears with chance p on each page load
+  const p = 0.2; // default recommend_probability, matches config.ts
+  if (Math.random() >= p) {
+    const widget = document.getElementById('recommend-widget');
+    if (widget) widget.style.display = 'none';
+    return;
+  }
+
   toggle.addEventListener('click', () => {
     const widget = document.getElementById('recommend-widget');
     widget.classList.remove('collapsed');

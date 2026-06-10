@@ -3744,7 +3744,7 @@ definitions:
         value: 1
       - type: counter
         event: user.message
-        window: single_session
+        window: 30m
         operator: ">="
         value: 7
   - id: full_spectrum

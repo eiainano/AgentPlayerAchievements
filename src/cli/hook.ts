@@ -252,7 +252,7 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
           payload: {
             char_count: pp.char_count,
             word_count: pp.word_count,
-            text_content: promptText.slice(0, 200), // truncated — enough for keyword matching, limits secret exposure
+            text_content: redactSecrets(promptText).slice(0, 200), // truncated — enough for keyword matching, secrets redacted before persist
             source: 'hook_auto',
           },
         });
@@ -313,6 +313,27 @@ export function computePromptPayload(promptText: string): PromptPayload {
     has_code_block: promptText.includes('```'),
     has_question_mark: promptText.includes('?'),
   };
+}
+
+/** Strip common secret patterns from text before persisting in event logs */
+function redactSecrets(text: string): string {
+  return text
+    // OpenAI / Anthropic / generic API keys
+    .replace(/\b(sk|pk)_[A-Za-z0-9]{20,}\b/g, '[API_KEY_REDACTED]')
+    // AWS keys
+    .replace(/\b(AKIA|ASIA)[A-Z0-9]{16}\b/g, '[AWS_KEY_REDACTED]')
+    // Bearer tokens in HTTP headers
+    .replace(/\bBearer\s+[A-Za-z0-9\-._~+/]{20,}\b/gi, 'Bearer [TOKEN_REDACTED]')
+    // Authorization headers
+    .replace(/\bAuthorization:\s*\S+/gi, 'Authorization: [REDACTED]')
+    // JWT-like tokens (base64url with dots)
+    .replace(/\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/g, '[JWT_REDACTED]')
+    // GitHub tokens (ghp_, gho_, ghu_, etc.)
+    .replace(/\bgh[pousy]_[A-Za-z0-9]{36,}\b/g, '[GH_TOKEN_REDACTED]')
+    // Basic auth inline (password: `http://user:pass@host`)
+    .replace(/\/\/([^:@/\s]+):([^@/\s]+)@/g, '//$1:[PASS_REDACTED]@')
+    // Private SSH keys inline
+    .replace(/-----BEGIN[ A-Z]*PRIVATE KEY-----[\s\S]{0,1000}?-----END[ A-Z]*PRIVATE KEY-----/g, '[PRIVATE_KEY_REDACTED]');
 }
 
 // ── P0-1: JSONL transcript parsing ────────────────────────────

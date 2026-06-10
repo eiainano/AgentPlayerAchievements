@@ -33,6 +33,7 @@ function showConfig(): void {
   console.log(`  ${B}active_profile${R}    ${cfg.active_profile}`);
   console.log(`  ${B}debug${R}             ${boolLabel(cfg.debug).padEnd(6)}`);
   console.log(`  ${B}telemetry${R}         ${boolLabel(cfg.telemetry).padEnd(6)}${D}(anonymous usage data)${R}`);
+  console.log(`  ${B}recommend_prob${R}     ${cfg.recommend_probability}`);
 
   if (profiles.length > 1) {
     console.log(`\n  ${D}Profiles:${R} ${profiles.join(', ')}`);
@@ -43,6 +44,7 @@ function showConfig(): void {
   console.log(`    ${C}agpa config sound on|off${R}       ${D}Sound effects${R}`);
   console.log(`    ${C}agpa config profile <name>${R}     ${D}Switch profile${R}`);
   console.log(`    ${C}agpa config debug true|false${R}   ${D}Debug mode${R}`);
+  console.log(`    ${C}agpa config recommend_probability <0.0-1.0>${R}  ${D}Recommend probability${R}`);
   console.log('');
 }
 
@@ -112,9 +114,26 @@ function main(): void {
       break;
     }
 
+    case 'recommend_probability':
+    case 'rp': {
+      if (!value) {
+        console.error('Usage: agpa config recommend_probability <0.0-1.0>');
+        process.exit(1);
+      }
+      const num = parseFloat(value);
+      if (isNaN(num) || num < 0 || num > 1) {
+        console.error('recommend_probability must be between 0.0 and 1.0');
+        process.exit(1);
+      }
+      saveConfig({ recommend_probability: num });
+      const pct = Math.round(num * 100);
+      console.log(`✅ Recommendation probability set to ${num} (${pct}%)`);
+      break;
+    }
+
     default:
       console.error(`Unknown config key: "${key}"`);
-      console.error('Available keys: lang, sound, profile, debug');
+      console.error('Available keys: lang, sound, profile, debug, recommend_probability');
       process.exit(1);
   }
 }

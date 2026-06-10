@@ -25,6 +25,7 @@ export interface AppConfig {
   sound_enabled: boolean;
   simple_animations: boolean;
   banner_theme: BannerTheme;
+  recommend_probability: number;
 }
 
 const DEFAULTS: AppConfig = {
@@ -35,6 +36,7 @@ const DEFAULTS: AppConfig = {
   sound_enabled: true,
   simple_animations: false,
   banner_theme: 'Arcade',
+  recommend_probability: 0.2,
 };
 
 /** Read config from file, then override with env vars */

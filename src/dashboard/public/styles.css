@@ -1033,6 +1033,26 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
   background: rgba(128, 128, 144, .07);
 }
 
+.streak-multiplier {
+  display: none;
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #1a1a2e;
+  letter-spacing: .5px;
+  cursor: default;
+  white-space: nowrap;
+}
+.streak-multiplier.active {
+  display: block;
+}
+
 /* ── Activity Heatmap ──────────────────────────────────── */
 
 .heatmap-card {

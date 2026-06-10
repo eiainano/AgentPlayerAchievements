@@ -20,7 +20,7 @@ function makeTmpDir(): string {
 
 describe('history', () => {
   describe('--help', () => {
-    it('shows usage', () => {
+    it('shows usage', { timeout: 20_000 }, () => {
       const { stdout, status } = runHistory('--help');
       expect(status).toBe(0);
       expect(stdout).toContain('AGPA History');

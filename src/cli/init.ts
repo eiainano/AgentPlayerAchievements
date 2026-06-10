@@ -1131,6 +1131,7 @@ function compileAchievementsJSON(dataDir: string): string | null {
       hint_cn: d.hint_cn,
       future: d.future,
       challenge: d.challenge,
+      progress_trackable: d.progress_trackable,
     })),
   };
 

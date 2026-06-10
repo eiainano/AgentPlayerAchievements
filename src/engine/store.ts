@@ -3,6 +3,7 @@ import * as path from 'path';
 import type { AchievementState, TrackedEvent } from './types.js';
 import type { AgentToolStats } from './stats.js';
 import { safeParse, achievementStateSchema, trackedEventSchema, agentToolStatsSchema } from '../utils/validate.js';
+import { migrateState } from './migrate.js';
 
 export class Store {
   readonly stateDir: string;
@@ -25,7 +26,8 @@ export class Store {
     try {
       if (fs.existsSync(statePath)) {
         const raw = JSON.parse(fs.readFileSync(statePath, 'utf-8'));
-        state = safeParse(achievementStateSchema, raw, state);
+        const migrated = migrateState(raw);
+        state = safeParse(achievementStateSchema, migrated, state);
       }
     } catch {
       // state stays default

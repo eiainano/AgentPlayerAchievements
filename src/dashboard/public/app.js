@@ -408,6 +408,7 @@ const I18N = {
     streak_best: 'Best',
     streak_today_done: 'Coded today ✓',
     streak_today_pending: 'Not yet today',
+    streak_mult_tip: 'streak bonus',
     stat_level: 'Level',
     stat_xp: 'XP',
     stat_unlocked: 'Unlocked',
@@ -516,6 +517,7 @@ const I18N = {
     streak_best: '最高纪录',
     streak_today_done: '今天已编码 ✓',
     streak_today_pending: '今天还没写代码',
+    streak_mult_tip: '连胜加成',
     stat_level: '等级',
     stat_xp: '经验',
     stat_unlocked: '已解锁',
@@ -1343,13 +1345,14 @@ async function refreshData() {
 
 // ── Profile Hero ─────────────────────────────────────
 
-function renderStreakCard(streak) {
+function renderStreakCard(streak, multiplier) {
   const card = document.getElementById('streak-card');
   if (!card) return;
 
   const currentEl = document.getElementById('streak-current');
   const longestEl = document.getElementById('streak-longest');
   const todayEl = document.getElementById('streak-today');
+  const multEl = document.getElementById('streak-multiplier');
 
   if (!streak || (streak.current === 0 && !streak.today_active)) {
     card.style.display = 'none';
@@ -1359,6 +1362,19 @@ function renderStreakCard(streak) {
   card.style.display = '';
   if (currentEl) currentEl.textContent = streak.current;
   if (longestEl) longestEl.textContent = streak.longest;
+
+  // Show streak multiplier when > 1.0x
+  if (multEl) {
+    if (multiplier > 1.0) {
+      const pct = Math.round((multiplier - 1.0) * 100);
+      multEl.textContent = '×' + multiplier.toFixed(1);
+      multEl.title = '+' + pct + '% XP (' + t('streak_mult_tip') + ')';
+      multEl.className = 'streak-multiplier active';
+    } else {
+      multEl.className = 'streak-multiplier';
+      multEl.textContent = '';
+    }
+  }
 
   if (todayEl) {
     if (streak.today_active) {
@@ -1448,7 +1464,7 @@ function renderHeatmap(heatmap) {
 function renderProfile(data) {
   const { stats } = data;
 
-  renderStreakCard(stats.streak);
+  renderStreakCard(stats.streak, stats.streak_multiplier || 1.0);
   renderHeatmap(stats.heatmap);
   renderTitlesRow(data);
 

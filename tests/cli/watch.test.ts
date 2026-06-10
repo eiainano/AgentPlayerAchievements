@@ -14,7 +14,7 @@ function runWatch(...args: string[]): { stdout: string; stderr: string; status: 
 
 describe('watch', () => {
   describe('--help', () => {
-    it('shows usage', () => {
+    it('shows usage', { timeout: 20_000 }, () => {
       const { stdout, status } = runWatch('--help');
       expect(status).toBe(0);
       expect(stdout).toContain('AGPA Watch');

@@ -1,6 +1,6 @@
 import type { RarityLevel, TrackedEvent } from '../engine/types.js';
 
-export const XP_PER_TASK = 10;
+export const XP_PER_TASK = 25;
 
 export const ACHIEVEMENT_XP: Record<RarityLevel, number> = {
   common: 50,
@@ -29,16 +29,28 @@ export function calcLevelProgress(totalXp: number): { current: number; target: n
   };
 }
 
+/**
+ * Streak multiplier: 1.0x at base, +0.1 per consecutive day, cap at 2.0x (day 11+).
+ * Only applies when streakDays > 1 (first day is baseline).
+ */
+export function calcStreakMultiplier(streakDays: number): number {
+  if (streakDays <= 1) return 1.0;
+  return Math.min(2.0, 1.0 + (streakDays - 1) * 0.1);
+}
+
 export function calcTotalXp(
   unlockedAchievements: Array<{ rarity: RarityLevel }>,
   taskCount: number,
   usageXP?: number,
+  streakMultiplier?: number,
 ): number {
   const achXp = unlockedAchievements.reduce(
     (sum, a) => sum + (ACHIEVEMENT_XP[a.rarity] || 0),
     0,
   );
-  return achXp + taskCount * XP_PER_TASK + (usageXP || 0);
+  const baseXp = achXp + taskCount * XP_PER_TASK + (usageXP || 0);
+  const mult = streakMultiplier ?? 1.0;
+  return Math.round(baseXp * mult);
 }
 
 // ── P1-1: Usage-based XP ────────────────────────────────────────────────

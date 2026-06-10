@@ -241,6 +241,20 @@ export class AchievementEngine {
       }
     }
 
+    // Compute XP/level for MCP agent awareness (simplified: achievement XP + task XP, no streak multiplier)
+    const ACHIEVEMENT_XP: Record<string, number> = {
+      common: 50, uncommon: 100, rare: 200, epic: 300, legendary: 500, mythic: 1000,
+    };
+    let achievementXp = 0;
+    for (const def of this.definitions) {
+      if (this.state.unlocked[def.id]) {
+        achievementXp += ACHIEVEMENT_XP[def.rarity] || 50;
+      }
+    }
+    const taskCount = this.events.filter(e => e.event_type === 'task.complete').length;
+    const totalXp = achievementXp + taskCount * 25;
+    const level = Math.floor(Math.sqrt(totalXp / 100));
+
     return {
       total_achievements: total,
       unlocked,
@@ -249,6 +263,8 @@ export class AchievementEngine {
       by_category: byCategory,
       by_rarity: byRarity,
       state_dir: this.stateDir,
+      level,
+      total_xp: totalXp,
     };
   }
 

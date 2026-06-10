@@ -6,6 +6,7 @@ import {
   calcTotalXp,
   calcUsageXP,
   calcUsageBreakdown,
+  calcStreakMultiplier,
   ACHIEVEMENT_XP,
   XP_PER_TASK,
 } from '../../src/dashboard/xp.js';
@@ -59,8 +60,8 @@ describe('xp', () => {
     expect(ACHIEVEMENT_XP.mythic).toBe(1000);
   });
 
-  it('XP_PER_TASK is 10', () => {
-    expect(XP_PER_TASK).toBe(10);
+  it('XP_PER_TASK is 25', () => {
+    expect(XP_PER_TASK).toBe(25);
   });
 
   it('calcTotalXp sums achievement XP and task XP', () => {
@@ -69,13 +70,39 @@ describe('xp', () => {
       { rarity: 'mythic' as const },
       { rarity: 'uncommon' as const },
     ];
-    expect(calcTotalXp(achievements, 10)).toBe(50 + 1000 + 100 + 10 * 10);
+    // 50 + 1000 + 100 + 25 * 10 = 1400 (no multiplier)
+    expect(calcTotalXp(achievements, 10)).toBe(1400);
   });
 
   it('calcTotalXp includes optional usageXP', () => {
     const achievements = [{ rarity: 'common' as const }];
-    expect(calcTotalXp(achievements, 0, 100)).toBe(50 + 100);
+    expect(calcTotalXp(achievements, 0, 100)).toBe(150); // 50 + 100
     expect(calcTotalXp(achievements, 0)).toBe(50); // backward compatible
+  });
+
+  it('calcTotalXp applies streak multiplier', () => {
+    const achievements = [{ rarity: 'common' as const }];
+    // Base = 50, with 7-day streak = 1.6x → round(80) = 80
+    expect(calcTotalXp(achievements, 0, 0, 1.6)).toBe(80);
+    // With 11-day streak = 2.0x cap → round(100) = 100
+    expect(calcTotalXp(achievements, 0, 0, 2.0)).toBe(100);
+  });
+
+  it('calcStreakMultiplier returns 1.0 for 0 or 1 day streak', () => {
+    expect(calcStreakMultiplier(0)).toBe(1.0);
+    expect(calcStreakMultiplier(1)).toBe(1.0);
+  });
+
+  it('calcStreakMultiplier scales linearly from day 2', () => {
+    expect(calcStreakMultiplier(2)).toBe(1.1);
+    expect(calcStreakMultiplier(3)).toBe(1.2);
+    expect(calcStreakMultiplier(7)).toBe(1.6);
+  });
+
+  it('calcStreakMultiplier caps at 2.0 from day 11', () => {
+    expect(calcStreakMultiplier(11)).toBe(2.0);
+    expect(calcStreakMultiplier(30)).toBe(2.0);
+    expect(calcStreakMultiplier(100)).toBe(2.0);
   });
 });
 

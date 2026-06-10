@@ -180,6 +180,13 @@ export interface EvaluationResult {
   target: number;
 }
 
+export interface MigrationRecord {
+  from: number;
+  to: number;
+  timestamp: string; // ISO 8601
+  description?: string;
+}
+
 export interface AchievementState {
   unlocked: Record<string, string>;
   stats: {
@@ -188,6 +195,8 @@ export interface AchievementState {
     [key: string]: unknown;
   };
   last_evaluated_line?: number;
+  schema_version?: number;
+  migration_history?: MigrationRecord[];
 }
 
 export type SetRewardType = 'title' | 'showcase_border' | 'stat_counter' | 'theme' | 'animation' | 'badge';
@@ -213,6 +222,8 @@ export interface AchievementStats {
   by_category: Record<string, { total: number; unlocked: number }>;
   by_rarity: Record<string, { total: number; unlocked: number }>;
   state_dir: string;
+  level?: number;
+  total_xp?: number;
 }
 
 export interface EngineOptions {

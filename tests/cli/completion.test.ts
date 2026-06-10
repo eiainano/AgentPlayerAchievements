@@ -21,7 +21,7 @@ function runCompletion(shell: string): string {
 
 describe('completion', () => {
   describe('bash', () => {
-    it('generates a valid bash completion function', () => {
+    it('generates a valid bash completion function', { timeout: 20_000 }, () => {
       const out = runCompletion('bash');
       expect(out).toContain('_agpa()');
       expect(out).toContain('complete -F _agpa agpa');

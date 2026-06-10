@@ -11,12 +11,21 @@ export const trackedEventSchema = z.object({
   }).optional(),
 });
 
+export const migrationRecordSchema = z.object({
+  from: z.number(),
+  to: z.number(),
+  timestamp: z.string(),
+  description: z.string().optional(),
+});
+
 export const achievementStateSchema = z.object({
   unlocked: z.record(z.string(), z.string()),
   stats: z.object({
     total_unlocked: z.number(),
   }).passthrough(),
   last_evaluated_line: z.number().optional(),
+  schema_version: z.number().optional(),
+  migration_history: z.array(migrationRecordSchema).optional(),
 });
 
 export const showcaseDataSchema = z.object({

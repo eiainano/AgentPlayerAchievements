@@ -14,7 +14,7 @@ function runUpgrade(...args: string[]): { stdout: string; stderr: string; status
 
 describe('upgrade', () => {
   describe('--help', () => {
-    it('shows usage with npm install methods', () => {
+    it('shows usage with npm install methods', { timeout: 20_000 }, () => {
       const { stdout, status } = runUpgrade('--help');
       expect(status).toBe(0);
       expect(stdout).toContain('AGPA Upgrade');

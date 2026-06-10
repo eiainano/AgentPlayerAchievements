@@ -1,5 +1,14 @@
 # Changelog
 
+### 数据迁移框架 + XP 系统调优 + Streak 乘法 + /achievements 命令增强 — 2026-06-10
+
+- **数据迁移框架**：`src/engine/migrate.ts` 新建，`migrateState()` 在 `store.load()` 入口自动执行增量迁移链。只补字段不删不改，失败熔断，幂等。`AchievementState` 新增 `schema_version` + `migration_history`
+- **XP 调优**：`XP_PER_TASK` 10→25（task 贡献从 micro→visible）。`calcStreakMultiplier()` +0.1/天，1.0x→2.0x，11 天封顶
+- **Dashboard Streak 乘数**：Streak 卡片右下角显示金色 ×N pill，hover 显示"streak bonus"提示。中英双语 i18n 键
+- **MCP stats 扩展**：`engine.stats()` 返回 `level` + `total_xp`，Agent 通过 `achievement.stats` 工具可直接读取等级/XP
+- **`/achievements` 命令增强**：`compile-achievements.ts` 支持 `--profile` 参数；命令文件 XP 计算用真实值（50/100/200/...）；stats 模式显示 streak 信息；locked 模式显示 `📊 Progress-tracked` 标记；compile 和 init 输出含 `progress_trackable` 字段
+- **测试更新**：XP 测试 14→18 测试（+7 multiplier 测试），1022 总测试通过（原有 3 banner 测试待修），TS 编译零错误
+
 ### Tip/Hint 覆盖 + Dashboard 渲染 + Session Mini Report + Hook launcher — 2026-06-10
 
 - **Tip/Hint 内容**：81 tips (14→81, 85 个 Common/Uncommon 非隐藏)，143 hints (93→143, 147 个非隐藏)，hidden 0 tips。`scripts/generate-tip-hint-content.ts` 一键生成

@@ -11,7 +11,7 @@ import type {
 } from '../engine/types.js';
 import type { AgentToolStats } from '../engine/stats.js';
 import { evaluateCondition } from '../engine/evaluator.js';
-import { calcTotalXp, calcLevel, calcLevelProgress, calcUsageBreakdown, XP_PER_TASK } from './xp.js';
+import { calcTotalXp, calcLevel, calcLevelProgress, calcUsageBreakdown, XP_PER_TASK, calcStreakMultiplier } from './xp.js';
 import type { UsageBreakdown } from './xp.js';
 import { buildTimeline } from './timeline.js';
 import { loadConfig } from '../config.js';
@@ -101,6 +101,7 @@ export interface DashboardStats {
   xp_progress: { current: number; target: number };
   showcase: Array<{ slot: number; achievement: AchievementItem | null }>;
   streak: StreakData;
+  streak_multiplier: number;
   heatmap: HeatmapData;
   tool_stats?: AgentToolStats;
   usage_xp: number;
@@ -262,22 +263,24 @@ export function buildCardResponse(
   const useZh = config.lang === 'zh';
   const setDefMap = new Map(setDefinitions.map(s => [s.id, s]));
 
+  // ── Streak multiplier (computed before XP since it affects XP) ─
+  const streak = existingStats?.daily
+    ? calcStreakFromDaily(existingStats.daily)
+    : calcStreak(events);
+  const cardStreakMultiplier = calcStreakMultiplier(streak.current);
+
   // ── Level & XP ────────────────────────────────────────────────
   const taskCount = events.filter(e => e.event_type === 'task.complete').length;
   const taskXp = taskCount * XP_PER_TASK;
   const usageBreakdown = calcUsageBreakdown(events);
   const achievementXp = (state.stats?.total_unlocked || 0) * 50;
-  const totalXp = taskXp + achievementXp + (usageBreakdown?.usage_xp || 0);
+  const totalXp = Math.round((taskXp + achievementXp + (usageBreakdown?.usage_xp || 0)) * cardStreakMultiplier);
   const level = calcLevel(totalXp);
   const xpProgress = calcLevelProgress(totalXp);
 
   // ── Stats ─────────────────────────────────────────────────────
   const toolEvents = events.filter(e => e.event_type === 'tool.complete').length;
   const sessionEvents = events.filter(e => e.event_type === 'session.start').length;
-
-  const streak = existingStats?.daily
-    ? calcStreakFromDaily(existingStats.daily)
-    : calcStreak(events);
 
   // ── Rarity breakdown ───────────────────────────────────────────
   const byRarity = existingStats?.by_rarity || {};
@@ -494,12 +497,18 @@ export function buildApiResponse(
   const taskCount = events.filter(e => e.event_type === 'task.complete').length;
   const achievements = buildAchievementsResponse(definitions, state, { events, taskCount });
 
+  // Compute streak data for multiplier
+  const streakData = toolStats?.daily
+    ? calcStreakFromDaily(toolStats.daily as Record<string, { sessions: number }>)
+    : calcStreak(events);
+  const streakMultiplier = calcStreakMultiplier(streakData.current);
   const unlockedDefs = definitions.filter(d => state.unlocked[d.id]);
   const usageBreakdown = calcUsageBreakdown(events);
   const totalXp = calcTotalXp(
     unlockedDefs.map(d => ({ rarity: d.rarity })),
     taskCount,
     usageBreakdown.usage_xp,
+    streakMultiplier,
   );
 
   // Build daily_stats from stats.json cache (30 most recent days)
@@ -534,9 +543,8 @@ export function buildApiResponse(
       total_xp: totalXp,
       xp_progress: calcLevelProgress(totalXp),
       showcase: showcaseData,
-      streak: toolStats?.daily
-        ? calcStreakFromDaily(toolStats.daily as Record<string, { sessions: number }>)
-        : calcStreak(events),
+      streak: streakData,
+      streak_multiplier: streakMultiplier,
       heatmap: toolStats?.daily
         ? computeHeatmapFromDaily(toolStats.daily as Record<string, { sessions: number }>)
         : computeHeatmap(events),

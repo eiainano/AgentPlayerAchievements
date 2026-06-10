@@ -65,14 +65,14 @@ If 0 unlocked: show encouraging message with the 6 onboarding guide items and ho
 
 #### Mode: locked
 
-Show locked achievements (non-hidden only):
+Show locked achievements (non-hidden only). Sort: by rarity (common → mythic, easiest first). For achievements with `progress_trackable: true`, show a progress indicator and hint; otherwise just show the description:
+
 ```
 ○ {icon} {display_name} ({rarity})
    └─ {description}
-💡 {hint_cn}  (use hint or hint_cn based on language; omit if no hint)
+💡 {hint}  (use hint or hint_cn based on language; omit if no hint)
+📊 Progress-tracked  ← only if progress_trackable: true
 ```
-
-Sort: by rarity (common → mythic, easiest first).
 
 If all unlocked: "🎉 All achievements unlocked! You're a legend."
 
@@ -95,6 +95,7 @@ Show:
 ⭐ XP: {xp} (Level {level})
 📊 Progress: {unlocked}/{total} ({pct}%)
 🎯 Next level: {xp_needed} XP
+🔥 Streak: {streak_current} days (best: {streak_longest})  ×{streak_multiplier}
 
 Rarity Distribution:
 ▰ Common:     {common_unlocked}/{common_total}
@@ -108,7 +109,9 @@ Top Sets:
 {set_name}: {set_unlocked}/{set_total}
 ```
 
-XP and level: from state.json `stats` object. If not present, calculate: 1 unlock = varies by rarity (Common=10, Uncommon=25, Rare=50, Epic=100, Legendary=200, Mythic=500). Level = floor(cumulative / 100) + 1.
+XP and level: from state.json `stats` object. Unlock XP by rarity: Common=50, Uncommon=100, Rare=200, Epic=300, Legendary=500, Mythic=1000. Task XP: 25 each. Level = floor(sqrt(totalXp / 100)). Streak multiplier: 1.0 + (streakDays - 1) × 0.1, cap 2.0×.
+
+Streak data: count consecutive days with `session.start` from event.log (filter event_type === 'session.start' in event.log lines). Each unique date = 1 day. Current streak = consecutive days ending today/yesterday. Longest = max consecutive run in history.
 
 #### Mode: recent
 

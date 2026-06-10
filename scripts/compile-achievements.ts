@@ -1,17 +1,28 @@
 /**
  * Compile YAML achievement definitions → JSON snapshot for Claude command files.
- * Run: npx tsx scripts/compile-achievements.ts [--state-dir <path>]
+ * Run: npx tsx scripts/compile-achievements.ts [--state-dir <path>|--profile <name>]
  *
  * Claude can't parse YAML directly, so we pre-compile to JSON stored in stateDir.
  * The /achievements command reads this JSON to know achievement metadata.
+ *
+ * Options:
+ *   --state-dir <path>   Write to an explicit directory
+ *   --profile <name>     Write to a named profile's state directory
+ *   (Default: default profile ~/.agent-achievements/)
  */
 import * as fs from 'fs';
 import { resolveProfileDir } from '../src/utils/profile.js';
 import { parseYAML } from '../src/engine/yaml-parser.js';
 
-const stateDir = process.argv.includes('--state-dir')
-  ? process.argv[process.argv.indexOf('--state-dir') + 1]!
-  : resolveProfileDir('default');
+let stateDir: string;
+if (process.argv.includes('--profile')) {
+  const name = process.argv[process.argv.indexOf('--profile') + 1]!;
+  stateDir = resolveProfileDir(name);
+} else if (process.argv.includes('--state-dir')) {
+  stateDir = process.argv[process.argv.indexOf('--state-dir') + 1]!;
+} else {
+  stateDir = resolveProfileDir('default');
+}
 
 const yamlPath = 'achievement-definitions.yaml';
 
@@ -54,6 +65,7 @@ const output = {
     hint_cn: d.hint_cn,
     future: d.future,
     challenge: d.challenge,
+    progress_trackable: d.progress_trackable,
   })),
 };
 

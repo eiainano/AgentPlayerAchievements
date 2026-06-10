@@ -1,5 +1,5 @@
 import * as YAML from 'yaml';
-import type { AchievementDefinition, Condition, ConditionType, PixelArt, PixelArtSize, SetDefinition, SetRewardType } from './types.js';
+import type { AchievementDefinition, Condition, ConditionType, PixelArt, PixelArtSize, SetDefinition, SetRewardType, QuestlineDefinition, StageDefinition } from './types.js';
 
 const VALID_REWARD_TYPES: Set<string> = new Set([
   'title', 'showcase_border', 'stat_counter', 'theme', 'animation', 'badge',
@@ -75,8 +75,12 @@ function parsePixelArtSize(raw: Record<string, unknown>, resolution: number): Pi
   return { palette, data };
 }
 
-export function parseYAML(text: string): { definitions: AchievementDefinition[]; sets: SetDefinition[] } {
-  const raw = YAML.parse(text) as { definitions?: Array<Record<string, unknown>>; sets?: Record<string, Record<string, unknown>> } | null;
+export function parseYAML(text: string): { definitions: AchievementDefinition[]; sets: SetDefinition[]; questlines: QuestlineDefinition[] } {
+  const raw = YAML.parse(text) as {
+    definitions?: Array<Record<string, unknown>>;
+    sets?: Record<string, Record<string, unknown>>;
+    questlines?: Array<Record<string, unknown>>;
+  } | null;
   if (!raw?.definitions || !Array.isArray(raw.definitions)) {
     throw new Error('Invalid achievement YAML: missing or empty "definitions" array');
   }
@@ -136,7 +140,46 @@ export function parseYAML(text: string): { definitions: AchievementDefinition[];
     }
   }
 
-  return { definitions, sets };
+  // Parse questlines
+  const questlines: QuestlineDefinition[] = [];
+  if (raw.questlines && Array.isArray(raw.questlines)) {
+    for (const qRaw of raw.questlines) {
+      const id = typeof qRaw.id === 'string' ? qRaw.id : null;
+      if (!id) throw new Error('Questline is missing "id"');
+
+      const stagesRaw = Array.isArray(qRaw.stages) ? qRaw.stages : [];
+      const stages: StageDefinition[] = stagesRaw.map((s: Record<string, unknown>, si: number) => {
+        if (typeof s.stage !== 'number') throw new Error(`Questline "${id}" stage ${si}: missing "stage" number`);
+        return {
+          stage: s.stage as number,
+          name: typeof s.name === 'string' ? s.name : `Stage ${si + 1}`,
+          name_cn: typeof s.name_cn === 'string' ? s.name_cn : `第${si + 1}阶段`,
+          achievements: Array.isArray(s.achievements) && s.achievements.every((x: unknown) => typeof x === 'string')
+            ? s.achievements as string[] : [],
+        };
+      });
+
+      const rewardRaw = qRaw.reward as Record<string, unknown> | undefined;
+      const rewardType = typeof rewardRaw?.type === 'string' ? rewardRaw.type : null;
+      const rewardValue = typeof rewardRaw?.value === 'string' ? rewardRaw.value : '';
+
+      questlines.push({
+        id,
+        name: typeof qRaw.name === 'string' ? qRaw.name : id,
+        name_cn: typeof qRaw.name_cn === 'string' ? qRaw.name_cn : id,
+        icon: typeof qRaw.icon === 'string' ? qRaw.icon : '🧭',
+        description: typeof qRaw.description === 'string' ? qRaw.description : '',
+        description_cn: typeof qRaw.description_cn === 'string' ? qRaw.description_cn : '',
+        stages,
+        reward: {
+          type: rewardType && VALID_REWARD_TYPES.has(rewardType) ? rewardType as SetRewardType : 'badge',
+          value: rewardValue,
+        },
+      });
+    }
+  }
+
+  return { definitions, sets, questlines };
 }
 
 function parseConditions(raw: unknown, achId: string): Condition[] {

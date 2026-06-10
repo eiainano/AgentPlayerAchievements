@@ -2758,6 +2758,21 @@ definitions:
         operator: ">="
         value: 1
         window: all
+  - id: mind_the_gap
+    name: Mind the Gap
+    name_cn: 时光裂缝
+    description: Over 2 hours between two messages in the same session. You were so deep in thought the AI wondered if you'd left.
+    description_cn: 同一次 session 中两次消息间隔超过 2 小时。AI 差点以为你人没了。
+    icon: ⏳
+    category: hidden
+    rarity: epic
+    hidden: true
+    conditions:
+      - type: time_gap
+        event: user.message
+        window: single_session
+        value: 2
+        unit: h
   - id: silent_night
     name: Silent Night
     name_cn: 静夜思

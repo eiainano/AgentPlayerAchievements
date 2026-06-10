@@ -8,7 +8,7 @@ const VALID_REWARD_TYPES: Set<string> = new Set([
 const VALID_CONDITION_TYPES: Set<string> = new Set([
   'counter', 'threshold', 'streak', 'sequence', 'distinct_count',
   'event', 'set_completion', 'ratio', 'pattern_match',
-  'mode', 'sequence_count',
+  'mode', 'sequence_count', 'time_gap',
 ]);
 
 /** Parse YAML icon field: supports emoji string or pixel-art object { src, alt } */

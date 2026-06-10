@@ -697,6 +697,54 @@ function evalSequenceCount(events: TrackedEvent[], cond: Condition): EvaluationR
   return { met, progress: count, target };
 }
 
+// ── Time gap ──────────────────────────────────────────────────────────
+
+/**
+ * Evaluate whether any two consecutive events of the same type have a time
+ * gap at least `cond.value` apart (converted to ms via `cond.unit`, default h).
+ */
+function evalTimeGap(events: TrackedEvent[], cond: Condition): EvaluationResult {
+  events = scopeEvents(events, cond);
+  const targetMs = parseTimeValue(cond.value, cond.unit);
+
+  // Filter to matching events in chronological order
+  const matching = events
+    .filter(e => {
+      if (cond.event && e.event_type !== cond.event) return false;
+      return true;
+    })
+    .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+  if (matching.length < 2) return { met: false, progress: 0, target: cond.value };
+
+  let maxGapMs = 0;
+  for (let i = 1; i < matching.length; i++) {
+    const t1 = new Date(matching[i - 1]!.timestamp).getTime();
+    const t2 = new Date(matching[i]!.timestamp).getTime();
+    const gap = t2 - t1;
+    if (gap > maxGapMs) maxGapMs = gap;
+  }
+
+  const op: ConditionOperator = cond.operator || '>=';
+  const maxGapInUnit = maxGapMs / (targetMs / cond.value); // convert back to display unit
+  return {
+    met: evalOp(op, maxGapMs, targetMs),
+    progress: Math.round(maxGapInUnit * 100) / 100,
+    target: cond.value,
+  };
+}
+
+function parseTimeValue(value: number, unit?: string): number {
+  switch (unit) {
+    case 'ms': return value;
+    case 's':  return value * 1000;
+    case 'm':  return value * 60000;
+    case 'h':  return value * 3600000;
+    case 'd':  return value * 86400000;
+    default:   return value * 3600000; // default: hours
+  }
+}
+
 // ── Pattern match ───────────────────────────────────────────────────
 
 function evalPatternMatch(events: TrackedEvent[], cond: Condition): EvaluationResult {
@@ -776,6 +824,7 @@ export function evaluateCondition(cond: Condition, events: TrackedEvent[]): Eval
     case 'sequence_count': return evalSequenceCount(events, cond);
     case 'pattern_match': return evalPatternMatch(events, cond);
     case 'ratio': return evalRatio(events, cond);
+    case 'time_gap': return evalTimeGap(events, cond);
     default: return { met: false, progress: 0, target: 0 };
   }
 }

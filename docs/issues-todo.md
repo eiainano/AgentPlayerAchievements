@@ -1,6 +1,6 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-10 | 总成就数: 193 | 条件类型: 11 | Tests: 1033 (1030 ✅ / 42 files) | 3 banner 测试待修复 ⚠️ | 0 不可达 ✅ | 0 审计错误 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | Logo 像素画 + Dashboard 集成 ✅ | 语言自动检测 ✅ | CLI 25 命令 ✅ | agpa uninstall ✅ | 跨平台通知增强 ✅ | macOS JXA 通知 ✅ | Dashboard 导出按钮 ✅ | 共享主题常量 ✅ | LLM 审计脚本 ✅ | Legendary/Mythic 卡片动画 ✅ | 称号 & 徽章系统 ✅ | 响应式布局 ✅ | 全球统计 opt-in 🚫 暂缓 | 隐藏成就 46 | tip/hint 系统 ✅
+> 最后更新: 2026-06-10 | 总成就数: 194 | 条件类型: 12 | Tests: 1034 (1030 ✅ / 42 files) | 3 banner 测试待修复 ⚠️ | 0 不可达 ✅ | 0 审计错误 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | Logo 像素画 + Dashboard 集成 ✅ | 语言自动检测 ✅ | CLI 25 命令 ✅ | agpa uninstall ✅ | 跨平台通知增强 ✅ | macOS JXA 通知 ✅ | Dashboard 导出按钮 ✅ | 共享主题常量 ✅ | LLM 审计脚本 ✅ | Legendary/Mythic 卡片动画 ✅ | 称号 & 徽章系统 ✅ | 响应式布局 ✅ | 全球统计 opt-in 🚫 暂缓 | 隐藏成就 46 | tip/hint 系统 ✅
 
 ---
 
@@ -54,7 +54,7 @@
 
 ### Phase 2: LLM 审计脚本 (`scripts/audit-achievements.ts`)
 
-- **LLM 审计管道** — `buildSystemPrompt()` 详解 11 种 condition type + window 类型 + 6 项检查（B-Semantic/B-Event/B-Window/B-Operator/C-Missing/C-Extra）
+- **LLM 审计管道** — `buildSystemPrompt()` 详解 12 种 condition type + window 类型 + 6 项检查（B-Semantic/B-Event/B-Window/B-Operator/C-Missing/C-Extra）
 - **双 Provider 支持** — Anthropic（tool_use 结构化输出）和 OpenAI 兼容（response_format json_object）
 - **智能分批** — 默认 20 成就/批，ANTHROPIC_API_KEY 或 OPENAI_API_KEY 自动检测
 - **Phase 1 联动** — 默认仅审计 `needsLLMReview` 标记成就；`--all` 全部 193 个

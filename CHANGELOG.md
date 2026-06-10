@@ -1,5 +1,12 @@
 # Changelog
 
+### 新增 time_gap 条件类型 + "时光裂缝"成就 — 2026-06-10
+
+- **新增条件类型 `time_gap`**：检查同一窗口内连续两个同类型事件的时间间隔，支持 `unit` 字段（ms/s/m/h/d，默认 h）。在 `types.ts`、`evaluator.ts`（`evalTimeGap()`）、`yaml-parser.ts`（白名单）全链路实现
+- **Filter DSL 增强**：`evaluator.ts` 新增 `<=` 和 `>=` 运算符支持；test 中新增 `time_gap` 用例（生成间隔>2h 的两个事件）
+- **新成就 `mind_the_gap`** — "Mind the Gap" / 时光裂缝 ⏳，隐藏 epic，同 session 内两次 user.message 间隔≥2h 触发
+- **测试更新**：auditor 193→194，every-achievement 194/194 通过，全量 1030/1034 通过
+
 ### 低电量成就（Last Stand）+ battery 检测 + filter DSL 扩展 — 2026-06-10
 
 - **电池检测跨平台**：`src/utils/battery.ts`，支持 macOS（`pmset -g batt`）、Linux（`/sys/class/power_supply/`）、Windows（`wmic path Win32_Battery`），统一返回 `on_battery` + `battery_pct`

@@ -370,6 +370,18 @@ function genEvents(cond: Condition): TrackedEvent[] {
       return result;
     }
 
+    // ── time_gap ────────────────────────────────────────────
+    case 'time_gap': {
+      const gapHrs = cond.unit === 'm' ? 1 : cond.unit === 's' ? 1 / 3600 : cond.value;
+      const gapMs = gapHrs * 3600000 + 1000; // just over the threshold
+      const t1 = new Date();
+      const t2 = new Date(t1.getTime() + gapMs);
+      return [
+        evt(cond.event || 'user.message', payload, { timestamp: t1.toISOString(), context: { session_id: 'test-session', model: 'auto', ...ctx } }),
+        evt(cond.event || 'user.message', payload, { timestamp: t2.toISOString(), context: { session_id: 'test-session', model: 'auto', ...ctx } }),
+      ];
+    }
+
     // ── set_completion ───────────────────────────────────────
     case 'set_completion':
       return [];

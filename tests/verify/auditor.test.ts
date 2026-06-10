@@ -667,6 +667,6 @@ describe('Integration: real YAML', () => {
     console.log(`IDs: ${report.needsLLMReview.join(', ')}`);
 
     expect(errors).toHaveLength(0);
-    expect(report.total).toBe(193);
+    expect(report.total).toBe(194);
   });
 });

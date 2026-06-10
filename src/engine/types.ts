@@ -83,7 +83,8 @@ export type ConditionType =
   | 'ratio'
   | 'pattern_match'
   | 'mode'
-  | 'sequence_count';
+  | 'sequence_count'
+  | 'time_gap';
 
 export type ConditionOperator = '>=' | '<=' | '==' | '>' | '<';
 

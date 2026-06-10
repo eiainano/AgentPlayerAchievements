@@ -218,7 +218,7 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
                   lower.includes('d_model'))) attnScore++;                        // scaling factor
 
               editPayload.has_attention_pattern =
-                lower.includes('attention') && (isBuiltin || attnScore >= 2);
+                lower.includes('attention') && (isBuiltin || attnScore >= 1);
             } catch { /* file gone */ }
           }
         }

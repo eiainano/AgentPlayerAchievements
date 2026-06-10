@@ -1,5 +1,16 @@
 # Changelog
 
+### Questline 成就旅程线系统全面实施 — 2026-06-11
+
+- **5 条 RPG 旅程线**：Bug Hunter（除虫大师）、Toolsmith（工具匠人）、Builder（建造大师）、Night Shift（夜行者）、Polyglot（语言通才）
+- **每线 3 阶段**（开始→中段→终章），~49 个成就覆盖（24%），成就可多归属
+- **Dashboard**：新增"旅程" nav tab（成就与套装之间），可展开的横向进度卡片 + 阶段成就详细列表
+- **完成奖励**：全部 3 阶段解锁获得专属 title（如"精英除虫师"、"工具大师"等）
+- **YAML 权威源**：`achievement-definitions.yaml` 新增 `questlines:` 区块（130 行）
+- **实现文件**：types.ts → yaml-parser.ts → engine.ts → api.ts → server.ts → index.html → styles.css → app.js
+- **纯展示层**：不改 engine/evaluator，进度 = state.unlocked 查询，排列按完成百分比降序
+- **设计/计划文档**：`docs/superpowers/specs/2026-06-11-questline-system-design.md` + `docs/superpowers/plans/2026-06-11-questline-system.md`
+
 ### buildQuestlinesResponse API — 2026-06-11
 
 - **`src/dashboard/api.ts`**：新增 `buildQuestlinesResponse()` 函数，将 `QuestlineDefinition[]` 转换为带阶段进度、当前阶段和完成状态的响应数据；按完成百分比降序排列

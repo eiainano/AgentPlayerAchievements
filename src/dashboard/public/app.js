@@ -400,6 +400,12 @@ const I18N = {
     nav_timeline: 'Timeline',
     section_achievements: 'Achievements',
     section_sets: 'Sets',
+    nav_questlines: 'Quests',
+    section_questlines: 'Questlines',
+    questlines_desc: 'Your growth path',
+    questlines_stage: 'Stage',
+    questlines_reward: 'Reward',
+    questlines_complete: 'Complete!',
     section_timeline: 'Timeline',
     hero_title: 'Agent Player Achievements',
     xp_label: '{xp} XP • Level {level}',
@@ -517,6 +523,12 @@ const I18N = {
     nav_insights: '洞察',
     section_achievements: '成就',
     section_sets: '套装',
+    nav_questlines: '旅程',
+    section_questlines: '旅程',
+    questlines_desc: '你的成长之路',
+    questlines_stage: '第',
+    questlines_reward: '奖励',
+    questlines_complete: '全部完成！',
     section_timeline: '时间线',
     section_insights: '洞察',
     hero_title: 'Agent 玩家成就',
@@ -828,6 +840,7 @@ function renderAll(data) {
   renderSafe('visit-tip', () => renderFirstVisitTip(data));
   renderSafe('onboarding', () => renderOnboardingGuide(data));
   renderSafe('achievements', () => renderAchievements(data));
+  renderSafe('questlines', () => renderQuestlines(data));
   renderSafe('sets', () => renderSets(data));
   renderSafe('badges', () => renderBadges(data));
   renderSafe('timeline', () => renderTimeline(data));
@@ -2074,6 +2087,66 @@ function renderSets(data) {
       ${rewardHtml}
     </div>`;
   }).join('');
+}
+
+// ── Questlines ─────────────────────────────────────────
+
+function renderQuestlines(data) {
+  const stack = document.getElementById('questlines-stack');
+  if (!stack) return;
+
+  if (!data.questlines || data.questlines.length === 0) {
+    stack.innerHTML = '<div class="empty-state"><span class="empty-state-icon">🧭</span><div class="empty-state-text">No quests defined yet.</div></div>';
+    return;
+  }
+
+  stack.innerHTML = data.questlines.map(ql => {
+    var pct = ql.total_count > 0 ? Math.round((ql.unlocked_count / ql.total_count) * 100) : 0;
+    var complete = ql.completed;
+    var stageName = currentLang === 'zh' ? (ql.current_stage_name_cn || ('第' + ql.current_stage + '阶段')) : ql.current_stage_name;
+    var displayNameQl = currentLang === 'zh' && ql.name_cn ? ql.name_cn : ql.name;
+    var displayDesc = currentLang === 'zh' && ql.description_cn ? ql.description_cn : ql.description;
+
+    var stagesHtml = ql.stages.map(function(s) {
+      var stageNameStr = currentLang === 'zh' ? (s.name_cn || s.name) : s.name;
+      var achsHtml = s.achievements.map(function(a) {
+        return '<div class="questline-ach-badge ' + (a.unlocked ? 'unlocked' : 'locked') + '">' +
+          '<span class="ach-icon">' + (a.unlocked ? escHtml(a.icon) : '○') + '</span>' +
+          '<span>' + escHtml(currentLang === 'zh' && a.name_cn ? a.name_cn : a.name) + '</span>' +
+        '</div>';
+      }).join('');
+      return '<div class="questline-stage">' +
+        '<div class="questline-stage-header">' + t('questlines_stage') + ' ' + s.stage + ': ' + escHtml(stageNameStr) + ' — ' + s.completed + '/' + s.total + '</div>' +
+        '<div class="questline-stage-achs">' + achsHtml + '</div>' +
+      '</div>';
+    }).join('');
+
+    var rewardHtml = complete && ql.reward && ql.reward.value
+      ? '<div class="questline-reward">' + t('questlines_reward') + ': ' + escHtml(ql.reward.value) + '</div>'
+      : '';
+
+    return '<div class="questline-card' + (complete ? ' complete' : '') + '" onclick="toggleQuestlineCard(this)">' +
+      '<div class="questline-card-header">' +
+        '<span class="questline-card-icon">' + escHtml(ql.icon) + '</span>' +
+        '<div class="questline-card-info">' +
+          '<div class="questline-card-name">' + escHtml(displayNameQl) + '</div>' +
+          '<div class="questline-card-desc">' + escHtml(displayDesc) + '</div>' +
+        '</div>' +
+        '<div class="questline-card-meta">' +
+          '<div class="questline-card-stage">' + t('questlines_stage') + ' ' + ql.current_stage + ': ' + escHtml(stageName) + '</div>' +
+          '<div class="questline-card-progress">' + ql.unlocked_count + '/' + ql.total_count + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="questline-card-bar">' +
+        '<div class="questline-card-bar-fill" style="width:' + pct + '%"></div>' +
+      '</div>' +
+      '<div class="questline-stages">' + stagesHtml + rewardHtml + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleQuestlineCard(card) {
+  card.classList.toggle('expanded');
 }
 
 // ── Titles Row ────────────────────────────────────────

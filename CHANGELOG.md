@@ -1,5 +1,14 @@
 # Changelog
 
+### 节日成就（圣诞/元旦/情人节）+ month/day filter 支持 — 2026-06-10
+
+- **matchFilter 增加 month/day**：从 `event.timestamp` 提取月份和日期，filter 表达式支持 `month == 12 && day == 25` 的语法
+- **3 个节日隐藏 epic 成就**：
+  - `merry_christmas` — "Silent Night, Code Bright"（圣诞日，12月25日）
+  - `new_year_code` — "First Dispatch of the Year"（元旦，1月1日）
+  - `code_valentine` — "Be My Code Valentine"（情人节，2月14日）
+- **测试更新**：auditor 成就计数 188→191
+
 ### 关键词匹配成就 + user.message text_content + filter 增强 — 2026-06-10
 
 - **`user.message` 事件新增 text_content**：hook.ts 在 `UserPromptSubmit` 时将用户消息经 `redactSecrets()` 脱敏（strip API key/Bearer/JWT/GitHub token/AWS key/SSH key/内联密码）后截取前 200 字符存入 payload.text_content，pattern_match 和 counter+filter 可以直接匹配关键词，同时防止凭据泄露

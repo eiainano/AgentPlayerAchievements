@@ -1,6 +1,6 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-10 | 总成就数: 201 | 条件类型: 12 | Tests: 1041 (1038 ✅ / 42 files) | 3 banner 测试待修复 ⚠️ | 0 不可达 ✅ | 0 审计错误 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | Logo 像素画 + Dashboard 集成 ✅ | 语言自动检测 ✅ | CLI 25 命令 ✅ | agpa uninstall ✅ | 跨平台通知增强 ✅ | macOS JXA 通知 ✅ | Dashboard 导出按钮 ✅ | 共享主题常量 ✅ | LLM 审计脚本 ✅ | Legendary/Mythic 卡片动画 ✅ | 称号 & 徽章系统 ✅ | 响应式布局 ✅ | 全球统计 opt-in 🚫 暂缓 | 隐藏成就 50 | tip/hint 系统 ✅
+> 最后更新: 2026-06-11 | 总成就数: 208 | 条件类型: 12 | Tests: 1067 (1067 ✅ / 43 files) | 0 不可达 ✅ | 0 审计错误 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | Logo 像素画 + Dashboard 集成 ✅ | 语言自动检测 ✅ | CLI 25 命令 ✅ | agpa uninstall ✅ | 跨平台通知增强 ✅ | macOS JXA 通知 ✅ | Dashboard 导出按钮 ✅ | 共享主题常量 ✅ | LLM 审计脚本 ✅ | Legendary/Mythic 卡片动画 ✅ | 称号 & 徽章系统 ✅ | 响应式布局 ✅ | 全球统计 opt-in 🚫 暂缓 | 隐藏成就 54 | tip/hint 系统 ✅
 
 ---
 
@@ -70,6 +70,46 @@
 | `marathon` | "Single session ≥ 3h" 但 threshold 不加 `per_event`，累加所有 session 的 duration | +`per_event: true` |
 | `iterative_refiner` | "Single task 20+ turns" 但 threshold 不加 `per_event`，累加所有 task 的 step_count；且 operator `>` 应为 `>=`（描述说"20+"） | +`per_event: true`，`>`→`>=` |
 | `the_all_nighter` | "Single task ≥ 6h" 但 threshold 不加 `per_event`，累加所有 task 的 duration | +`per_event: true` |
+
+---
+## 🆕 14 个 HIGH Bug 修复 (v0.1.8, 6/11)
+
+基于全量代码审查（`docs/code-review-2026-06-11.md`）第二轮修复，14/14 HIGH 全部修复：
+
+### Evaluator 正确性（4 个）
+| # | 成就影响 | 修复 |
+|---|----------|------|
+| H1 | `evalDistinctCount` 无视 filter/role → 条件绕过 | +`matchFilter()` + `matchRole()` |
+| H3 | evalRatio/sequenceCount 手动操作符 → 漂移风险 | 统一 `evalOp()` |
+| H4 | evalMode/patternMatch 不 scope → `im_sorry_dave` 窗口无视 | +`scopeEvents()` |
+| H12 | `evalPredicate` fail-open → filter 笔误静默放行 | `true` → `false` |
+
+### 数据一致性（5 个）
+| # | 问题 | 修复 |
+|---|------|------|
+| H2 | poll 先存 state 再发 unlock 事件 → crash 不一致 | 调换顺序：先 emit 后 save |
+| H5 | loadPending raw JSON.parse + 无数组校验 | `safeParse(z.array(...))` |
+| H7 | Import 命令无 schema 校验 | +`exportPayloadSchema` Zod gate |
+| H8 | init.ts default profile 走 `profiles/default/` 非根目录 | +`profile !== DEFAULT_PROFILE` |
+| H11 | Bash `includes()` 匹配注释/echo/多行脚本 | word-boundary regex |
+
+### YAML 数据完整性（2 个）
+| # | 问题 | 修复 |
+|---|------|------|
+| H9 | 4 成就声明 set 但不在此 set 成员列表 | 补全 `agent_commander`/`bug_catcher`/`git_flow`/`completionist` |
+| H10 | `infinite_loop` 缺 `per_event: true` | +`per_event: true` |
+
+### Dashboard 泄漏（2 个）
+| # | 问题 | 修复 |
+|---|------|------|
+| H13 | IntersectionObserver 每 10s 新建 → 1h 360 孤儿 | 复用 `_navObserver`，先 disconnect |
+| H14 | nav 事件监听器每 poll 累积 → 1h 360 重复触发 | 移至 `controlsSetup`（一次绑定 + 委托） |
+
+### H6（JSON.parse 规范）
+- **已修 4 核心文件**: `profile.ts`（+`profileMetaSchema`）、`poll.ts`、`history.ts`、`import.ts` + `validate.ts`
+- **合理保留 11 处**: store.ts/config.ts（已有 safeParse 后置）、hook.ts（受控源/try-catch）、doctor/verify（诊断必须容忍残缺）、server.ts（泛型 body parser）、init.ts（readJSON 尾部逗号清理）、package.json reads（自有文件 always valid）
+
+**测试**: 1067/1067 ✅ | **TypeScript**: 2 预存错误未受影响 ✅
 
 ---
 

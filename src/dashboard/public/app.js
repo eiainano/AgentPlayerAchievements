@@ -806,6 +806,7 @@ const RARITY_LEVELS = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'mythi
 // ── Error Boundary ──────────────────────────────────────
 
 let renderErrors = [];
+let _navObserver = null; // reused across poll cycles (H13 fix)
 
 function renderSafe(name, fn) {
   try { fn(); } catch (e) {
@@ -1053,7 +1054,9 @@ function renderNav(data) {
 
   const links = document.querySelectorAll('.nav-link');
   const sections = ['profile', 'achievements', 'sets', 'timeline', 'insights'];
-  const observer = new IntersectionObserver(entries => {
+  // Reuse observer across poll cycles to prevent leak (H13)
+  if (_navObserver) _navObserver.disconnect();
+  _navObserver = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (e.isIntersecting) {
         links.forEach(l => l.classList.toggle('active', l.dataset.section === e.target.id));
@@ -1062,7 +1065,7 @@ function renderNav(data) {
   }, { rootMargin: '-40% 0px -55% 0px' });
   sections.forEach(id => {
     const el = document.getElementById(id);
-    if (el) observer.observe(el);
+    if (el) _navObserver.observe(el);
   });
 }
 
@@ -1712,6 +1715,45 @@ function renderAchievements(data) {
       });
     }
 
+    // Category nav — bind once with event delegation
+    const catNav = document.getElementById('category-nav');
+    if (catNav) {
+      catNav.addEventListener('click', e => {
+        const pill = e.target.closest('.category-pill');
+        if (!pill) return;
+        catNav.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        currentCategory = pill.dataset.cat || null;
+        renderGrid(dashboardData);
+      });
+    }
+
+    // Rarity nav — bind once with event delegation
+    const rarityNav = document.getElementById('rarity-nav');
+    if (rarityNav) {
+      rarityNav.addEventListener('click', e => {
+        const pill = e.target.closest('.rarity-pill');
+        if (!pill) return;
+        rarityNav.querySelectorAll('.rarity-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        currentRarity = pill.dataset.rarity || null;
+        renderGrid(dashboardData);
+      });
+    }
+
+    // Filter tabs — bind once with event delegation
+    const filterTabs = document.getElementById('filter-tabs');
+    if (filterTabs) {
+      filterTabs.addEventListener('click', e => {
+        const tab = e.target.closest('.filter-tab');
+        if (!tab) return;
+        filterTabs.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentFilter = tab.dataset.filter;
+        renderGrid(dashboardData);
+      });
+    }
+
     initSortPicker(data);
 
     controlsSetup = true;
@@ -1724,51 +1766,27 @@ function renderAchievements(data) {
   // ── Populate sort options (i18n) ──
   populateSortPicker();
 
-  // ── Category nav ──
+  // ── Category nav HTML (rebuild each render — categories may change) ──
   const catNav = document.getElementById('category-nav');
   if (catNav) {
     const cats = [...new Set(data.achievements.map(a => a.category))];
     catNav.innerHTML = `<button class="category-pill ${!currentCategory ? 'active' : ''}" data-cat="">${t('cat_all')}</button>` +
       cats.map(c => `<button class="category-pill ${currentCategory === c ? 'active' : ''}" data-cat="${c}">${displayCategory(c)}</button>`).join('');
-    catNav.addEventListener('click', e => {
-      const pill = e.target.closest('.category-pill');
-      if (!pill) return;
-      catNav.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
-      currentCategory = pill.dataset.cat || null;
-      renderGrid(data);
-    });
   }
 
-  // ── Rarity nav ──
+  // ── Rarity nav HTML (rebuild each render — i18n may change) ──
   const rarityNav = document.getElementById('rarity-nav');
   if (rarityNav) {
     rarityNav.innerHTML = `<button class="rarity-pill ${!currentRarity ? 'active' : ''}" data-rarity="">${t('rarity_all')}</button>` +
       RARITY_LEVELS.map(r => `<button class="rarity-pill ${currentRarity === r ? 'active' : ''}" data-rarity="${r}">${displayRarity(r)}</button>`).join('');
-    rarityNav.addEventListener('click', e => {
-      const pill = e.target.closest('.rarity-pill');
-      if (!pill) return;
-      rarityNav.querySelectorAll('.rarity-pill').forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
-      currentRarity = pill.dataset.rarity || null;
-      renderGrid(data);
-    });
   }
 
-  // ── Filter tabs ──
+  // ── Filter tabs i18n labels (update each render) ──
   const filterTabs = document.getElementById('filter-tabs');
   if (filterTabs) {
     filterTabs.querySelectorAll('.filter-tab').forEach(tab => {
       const key = tab.dataset.filter === 'all' ? 'filter_all' : tab.dataset.filter === 'unlocked' ? 'filter_unlocked' : 'filter_locked';
       tab.textContent = t(key);
-    });
-    filterTabs.addEventListener('click', e => {
-      const tab = e.target.closest('.filter-tab');
-      if (!tab) return;
-      filterTabs.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      currentFilter = tab.dataset.filter;
-      renderGrid(data);
     });
   }
 
@@ -2164,10 +2182,10 @@ function renderTitlesRow(data) {
   }
 
   row.style.display = 'flex';
-  row.innerHTML = titles.map(t => {
-    const setName = currentLang === 'zh' && t.set_name_cn ? t.set_name_cn : t.set_name;
-    return `<span class="title-pill" data-rarity="${t.rarity}" title="${t('title_tooltip', { set: setName })}">
-      ${iconHtml(t.icon, { size: 16 })} ${escHtml(t.title)}
+  row.innerHTML = titles.map(title => {
+    const setName = currentLang === 'zh' && title.set_name_cn ? title.set_name_cn : title.set_name;
+    return `<span class="title-pill" data-rarity="${title.rarity}" title="${t('title_tooltip', { set: setName })}">
+      ${iconHtml(title.icon, { size: 16 })} ${escHtml(title.title)}
     </span>`;
   }).join('');
 }
@@ -2586,12 +2604,6 @@ function drawTimeHeatmap(canvasId, data) {
   for (let h = 0; h < 24; h += 3) {
     ctx.fillText(h + 'h', pad.left + h * cellW + cellW / 2, pad.top + ph + 16);
   }
-}
-
-function escHtml(s) {
-  const div = document.createElement('div');
-  div.textContent = s;
-  return div.innerHTML;
 }
 
 function escAttr(s) {

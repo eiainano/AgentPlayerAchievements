@@ -50,7 +50,7 @@ engine = createEngine(currentProfile);
 // ── MCP Server ───────────────────────────────────────────────────────
 
 const server = new McpServer(
-  { name: 'agpa', version: '0.1.6' },
+  { name: 'agpa', version: '0.1.8' },
   { capabilities: { tools: {} } },
 );
 
@@ -77,7 +77,7 @@ async function main() {
 
   const eng = getEngine();
   process.stderr.write(
-    `AGPA MCP v0.1.6 · ${eng.definitions.length} achievements · ${currentProfile} · ${eng.toolSource}\n`,
+    `AGPA MCP v0.1.8 · ${eng.definitions.length} achievements · ${currentProfile} · ${eng.toolSource}\n`,
   );
 }
 

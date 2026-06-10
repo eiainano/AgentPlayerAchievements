@@ -8,12 +8,28 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { z } from 'zod';
 import { AchievementEngine } from '../engine/engine.js';
 import { resolveProfileDir, getProfileMeta } from '../utils/profile.js';
 import { loadConfig } from '../config.js';
 import { loadShowcase, saveShowcase } from '../helpers.js';
+import { safeParse } from '../utils/validate.js';
 import type { ExportPayload } from './types.js';
 import type { AchievementState } from '../engine/types.js';
+
+const exportPayloadSchema = z.object({
+  format_version: z.literal('1.0'),
+  exported_at: z.string(),
+  source: z.object({
+    tool: z.literal('agpa'),
+    version: z.string(),
+    profile: z.string(),
+    profile_emoji: z.string(),
+  }),
+  state: z.object({
+    unlocked: z.record(z.string(), z.string()),
+  }).passthrough(),
+}).passthrough();
 
 function readPackageVersion(): string {
   try {
@@ -72,21 +88,25 @@ export function cmdImport(): void {
     process.exit(1);
   }
 
-  // Read and parse the export file
-  let payload: ExportPayload;
+  // Read and parse the export file with schema validation
+  let payload: ExportPayload | null = null;
   try {
     const raw = fs.readFileSync(filePath, 'utf-8');
-    payload = JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    const validated = safeParse(exportPayloadSchema, parsed, null);
+    payload = validated ? (validated as unknown as ExportPayload) : null;
+    if (!payload) {
+      console.error('Error: invalid export file — schema validation failed');
+      console.error('Expected: format_version "1.0", source.tool "agpa", state.unlocked');
+      process.exit(1);
+    }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Unknown error';
     console.error(`Error reading file: ${msg}`);
     process.exit(1);
   }
 
-  // Validate format
-  if (payload.format_version !== '1.0') {
-    console.error(`Warning: format_version "${payload.format_version}" may not be compatible.`);
-  }
+  // state.unlocked already validated by schema, but double-check for TypeScript narrowing
   if (!payload.state?.unlocked) {
     console.error('Error: invalid export file — missing state.unlocked');
     process.exit(1);

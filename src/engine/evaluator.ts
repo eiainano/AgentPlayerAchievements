@@ -174,7 +174,7 @@ function evalPredicate(expr: string, ctx: Record<string, string | boolean | numb
     return false;
   }
 
-  return true; // unparseable → pass
+  return false; // unparseable filter → exclude event (fail-closed, consistent with matchFilter)
 }
 
 function parseRhs(raw: string): string | boolean | number {
@@ -587,6 +587,8 @@ function evalDistinctCount(events: TrackedEvent[], cond: Condition): EvaluationR
   for (const e of events) {
     if (e.event_type !== cond.event) continue;
     if (!sessionWindow && now - new Date(e.timestamp).getTime() > windowMs) continue;
+    if (cond.filter && !matchFilter(e, cond.filter)) continue;
+    if (!matchRole(e, cond.role)) continue;
     const val = cond.field ? getField(e, cond.field) : null;
     if (!val) continue;
     if (whitelist && !whitelist.has(val)) continue;
@@ -641,6 +643,7 @@ function evalSetCompletion(
 // ── Mode ────────────────────────────────────────────────────────────
 
 function evalMode(events: TrackedEvent[], cond: Condition): EvaluationResult {
+  events = scopeEvents(events, cond);
   const freq: Record<string, number> = {};
   let total = 0;
 
@@ -673,6 +676,7 @@ function evalMode(events: TrackedEvent[], cond: Condition): EvaluationResult {
 // ── Sequence count ──────────────────────────────────────────────────
 
 function evalSequenceCount(events: TrackedEvent[], cond: Condition): EvaluationResult {
+  events = scopeEvents(events, cond);
   const pattern = Array.isArray(cond.pattern) ? cond.pattern as string[] : null;
   if (!pattern || pattern.length === 0) return { met: false, progress: 0, target: cond.value };
 
@@ -684,21 +688,15 @@ function evalSequenceCount(events: TrackedEvent[], cond: Condition): EvaluationR
       if (pi >= pattern.length) { count++; pi = 0; }
     } else {
       pi = 0;
+      // Re-check current event against pattern start to avoid missing
+      // sequences after a false start (e.g. ['A','A','B'] with pattern ['A','B'])
+      if (e.event_type === pattern[0]) pi = 1;
     }
   }
 
   const target = cond.value;
-  const op = cond.operator || '>=';
-  const met = op === '>='
-    ? count >= target
-    : op === '<='
-      ? count <= target
-      : op === '=='
-        ? count === target
-        : op === '>'
-          ? count > target
-          : count < target;
-  return { met, progress: count, target };
+  const op: ConditionOperator = cond.operator || '>=';
+  return { met: evalOp(op, count, target), progress: count, target };
 }
 
 // ── Time gap ──────────────────────────────────────────────────────────
@@ -779,6 +777,7 @@ function parseTimeValue(value: number, unit?: string): number {
 // ── Pattern match ───────────────────────────────────────────────────
 
 function evalPatternMatch(events: TrackedEvent[], cond: Condition): EvaluationResult {
+  events = scopeEvents(events, cond);
   const regexSrc = typeof cond.pattern === 'string' ? cond.pattern : null;
   if (!regexSrc) return { met: false, progress: 0, target: 1 };
 
@@ -849,16 +848,8 @@ function evalRatio(events: TrackedEvent[], cond: Condition): EvaluationResult {
 
   const ratio = numerator / denominator;
   const target = cond.value;
-  const op = cond.operator || '>=';
-  const met = op === '>='
-    ? ratio >= target
-    : op === '<='
-      ? ratio <= target
-      : op === '>'
-        ? ratio > target
-        : op === '<'
-          ? ratio < target
-          : ratio === target;
+  const op: ConditionOperator = cond.operator || '>=';
+  const met = evalOp(op, ratio, target);
 
   return { met, progress: Math.round(ratio * 100), target: Math.round(target * 100) };
 }

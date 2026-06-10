@@ -481,7 +481,10 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  dispatch(cmdName, cmdArgs);
+  dispatch(cmdName, cmdArgs).catch(err => {
+    console.error(`\n  \x1b[0m✖ dispatch failed: ${err instanceof Error ? err.message : String(err)}`);
+    process.exit(1);
+  });
 }
 
 

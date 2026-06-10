@@ -53,8 +53,10 @@ export function registerConfigTool(server: McpServer): void {
               }
               saveConfig({ active_profile: normalized });
             }
-          } else {
+          } else if (VALID_KEYS.includes(k as keyof AppConfig)) {
             saveConfig({ [k]: v } as Partial<AppConfig>);
+          } else {
+            return formatMcpError(ErrorCodes.NOT_FOUND, `unknown config key: ${k}`);
           }
           return { content: [{ type: 'text', text: JSON.stringify({ status: 'ok', [k]: v }) }] };
         }

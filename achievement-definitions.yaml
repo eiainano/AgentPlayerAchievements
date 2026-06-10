@@ -2459,6 +2459,7 @@ definitions:
         field: duration_ms
         operator: ">="
         value: 60000
+        per_event: true
   - id: undying_curiosity
     name: Undying Curiosity
     name_cn: 不死的好奇心
@@ -2834,6 +2835,7 @@ definitions:
         field: duration_ms
         operator: <=
         value: 180000
+        per_event: true
       - type: event
         event: test.pass
         window: same_task
@@ -2854,6 +2856,7 @@ definitions:
         field: duration_ms
         operator: <=
         value: 60000
+        per_event: true
       - type: event
         event: test.pass
         window: same_task
@@ -2931,6 +2934,7 @@ definitions:
         field: elapsed_ms
         operator: <=
         value: 30000
+        per_event: true
         window: single_task
       - type: event
         event: test.pass
@@ -3886,6 +3890,7 @@ sets:
       - swat_team
       - delegator
       - avengers_assemble
+      - ultraman_8
     reward:
       type: showcase_border
       value: gold
@@ -3902,6 +3907,7 @@ sets:
       - merge_tamer
       - time_traveler
       - u_turn
+      - shipper
     reward:
       type: stat_counter
       value: commits
@@ -3912,6 +3918,7 @@ sets:
       - the_debugger
       - triple_debugger
       - first_try
+      - self_aware
     reward:
       type: stat_counter
       value: bugs_fixed
@@ -3982,6 +3989,7 @@ sets:
       - completionist_silver
       - completionist_gold
       - mythic_completionist
+      - achievement_hunter
     reward:
       type: badge
       value: 100% Complete
@@ -4022,11 +4030,11 @@ questlines:
       - stage: 1
         name: "Rookie Exterminator"
         name_cn: "实习除虫员"
-        achievements: [error_resilient, the_debugger, diagnostic_detective]
+        achievements: [error_resilient, the_debugger, triple_debugger]
       - stage: 2
         name: "Seasoned Hunter"
         name_cn: "老练猎手"
-        achievements: [self_healer, sisyphus, mitosis, chain_reaction]
+        achievements: [bounce_back, sisyphus, mitosis, chain_reaction]
       - stage: 3
         name: "Debugging Legend"
         name_cn: "调试传说"

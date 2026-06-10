@@ -1598,8 +1598,8 @@ async function main(): Promise<void> {
     }
   }
 
-  // Shared data directory
-  const dataDir = profile
+  // Shared data directory (DEFAULT_PROFILE "default" → legacy dir, named → profiles/<name>)
+  const dataDir = (profile && profile !== DEFAULT_PROFILE)
     ? path.join(AGPA_DIR, 'profiles', profile)
     : AGPA_DIR;
   if (profile) {

@@ -204,13 +204,14 @@ describe('mapEvents', () => {
       expect(types).toContain('git.commit');
     });
 
-    it('emits git.commit for git add', () => {
+    it('emits git.add for git add', () => {
       const data = {
         hook_event_name: 'PostToolUse', tool_name: 'Bash',
         tool_input: { command: 'git add .' },
       };
       const results = mapEvents('PostToolUse', data);
-      expect(results.map(r => r.event_type)).toContain('git.commit');
+      expect(results.map(r => r.event_type)).toContain('git.add');
+      expect(results.map(r => r.event_type)).not.toContain('git.commit');
     });
 
     it('emits git.push for git push', () => {
@@ -1554,12 +1555,22 @@ describe('image file detection', () => {
 // ── Bash regex edge cases ──────────────────────────────────────────
 
 describe('Bash git detection regex', () => {
-  it('git add includes "git add" → git.commit', () => {
+  it('git add includes "git add" → git.add', () => {
     const results = mapEvents('PostToolUse', {
       hook_event_name: 'PostToolUse', tool_name: 'Bash',
       tool_input: { command: 'git add src/' },
     });
+    expect(results.map(r => r.event_type)).toContain('git.add');
+    expect(results.map(r => r.event_type)).not.toContain('git.commit');
+  });
+
+  it('git commit -a (contains both "commit" and "add") → only git.commit', () => {
+    const results = mapEvents('PostToolUse', {
+      hook_event_name: 'PostToolUse', tool_name: 'Bash',
+      tool_input: { command: 'git commit -am "fix: stuff"' },
+    });
     expect(results.map(r => r.event_type)).toContain('git.commit');
+    expect(results.map(r => r.event_type)).not.toContain('git.add');
   });
 
   it('git commit with message → git.commit', () => {

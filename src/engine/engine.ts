@@ -191,16 +191,19 @@ export class AchievementEngine {
       newlyUnlocked.push({ ...def, unlocked_at: now });
     }
 
-    if (newlyUnlocked.length > 0) {
-      this.store.saveState(this.state);
-    }
-
-    // Emit achievement.unlocked events so downstream achievements (casual_collector, trophy_case) can count them
+    // Emit achievement.unlocked events BEFORE saving state so downstream
+    // achievements (casual_collector, trophy_case) can count them. If the
+    // process crashes after emit but before save, the next poll re-evaluates
+    // and re-emits — no data inconsistency.
     for (const def of newlyUnlocked) {
       this.track('achievement.unlocked', {
         achievement_id: def.id,
         rarity: def.rarity,
       } as EventPayload);
+    }
+
+    if (newlyUnlocked.length > 0) {
+      this.store.saveState(this.state);
     }
 
     this.unlockedThisPoll = newlyUnlocked;

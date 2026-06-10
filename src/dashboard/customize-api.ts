@@ -514,7 +514,7 @@ function updateFieldInYamlText(text: string, id: string, field: string, value: s
 }
 
 /** Only these fields are user-editable through the customize API */
-const ALLOWED_FIELDS = new Set(['name', 'name_cn', 'description', 'description_en']);
+const ALLOWED_FIELDS = new Set(['name', 'name_cn', 'description', 'description_cn', 'description_en']);
 
 function validateField(field: string): void {
   if (!ALLOWED_FIELDS.has(field)) {

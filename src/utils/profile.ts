@@ -13,6 +13,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { homedir } from 'os';
+import { safeParse, profileMetaSchema } from './validate.js';
 
 export const DEFAULT_PROFILE = 'default';
 export const MAX_PROFILES = 3;
@@ -93,7 +94,7 @@ export function getProfileMeta(name: string): ProfileMeta {
     try {
       if (fs.existsSync(metaPath)) {
         const raw = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
-        return { name: DEFAULT_PROFILE, emoji: raw.emoji || DEFAULT_EMOJI, created_at: raw.created_at || '', ...raw };
+        return safeParse(profileMetaSchema, { ...raw, name: DEFAULT_PROFILE }, { name: DEFAULT_PROFILE, emoji: DEFAULT_EMOJI, created_at: new Date().toISOString() });
       }
     } catch { /* ignore corrupt meta */ }
     return { name: DEFAULT_PROFILE, emoji: DEFAULT_EMOJI, created_at: new Date().toISOString() };
@@ -101,7 +102,9 @@ export function getProfileMeta(name: string): ProfileMeta {
   const metaPath = path.join(getProfilesBaseDir(), name, 'profile.json');
   try {
     if (fs.existsSync(metaPath)) {
-      return JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
+      const raw = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
+      const fallback = { name, emoji: NEW_PROFILE_DEFAULT_EMOJI, created_at: '' };
+      return safeParse(profileMetaSchema, { ...raw, name }, fallback);
     }
   } catch { /* ignore */ }
   return { name, emoji: NEW_PROFILE_DEFAULT_EMOJI, created_at: '' };

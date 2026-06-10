@@ -252,19 +252,24 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
           cmdPayload.duration_ms = data.duration_ms;
         }
         results.push({ event_type: 'command.run', payload: cmdPayload });
-        if (ti.command.includes('git commit') || ti.command.includes('git add')) {
+        // Git subcommand detection via word-boundary regex to avoid
+        // false positives from comments, echo, or multi-line scripts.
+        if (/\bgit commit\b/.test(ti.command)) {
           results.push({ event_type: 'git.commit', payload: { ...base } });
         }
-        if (ti.command.includes('gh pr create')) {
+        if (/\bgit add\b/.test(ti.command) && !/\bgit commit\b/.test(ti.command)) {
+          results.push({ event_type: 'git.add', payload: { ...base } });
+        }
+        if (/\bgh pr create\b/.test(ti.command)) {
           results.push({ event_type: 'git.pr_created', payload: { ...base } });
         }
-        if (ti.command.includes('git bisect')) {
+        if (/\bgit bisect\b/.test(ti.command)) {
           results.push({ event_type: 'git.bisect', payload: { ...base } });
         }
-        if (ti.command.includes('git merge') && ti.command.includes('--continue')) {
+        if (/\bgit merge\b/.test(ti.command) && /(?:^|\s)--continue\b/.test(ti.command)) {
           results.push({ event_type: 'merge.conflict_resolved', payload: { ...base, agent_involved: true } });
         }
-        if (ti.command.includes('git push')) {
+        if (/\bgit push\b/.test(ti.command)) {
           results.push({ event_type: 'git.push', payload: { ...base } });
         }
         // Detect file deletion via rm / unlink

@@ -1,5 +1,47 @@
 # Changelog
 
+### 8 个 CRITICAL Bug 修复 — 2026-06-11
+
+基于全代码审查报告（`docs/code-review-2026-06-11.md`）修复了 8 个致命问题：
+
+| # | 问题 | 文件 | 修复 |
+|---|------|------|------|
+| C1 | Zod schema 丢弃 `tool_source` 字段 → 按工具统计全错 | `src/utils/validate.ts` | 显式添加 `tool_source` + `protocol_version` 可选字段 |
+| C2 | `evalSequenceCount` 模式匹配在假启动后漏检序列 | `src/engine/evaluator.ts` | 指针重置后重检 `pattern[0]` |
+| C3 | `evalSequenceCount` 忽略 `window` 字段 | `src/engine/evaluator.ts` | 开头加 `scopeEvents()` 调用 |
+| C4 | 3 枚速通成就缺 `per_event: true` → 永远无法解锁 | `achievement-definitions.yaml` | `speed_run_bronze/silver/gold` 各加 `per_event: true` |
+| C5 | `bug_hunter` 任务线引用不存在的成就 ID | `achievement-definitions.yaml` | `diagnostic_detective` → `triple_debugger`, `self_healer` → `bounce_back` |
+| C6 | `git add` 误发 `git.commit` 事件 | `src/cli/hook.ts` | 拆分为 `git.add` 独立事件 + 防重叠 guard |
+| C7 | Dashboard `renderTitlesRow` 变量遮蔽导致功能崩溃 | `src/dashboard/public/app.js` | `t` → `title` 重命名 |
+| C8 | Config `set` 操作绕过 `VALID_KEYS` 校验 | `src/tools/config.ts` | 添加 key 校验，无效 key 返回 error |
+
+**测试**: 1067/1067 全部通过 ✅ （新增 `git commit -a` 防回归测试）
+**TypeScript**: 0 新错误 ✅ （2 个预存错误未受影响）
+
+### 14 个 HIGH Bug 修复 — 2026-06-11
+
+基于同一份审查报告的 14 个 HIGH 问题全部修复：
+
+| # | 问题 | 文件 | 修复 |
+|---|------|------|------|
+| H1 | `evalDistinctCount` 忽略 `filter`/`role` 条件 | `evaluator.ts` | 添加 `matchFilter()` + `matchRole()` 调用 |
+| H2 | poll 先存 state 再发 unlock 事件 → crash 不一致 | `engine.ts` | 调换顺序：先 emit 后 save |
+| H3 | evalRatio/sequenceCount 手动操作符比较 | `evaluator.ts` | 统一使用 `evalOp()` 规范函数 |
+| H4 | evalMode/patternMatch 不调用 `scopeEvents()` | `evaluator.ts` | 函数入口添加 `scopeEvents()` |
+| H5 | loadPending raw JSON.parse + 无数组校验 | `poll.ts` | `safeParse(z.array(...), ...)` |
+| H6 | 15+ 处 JSON.parse 违反正则 | 4 core files | profile.ts/poll.ts/history.ts/import.ts → safeParse；11 diagnostic 站点 try/catch 合理保留 |
+| H7 | Import 命令无 schema 校验 | `import.ts` | 新增 `exportPayloadSchema` + `safeParse` gate |
+| H8 | init.ts default profile 路径 bug | `init.ts` | 添加 `profile !== DEFAULT_PROFILE` 判断 |
+| H9 | 4 个成就声明 set 但不在成员列表 | `achievement-definitions.yaml` | 补全 4 处 set 成员 |
+| H10 | `infinite_loop` 缺 `per_event: true` | `achievement-definitions.yaml` | 添加 `per_event: true` |
+| H11 | Bash 命令匹配用 `includes()` 太脆弱 | `hook.ts` | 替换为 word-boundary regex |
+| H12 | `evalPredicate` fail-open | `evaluator.ts` | `return true` → `return false`（fail-closed） |
+| H13 | IntersectionObserver 每 10s 新建 → 泄漏 | `app.js` | 复用现有 `_navObserver`，disconnect 后再建 |
+| H14 | nav 事件监听器每 poll 累积 | `app.js` | 移至 `controlsSetup` 一次绑定 + 事件委托 |
+
+**测试**: 1067/1067 全部通过 ✅
+**TypeScript**: 2 预存错误未受影响 ✅
+
 ### Questline 成就旅程线系统全面实施 — 2026-06-11
 
 - **5 条 RPG 旅程线**：Bug Hunter（除虫大师）、Toolsmith（工具匠人）、Builder（建造大师）、Night Shift（夜行者）、Polyglot（语言通才）

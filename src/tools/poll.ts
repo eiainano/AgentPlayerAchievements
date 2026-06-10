@@ -5,12 +5,13 @@ import type { AchievementEngine } from '../engine/engine.js';
 import { formatAchievement } from '../helpers.js';
 import { loadConfig } from '../config.js';
 import { getRecommendResponse, buildRecommendationPrompt } from '../utils/recommend.js';
+import { safeParse } from '../utils/validate.js';
 
 function loadPending(stateDir: string): unknown[] {
   const pendingPath = `${stateDir}/pending.json`;
   try {
     if (fs.existsSync(pendingPath)) {
-      return JSON.parse(fs.readFileSync(pendingPath, 'utf-8'));
+      return safeParse(z.array(z.unknown()), JSON.parse(fs.readFileSync(pendingPath, 'utf-8')), []);
     }
   } catch { /* ignore */ }
   return [];

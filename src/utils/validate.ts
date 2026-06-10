@@ -9,6 +9,8 @@ export const trackedEventSchema = z.object({
     session_id: z.string().optional(),
     model: z.string().optional(),
   }).optional(),
+  tool_source: z.string().optional(),
+  protocol_version: z.string().optional(),
 });
 
 export const migrationRecordSchema = z.object({
@@ -65,6 +67,13 @@ export const appConfigSchema = z.object({
   simple_animations: z.boolean().default(false),
   banner_theme: z.enum(['Neon', 'Arcade', 'Gold']).default('Arcade'),
   recommend_probability: z.number().min(0).max(1).default(0.2),
+});
+
+export const profileMetaSchema = z.object({
+  name: z.string(),
+  emoji: z.string().default('🎮'),
+  created_at: z.string().default(''),
+  tracked_tools: z.array(z.string()).optional(),
 });
 
 export function safeParse<T>(schema: z.ZodType<T>, data: unknown, fallback: T): T {

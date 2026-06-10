@@ -112,9 +112,11 @@ function cmdAutoFill(): void {
   const engine = createEngine();
   const showcase = loadShowcase(engine.stateDir);
 
-  // Get unlocked achievements sorted by rarity descending (rarest first)
+  // Get unlocked achievements sorted by rarity descending (rarest first),
+  // excluding IDs already pinned in other slots
+  const existingIds = new Set(showcase.slots.filter(Boolean) as string[]);
   const unlocked = engine.definitions
-    .filter(d => engine.state.unlocked[d.id])
+    .filter(d => engine.state.unlocked[d.id] && !existingIds.has(d.id))
     .sort((a, b) => (RARITY_RANK[b.rarity] ?? 0) - (RARITY_RANK[a.rarity] ?? 0));
 
   // Fill empty slots

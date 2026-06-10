@@ -48,7 +48,10 @@ export function loadConfig(): AppConfig {
       cfg = safeParse(appConfigSchema, raw, cfg);
     }
   } catch {
-    /* ignore corrupt config, return defaults */
+    // Warn if config file exists but is corrupt — the next saveConfig() will overwrite it
+    if (fs.existsSync(CONFIG_PATH)) {
+      process.stderr.write(`[AGPA] ⚠ Corrupt config at ${CONFIG_PATH} — using defaults. Any config.save will overwrite.\n`);
+    }
   }
 
   // Environment variable overrides

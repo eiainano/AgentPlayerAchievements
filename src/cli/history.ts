@@ -13,10 +13,10 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { safeParse, trackedEventSchema } from '../utils/validate.js';
 import { homedir } from 'node:os';
 import { loadConfig } from '../config.js';
 import { resolveProfileDir, DEFAULT_PROFILE } from '../utils/profile.js';
-import { safeParse } from '../utils/validate.js';
 import type { TrackedEvent } from '../engine/types.js';
 
 const AGPA_DIR = path.join(homedir(), '.agent-achievements');
@@ -107,8 +107,8 @@ function readEvents(logPath: string): TrackedEvent[] {
   if (!fs.existsSync(logPath)) return [];
   const raw = fs.readFileSync(logPath, 'utf-8');
   return raw.trim().split('\n').filter(Boolean).map(line => {
-    // Use safeParse but fall back gracefully
-    try { return JSON.parse(line); } catch { return null; }
+    // Use safeParse for validated deserialization
+    try { return safeParse(trackedEventSchema, JSON.parse(line), null); } catch { return null; }
   }).filter(Boolean) as TrackedEvent[];
 }
 

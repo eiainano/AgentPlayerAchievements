@@ -184,7 +184,11 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
           if (fp.includes('..') || (!resolved.startsWith(cwdBase + '/') && !resolved.startsWith(homeBase + '/'))) {
             // skip — path outside allowed boundary
           } else {
-            try { editPayload.total_file_lines = fs.readFileSync(resolved, 'utf-8').split('\n').length; } catch { /* file gone */ }
+            try {
+              const content = fs.readFileSync(resolved, 'utf-8');
+              editPayload.total_file_lines = content.split('\n').length;
+              editPayload.text_content = content.slice(0, 200).toLowerCase();
+            } catch { /* file gone */ }
           }
         }
         results.push({ event_type: 'file.edit', payload: editPayload });

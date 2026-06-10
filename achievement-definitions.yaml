@@ -3654,6 +3654,26 @@ definitions:
         filter: file_path matches '*.m'
         operator: ">="
         value: 1
+  - id: attention_is_all_you_need
+    name: Attention Is All You Need
+    name_cn: 变形金刚
+    description: You are editing a Transformer. Autobots, roll out!
+    description_cn: 你在编辑Transformer。汽车人，变形出发！
+    icon: 🚚
+    category: hidden
+    rarity: rare
+    hidden: true
+    progress_trackable: true
+    hint: Edit a .py file containing classic Transformer attention code
+    hint_cn: 修改一个包含经典 Transformer Attention 代码的 .py 文件
+    tip: "Attention Is All You Need — or, as the Autobots say, roll out!"
+    tip_cn: "Attention Is All You Need —— 或者用汽车人的话说，变形出发！"
+    conditions:
+      - type: counter
+        event: file.edit
+        filter: file_path matches '*.py' && text_content contains 'attention'
+        operator: ">="
+        value: 1
   - id: full_spectrum
     name: Full Spectrum
     name_cn: 全光谱

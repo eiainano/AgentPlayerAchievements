@@ -1040,7 +1040,7 @@ function renderNav(data) {
   }
 
   const links = document.querySelectorAll('.nav-link');
-  const sections = ['profile', 'achievements', 'sets', 'timeline', 'insights'];
+  const sections = ['profile', 'achievements', 'questlines', 'sets', 'timeline', 'insights'];
   const observer = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (e.isIntersecting) {

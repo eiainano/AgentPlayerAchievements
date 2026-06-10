@@ -185,13 +185,14 @@ function sequenceCountProgress(events: TrackedEvent[], cond: Condition): number 
 
 /** Compute partial match progress for ordered sequence conditions */
 function sequenceProgress(events: TrackedEvent[], cond: Condition): number | null {
-  const pattern = Array.isArray(cond.pattern) ? (cond.pattern as string[]) : null;
-  if (!pattern || pattern.length === 0) return null;
+  const sequence = Array.isArray(cond.sequence) ? (cond.sequence as string[]) : null;
+  if (!sequence || sequence.length === 0) return null;
+  const scoped = scopedEvents(events, cond);
   let matched = 0;
-  for (const e of events) {
-    if (e.event_type === pattern[matched]) {
+  for (const e of scoped) {
+    if (e.event_type === sequence[matched]) {
       matched++;
-      if (matched >= pattern.length) return pattern.length; // fully matched
+      if (matched >= sequence.length) return sequence.length; // fully matched
     }
   }
   return matched; // partial match steps
@@ -208,7 +209,8 @@ function patternMatchProgress(events: TrackedEvent[], cond: Condition): number |
 /** Progress for ratio conditions — current numerator value (denominator handled by evaluator) */
 function ratioProgress(events: TrackedEvent[], cond: Condition): number | null {
   if (!cond.metric) return null;
-  const val = evaluateMetric(cond.metric, events);
+  const scoped = scopedEvents(events, cond);
+  const val = evaluateMetric(cond.metric, scoped);
   if (val === null || val === undefined) return null;
   return Math.round(val * 1000) / 1000;
 }

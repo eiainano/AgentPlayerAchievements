@@ -234,12 +234,9 @@ describe('findNearUnlocks', () => {
 
   // ── Unsupported types skipped ───────────────────────────────────
 
-  it('skips sequence, event, pattern_match, ratio, mode, set_completion types', () => {
+  it('skips event, mode, set_completion types', () => {
     const defs: AchievementDefinition[] = [
-      makeDef({ id: 'seq', conditions: [{ type: 'sequence', value: 1 }] as Condition[] }),
       makeDef({ id: 'evt', conditions: [{ type: 'event', value: 1 }] as Condition[] }),
-      makeDef({ id: 'pm', conditions: [{ type: 'pattern_match', value: 1 }] as Condition[] }),
-      makeDef({ id: 'rat', conditions: [{ type: 'ratio', value: 1 }] as Condition[] }),
       makeDef({ id: 'mod', conditions: [{ type: 'mode', value: 1 }] as Condition[] }),
       makeDef({ id: 'set', conditions: [{ type: 'set_completion', value: 1 }] as Condition[] }),
     ];

@@ -32,6 +32,10 @@ export interface AchievementItem {
   rarity: RarityLevel;
   hidden?: boolean;
   set_id?: string;
+  tip?: string;
+  tip_cn?: string;
+  hint?: string;
+  hint_cn?: string;
   unlocked: boolean;
   unlocked_at?: string;
   progress?: { current: number; target: number };
@@ -233,6 +237,10 @@ export function buildAchievementsResponse(
       rarity: def.rarity,
       hidden: def.hidden,
       set_id: def.set_id,
+      tip: def.tip,
+      tip_cn: def.tip_cn,
+      hint: def.hint,
+      hint_cn: def.hint_cn,
       unlocked,
       unlocked_at: unlockedAt,
       progress: unlocked ? undefined : computeProgress(def, opts.events || []),

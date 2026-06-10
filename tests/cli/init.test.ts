@@ -34,10 +34,9 @@ describe('hookCmd', () => {
     expect(cmd).toContain('AGPA_PROFILE=myprof');
   });
 
-  it('includes tsx and hook path', () => {
+  it('uses the hook launcher script', () => {
     const cmd = hookCmd('AGPA_TOOL_SOURCE=claude-code', 'auto', null);
-    expect(cmd).toContain('tsx');
-    expect(cmd).toContain('hook.ts');
+    expect(cmd).toContain('run-hook.sh');
   });
 
   it('uses correct mode string', () => {

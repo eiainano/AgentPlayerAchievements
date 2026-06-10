@@ -8,9 +8,8 @@ definitions:
     category: onboarding
     rarity: common
     hidden: false
-    tip: Talk to Claude like a colleague. The more specific your request, the better
-      the output. "Write a React login component with form validation" beats
-      "make a login page" every time.
+    tip: Talk to Claude like a colleague. The more specific your request, the better the output. "Write a React login
+      component with form validation" beats "make a login page" every time.
     tip_cn: 跟 Claude 像同事一样对话。诉求越具体，输出质量越高。“写一个 React 登录组件”比“写个登录页”好十倍。
     hint: Say hello and start your first conversation
     hint_cn: 打个招呼，开启你的第一次对话
@@ -29,8 +28,8 @@ definitions:
     category: onboarding
     rarity: common
     hidden: false
-    tip: Break complex work into tasks. Claude tracks progress per task and marks
-      completion automatically. Big refactor? Start with a task list.
+    tip: Break complex work into tasks. Claude tracks progress per task and marks completion automatically. Big refactor?
+      Start with a task list.
     tip_cn: 把复杂工作拆成 task。Claude 会根据 task 追踪进度，还能自动标记完成状态。大的重构？先列 task 清单。
     hint: Complete a few tasks and see what happens
     hint_cn: 完成几个 task，看看会发生什么
@@ -50,10 +49,9 @@ definitions:
     category: onboarding
     rarity: common
     hidden: false
-    tip: "Agents use tools like Read, Write, Bash, Search, WebFetch. The pros chain
-      them: read code → analyze → edit → run tests — all in one flow."
-    tip_cn: Agent 能调用 Read、Write、Bash、Search、WebFetch
-      等工具。真正的高手善于组合工具——读取代码→分析问题→编辑修复→运行测试，一气呵成。
+    tip: "Agents use tools like Read, Write, Bash, Search, WebFetch. The pros chain them: read code → analyze → edit → run
+      tests — all in one flow."
+    tip_cn: Agent 能调用 Read、Write、Bash、Search、WebFetch 等工具。真正的高手善于组合工具——读取代码→分析问题→编辑修复→运行测试，一气呵成。
     hint: Ask Claude to read a file or write some code for you
     hint_cn: 让 Claude 帮你读一个文件或写一段代码
     set: the_beginning
@@ -71,9 +69,8 @@ definitions:
     category: onboarding
     rarity: common
     hidden: false
-    tip: Permission modes control when Claude asks for approval. Default mode for
-      supervision, relaxed for trusted flows. Find your safety-efficiency sweet
-      spot.
+    tip: Permission modes control when Claude asks for approval. Default mode for supervision, relaxed for trusted flows.
+      Find your safety-efficiency sweet spot.
     tip_cn: 权限模式控制 Claude 何时需要你确认。默认模式适合监督，宽松模式适合信任流程。找到安全与效率的平衡点。
     hint: Take control — adjust how Claude asks for your permission
     hint_cn: 掌控 Claude 的权限行为——调整一下权限模式
@@ -92,8 +89,8 @@ definitions:
     category: onboarding
     rarity: common
     hidden: false
-    tip: /help is your built-in quick reference, faster than Googling. All slash
-      commands, plan mode docs, config reference — it's all there.
+    tip: /help is your built-in quick reference, faster than Googling. All slash commands, plan mode docs, config reference
+      — it's all there.
     tip_cn: /help 是内置快速参考，比 Google 快。想看所有 slash command、了解 plan mode、查配置？都在 help 里。
     hint: There's a built-in manual. Type /help to find it.
     hint_cn: 内置手册就在手边，找到它
@@ -112,8 +109,8 @@ definitions:
     category: onboarding
     rarity: common
     hidden: false
-    tip: Claude Code retains context between sessions. Come back tomorrow and Claude
-      remembers what you were doing. Leverage session continuity.
+    tip: Claude Code retains context between sessions. Come back tomorrow and Claude remembers what you were doing. Leverage
+      session continuity.
     tip_cn: Claude Code 在 session 之间保留上下文。隔天回来继续工作，Claude 还记得你们在做什么。善用 session 连续性。
     hint: Come back for another session within a day — your agent misses you
     hint_cn: 24 小时内再开一次 session，和老朋友重逢
@@ -133,8 +130,8 @@ definitions:
     category: onboarding
     rarity: common
     hidden: false
-    tip: Slash commands are shortcuts for common actions. Type / then Tab to see all
-      available commands. /help, /compact, /model are daily essentials.
+    tip: Slash commands are shortcuts for common actions. Type / then Tab to see all available commands. /help, /compact,
+      /model are daily essentials.
     tip_cn: slash command 是常用操作的快捷方式。输入 / 然后 tab 查看所有可用命令。/help、/compact、/model 都是日常必备。
     hint: Type a slash command — like a cheat code in your terminal
     hint_cn: 输入一个斜杠命令——就像控制台里的秘籍
@@ -153,9 +150,8 @@ definitions:
     category: onboarding
     rarity: common
     hidden: false
-    tip: Different models, different strengths. Opus for complex reasoning and
-      architecture, Sonnet for rapid iteration, Haiku for simple tasks. /model
-      to switch anytime.
+    tip: Different models, different strengths. Opus for complex reasoning and architecture, Sonnet for rapid iteration,
+      Haiku for simple tasks. /model to switch anytime.
     tip_cn: 不同模型各有所长。Opus 适合复杂推理和架构设计，Sonnet 适合快速迭代，Haiku 适合简单任务。用 /model 随时切换。
     hint: Try a different AI model — variety is the spice of coding
     hint_cn: 换一个 AI 模型试试，总有一款适合你
@@ -174,8 +170,8 @@ definitions:
     category: onboarding
     rarity: common
     hidden: false
-    tip: Worktrees isolate changes in a sandbox — your original code stays
-      untouched. Perfect for risky refactors and experiments.
+    tip: Worktrees isolate changes in a sandbox — your original code stays untouched. Perfect for risky refactors and
+      experiments.
     tip_cn: Worktree 隔离文件修改在沙盒中，不影响原代码。适合大范围重构、实验性改动。安全第一。
     hint: Take your code to an isolated workspace for safe experimentation
     hint_cn: 把你的代码带到隔离区去工作
@@ -194,8 +190,8 @@ definitions:
     category: onboarding
     rarity: common
     hidden: false
-    tip: MCP connects Claude to external tools — databases, cloud services, custom
-      APIs. Configure in .mcp.json and Claude auto-discovers them.
+    tip: MCP connects Claude to external tools — databases, cloud services, custom APIs. Configure in .mcp.json and Claude
+      auto-discovers them.
     tip_cn: MCP 让 Claude 连接外部工具和 API——数据库、云服务、自定义接口。在 .mcp.json 中配置，Claude 自动发现。
     hint: Connect Claude to an external service — expand its reach
     hint_cn: 给 Claude 接通外部工具——让它不再局限于本地
@@ -214,8 +210,8 @@ definitions:
     category: onboarding
     rarity: common
     hidden: false
-    tip: Claude reads screenshots, diagrams, PDFs, UI mockups. Debugging a UI issue?
-      Share a screenshot — it's more precise than describing it.
+    tip: Claude reads screenshots, diagrams, PDFs, UI mockups. Debugging a UI issue? Share a screenshot — it's more precise
+      than describing it.
     tip_cn: Claude 能读取截图、架构图、PDF、UI mockup。遇到复杂的 UI 问题？直接截图给 Claude，比描述文字准确。
     hint: Share an image with Claude — a picture is worth a thousand words
     hint_cn: 分享一张图片给 Claude——一图胜千言
@@ -234,8 +230,8 @@ definitions:
     category: onboarding
     rarity: common
     hidden: false
-    tip: The Dashboard tracks your achievement progress, XP, rarity stats, and set
-      collections. Run `npm run dashboard` from the project directory.
+    tip: The Dashboard tracks your achievement progress, XP, rarity stats, and set collections. Run `npm run dashboard` from
+      the project directory.
     tip_cn: Dashboard 追踪你的成就进度、XP、稀有度统计、套装收集。在项目目录运行 npm run dashboard 打开。
     hint: There's an achievement dashboard. Can you find it?
     hint_cn: 成就系统有一个 Web 面板——打开看看
@@ -254,9 +250,8 @@ definitions:
     category: onboarding
     rarity: common
     hidden: false
-    tip: Automode lets Claude work autonomously on long tasks without per-step
-      approval. Great for batch refactors and multi-file changes. Review
-      periodically.
+    tip: Automode lets Claude work autonomously on long tasks without per-step approval. Great for batch refactors and
+      multi-file changes. Review periodically.
     tip_cn: Automode 让 Claude 自主执行长任务，无需逐个确认。适合批量重构、多文件修改。定期 review 进度即可。
     hint: Let Claude drive autonomously for a while
     hint_cn: 让 Claude 自己开一会儿——激活自动驾驶模式
@@ -275,9 +270,8 @@ definitions:
     category: onboarding
     rarity: common
     hidden: false
-    tip: Once an MCP connection is established, Claude can call remote services.
-      From database queries to automated deploys — MCP brings your toolchain
-      into the conversation.
+    tip: Once an MCP connection is established, Claude can call remote services. From database queries to automated deploys
+      — MCP brings your toolchain into the conversation.
     tip_cn: MCP 连接建立后，Claude 可以调用远程服务。从数据库查询到自动化部署，MCP 把你的工具链带入对话中。
     hint: Establish a connection to an external server
     hint_cn: 建立一条通往外部服务器的连接
@@ -303,6 +297,8 @@ definitions:
         event: task.create
         operator: ">="
         value: 5
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: task_updater
     name: Status Report
     name_cn: 进度汇报
@@ -319,6 +315,8 @@ definitions:
         event: task.update
         operator: ">="
         value: 10
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: error_resilient
     name: Error Resilient
     name_cn: 容错强者
@@ -335,6 +333,9 @@ definitions:
         event: error.occurred
         operator: ">="
         value: 5
+    tip: Errors are learning opportunities. When a tool fails, Claude sees the error message and can self-correct. The best
+      developers read error messages carefully — Claude can explain what went wrong and why.
+    tip_cn: 错误是学习的机会。当工具调用失败时，Claude 能看到错误信息并自我修正。最好的开发者会仔细阅读错误信息——Claude 能解释错误原因和根源。
   - id: file_purger
     name: Spring Cleaning
     name_cn: 大扫除
@@ -351,11 +352,13 @@ definitions:
         event: file.delete
         operator: ">="
         value: 10
+    tip: Dead code is technical debt. Periodically clean up unused files — it reduces cognitive load and makes the codebase
+      more maintainable. Claude can help identify files that are no longer referenced.
+    tip_cn: 死代码就是技术债。定期清理无用文件能降低认知负担、提高可维护性。Claude 能帮你识别不再被引用的文件。
   - id: dual_wielder
     name: Three-Sword Style
     name_cn: 三刀流
-    description: Used 3+ different tools in a single task. Santoryu — three swords,
-      one warrior.
+    description: Used 3+ different tools in a single task. Santoryu — three swords, one warrior.
     description_cn: 同一个 task 里用了 3 种以上不同工具。三刀流——三把刀，一个剑士。
     icon: ⚔️
     category: tool_mastery
@@ -371,6 +374,9 @@ definitions:
         operator: ">="
         value: 3
     set: tool_connoisseur
+    tip: "Each tool has a specific strength: Read for analysis, Write for creation, Edit for modification, Bash for
+      execution, Search for discovery. The pro knows which tool fits which job."
+    tip_cn: 每个工具有独特的优势：Read 用于分析，Write 用于创建，Edit 用于修改，Bash 用于执行，Search 用于发现。高手知道哪个工具适合哪项工作。
   - id: double_digits
     name: Double Digits
     name_cn: 两位数
@@ -389,6 +395,9 @@ definitions:
         operator: ">="
         value: 10
         window: all
+    tip: Tasks are the atomic unit of work in Claude Code. Break each feature into small, focused tasks (one file change,
+      one test, one commit). Claude tracks progress and reports completion — use this to structure your workflow.
+    tip_cn: Task 是 Claude Code 中的基本工作单元。把每个功能拆成小而专注的 task（一个文件改动、一个测试、一个提交）。Claude 会自动追踪进度并报告完成状态——用这个来组织你的工作流。
   - id: century
     name: Century
     name_cn: 创世纪
@@ -405,6 +414,8 @@ definitions:
         operator: ">="
         value: 100
         window: all
+    hint: Complete tasks to make progress on your project.
+    hint_cn: 完成任务来推进你的项目。
   - id: millennium
     name: Millennium
     name_cn: 千禧年
@@ -421,6 +432,8 @@ definitions:
         operator: ">="
         value: 1000
         window: all
+    hint: Complete tasks to make progress on your project.
+    hint_cn: 完成任务来推进你的项目。
   - id: marathon
     name: Marathon
     name_cn: 跑马拉松
@@ -440,6 +453,9 @@ definitions:
         value: 10800000
         per_event: true
     set: endurance
+    tip: Pushing past your usual limits often leads to the most learning. Try going a little further than you normally
+      would.
+    tip_cn: 突破常规限制往往带来最多的学习。试试比你平常做得更多一点。
   - id: streak_7
     name: Streak 7
     name_cn: 连续7天使用
@@ -460,11 +476,13 @@ definitions:
         operator: ">="
         value: 7
     set: endurance
+    tip: Consistency compounds. Using Claude daily builds familiarity with both the tool and your codebase. Even short
+      sessions maintain momentum — the streak matters more than the session length.
+    tip_cn: 积累效应。每天使用 Claude 能建立对工具和代码库的熟悉度。即使是短 session 也能保持 momentum——连续天数比单次时长更重要。
   - id: streak_30
     name: Streak 30
     name_cn: 连续30天使用
-    description: 30 consecutive days of use. It's not just a tool anymore — it's a
-      lifestyle.
+    description: 30 consecutive days of use. It's not just a tool anymore — it's a lifestyle.
     description_cn: 连续 30 天使用。不仅是工具，是生活方式。
     icon: 📅
     category: milestones
@@ -479,6 +497,8 @@ definitions:
         operator: ">="
         value: 30
     set: endurance
+    hint: Show up consistently — habits are built one day at a time.
+    hint_cn: 每天坚持来——习惯是靠一天天积累的。
   - id: streak_100
     name: Streak 100
     name_cn: 连续 100 天使用
@@ -497,6 +517,8 @@ definitions:
         operator: ">="
         value: 100
     set: endurance
+    hint: Show up consistently — habits are built one day at a time.
+    hint_cn: 每天坚持来——习惯是靠一天天积累的。
   - id: polyglot
     name: Polyglot
     name_cn: 多语言人士
@@ -514,6 +536,9 @@ definitions:
         field: language
         operator: ">="
         value: 5
+    tip: Different languages have different strengths. TypeScript for type safety, Python for data work, Rust for
+      performance. The polyglot developer picks the right tool for each job.
+    tip_cn: 不同语言有不同优势。TypeScript 强类型安全、Python 数据处理、Rust 高性能。多语言开发者能为每项工作选对工具。
   - id: half_century
     name: Half Century
     name_cn: 任务过半百
@@ -530,6 +555,8 @@ definitions:
         operator: ">="
         value: 50
         window: all
+    hint: Complete tasks to make progress on your project.
+    hint_cn: 完成任务来推进你的项目。
   - id: streak_3
     name: Three-Day Streak
     name_cn: 三日连击
@@ -550,6 +577,9 @@ definitions:
         operator: ">="
         value: 3
     set: endurance
+    tip: Consistency compounds. Using Claude daily builds familiarity with both the tool and your codebase. Even short
+      sessions maintain momentum — the streak matters more than the session length.
+    tip_cn: 积累效应。每天使用 Claude 能建立对工具和代码库的熟悉度。即使是短 session 也能保持 momentum——连续天数比单次时长更重要。
   - id: file_centurion
     name: File Centurion
     name_cn: 文件百夫长
@@ -568,6 +598,9 @@ definitions:
         operator: ">="
         value: 100
         window: all
+    tip: "Reading code is the fastest way to understand a codebase. Claude can summarize entire files, trace data flow, and
+      identify patterns. Pro tip: use Read on unfamiliar files before asking Claude to edit them."
+    tip_cn: 读代码是理解一个代码库最快的方式。Claude 能帮你总结整个文件、追踪数据流向、识别代码模式。建议：在让 Claude 编辑不熟悉的文件之前，先用 Read 理解它。
   - id: token_1m
     name: Token Millionaire
     name_cn: 百万富翁
@@ -585,6 +618,8 @@ definitions:
         operator: ">="
         value: 1000000
         window: all
+    hint: Push your limits — the achievement tracks how far you go.
+    hint_cn: 挑战自己的极限——成就在你走多远。
   - id: test_centurion
     name: Green Bar
     name_cn: 全绿
@@ -601,6 +636,8 @@ definitions:
         operator: ">="
         value: 100
         window: all
+    hint: Keep using test.pass to progress.
+    hint_cn: 继续使用 test.pass 来推进进度。
   - id: multi_image_day
     name: Photo Album
     name_cn: 相册日
@@ -618,6 +655,9 @@ definitions:
         operator: ">="
         value: 5
         window: 24h
+    tip: Pushing past your usual limits often leads to the most learning. Try going a little further than you normally
+      would.
+    tip_cn: 突破常规限制往往带来最多的学习。试试比你平常做得更多一点。
   - id: chain_reaction
     name: Chain Reaction
     name_cn: 链式反应
@@ -636,6 +676,9 @@ definitions:
         window: single_session
         operator: ">="
         value: 5
+    tip: "Chaining tools is the key to productivity. A typical flow: Read (understand) → Plan (think) → Edit (change) → Bash
+      (test). The fewer turns per task, the faster you ship."
+    tip_cn: 串联工具是提升效率的关键。典型工作流：Read（理解）→ Plan（思考）→ Edit（修改）→ Bash（测试）。每个 task 的交互轮数越少，你交付得越快。
   - id: full_auto
     name: Full Auto
     name_cn: 自动档
@@ -659,6 +702,8 @@ definitions:
         window: same_session
         operator: ==
         value: 0
+    hint: Chain multiple actions together in the right order.
+    hint_cn: 按正确的顺序串联多个操作。
   - id: architect
     name: Architect
     name_cn: 建筑师
@@ -676,6 +721,8 @@ definitions:
         window: single_task
         operator: ">="
         value: 5
+    hint: Try different varieties of this to unlock progress.
+    hint_cn: 试试不同的类别来积累进度。
   - id: surgeon
     name: Surgeon
     name_cn: 外科手术
@@ -695,6 +742,8 @@ definitions:
       - type: event
         event: task.complete
         window: same_task
+    hint: Push your limits — the achievement tracks how far you go.
+    hint_cn: 挑战自己的极限——成就在你走多远。
   - id: seeker
     name: Seeker
     name_cn: 探索者
@@ -713,6 +762,9 @@ definitions:
         window: single_session
         operator: ">="
         value: 10
+    tip: "Chaining tools is the key to productivity. A typical flow: Read (understand) → Plan (think) → Edit (change) → Bash
+      (test). The fewer turns per task, the faster you ship."
+    tip_cn: 串联工具是提升效率的关键。典型工作流：Read（理解）→ Plan（思考）→ Edit（修改）→ Bash（测试）。每个 task 的交互轮数越少，你交付得越快。
   - id: self_aware
     name: Self-Aware
     name_cn: 自知之明
@@ -747,6 +799,9 @@ definitions:
           - agent.self_fix
           - test.pass
         window: single_task
+    tip: Some achievements require a specific sequence of actions. Think of it as a recipe — the order matters as much as
+      the ingredients. Plan your approach before diving in.
+    tip_cn: 有些成就需要特定的操作序列。把它想象成一个菜谱——顺序和配料同样重要。开始之前先规划好方法。
   - id: triple_debugger
     name: Triple Debugger
     name_cn: 三重调试
@@ -766,6 +821,8 @@ definitions:
         window: single_task
         operator: ">="
         value: 3
+    hint: Chain actions together repeatedly to master this pattern.
+    hint_cn: 反复串联特定操作来熟练掌握。
   - id: tool_completist
     name: Tool Completist
     name_cn: 工具大全
@@ -789,11 +846,12 @@ definitions:
         operator: ">="
         value: 5
     set: tool_connoisseur
+    hint: Try as many different tools as you can — variety builds mastery.
+    hint_cn: 试试尽可能多的不同工具——多样性带来精通。
   - id: the_switch
     name: Shift Gears
     name_cn: 模式换档
-    description: Switched from Plan mode to non-Plan mode in the same task to
-      complete implementation.
+    description: Switched from Plan mode to non-Plan mode in the same task to complete implementation.
     description_cn: 同一次 task 中从 Plan 模式切换到非Plan模式，完成最终实现。
     icon: 🎭
     category: skill
@@ -808,6 +866,9 @@ definitions:
           - agent.mode_activated
           - task.complete
         window: single_task
+    tip: Some achievements require a specific sequence of actions. Think of it as a recipe — the order matters as much as
+      the ingredients. Plan your approach before diving in.
+    tip_cn: 有些成就需要特定的操作序列。把它想象成一个菜谱——顺序和配料同样重要。开始之前先规划好方法。
   - id: off_the_grid
     name: Off the Grid
     name_cn: 离线模式
@@ -827,11 +888,12 @@ definitions:
         window: same_task
         operator: ==
         value: 0
+    hint: Wait for the right moment — this unlocks when conditions align.
+    hint_cn: 等待合适的时机——条件具备时自然解锁。
   - id: first_try
     name: Smooth Criminal
     name_cn: 尽享丝滑
-    description: Agent's first test run passed on the first try — zero failures,
-      smooth as silk.
+    description: Agent's first test run passed on the first try — zero failures, smooth as silk.
     description_cn: agent 写完代码后第一次测试就直接通过，中间无失败，非常丝滑。
     icon: 🐞
     category: skill
@@ -852,11 +914,12 @@ definitions:
         operator: ">="
         value: 1
     set: bug_catcher
+    hint: Wait for the right moment — this unlocks when conditions align.
+    hint_cn: 等待合适的时机——条件具备时自然解锁。
   - id: terminal_only
     name: Terminal Only
     name_cn: 纯终端玩法
-    description: Completed a task using only terminal commands, zero file edits.
-      Simple, old-school, effective.
+    description: Completed a task using only terminal commands, zero file edits. Simple, old-school, effective.
     description_cn: 完成一个 task只用终端命令，零文件编辑。简单、老派，但有效。
     icon: 💻
     category: skill
@@ -878,6 +941,8 @@ definitions:
         window: same_task
         operator: ">="
         value: 1
+    hint: Wait for the right moment — this unlocks when conditions align.
+    hint_cn: 等待合适的时机——条件具备时自然解锁。
   - id: minimalist
     name: Minimalist
     name_cn: 极简主义
@@ -897,6 +962,9 @@ definitions:
         role: assistant
         operator: <=
         value: 80
+    tip: Pushing past your usual limits often leads to the most learning. Try going a little further than you normally
+      would.
+    tip_cn: 突破常规限制往往带来最多的学习。试试比你平常做得更多一点。
   - id: novelist
     name: Novelist
     name_cn: 小说家
@@ -916,6 +984,9 @@ definitions:
         role: assistant
         operator: ">="
         value: 500
+    tip: Pushing past your usual limits often leads to the most learning. Try going a little further than you normally
+      would.
+    tip_cn: 突破常规限制往往带来最多的学习。试试比你平常做得更多一点。
   - id: one_shot
     name: One Shot
     name_cn: 一发入魂
@@ -933,6 +1004,8 @@ definitions:
         window: single_task
         operator: ==
         value: 1
+    hint: Push your limits — the achievement tracks how far you go.
+    hint_cn: 挑战自己的极限——成就在你走多远。
   - id: iterative_refiner
     name: Iterative Refiner
     name_cn: 慢工出细活
@@ -949,11 +1022,12 @@ definitions:
         operator: ">="
         value: 20
         per_event: true
+    hint: Push your limits — the achievement tracks how far you go.
+    hint_cn: 挑战自己的极限——成就在你走多远。
   - id: night_owl
     name: Night Owl
     name_cn: 夜猫子
-    description: Started a session in the wee hours (0:00-5:00). You're a creature
-      of the night.
+    description: Started a session in the wee hours (0:00-5:00). You're a creature of the night.
     description_cn: 某次在凌晨 (0:00-5:00) 启动了 session。你是夜行动物。
     icon: 🦉
     category: style
@@ -1032,6 +1106,8 @@ definitions:
         operator: ">="
         value: 5
         window: all
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: executive_summary
     name: Executive Summary
     name_cn: 执行摘要
@@ -1050,6 +1126,8 @@ definitions:
         operator: ">="
         value: 25
         window: all
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: code_talker
     name: Code Talker
     name_cn: 代码语者
@@ -1068,6 +1146,8 @@ definitions:
         operator: ">="
         value: 10
         window: all
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: no_questions_asked
     name: No Questions Asked
     name_cn: 不问问题
@@ -1121,6 +1201,8 @@ definitions:
         operator: ">="
         value: 500
         window: all
+    hint: Editing files is how projects take shape — keep at it.
+    hint_cn: 编辑文件是项目成型的过程——持续下去。
   - id: git_wizard
     name: Git Wizard
     name_cn: Git魔法师
@@ -1139,6 +1221,8 @@ definitions:
         value: 100
         window: all
     set: git_flow
+    hint: Version control your work with git commits.
+    hint_cn: 用 git 提交来管理你的版本历史。
   - id: shell_shocker
     name: Ghost in the Shell
     name_cn: 攻“壳”机动队
@@ -1159,6 +1243,9 @@ definitions:
         value: 250
         window: all
     set: tool_connoisseur
+    tip: "Chaining tools is the key to productivity. A typical flow: Read (understand) → Plan (think) → Edit (change) → Bash
+      (test). The fewer turns per task, the faster you ship."
+    tip_cn: 串联工具是提升效率的关键。典型工作流：Read（理解）→ Plan（思考）→ Edit（修改）→ Bash（测试）。每个 task 的交互轮数越少，你交付得越快。
   - id: web_wanderer
     name: Webmancer
     name_cn: 网络漫游者
@@ -1178,11 +1265,13 @@ definitions:
         operator: ">="
         value: 100
         window: all
+    tip: "Chaining tools is the key to productivity. A typical flow: Read (understand) → Plan (think) → Edit (change) → Bash
+      (test). The fewer turns per task, the faster you ship."
+    tip_cn: 串联工具是提升效率的关键。典型工作流：Read（理解）→ Plan（思考）→ Edit（修改）→ Bash（测试）。每个 task 的交互轮数越少，你交付得越快。
   - id: parallel_universe
     name: Heart of the Swarm
     name_cn: 虫群之心
-    description: Spawned 10+ sub-agents in a single session. Parallel processing at
-      its finest.
+    description: Spawned 10+ sub-agents in a single session. Parallel processing at its finest.
     description_cn: 单 session 中 spawn 了 10+ 个子 agent。极致并行。
     icon: 🌌
     category: tool_mastery
@@ -1194,6 +1283,8 @@ definitions:
         window: single_session
         operator: ">="
         value: 10
+    hint: Spawn sub-agents to parallelize your work.
+    hint_cn: 派出子 agent 来并行处理任务。
   - id: mcp_explorer
     name: MCP Explorer
     name_cn: MCP 探索者
@@ -1211,6 +1302,8 @@ definitions:
         field: server_name
         operator: ">="
         value: 5
+    hint: Connect to different MCP servers to expand your toolchain.
+    hint_cn: 连接不同的 MCP 服务器，扩展你的工具链。
   - id: image_whisperer
     name: More than meets the eye
     name_cn: 不只眼前所见
@@ -1227,6 +1320,8 @@ definitions:
         event: image.read
         operator: ">="
         value: 5
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: undo_master
     name: Take back a Move
     name_cn: 悔棋
@@ -1245,6 +1340,8 @@ definitions:
         operator: ">="
         value: 25
         window: all
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: git_tenderfoot
     name: Git Scouting
     name_cn: Git 童子军
@@ -1265,11 +1362,13 @@ definitions:
         value: 10
         window: all
     set: git_flow
+    tip: Commit early, commit often. Each commit is a checkpoint you can return to. Claude follows conventional commit
+      format — descriptive messages that explain WHY, not just WHAT changed.
+    tip_cn: 早提交，勤提交。每次提交都是一个可回退的检查点。Claude 遵循 conventional commit 格式——描述性信息要说明 WHY 而非仅仅 WHAT。
   - id: git_veteran
     name: Git Veteran
     name_cn: Git 老兵
-    description: Agent participated in 250 git commits. Your collaboration
-      transcends code — it's trust.
+    description: Agent participated in 250 git commits. Your collaboration transcends code — it's trust.
     description_cn: agent 参与了 250 次 git commit。你们的协作已经超越了代码——是信任。
     icon: 🎖️
     category: tool_mastery
@@ -1284,6 +1383,8 @@ definitions:
         value: 250
         window: all
     set: git_flow
+    hint: Version control your work with git commits.
+    hint_cn: 用 git 提交来管理你的版本历史。
   - id: pr_champion
     name: PR Champion
     name_cn: PR 冠军
@@ -1302,6 +1403,9 @@ definitions:
         filter: agent_involved == true
         operator: ">="
         value: 1
+    tip: Pull Requests are the gateway to collaboration. A good PR description should explain the problem, the approach, and
+      any trade-offs. Claude can draft descriptions based on the commit history.
+    tip_cn: Pull Request 是协作的入口。好的 PR 描述应说明问题、方案和权衡取舍。Claude 能基于提交历史帮你起草描述。
   - id: cicd_pioneer
     name: CI/CD Pioneer
     name_cn: CI/CD 先驱
@@ -1318,6 +1422,8 @@ definitions:
         filter: file_path matches '*.github/workflows/*.yml'
         operator: ">="
         value: 1
+    hint: Let Claude create new files for your project.
+    hint_cn: 让 Claude 为你创建新文件。
   - id: code_reviewer
     name: Code Reviewer
     name_cn: 代码审查者
@@ -1334,6 +1440,8 @@ definitions:
         event: code.review_requested
         operator: ">="
         value: 1
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: deep_review
     name: Deep Review
     name_cn: 深度审查
@@ -1352,6 +1460,9 @@ definitions:
         per_event: true
         operator: ">="
         value: 10
+    tip: Pushing past your usual limits often leads to the most learning. Try going a little further than you normally
+      would.
+    tip_cn: 突破常规限制往往带来最多的学习。试试比你平常做得更多一点。
   - id: plan_mode_user
     name: Strategy Master
     name_cn: 战略大师
@@ -1369,6 +1480,8 @@ definitions:
         event: plan.mode_entered
         operator: ">="
         value: 1
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: plan_strategist
     name: Blueprintist
     name_cn: 蓝图主义者
@@ -1387,6 +1500,8 @@ definitions:
         operator: ">="
         value: 25
         window: all
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: auto_committer
     name: Auto Committer
     name_cn: 自动提交
@@ -1405,6 +1520,9 @@ definitions:
         filter: agent_involved == true
         operator: ">="
         value: 1
+    tip: Commit early, commit often. Each commit is a checkpoint you can return to. Claude follows conventional commit
+      format — descriptive messages that explain WHY, not just WHAT changed.
+    tip_cn: 早提交，勤提交。每次提交都是一个可回退的检查点。Claude 遵循 conventional commit 格式——描述性信息要说明 WHY 而非仅仅 WHAT。
   - id: changelog_keeper
     name: Keep a diary
     name_cn: 记日记
@@ -1422,11 +1540,13 @@ definitions:
         filter: file_path matches '*CHANGELOG*'
         operator: ">="
         value: 1
+    tip: Starting from scratch is often the cleanest approach. When you need a new module, component, or config file, just
+      describe what you need — Claude handles boilerplate, imports, and structure so you can focus on the logic.
+    tip_cn: 从零开始往往是最干净的做法。当你需要新模块、组件或配置文件时，直接描述你的需求——Claude 会帮你处理样板代码、导入和结构，让你专注于业务逻辑。
   - id: context_conscious
     name: Context Anxiety
     name_cn: 上下文焦虑
-    description: Triggered 3+ auto-compactions in a single task. You're pushing your
-      agent's memory limit.
+    description: Triggered 3+ auto-compactions in a single task. You're pushing your agent's memory limit.
     description_cn: 单 task 中触发了 3 次以上自动压缩。你在挑战 agent 的记忆极限。
     icon: 🧩
     category: workflow
@@ -1440,6 +1560,9 @@ definitions:
         window: single_task
         operator: ">="
         value: 3
+    tip: Pushing past your usual limits often leads to the most learning. Try going a little further than you normally
+      would.
+    tip_cn: 突破常规限制往往带来最多的学习。试试比你平常做得更多一点。
   - id: session_veteran
     name: Talk Show Host
     name_cn: 脱口秀主持人
@@ -1458,6 +1581,9 @@ definitions:
         operator: ">="
         value: 50
         window: all
+    tip: Claude Code retains context between sessions — pick up where you left off. Each session starts with the full file
+      tree and recent history. Use descriptive first messages to re-establish context quickly.
+    tip_cn: Claude Code 在 session 之间保留上下文——你可以从上次停下的地方继续。每个 session 开始时都有完整的文件树和最近历史。用描述性的初始消息快速重建上下文。
   - id: session_centurion
     name: The King's Speech
     name_cn: 国王的演讲
@@ -1474,6 +1600,8 @@ definitions:
         operator: ">="
         value: 300
         window: all
+    hint: Start sessions regularly to build momentum.
+    hint_cn: 经常开启新的 session，保持势头。
   - id: token_titan
     name: Go buy tokens now!
     name_cn: 快去买Token！
@@ -1491,6 +1619,8 @@ definitions:
         operator: ">="
         value: 10000000
         window: all
+    hint: Push your limits — the achievement tracks how far you go.
+    hint_cn: 挑战自己的极限——成就在你走多远。
   - id: token_legend
     name: Infinite Monkey Theorem
     name_cn: 无限猴子定理
@@ -1508,6 +1638,8 @@ definitions:
         operator: ">="
         value: 100000000
         window: all
+    hint: Push your limits — the achievement tracks how far you go.
+    hint_cn: 挑战自己的极限——成就在你走多远。
   - id: multi_project
     name: Multi-Project
     name_cn: 多项目
@@ -1524,11 +1656,12 @@ definitions:
         window: 24h
         operator: ">="
         value: 3
+    hint: Try different varieties of this to unlock progress.
+    hint_cn: 试试不同的类别来积累进度。
   - id: full_cycle
     name: Full Cycle
     name_cn: 全流程
-    description: "Agent independently completed the full cycle: code → commit → PR.
-      You just watched the results."
+    description: "Agent independently completed the full cycle: code → commit → PR. You just watched the results."
     description_cn: agent 独立完成了编码→commit→PR 全过程，你只是看了结果。
     icon: ♻️
     category: workflow
@@ -1541,11 +1674,12 @@ definitions:
           - git.commit
           - git.pr_created
         window: single_session
+    hint: Chain multiple actions together in the right order.
+    hint_cn: 按正确的顺序串联多个操作。
   - id: cycle_master
     name: Ouroboros
     name_cn: 衔尾蛇
-    description: Completed 10 full cycles (code → commit → PR). You almost don't
-      need to code anymore.
+    description: Completed 10 full cycles (code → commit → PR). You almost don't need to code anymore.
     description_cn: 累计完成 10 次 Full Cycle（编码→commit→PR）。你几乎不需要写代码了。
     icon: 🔁
     category: workflow
@@ -1561,6 +1695,8 @@ definitions:
         window: single_session
         operator: ">="
         value: 10
+    hint: Chain actions together repeatedly to master this pattern.
+    hint_cn: 反复串联特定操作来熟练掌握。
   - id: merge_tamer
     name: I'm here to mediate
     name_cn: 我是来劝架的
@@ -1577,6 +1713,8 @@ definitions:
         operator: ">="
         value: 1
     set: git_flow
+    hint: Keep using merge.conflict_resolved to progress.
+    hint_cn: 继续使用 merge.conflict_resolved 来推进进度。
   - id: subagent_handler
     name: Pokemon Player
     name_cn: 宝可梦玩家
@@ -1593,6 +1731,8 @@ definitions:
         operator: ">="
         value: 25
         window: all
+    hint: Spawn sub-agents to parallelize your work.
+    hint_cn: 派出子 agent 来并行处理任务。
   - id: review_regular
     name: Gatekeeper
     name_cn: 守门人
@@ -1611,6 +1751,8 @@ definitions:
         operator: ">="
         value: 25
         window: all
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: command_crafter
     name: A New Spell
     name_cn: 新的咒语
@@ -1628,6 +1770,8 @@ definitions:
         operator: ">="
         value: 1
     set: creators_forge
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: command_library
     name: Command Library
     name_cn: 命令图书馆
@@ -1644,11 +1788,12 @@ definitions:
         operator: ">="
         value: 10
         window: all
+    hint: Keep using command.created to progress.
+    hint_cn: 继续使用 command.created 来推进进度。
   - id: skill_creator
     name: Skill Creator
     name_cn: 技能创造者
-    description: Created your first custom skill. Your agent's capabilities are
-      defined by you.
+    description: Created your first custom skill. Your agent's capabilities are defined by you.
     description_cn: 创建了你的第一个自定义 skill。agent 的能力边界由你定义。
     icon: ✨
     category: creator
@@ -1662,6 +1807,8 @@ definitions:
         operator: ">="
         value: 1
     set: creators_forge
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: skill_publisher
     name: Skill Publisher
     name_cn: 技能发布者
@@ -1676,11 +1823,12 @@ definitions:
         event: skill.published
         operator: ">="
         value: 1
+    hint: Keep using skill.published to progress.
+    hint_cn: 继续使用 skill.published 来推进进度。
   - id: skill_adept
     name: Skill Adept
     name_cn: 技多不压身
-    description: Invoked 5+ distinct skills. More skills, less worries — the master
-      of all trades.
+    description: Invoked 5+ distinct skills. More skills, less worries — the master of all trades.
     description_cn: 调用过 5 种以上不同的 skill。技多不压身。
     icon: 🎓
     category: skill
@@ -1695,6 +1843,9 @@ definitions:
         operator: ">="
         value: 5
     set: creators_forge
+    tip: Skills are task-specific expertise packages. The community has created skills for everything from code review to
+      deployment. Each skill you try adds a new capability to your toolkit.
+    tip_cn: Skill 是任务特定的专业知识包。社区已经创建了从代码审查到部署的各种 skill。每多尝试一个 skill 就为你的工具箱增加一项能力。
   - id: agent_architect
     name: From the first stirrings of life
     name_cn: 从第一个生命的萌芽开始
@@ -1710,6 +1861,8 @@ definitions:
         event: agent.created
         operator: ">="
         value: 1
+    hint: Keep using agent.created to progress.
+    hint_cn: 继续使用 agent.created 来推进进度。
   - id: hooks_master
     name: Hook Up
     name_cn: 勾勾搭搭
@@ -1727,6 +1880,8 @@ definitions:
         event: hook.configured
         operator: ">="
         value: 1
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: plugin_explorer
     name: Plug and Play
     name_cn: 即插即用
@@ -1744,6 +1899,8 @@ definitions:
         event: plugin.installed
         operator: ">="
         value: 1
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: template_master
     name: Use Template
     name_cn: 用模板
@@ -1760,6 +1917,8 @@ definitions:
         event: template.created
         operator: ">"
         value: 1
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: slash_commander
     name: Welcome back, Commander
     name_cn: 欢迎回家，指挥官
@@ -1776,6 +1935,8 @@ definitions:
         field: command_name
         operator: ">"
         value: 5
+    hint: Try different varieties of this to unlock progress.
+    hint_cn: 试试不同的类别来积累进度。
   - id: ill_do_it_myself
     name: Pissed Off
     name_cn: 怒上心头
@@ -1856,8 +2017,7 @@ definitions:
   - id: daily_checkin
     name: Daily Check-In
     name_cn: 每日签到
-    description: Used daily for 15 days, but only sent one message each time. Just
-      clocking in?
+    description: Used daily for 15 days, but only sent one message each time. Just clocking in?
     description_cn: 连续 15 天每天使用但只发一条消息。你是来签到的吗？
     icon: ✅
     category: milestones
@@ -2018,8 +2178,7 @@ definitions:
   - id: true_vibe_coder
     name: True Vibe Coder
     name_cn: 真·Vibe Coder
-    description: Skip permissions + write code + commit + PR, all in one smooth
-      flow. Complete trust, complete vibe.
+    description: Skip permissions + write code + commit + PR, all in one smooth flow. Complete trust, complete vibe.
     description_cn: skip permissions + 写代码 + commit + PR，一气呵成。完全的信任，完全的 vibe。
     icon: 🌊
     category: hidden
@@ -2072,8 +2231,7 @@ definitions:
   - id: early_bird
     name: Early Bird
     name_cn: 早起的鸟儿有虫吃
-    description: Started a session in the early morning (6:00-9:00). The early bird
-      gets the worm.
+    description: Started a session in the early morning (6:00-9:00). The early bird gets the worm.
     description_cn: 某次在清晨 (6:00-9:00) 启动了 session。早起的鸟儿有虫吃。
     icon: 🐦
     category: style
@@ -2104,8 +2262,7 @@ definitions:
   - id: rubber_duck
     name: Rubber Duck
     name_cn: 橡皮小黄鸭
-    description: Agent sent 20+ messages in a single session. It's your chatty
-      debugging buddy.
+    description: Agent sent 20+ messages in a single session. It's your chatty debugging buddy.
     description_cn: 单 session 中 agent 发送了 20+ 条消息。它是个爱说话的 debugging 伙伴。
     icon: 🦆
     category: hidden
@@ -2121,8 +2278,7 @@ definitions:
   - id: the_negotiator
     name: The Negotiator
     name_cn: 谈判专家
-    description: Agent refused you at first, but accepted after you rephrased.
-      Communication is an art.
+    description: Agent refused you at first, but accepted after you rephrased. Communication is an art.
     description_cn: agent 第一次拒绝了你的请求，换个说法它就接受了。沟通是一门艺术。
     icon: 🤝
     category: skill
@@ -2138,8 +2294,7 @@ definitions:
   - id: u_turn
     name: Remastered
     name_cn: 重制版
-    description: Had your agent revert and start over in a new direction. Starting
-      over takes courage — and knowing what you want.
+    description: Had your agent revert and start over in a new direction. Starting over takes courage — and knowing what you want.
     description_cn: 主动让 agent revert 后换方向重新实现。推翻重来需要勇气，也说明你明确知道自己要什么。
     icon: ↩️
     category: workflow
@@ -2155,8 +2310,7 @@ definitions:
   - id: silent_partner
     name: Guy in the Chair
     name_cn: 幕后搭档
-    description: Agent edited files and completed a task — you just watched. Pure
-      delegation.
+    description: Agent edited files and completed a task — you just watched. Pure delegation.
     description_cn: agent 编辑了文件并完成了一个 task——你只是看着。纯粹的委派。
     icon: 🤐
     category: style
@@ -2174,8 +2328,7 @@ definitions:
   - id: time_traveler
     name: Time Traveler
     name_cn: 时间旅者
-    description: Agent successfully used git bisect to find a bug. Traversing git
-      history to find the culprit.
+    description: Agent successfully used git bisect to find a bug. Traversing git history to find the culprit.
     description_cn: agent 成功使用了 git bisect 定位 bug。穿越 git 历史，找出真凶。
     icon: ⏳
     category: workflow
@@ -2199,8 +2352,7 @@ definitions:
     conditions:
       - type: counter
         event: command.run
-        filter: command contains 'grep -E' || command contains 'sed -E' || command
-          contains "grep -P"
+        filter: command contains 'grep -E' || command contains 'sed -E' || command contains "grep -P"
         operator: ">="
         value: 1
   - id: friday_deploy
@@ -2221,8 +2373,7 @@ definitions:
   - id: infinite_loop
     name: Infinite Loop
     name_cn: 无限循环
-    description: A command took over 60 seconds. Patience is a virtue... or an
-      infinite loop.
+    description: A command took over 60 seconds. Patience is a virtue... or an infinite loop.
     description_cn: 一个命令执行超过了 60 秒。耐心，是一种美德……也可能是死循环。
     icon: ♾️
     category: hidden
@@ -2282,6 +2433,8 @@ definitions:
         event: deepseek.conversation
         operator: ">="
         value: 1
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: file_type_sampler
     name: Type Sampler
     name_cn: 文件类型收集者
@@ -2301,8 +2454,8 @@ definitions:
   - id: clockwork_orange
     name: A Clockwork Orange
     name_cn: 发条橙
-    description: Activated automode 3 times. Like Alex, your agent runs on clockwork
-      now — a little ultraviolence, a little automation.
+    description: Activated automode 3 times. Like Alex, your agent runs on clockwork now — a little ultraviolence, a little
+      automation.
     description_cn: 累计激活 automode 3 次。你的 agent 像发条一样自动运转——带着一点超暴力和一点机械感。
     icon: 🍊
     category: hidden
@@ -2315,11 +2468,12 @@ definitions:
         event: automode.start
         operator: ">="
         value: 3
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: whale_song
     name: Orca
     name_cn: 杀手鲸
-    description: Completed a task using a DeepSeek model. The deep sea hums — and
-      you listened.
+    description: Completed a task using a DeepSeek model. The deep sea hums — and you listened.
     description_cn: 使用 DeepSeek 模型完成了一个 task。深海在低语——而你听见了。
     icon: 🐋
     category: hidden
@@ -2333,11 +2487,13 @@ definitions:
         filter: model contains 'deepseek'
         operator: ">="
         value: 1
+    tip: Tasks are the atomic unit of work in Claude Code. Break each feature into small, focused tasks (one file change,
+      one test, one commit). Claude tracks progress and reports completion — use this to structure your workflow.
+    tip_cn: Task 是 Claude Code 中的基本工作单元。把每个功能拆成小而专注的 task（一个文件改动、一个测试、一个提交）。Claude 会自动追踪进度并报告完成状态——用这个来组织你的工作流。
   - id: mathematical_theory_of_communication
     name: A Mathematical Theory of Communication
     name_cn: 通信的数学理论
-    description: Completed a task using a Claude model. Shannon laid the foundation,
-      Claude carries the signal.
+    description: Completed a task using a Claude model. Shannon laid the foundation, Claude carries the signal.
     description_cn: 使用 Claude 模型完成了一个 task。香农奠基，Claude传信。
     icon: 📡
     category: hidden
@@ -2351,11 +2507,13 @@ definitions:
         filter: model contains 'claude'
         operator: ">="
         value: 1
+    tip: Tasks are the atomic unit of work in Claude Code. Break each feature into small, focused tasks (one file change,
+      one test, one commit). Claude tracks progress and reports completion — use this to structure your workflow.
+    tip_cn: Task 是 Claude Code 中的基本工作单元。把每个功能拆成小而专注的 task（一个文件改动、一个测试、一个提交）。Claude 会自动追踪进度并报告完成状态——用这个来组织你的工作流。
   - id: blossom
     name: Blossom
     name_cn: 花朵
-    description: Completed a task using a GPT model. Like a flower seeking sunlight,
-      the model reached for the right answer.
+    description: Completed a task using a GPT model. Like a flower seeking sunlight, the model reached for the right answer.
     description_cn: 使用 GPT 模型完成了一个 task。如花向阳光，模型向答案。
     icon: 🌸
     category: hidden
@@ -2369,11 +2527,13 @@ definitions:
         filter: model contains 'gpt'
         operator: ">="
         value: 1
+    tip: Tasks are the atomic unit of work in Claude Code. Break each feature into small, focused tasks (one file change,
+      one test, one commit). Claude tracks progress and reports completion — use this to structure your workflow.
+    tip_cn: Task 是 Claude Code 中的基本工作单元。把每个功能拆成小而专注的 task（一个文件改动、一个测试、一个提交）。Claude 会自动追踪进度并报告完成状态——用这个来组织你的工作流。
   - id: alien
     name: Alien
     name_cn: 异形
-    description: Your first sub-agent spawned. In space, no one can hear you scream…
-      but the event log caught it.
+    description: Your first sub-agent spawned. In space, no one can hear you scream… but the event log caught it.
     description_cn: 你第一次 spawn 了 sub-agent。在太空中，没人听得到你的尖叫……但 event log 记下来了。
     icon: 👾
     category: hidden
@@ -2386,11 +2546,13 @@ definitions:
         event: agent.spawn
         operator: ">="
         value: 1
+    tip: Sub-agents let you parallelize work. Each agent works independently on its task — one can refactor while another
+      writes tests. Great for large migrations, multi-file changes, and code review.
+    tip_cn: 子 agent 让你并行工作。每个 agent 独立处理自己的任务——一个重构代码，另一个写测试。适合大规模迁移、多文件修改和代码审查。
   - id: fifth_element
     name: The Fifth Element
     name_cn: 第五元素
-    description: "Used 5+ different tools in a single task. Earth, water, fire, air…
-      and the fifth: you. All elements united."
+    description: "Used 5+ different tools in a single task. Earth, water, fire, air… and the fifth: you. All elements united."
     description_cn: 同一个 task 里调用了 5 种以上不同的工具。地、水、火、风……第五元素就是你。五行齐聚，万物合一。
     icon: 💫
     category: hidden
@@ -2404,11 +2566,12 @@ definitions:
         value: 5
         window: single_task
     set: tool_connoisseur
+    hint: Try as many different tools as you can — variety builds mastery.
+    hint_cn: 试试尽可能多的不同工具——多样性带来精通。
   - id: dragonborn
     name: Dragonborn
     name_cn: 龙裔
-    description: Read 337 distinct files. You've read every book in the College of
-      Winterhold. FUS RO DAH!
+    description: Read 337 distinct files. You've read every book in the College of Winterhold. FUS RO DAH!
     description_cn: 累计阅读了 337 个不同的文件。冬堡学院的所有藏书你都翻遍了。伏斯洛达！
     icon: 🐉
     category: hidden
@@ -2422,6 +2585,8 @@ definitions:
         operator: ">="
         value: 337
         window: all
+    hint: Try different varieties of this to unlock progress.
+    hint_cn: 试试不同的类别来积累进度。
   - id: meltdown
     name: Meltdown
     name_cn: 熔断
@@ -2442,8 +2607,7 @@ definitions:
   - id: silent_night
     name: Silent Night
     name_cn: 静夜思
-    description: Completed a task in the wee hours (0:00-5:00). The best code is
-      born in darkness.
+    description: Completed a task in the wee hours (0:00-5:00). The best code is born in darkness.
     description_cn: 某次在凌晨（0:00-5:00）完成了一个 task。最好的代码诞生在黑暗中。
     icon: 🌙
     category: challenge
@@ -2481,6 +2645,9 @@ definitions:
         window: single_task
         operator: ">="
         value: 3
+    tip: Different languages have different strengths. TypeScript for type safety, Python for data work, Rust for
+      performance. The polyglot developer picks the right tool for each job.
+    tip_cn: 不同语言有不同优势。TypeScript 强类型安全、Python 数据处理、Rust 高性能。多语言开发者能为每项工作选对工具。
   - id: speed_run_bronze
     name: Speed Run (Bronze)
     name_cn: 速通(铜牌)
@@ -2524,8 +2691,7 @@ definitions:
   - id: ten_task_no_edit
     name: Ten-Task No Edit
     name_cn: 十连零编辑
-    description: 10 consecutive tasks with zero manual edits. You're a conductor,
-      not an editor.
+    description: 10 consecutive tasks with zero manual edits. You're a conductor, not an editor.
     description_cn: 连续 10 个 task 零手动编辑。你是 conductor，不是 editor。
     icon: 🎼
     category: challenge
@@ -2559,6 +2725,9 @@ definitions:
         window: 24h
         operator: ">="
         value: 3
+    tip: Variety is the spice of mastery. The broader your experience across different options, the better your intuition
+      for choosing the right one.
+    tip_cn: 多样性是精通的关键。你在不同选项上的经验越广，你对"选哪个"的直觉就越好。
   - id: short_circuit
     name: Short Circuit
     name_cn: 短路
@@ -2580,8 +2749,7 @@ definitions:
   - id: speed_run_gold
     name: Speed Run (Gold)
     name_cn: 速通 (金牌)
-    description: Completed a task within 30 seconds of session start. Blink and
-      you'll miss it.
+    description: Completed a task within 30 seconds of session start. Blink and you'll miss it.
     description_cn: 在 session 开启 30 秒内完成一个 task。还没暖身就结束了。
     icon: ⚡
     category: challenge
@@ -2602,8 +2770,7 @@ definitions:
   - id: silent_partner_ii
     name: Guy in the Chair II
     name_cn: 幕后搭档 II
-    description: Agent edited files in 3 tasks, one session, zero interference from
-      you. Autopilot engaged.
+    description: Agent edited files in 3 tasks, one session, zero interference from you. Autopilot engaged.
     description_cn: 同一 session 中 agent 编辑了文件并完成了 3 个 task，你毫无干预。自动驾驶已激活。
     icon: 🪑
     category: challenge
@@ -2624,8 +2791,7 @@ definitions:
   - id: in_the_zone
     name: In the Zone
     name_cn: 心流状态
-    description: Completed 5+ tasks in a single session. When you're in the zone,
-      you're unstoppable.
+    description: Completed 5+ tasks in a single session. When you're in the zone, you're unstoppable.
     description_cn: 单 session 里完成了 5+ 个 task。进入状态的人，势不可挡。
     icon: 🌪️
     category: challenge
@@ -2657,6 +2823,9 @@ definitions:
         operator: ">="
         value: 6
         window: all
+    tip: Each unlocked achievement represents a skill or habit you've developed. The rarer the achievement, the more it
+      reflects mastery — Legendary and Mythic achievements are true marks of expertise.
+    tip_cn: 每一个已解锁的成就都代表你已掌握的一项技能或习惯。稀有度越高越体现专业水平——Legendary 和 Mythic 成就是真正的专业标志。
   - id: completionist_bronze
     name: Completionist (Bronze)
     name_cn: 完美主义(铜牌)
@@ -2686,6 +2855,8 @@ definitions:
       - type: set_completion
         rarity: uncommon
         include_above: true
+    hint: Complete all achievements in the related set.
+    hint_cn: 完成所属套装的全部成就。
   - id: completionist_gold
     name: Completionist (Gold)
     name_cn: 完美主义(金牌)
@@ -2699,6 +2870,8 @@ definitions:
     conditions:
       - type: set_completion
         exclude_hidden: true
+    hint: Complete all achievements in the related set.
+    hint_cn: 完成所属套装的全部成就。
   - id: mythic_completionist
     name: Mythic Completionist
     name_cn: 超神完美主义者
@@ -2712,11 +2885,12 @@ definitions:
     conditions:
       - type: set_completion
         all: true
+    hint: Complete all achievements in the related set.
+    hint_cn: 完成所属套装的全部成就。
   - id: cross_agent
     name: Cross-Agent Collector
     name_cn: 跨Agent成就收藏家
-    description: Has achievement records on 2 different agent tools (e.g. Claude
-      Code + OpenCode). Agent polyglot.
+    description: Has achievement records on 2 different agent tools (e.g. Claude Code + OpenCode). Agent polyglot.
     description_cn: 在 2 个不同的 agent 工具上都有成就记录（如 Claude Code + OpenCode）。agent 多面手。
     icon: 🔗
     category: community
@@ -2728,11 +2902,12 @@ definitions:
         field: tool_source
         operator: ">="
         value: 2
+    hint: Try different varieties of this to unlock progress.
+    hint_cn: 试试不同的类别来积累进度。
   - id: casual_collector
     name: Casual Collector
     name_cn: 随缘收集
-    description: Unlocked 20 achievements. You're not hunting for completion — the
-      good ones just come naturally.
+    description: Unlocked 20 achievements. You're not hunting for completion — the good ones just come naturally.
     description_cn: 解锁了 20 个成就。你不追求全收集，好东西自然来。
     icon: 🍀
     category: community
@@ -2747,11 +2922,13 @@ definitions:
         operator: ">="
         value: 20
         window: all
+    tip: Each unlocked achievement represents a skill or habit you've developed. The rarer the achievement, the more it
+      reflects mastery — Legendary and Mythic achievements are true marks of expertise.
+    tip_cn: 每一个已解锁的成就都代表你已掌握的一项技能或习惯。稀有度越高越体现专业水平——Legendary 和 Mythic 成就是真正的专业标志。
   - id: achievement_hunter
     name: Achievement Hunter
     name_cn: 成就猎人
-    description: Unlocked 50 achievements. Not just collecting — you've become a
-      hunter.
+    description: Unlocked 50 achievements. Not just collecting — you've become a hunter.
     description_cn: 解锁了 50 个成就。不是收集而已——你已成猎人。
     icon: 🎯
     category: community
@@ -2785,11 +2962,13 @@ definitions:
         operator: ">="
         value: 10
         window: all
+    tip: "The terminal is your agent's superpower. Claude can run tests, install packages, lint code, and deploy. Pro tip:
+      for complex commands, ask Claude to build the command step by step — it's safer and more educational."
+    tip_cn: 终端是 agent 的超能力。Claude 可以运行测试、安装包、检查代码、部署上线。建议：对于复杂命令，让 Claude 逐步构建——更安全也更有教育意义。
   - id: command_baby
     name: Command Baby
     name_cn: 命令宝宝
-    description: Agent tried 30 different shell commands. It's curious about
-      everything on the terminal.
+    description: Agent tried 30 different shell commands. It's curious about everything on the terminal.
     description_cn: agent 试过 30 种不同的 shell 命令。它对终端的一切都充满好奇。
     icon: 👶
     category: tool_mastery
@@ -2802,11 +2981,12 @@ definitions:
         operator: ">="
         value: 30
         window: all
+    hint: Try different varieties of this to unlock progress.
+    hint_cn: 试试不同的类别来积累进度。
   - id: command_master
     name: Command Master
     name_cn: 命令大师
-    description: Agent used 100 different shell commands. Its terminal knowledge
-      rivals yours.
+    description: Agent used 100 different shell commands. Its terminal knowledge rivals yours.
     description_cn: agent 用过 100 种不同的 shell 命令。它的终端知识已经不在你之下了。
     icon: 🧙
     category: tool_mastery
@@ -2819,6 +2999,8 @@ definitions:
         operator: ">="
         value: 100
         window: all
+    hint: Try different varieties of this to unlock progress.
+    hint_cn: 试试不同的类别来积累进度。
   - id: cerberus
     name: Super Mario Bros
     name_cn: 超级马力欧兄弟
@@ -2834,6 +3016,11 @@ definitions:
         filter: command contains '|'
         operator: ">="
         value: 2
+    hint: Use the terminal — run commands through your agent.
+    hint_cn: 使用终端——通过 agent 来运行命令。
+    tip: "The terminal is your agent's superpower. Claude can run tests, install packages, lint code, and deploy. Pro tip:
+      for complex commands, ask Claude to build the command step by step — it's safer and more educational."
+    tip_cn: 终端是 agent 的超能力。Claude 可以运行测试、安装包、检查代码、部署上线。建议：对于复杂命令，让 Claude 逐步构建——更安全也更有教育意义。
   - id: fail_forward
     name: Fail Forward
     name_cn: 初尝失败
@@ -2850,6 +3037,9 @@ definitions:
         event: tool.failure
         operator: ">="
         value: 1
+    tip: Not every tool call succeeds. When tools fail, Claude adapts — trying different approaches, fixing arguments, or
+      falling back to alternatives. This resilience is what makes agentic coding powerful.
+    tip_cn: 不是每次工具调用都会成功。失败时 Claude 会调整——换方法、改参数、或用备选方案。这种韧性正是 agent 编程的强大之处。
   - id: bounce_back
     name: Bounce Back
     name_cn: 反弹力
@@ -2867,6 +3057,9 @@ definitions:
         operator: ">="
         value: 10
         window: all
+    tip: Not every tool call succeeds. When tools fail, Claude adapts — trying different approaches, fixing arguments, or
+      falling back to alternatives. This resilience is what makes agentic coding powerful.
+    tip_cn: 不是每次工具调用都会成功。失败时 Claude 会调整——换方法、改参数、或用备选方案。这种韧性正是 agent 编程的强大之处。
   - id: failure_mother
     name: Failure Is the Mother of Success
     name_cn: 失败是成功之母
@@ -2882,11 +3075,12 @@ definitions:
         operator: ">="
         value: 100
         window: all
+    hint: When things fail, try a different approach.
+    hint_cn: 事情失败时，换个方法试试。
   - id: phoenix
     name: Phoenix
     name_cn: 凤凰涅槃
-    description: Agent failed and immediately succeeded on the next try, 10 times.
-      Rise from the ashes.
+    description: Agent failed and immediately succeeded on the next try, 10 times. Rise from the ashes.
     description_cn: agent 失败后立即在下一次尝试中成功，反复 10 次。浴火重生。
     icon: 🔥
     category: skill
@@ -2899,6 +3093,8 @@ definitions:
           - tool.complete
         operator: ">="
         value: 10
+    hint: Chain actions together repeatedly to master this pattern.
+    hint_cn: 反复串联特定操作来熟练掌握。
   - id: mcp_connoisseur
     name: MCP Connoisseur
     name_cn: MCP 品鉴师
@@ -2915,11 +3111,12 @@ definitions:
         operator: ">="
         value: 10
         window: all
+    hint: Try as many different tools as you can — variety builds mastery.
+    hint_cn: 试试尽可能多的不同工具——多样性带来精通。
   - id: mcp_collector
     name: MCP Collector
     name_cn: MCP 收藏家
-    description: Agent used 30 different MCP tools. It's not using tools — it's
-      collecting them.
+    description: Agent used 30 different MCP tools. It's not using tools — it's collecting them.
     description_cn: agent 用过 30 种不同的 MCP tool。它不是在用工具，是在收集工具。
     icon: 🏛️
     category: tool_mastery
@@ -2932,6 +3129,8 @@ definitions:
         operator: ">="
         value: 30
         window: all
+    hint: Try as many different tools as you can — variety builds mastery.
+    hint_cn: 试试尽可能多的不同工具——多样性带来精通。
   - id: scribe
     name: Scribe
     name_cn: 笔耕不辍
@@ -2949,6 +3148,9 @@ definitions:
         operator: ">="
         value: 50
         window: all
+    tip: Creating files from scratch gives you full control over the structure. Describe the purpose, not just the content —
+      Claude will scaffold imports, types, and exports that integrate with your existing patterns.
+    tip_cn: 从零创建文件让你完全掌控结构。描述用途而非仅仅内容——Claude 会搭建好导入、类型和导出，使其与你现有的代码模式集成。
   - id: delegator
     name: Delegator
     name_cn: 放权大师
@@ -2966,11 +3168,13 @@ definitions:
         operator: ">="
         value: 5
     set: agent_commander
+    tip: Sub-agents let you parallelize work. Each agent works independently on its task — one can refactor while another
+      writes tests. Great for large migrations, multi-file changes, and code review.
+    tip_cn: 子 agent 让你并行工作。每个 agent 独立处理自己的任务——一个重构代码，另一个写测试。适合大规模迁移、多文件修改和代码审查。
   - id: swat_team
     name: SWAT Team
     name_cn: 特种小队
-    description: Spawned exactly 4 sub-agents in a single session. Four-person
-      tactical unit.
+    description: Spawned exactly 4 sub-agents in a single session. Four-person tactical unit.
     description_cn: 同一 session 中恰好 spawn 了 4 个子 agent。四人战术小组。
     icon: 🎯
     category: workflow
@@ -2985,11 +3189,13 @@ definitions:
         operator: ==
         value: 4
     set: agent_commander
+    tip: Sub-agents let you parallelize work. Each agent works independently on its task — one can refactor while another
+      writes tests. Great for large migrations, multi-file changes, and code review.
+    tip_cn: 子 agent 让你并行工作。每个 agent 独立处理自己的任务——一个重构代码，另一个写测试。适合大规模迁移、多文件修改和代码审查。
   - id: avengers_assemble
     name: Avengers Assemble
     name_cn: 复仇者集结
-    description: Spawned 6 distinct agent types. Each hero brings a different power.
-      Avengers, assemble!
+    description: Spawned 6 distinct agent types. Each hero brings a different power. Avengers, assemble!
     description_cn: Spawn 过 6 种不同类型的 agent。每位英雄各怀绝技。复仇者，集结！
     icon: 🛡️
     category: workflow
@@ -3002,6 +3208,8 @@ definitions:
         operator: ==
         value: 6
     set: agent_commander
+    hint: Try different agent types — each has unique strengths.
+    hint_cn: 试试不同类型的 agent——各有专长。
   - id: shipper
     name: Ship It
     name_cn: 一键发货
@@ -3020,6 +3228,9 @@ definitions:
         operator: ">="
         value: 10
         window: all
+    tip: Code that isn't pushed might as well not exist. Regular pushes enable CI/CD, collaboration, and backups. Claude can
+      push for you — but always review before pushing to shared branches.
+    tip_cn: 不推送的代码和不写没区别。定期推送让 CI/CD、协作和备份成为可能。Claude 可以帮你推送——但在推送到共享分支前务必 review。
   - id: pythonista
     name: Pythonista
     name_cn: Pythonista
@@ -3040,6 +3251,8 @@ definitions:
         value: 50
         window: all
     set: linguist
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: type_astronaut
     name: Type Astronaut
     name_cn: 类型宇航员
@@ -3060,6 +3273,8 @@ definitions:
         value: 50
         window: all
     set: linguist
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: web_weaver
     name: Web Weaver
     name_cn: 网络织者
@@ -3080,6 +3295,8 @@ definitions:
         value: 50
         window: all
     set: linguist
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: bean_counter
     name: Bean Counter
     name_cn: 咖啡豆计数员
@@ -3100,6 +3317,8 @@ definitions:
         value: 50
         window: all
     set: linguist
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: pointer_pilot
     name: Pointer Pilot
     name_cn: 指针领航员
@@ -3160,6 +3379,8 @@ definitions:
         value: 50
         window: all
     set: linguist
+    tip: Master this feature through consistent use. The more you use it, the more natural it becomes.
+    tip_cn: 通过持续使用来掌握这个功能。用得越多越自然。
   - id: smorgasbord
     name: Smorgasbord
     name_cn: 丰盛大餐
@@ -3198,6 +3419,8 @@ definitions:
         operator: ">="
         value: 10
     set: linguist
+    hint: Work in different programming languages to broaden your horizons.
+    hint_cn: 尝试不同的编程语言，拓宽你的视野。
   - id: test_champion
     name: Test Champion
     name_cn: 测试冠军
@@ -3236,6 +3459,9 @@ definitions:
         window: all
         operator: ">="
         value: 12
+    tip: Variety is the spice of mastery. The broader your experience across different options, the better your intuition
+      for choosing the right one.
+    tip_cn: 多样性是精通的关键。你在不同选项上的经验越广，你对"选哪个"的直觉就越好。
   - id: power_session
     name: Power Session
     name_cn: 全力冲刺
@@ -3255,6 +3481,9 @@ definitions:
         operator: ">="
         value: 25
     set: endurance
+    tip: "Chaining tools is the key to productivity. A typical flow: Read (understand) → Plan (think) → Edit (change) → Bash
+      (test). The fewer turns per task, the faster you ship."
+    tip_cn: 串联工具是提升效率的关键。典型工作流：Read（理解）→ Plan（思考）→ Edit（修改）→ Bash（测试）。每个 task 的交互轮数越少，你交付得越快。
 sets:
   the_beginning:
     name: The Beginning

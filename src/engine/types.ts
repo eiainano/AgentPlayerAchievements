@@ -184,6 +184,7 @@ export interface AchievementState {
   unlocked: Record<string, string>;
   stats: {
     total_unlocked: number;
+    session_count?: number;
     [key: string]: unknown;
   };
   last_evaluated_line?: number;

@@ -53,6 +53,7 @@ import { renderPopup, type PopupAchievement } from '../utils/ansi-popup.js';
 import { findNearUnlocks } from '../utils/progress-nudge.js';
 import { detectLanguage } from '../utils/lang-detect.js';
 import { evaluateCondition } from '../engine/evaluator.js';
+import { computeSessionReport, renderSessionReport, shouldReport, findLastSessionId } from '../utils/session-report.js';
 
 const activeProfile = process.env.AGPA_PROFILE || loadConfig().active_profile || DEFAULT_PROFILE;
 const stateDir = resolveProfileDir(activeProfile);
@@ -485,6 +486,20 @@ function cmdPoll(): void {
   ENGINE.init();
 
   const newlyUnlocked = ENGINE.poll();
+
+  // ── Session mini report (TTY only, Fibonacci interval) ─────────
+  if (process.stdout.isTTY) {
+    const sessionCount = (ENGINE.state.stats.session_count ?? 0) + 1;
+    ENGINE.state.stats.session_count = sessionCount;
+    ENGINE.saveState(ENGINE.state);
+
+    if (shouldReport(sessionCount)) {
+      const realSessionId = findLastSessionId(ENGINE.events) || ENGINE.sessionId;
+      const report = computeSessionReport(ENGINE.events, realSessionId);
+      const reportStr = renderSessionReport(report);
+      process.stdout.write('\n' + reportStr + '\n\n');
+    }
+  }
 
   if (newlyUnlocked.length === 0) {
     process.stderr.write('[AGPA] poll: no new achievements\n');

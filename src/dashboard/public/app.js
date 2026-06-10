@@ -476,6 +476,8 @@ const I18N = {
     modal_hidden_desc: 'Achievement details are hidden.',
     modal_hidden_reveal: 'Reveal',
     modal_hidden_hide: 'Hide',
+    modal_tip_label: '💡 Tip',
+    modal_hint_label: '💡 Clue',
     guide_title: 'Getting Started',
     guide_subtitle: 'Try these easy achievements to get your first unlocks.',
     guide_empty_title: 'This page is empty for now.',
@@ -579,6 +581,8 @@ const I18N = {
     modal_hidden_desc: '成就详情已隐藏。',
     modal_hidden_reveal: '查看描述',
     modal_hidden_hide: '隐藏描述',
+    modal_tip_label: '💡 小贴士',
+    modal_hint_label: '💡 线索',
     guide_title: '从这里开始',
     guide_subtitle: '尝试解锁这些简单成就，迈出第一步。',
     guide_empty_title: '这里是空的。',
@@ -1804,7 +1808,9 @@ function renderGrid(data) {
     const progressHtml = a.progress && a.progress.target > 0
       ? `<div class="ach-progress"><div class="ach-progress-fill" style="width:${progressPct}%"></div><span class="ach-progress-text">${progressText}</span></div>`
       : '';
+    const hint = currentLang === 'zh' ? (a.hint_cn || a.hint) : (a.hint || a.hint_cn);
     const hiddenHint = locked && a.hidden ? `<div class="ach-hidden-hint">${t('hidden_hint')}</div>` : '';
+    const hintHtml = locked && !a.hidden && hint ? `<div class="ach-hint">💡 ${escHtml(hint)}</div>` : '';
     const nameDisplay = locked && a.hidden ? '???' : displayName(a);
 
     const pinBtn = inPickMode && !locked
@@ -1829,6 +1835,7 @@ function renderGrid(data) {
       <span class="ach-rarity-badge">${displayRarity(a.rarity)}</span>
       ${progressHtml}
       ${hiddenHint}
+      ${hintHtml}
     </div>`;
   }).join('');
 }
@@ -1911,6 +1918,23 @@ function openModal(ach) {
       ` : `
       <div class="modal-desc">${escHtml(desc)}</div>
       `}
+
+      ${!locked && (ach.tip || ach.tip_cn) ? `
+      <div class="modal-divider"></div>
+      <div class="modal-tip-section">
+        <div class="modal-tip-label">${t('modal_tip_label')}</div>
+        <div class="modal-tip-text">${escHtml(currentLang === 'zh' ? (ach.tip_cn || ach.tip) : (ach.tip || ach.tip_cn))}</div>
+      </div>
+      ` : ''}
+
+      ${locked && !ach.hidden && (ach.hint || ach.hint_cn) ? `
+      <div class="modal-divider"></div>
+      <div class="modal-tip-section">
+        <div class="modal-tip-label">${t('modal_hint_label')}</div>
+        <div class="modal-tip-text modal-hint-text">💡 ${escHtml(currentLang === 'zh' ? (ach.hint_cn || ach.hint) : (ach.hint || ach.hint_cn))}</div>
+      </div>
+      ` : ''}
+
       ${bottomSections}
     </div>`;
 

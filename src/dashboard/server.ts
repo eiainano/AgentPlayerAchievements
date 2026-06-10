@@ -234,6 +234,7 @@ export function createServer(port: number, defaultProfile: string): http.Server 
         showcaseData,
         engine.stats(),
         engine.setDefinitions,
+        engine.questlineDefinitions,
         engine.toolStats(),
         { includeRecommend },
       );
@@ -492,7 +493,7 @@ export function createServer(port: number, defaultProfile: string): http.Server 
       }
       engine.resetState();
       engine.init();
-      const data = buildApiResponse(engine.definitions, engine.state, engine.events, [], engine.stats(), engine.setDefinitions, engine.toolStats());
+      const data = buildApiResponse(engine.definitions, engine.state, engine.events, [], engine.stats(), engine.setDefinitions, engine.questlineDefinitions, engine.toolStats());
       data.profile = resolvedProfile;
       data.profile_emoji = getProfileMeta(resolvedProfile).emoji;
       data.is_demo = (resolvedProfile as string) === '_demo';

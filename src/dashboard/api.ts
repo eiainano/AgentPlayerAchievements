@@ -19,7 +19,7 @@ import type { AppConfig } from '../config.js';
 import type { StreakData, HeatmapData, DayActivity } from '../utils/activity.js';
 import { calcStreak, computeHeatmap, computeHeatmapFromDaily, calcStreakFromDaily } from '../utils/activity.js';
 import { getRecommendResponse } from '../utils/recommend.js';
-import type { RecommendResponse } from '../engine/types.js';
+import type { RecommendResponse, QuestlineDefinition } from '../engine/types.js';
 
 // ── Response types ────────────────────────────────────────────────────
 
@@ -111,6 +111,40 @@ export interface DashboardStats {
   daily_stats?: Array<{ date: string; sessions: number; tool_calls: number; tasks: number }>;
 }
 
+export interface QuestlineStageItem {
+  stage: number;
+  name: string;
+  name_cn?: string;
+  achievements: Array<{
+    id: string;
+    name: string;
+    name_cn?: string;
+    icon: string;
+    rarity: RarityLevel;
+    unlocked: boolean;
+  }>;
+  completed: number;
+  total: number;
+}
+
+export interface QuestlineItem {
+  id: string;
+  name: string;
+  name_cn?: string;
+  icon: string;
+  description: string;
+  description_cn?: string;
+  stages: QuestlineStageItem[];
+  unlocked_count: number;
+  total_count: number;
+  current_stage: number;
+  current_stage_name: string;
+  current_stage_name_cn?: string;
+  completed: boolean;
+  reward: SetReward;
+  reward_earned: boolean;
+}
+
 export interface DashboardData {
   achievements: AchievementItem[];
   stats: DashboardStats;
@@ -126,6 +160,7 @@ export interface DashboardData {
   is_demo?: boolean;
   has_demo?: boolean;
   recommend?: RecommendResponse;
+  questlines?: QuestlineItem[];
 }
 
 // ── Card API types ────────────────────────────────────────────────────
@@ -407,6 +442,98 @@ export function buildCardResponse(
   };
 }
 
+export function buildQuestlinesResponse(
+  questlineDefinitions: QuestlineDefinition[],
+  definitions: AchievementDefinition[],
+  state: AchievementState,
+): QuestlineItem[] {
+  if (!questlineDefinitions || questlineDefinitions.length === 0) return [];
+
+  const defMap = new Map(definitions.map(d => [d.id, d]));
+
+  const items: QuestlineItem[] = questlineDefinitions.map(q => {
+    let totalCount = 0;
+    let unlockedCount = 0;
+    let currentStage = 1;
+    let currentStageName = q.stages[0]?.name || 'Stage 1';
+    let currentStageNameCn: string | undefined = q.stages[0]?.name_cn || '第1阶段';
+
+    const stages: QuestlineStageItem[] = q.stages.map(stage => {
+      let stageUnlocked = 0;
+      const stageAchs = stage.achievements.map(achId => {
+        const def = defMap.get(achId);
+        const unlocked = !!state.unlocked[achId];
+        if (unlocked) stageUnlocked++;
+        return {
+          id: achId,
+          name: def?.name || achId,
+          name_cn: def?.name_cn,
+          icon: def?.icon || '🏆',
+          rarity: def?.rarity || 'common',
+          unlocked,
+        };
+      });
+
+      totalCount += stageAchs.length;
+      unlockedCount += stageUnlocked;
+
+      return {
+        stage: stage.stage,
+        name: stage.name,
+        name_cn: stage.name_cn,
+        achievements: stageAchs,
+        completed: stageUnlocked,
+        total: stageAchs.length,
+      };
+    });
+
+    // Determine current stage: first incomplete stage
+    for (const s of stages) {
+      if (s.completed < s.total) {
+        currentStage = s.stage;
+        currentStageName = s.name;
+        currentStageNameCn = s.name_cn;
+        break;
+      }
+      // If we're at the last stage and it's complete, stay there
+      if (s.stage === stages.length) {
+        currentStage = s.stage;
+        currentStageName = s.name;
+        currentStageNameCn = s.name_cn;
+      }
+    }
+
+    const completed = unlockedCount === totalCount && totalCount > 0;
+
+    return {
+      id: q.id,
+      name: q.name,
+      name_cn: q.name_cn,
+      icon: q.icon,
+      description: q.description,
+      description_cn: q.description_cn,
+      stages,
+      unlocked_count: unlockedCount,
+      total_count: totalCount,
+      current_stage: currentStage,
+      current_stage_name: currentStageName,
+      current_stage_name_cn: currentStageNameCn,
+      completed,
+      reward: q.reward,
+      reward_earned: completed,
+    };
+  });
+
+  // Sort by completion percentage descending
+  items.sort((a, b) => {
+    const pa = a.total_count > 0 ? a.unlocked_count / a.total_count : 0;
+    const pb = b.total_count > 0 ? b.unlocked_count / b.total_count : 0;
+    return pb - pa;
+  });
+
+  return items;
+}
+
 export function buildSetsResponse(
   definitions: AchievementDefinition[],
   state: AchievementState,
@@ -495,6 +622,7 @@ export function buildApiResponse(
   showcaseData: Array<{ slot: number; achievement: AchievementItem | null }>,
   engineStats: { total_events: number; by_category: Record<string, { total: number; unlocked: number }>; by_rarity: Record<string, { total: number; unlocked: number }> },
   setDefinitions: SetDefinition[],
+  questlineDefinitions?: QuestlineDefinition[],
   toolStats?: AgentToolStats,
   opts?: { includeRecommend?: boolean },
 ): DashboardData {
@@ -538,6 +666,10 @@ export function buildApiResponse(
     ? getRecommendResponse(definitions, events, state, 'dashboard')
     : undefined;
 
+  const questlines = questlineDefinitions
+    ? buildQuestlinesResponse(questlineDefinitions, definitions, state)
+    : undefined;
+
   return {
     achievements,
     stats: {
@@ -567,5 +699,6 @@ export function buildApiResponse(
     badges,
     config: { lang: loadConfig().lang },
     ...(recommend ? { recommend } : {}),
+    ...(questlines ? { questlines } : {}),
   };
 }

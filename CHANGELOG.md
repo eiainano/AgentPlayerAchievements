@@ -1,5 +1,14 @@
 # Changelog
 
+### Embed recommend data into Dashboard API response — 2026-06-11
+
+- **新功能**：Dashboard API `/api/data?include_recommend=true` 现在返回 `recommend` 字段，包含以下三类推荐数据：
+  - `near_win`：接近解锁的成就列表（前 5 个，基于 progress-nudge）
+  - `discovery`：一个未被发现的成就推荐（基于事件盲区检测）
+  - `surprise`：一个随机的隐藏成就提示（基于 sessionId 确定性哈希选取）
+- **设计原则**：`include_recommend` 为可选 query 参数，默认为 false，避免对非 widget 消费者产生不必要的计算开销
+- **实现位置**：`src/dashboard/api.ts`（buildApiResponse）和 `src/dashboard/server.ts`（GET /api/data handler）
+
 ### Top 10 下一阶段 TODO 路线文档 — 2026-06-10
 
 - **新增产品路线文档**：`docs/top10-next-todos-2026-06-10.md`

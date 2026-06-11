@@ -178,6 +178,9 @@ function sequenceCountProgress(events: TrackedEvent[], cond: Condition): number 
       if (pi >= pattern.length) { count++; pi = 0; }
     } else {
       pi = 0;
+      // Re-check current event against pattern start to avoid missing
+      // sequences after a false start (e.g. ['A','A','B'] with pattern ['A','B'])
+      if (e.event_type === pattern[0]) pi = 1;
     }
   }
   return count;

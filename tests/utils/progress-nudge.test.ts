@@ -195,6 +195,27 @@ describe('findNearUnlocks', () => {
     expect(result[0]!.target).toBe(3);
   });
 
+  it('sequence_count recovers from false starts', () => {
+    // Pattern ['A','B'] with stream 'A','A','B' — second 'A' is a false start,
+    // should re-check against pattern[0] and count as 1 cycle
+    const events = [
+      makeEvent({ event_type: 'A' }),
+      makeEvent({ event_type: 'A' }),
+      makeEvent({ event_type: 'B' }),
+      makeEvent({ event_type: 'A' }),
+      makeEvent({ event_type: 'B' }),
+    ];
+    const def = makeDef({
+      conditions: [{ type: 'sequence_count', pattern: ['A', 'B'], value: 3 }],
+    });
+
+    const result = findNearUnlocks([def], events, makeState());
+    expect(result).toHaveLength(1);
+    // A,A,B = 1 cycle (second A recovers), A,B = 1 cycle → total 2
+    expect(result[0]!.current).toBe(2);
+    expect(result[0]!.target).toBe(3);
+  });
+
   // ── Set completion is skipped (removed — used set_id not condition fields) ─
 
   it('skips set_completion type', () => {

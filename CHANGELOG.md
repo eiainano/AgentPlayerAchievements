@@ -1,5 +1,13 @@
 # Changelog
 
+### 作弊码 + 创造模式成就 — 2026-06-11
+
+新增两个探测核心文件访问的隐藏成就：
+- **cheat_code**（作弊码 🎮，rare）：agent 读取 AGPA 10 大核心文件之一，偷看引擎盖下的秘密
+- **creative_mode**（创造模式 🛠️，epic）：agent 编辑 AGPA 10 大核心文件之一，解锁创造权限
+- 使用 `counter` + `file_path contains` filter 实现，通过 `||` OR 逻辑同时匹配 10 个核心路径
+- 成就总数 204→206
+
 ### 甜蜜与烦恼成就 + first_in_session 模式匹配标志 — 2026-06-11
 
 新增 `sweet_troubles`（甜蜜与烦恼）成就：用户在当前 session 第一条消息中提及伴侣称呼时触发。

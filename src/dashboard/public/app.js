@@ -514,6 +514,10 @@ const I18N = {
     title_tooltip: 'From set: {set}',
     badge_unlocked: '✓ {completed}/{total}',
     tools_hint: '💡 Use "agpa profile softwares" in your terminal to change which tools are tracked.',
+    tour_prev: '← Previous',
+    tour_next: 'Next →',
+    tour_done: '✓ Done',
+    tour_skip: '✕ Skip',
   },
   zh: {
     nav_profile: '个人主页',
@@ -635,6 +639,10 @@ const I18N = {
     title_tooltip: '来自套装：{set}',
     badge_unlocked: '✓ {completed}/{total}',
     tools_hint: '💡 在终端中使用 "agpa profile softwares" 来更改要追踪的工具。',
+    tour_prev: '← 上一步',
+    tour_next: '下一步 →',
+    tour_done: '✓ 完成',
+    tour_skip: '✕ 跳过',
   },
 };
 
@@ -2789,7 +2797,7 @@ function exportData() {
     })
     .then(function(blob) {
       var date = new Date().toISOString().slice(0, 10);
-      var profile = window.__agpaProfile || 'default';
+      var profile = currentProfile || 'default';
       var link = document.createElement('a');
       link.download = 'agpa-export-' + profile + '-' + date + '.json';
       link.href = URL.createObjectURL(blob);

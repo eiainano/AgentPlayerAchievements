@@ -97,12 +97,12 @@ var AGPATour = (function() {
         '<div class="tour-tooltip-desc">' + step.desc + '</div>' +
         '<div class="tour-tooltip-btns">' +
           (index > 0
-            ? '<button class="tour-btn tour-btn-prev" id="tour-prev">← 上一步</button>'
+            ? '<button class="tour-btn tour-btn-prev" id="tour-prev">' + (typeof t === 'function' ? t('tour_prev') : '← Previous') + '</button>'
             : '<span></span>') +
           (index < STEPS.length - 1
-            ? '<button class="tour-btn tour-btn-next" id="tour-next">下一步 →</button>'
-            : '<button class="tour-btn tour-btn-done" id="tour-done">✓ 完成</button>') +
-          '<button class="tour-btn tour-btn-skip" id="tour-skip">✕ 跳过</button>' +
+            ? '<button class="tour-btn tour-btn-next" id="tour-next">' + (typeof t === 'function' ? t('tour_next') : 'Next →') + '</button>'
+            : '<button class="tour-btn tour-btn-done" id="tour-done">' + (typeof t === 'function' ? t('tour_done') : '✓ Done') + '</button>') +
+          '<button class="tour-btn tour-btn-skip" id="tour-skip">' + (typeof t === 'function' ? t('tour_skip') : '✕ Skip') + '</button>' +
         '</div>';
 
       tooltip.style.left = Math.max(20, rect.left) + 'px';

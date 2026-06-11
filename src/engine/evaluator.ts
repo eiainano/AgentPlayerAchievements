@@ -707,6 +707,7 @@ function evalSequenceCount(events: TrackedEvent[], cond: Condition): EvaluationR
  */
 function evalTimeGap(events: TrackedEvent[], cond: Condition): EvaluationResult {
   events = scopeEvents(events, cond);
+  if (cond.value <= 0) return { met: false, progress: 0, target: cond.value };
   const targetMs = parseTimeValue(cond.value, cond.unit);
 
   // Filter to matching events in chronological order

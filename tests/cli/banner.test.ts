@@ -28,9 +28,11 @@ describe('renderBanner', () => {
   // ── Font selection ──────────────────────────────────────────────
 
   it('uses Larry 3D font for width >= 80', () => {
+    process.env.AGPA_BANNER_THEME = 'Neon';
     mockTextSync.mockReturnValue(LARRY_3D_ART);
     renderBanner(80, '0.1.0');
     expect(mockTextSync).toHaveBeenCalledWith('AGPA', expect.objectContaining({ font: 'Larry 3D', horizontalLayout: 'full' }));
+    delete process.env.AGPA_BANNER_THEME;
   });
 
   it('uses Small font for width 60-79', () => {
@@ -42,10 +44,12 @@ describe('renderBanner', () => {
   // ── Neon gradient ───────────────────────────────────────────────
 
   it('applies cyan→magenta gradient to art rows', () => {
+    process.env.AGPA_BANNER_THEME = 'Neon';
     mockTextSync.mockReturnValue(LARRY_3D_ART);
     const result = renderBanner(100, '0.1.0');
     expect(result).toContain('\x1b[38;2;0;255;255m');   // cyan
     expect(result).toContain('\x1b[38;2;220;50;220m');  // purple
+    delete process.env.AGPA_BANNER_THEME;
   });
 
   // ── No decorations ──────────────────────────────────────────────
@@ -87,9 +91,11 @@ describe('renderBanner', () => {
   // ── Boundaries ──────────────────────────────────────────────────
 
   it('uses Larry 3D at exactly 80', () => {
+    process.env.AGPA_BANNER_THEME = 'Neon';
     mockTextSync.mockReturnValue(LARRY_3D_ART);
     renderBanner(80, '0.1.0');
     expect(mockTextSync).toHaveBeenCalledWith('AGPA', expect.objectContaining({ font: 'Larry 3D', horizontalLayout: 'full' }));
+    delete process.env.AGPA_BANNER_THEME;
   });
 
   it('uses Small at exactly 79', () => {

@@ -689,6 +689,8 @@ definitions:
     rarity: rare
     hidden: false
     set: agent_commander
+    tip: Auto mode lets Claude chain tools without asking — perfect for multi-step flows like "read → edit → test → commit". Watch the first few steps, then let it run.
+    tip_cn: 自动模式让 Claude 无需确认即可串联工具——非常适合"读取→修改→测试→提交"等多步流程。观察前几步，然后让它自动跑。
     conditions:
       - type: sequence
         event: tool.complete
@@ -714,6 +716,8 @@ definitions:
     rarity: rare
     hidden: false
     set: agent_commander
+    tip: "Large refactors work best when you split them — plan first, then execute file by file. Describe the architecture, then let Claude implement each piece with context from the plan."
+    tip_cn: "大型重构最好拆开做 — 先规划，再逐个文件执行。描述好架构方案，然后让 Claude 在规划上下文中逐个实现。"
     conditions:
       - type: distinct_count
         event: file.edit
@@ -733,6 +737,8 @@ definitions:
     rarity: epic
     hidden: false
     set: agent_commander
+    tip: Precision editing is about context — instead of 'fix the bug', point at specific lines. "Add error handling after line 42" produces cleaner, more surgical changes.
+    tip_cn: 精准编辑的关键在于上下文——与其说'修复 bug'，不如指向具体行号。"在第 42 行后加错误处理"能产生更干净、更外科手术式的修改。
     conditions:
       - type: threshold
         metric: edit_lines / total_file_lines
@@ -777,6 +783,8 @@ definitions:
     hint: Let the agent fix its own mistakes
     hint_cn: 让 agent 自己修 bug
     set: bug_catcher
+    tip: When your agent hits an error, try saying 'fix this' before jumping in manually. Agents learn to self-correct — and each self-fix is one less context switch for you.
+    tip_cn: 当 agent 报错时，先试试说"修复这个"再手动介入。Agent 能学会自我修正——每次自修复都少一次上下文切换。
     conditions:
       - type: event
         event: agent.self_fix
@@ -812,6 +820,8 @@ definitions:
     rarity: rare
     hidden: false
     set: bug_catcher
+    tip: Debug chains — fail → fix → fail → fix — teach your agent resilience. When you see a pattern of failures, let the agent work through them. Each cycle builds robustness.
+    tip_cn: 失败→修复→失败→修复的调试链能锻炼 agent 的韧性。看到连续报错时，让 agent 自己逐个解决，每轮循环都在增强鲁棒性。
     conditions:
       - type: sequence_count
         pattern:
@@ -832,6 +842,8 @@ definitions:
     category: skill
     rarity: rare
     hidden: false
+    tip: Each tool has a specialty. Read for understanding, Edit for changes, Bash for tests, WebSearch for research. Chaining them in the right order multiplies your productivity.
+    tip_cn: 每个工具有自己的专长。Read 用于理解、Edit 用于修改、Bash 用于测试、WebSearch 用于调研。按正确顺序串联它们能成倍提升效率。
     conditions:
       - type: distinct_count
         event: tool.complete
@@ -878,6 +890,8 @@ definitions:
     category: skill
     rarity: uncommon
     hidden: false
+    tip: Not every problem needs a web search. Local-only tasks are faster, more private, and work offline. Try describing the problem from first principles instead of reaching for a search result.
+    tip_cn: 不是每个问题都需要上网搜。纯本地任务更快、更隐私、还能离线工作。试试从基本原理描述问题，而不是直接搜索答案。
     conditions:
       - type: event
         event: task.complete
@@ -899,6 +913,8 @@ definitions:
     category: skill
     rarity: rare
     hidden: false
+    tip: "Writing tests before code is not dogma — it is a strategy. When Claude generates tests alongside code, you catch edge cases before they become bugs. Try TDD: test first, then implementation."
+    tip_cn: 先写测试再写代码不是教条——是策略。当 Claude 同步生成测试和代码时，你能在 bug 出现前就捕获边界情况。试试 TDD：先测试，再实现。
     conditions:
       - type: event
         event: test.pass
@@ -1213,6 +1229,8 @@ definitions:
     rarity: rare
     hidden: false
     progress_trackable: true
+    tip: Leverage Claude for commit messages too — 'commit this with a descriptive message' produces well-formatted, conventional commits. Pair with GitHub CLI for PRs and code review.
+    tip_cn: 让 Claude 也帮你写提交信息吧——'提交这段代码，写个好的描述'就能生成规范的 commit message。配合 GitHub CLI 还能提 PR 和做代码审查。
     conditions:
       - type: counter
         event: git.commit
@@ -2168,6 +2186,8 @@ definitions:
     rarity: common
     hidden: true
     progress_trackable: true
+    tip: When debugging across JS/TS files, give Claude the full import chain — component → hook → util. It reads the dependency graph and understands the full data flow, not just one file.
+    tip_cn: 调试跨 JS/TS 文件问题时，给 Claude 完整的引用链——组件→hook→工具函数。它能读取依赖图并理解完整的数据流，而不只是单个文件。
     conditions:
       - type: counter
         event: file.read

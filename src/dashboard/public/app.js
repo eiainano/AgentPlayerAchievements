@@ -518,6 +518,8 @@ const I18N = {
     tour_next: 'Next →',
     tour_done: '✓ Done',
     tour_skip: '✕ Skip',
+    cosmetic_stat_commits: 'commits',
+    cosmetic_stat_bugs_fixed: 'bugs fixed',
   },
   zh: {
     nav_profile: '个人主页',
@@ -643,6 +645,8 @@ const I18N = {
     tour_next: '下一步 →',
     tour_done: '✓ 完成',
     tour_skip: '✕ 跳过',
+    cosmetic_stat_commits: '次提交',
+    cosmetic_stat_bugs_fixed: '个 Bug',
   },
 };
 
@@ -1547,6 +1551,57 @@ function renderProfile(data) {
           badgesRow.style.display = 'none';
         }
       }
+    }
+  }
+
+  // ── Stat Counters (from completed set stat_counter rewards) ──
+  {
+    const counters = data.cosmetics?.stat_counters || [];
+    const row = document.getElementById('hero-counters-row');
+    if (row) {
+      if (counters.length === 0) {
+        row.style.display = 'none';
+      } else {
+        row.style.display = '';
+        row.innerHTML = counters.map(c => {
+          const name = currentLang === 'zh' ? (c.set_name_cn || c.set_name) : c.set_name;
+          return `<span class="cosmetic-stat" title="${escHtml(name)}">
+            ${c.icon}
+            <span class="cosmetic-stat-count">${c.count}</span>
+            <span class="cosmetic-stat-label">${escHtml(t('cosmetic_stat_' + c.label))}</span>
+          </span>`;
+        }).join('');
+      }
+    }
+  }
+
+  // ── Showcase border cosmetic ──
+  {
+    const border = data.cosmetics?.showcase_border;
+    if (border && border.value) {
+      document.body.dataset.showcaseBorder = border.value;
+    } else {
+      delete document.body.dataset.showcaseBorder;
+    }
+  }
+
+  // ── Theme cosmetic (Polar Night) ──
+  {
+    const theme = data.cosmetics?.theme;
+    if (theme && theme.value) {
+      document.body.dataset.cosmeticTheme = theme.value;
+    } else {
+      delete document.body.dataset.cosmeticTheme;
+    }
+  }
+
+  // ── Animation cosmetic (Speedrun) ──
+  {
+    const anim = data.cosmetics?.animation;
+    if (anim && anim.value) {
+      document.body.dataset.cosmeticAnimation = anim.value;
+    } else {
+      delete document.body.dataset.cosmeticAnimation;
     }
   }
 

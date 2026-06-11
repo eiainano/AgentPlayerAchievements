@@ -145,6 +145,22 @@ export interface QuestlineItem {
   reward_earned: boolean;
 }
 
+export interface StatCounterItem {
+  set_id: string;
+  set_name: string;
+  set_name_cn?: string;
+  icon: string;
+  count: number;
+  label: string;       // the YAML `value` field, e.g. "commits", "bugs_fixed"
+}
+
+export interface CosmeticsResponse {
+  showcase_border: { set_id: string; value: string } | null;
+  stat_counters: StatCounterItem[];
+  animation: { set_id: string; value: string } | null;
+  theme: { set_id: string; value: string } | null;
+}
+
 export interface DashboardData {
   achievements: AchievementItem[];
   stats: DashboardStats;
@@ -157,6 +173,7 @@ export interface DashboardData {
   max_profiles?: number;
   titles: TitleItem[];
   badges: BadgeItem[];
+  cosmetics?: CosmeticsResponse;
   is_demo?: boolean;
   has_demo?: boolean;
   recommend?: RecommendResponse;
@@ -615,6 +632,77 @@ function buildTitlesAndBadges(sets: SetItem[], definitions: AchievementDefinitio
   return { titles, badges };
 }
 
+/** Map stat_counter labels to event types for real-time counting. */
+const STAT_EVENT_MAP: Record<string, string[]> = {
+  commits: ['git.commit'],
+  bugs_fixed: ['agent.self_fix', 'tool.failure'],
+};
+
+function computeStat(label: string, events: TrackedEvent[]): number {
+  const eventTypes = STAT_EVENT_MAP[label];
+  if (!eventTypes) return 0;
+  return events.filter(e => eventTypes.includes(e.event_type)).length;
+}
+
+/**
+ * Build cosmetics from completed sets — showcase_border, stat_counter,
+ * animation, theme. These are the 4 reward types that buildTitlesAndBadges
+ * currently skips.
+ */
+export function buildCosmeticsResponse(
+  sets: SetItem[],
+  events: TrackedEvent[],
+): CosmeticsResponse {
+  let showcaseBorder: CosmeticsResponse['showcase_border'] = null;
+  const statCounters: StatCounterItem[] = [];
+  let animation: CosmeticsResponse['animation'] = null;
+  let theme: CosmeticsResponse['theme'] = null;
+
+  for (const set of sets) {
+    if (set.completed !== set.total || set.total === 0) continue;
+    const reward = set.reward;
+    if (!reward || !reward.value) continue;
+
+    switch (reward.type) {
+      case 'showcase_border':
+        if (reward.value && !showcaseBorder) {
+          showcaseBorder = { set_id: set.id, value: reward.value };
+        }
+        break;
+      case 'stat_counter': {
+        const count = computeStat(reward.value, events);
+        const icon = set.achievements.find(a => a.unlocked)?.icon || '🏆';
+        statCounters.push({
+          set_id: set.id,
+          set_name: set.name,
+          set_name_cn: set.name_cn,
+          icon,
+          count,
+          label: reward.value,
+        });
+        break;
+      }
+      case 'animation':
+        if (reward.value && !animation) {
+          animation = { set_id: set.id, value: reward.value };
+        }
+        break;
+      case 'theme':
+        if (reward.value && !theme) {
+          theme = { set_id: set.id, value: reward.value };
+        }
+        break;
+    }
+  }
+
+  return {
+    showcase_border: showcaseBorder,
+    stat_counters: statCounters,
+    animation,
+    theme,
+  };
+}
+
 export function buildApiResponse(
   definitions: AchievementDefinition[],
   state: AchievementState,
@@ -661,6 +749,7 @@ export function buildApiResponse(
   // Build sets response — needed for sets field and titles/badges
   const setItems = buildSetsResponse(definitions, state, setDefinitions);
   const { titles, badges } = buildTitlesAndBadges(setItems, definitions);
+  const cosmetics = buildCosmeticsResponse(setItems, events);
 
   const recommend = (opts?.includeRecommend)
     ? getRecommendResponse(definitions, events, state, 'dashboard')
@@ -697,6 +786,7 @@ export function buildApiResponse(
     sets: setItems,
     titles,
     badges,
+    cosmetics,
     config: { lang: loadConfig().lang },
     ...(recommend ? { recommend } : {}),
     ...(questlines ? { questlines } : {}),

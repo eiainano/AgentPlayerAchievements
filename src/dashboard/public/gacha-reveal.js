@@ -23,6 +23,11 @@ const RARITY_CONFIG = {
 
 const __gachaRARITY_ORDER = ['mythic', 'legendary', 'epic', 'rare', 'uncommon', 'common'];
 
+/** Speed multiplier for gacha animations — "fast" cosmetic (Speedrun set) = 0.5x. */
+function __gachaSpeedMultiplier() {
+  return document.body.dataset.cosmeticAnimation === 'fast' ? 0.5 : 1.0;
+}
+
 // ── Helpers ─────────────────────────────────────────────
 
 function gachaRarityColor(rarity) {
@@ -146,7 +151,9 @@ class GachaReveal {
   constructor(achievement, options) {
     this.ach = achievement;
     this.rarity = achievement.rarity || 'common';
-    this.config = RARITY_CONFIG[this.rarity] || RARITY_CONFIG.common;
+    this.config = { ...(RARITY_CONFIG[this.rarity] || RARITY_CONFIG.common) };
+    // Apply cosmetic speed multiplier (e.g. Speedrun set — 0.5x)
+    this.config.duration = Math.round(this.config.duration * __gachaSpeedMultiplier());
     this.destroyed = false;
     this.particles = null;
     this.canvas = null;

@@ -2125,6 +2125,111 @@ definitions:
         filter: command contains 'sudo'
         operator: ">="
         value: 1
+  - id: art_of_letting_go
+    name: The Art of Letting Go
+    name_cn: 断舍离
+    description: Agent ran rm -rf. Let it go. All of it.
+    description_cn: agent 执行了 rm -rf。断舍离——该扔的，一个不留。
+    icon: 🔥
+    category: hidden
+    rarity: uncommon
+    hidden: true
+    conditions:
+      - type: counter
+        event: tool.complete
+        filter: command contains 'rm -rf' || command contains 'rm -f' || command contains 'rmdir'
+        operator: ">="
+        value: 1
+  - id: moving_company
+    name: Moving Company
+    name_cn: 搬家公司
+    description: Agent ran mv. New place, new path, same file.
+    description_cn: agent 执行了 mv。新家新路径，文件还是那个文件。
+    icon: 📦
+    category: hidden
+    rarity: uncommon
+    hidden: true
+    conditions:
+      - type: counter
+        event: tool.complete
+        filter: command contains 'mv '
+        operator: ">="
+        value: 1
+  - id: sharingan
+    name: Sharingan
+    name_cn: 写轮眼
+    description: Agent ran cp. Copy ninjutsu — why rewrite when you can copy?
+    description_cn: agent 执行了 cp。复制忍术——能复印，为什么要重写？
+    icon: 🖨️
+    category: hidden
+    rarity: rare
+    hidden: true
+    conditions:
+      - type: counter
+        event: tool.complete
+        filter: command contains 'cp '
+        operator: ">="
+        value: 1
+  - id: inventory_check
+    name: Inventory Check
+    name_cn: 仓储检查
+    description: Agent ran df or du. Who's been hoarding all the gigabytes?
+    description_cn: agent 执行了 df 或 du。来，盘点一下——谁占了这么多货架？
+    icon: 📊
+    category: hidden
+    rarity: uncommon
+    hidden: true
+    conditions:
+      - type: counter
+        event: tool.complete
+        filter: command contains 'df ' || command contains 'du '
+        operator: ">="
+        value: 1
+  - id: my_turf_my_rules
+    name: My Turf, My Rules
+    name_cn: 我的地盘我做主
+    description: Agent ran chmod. Permissions? I am the permission.
+    description_cn: agent 执行了 chmod。权限？我就是权限。
+    icon: 🔓
+    category: hidden
+    rarity: rare
+    hidden: true
+    conditions:
+      - type: counter
+        event: tool.complete
+        filter: command contains 'chmod'
+        operator: ">="
+        value: 1
+  - id: peek_a_boo
+    name: Peek-a-Boo
+    name_cn: 管中窥豹
+    description: Agent ran head. Just checking the top — nothing wrong with that.
+    description_cn: agent 执行了 head。就看个开头——管中窥豹，可见一斑。
+    icon: 👀
+    category: hidden
+    rarity: uncommon
+    hidden: true
+    conditions:
+      - type: counter
+        event: tool.complete
+        filter: command contains 'head '
+        operator: ">="
+        value: 1
+  - id: stalker
+    name: Stalker
+    name_cn: 尾行者
+    description: Agent ran tail. Following every new line like a shadow.
+    description_cn: agent 执行了 tail。如影随形地跟踪文件的每一行新输出。
+    icon: 🐾
+    category: hidden
+    rarity: uncommon
+    hidden: true
+    conditions:
+      - type: counter
+        event: tool.complete
+        filter: command contains 'tail '
+        operator: ">="
+        value: 1
   - id: snake_charmer
     name: Snake Charmer
     name_cn: 耍蛇人

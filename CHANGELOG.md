@@ -1,5 +1,18 @@
 # Changelog
 
+### 7 个 Shell 命令成就 — 2026-06-11
+
+新增 7 个基于 shell 命令触发的隐藏成就，与已有的危险命令成就风格一致：
+- **art_of_letting_go**（断舍离 🔥）：`rm -rf` / `rm -f` / `rmdir`
+- **moving_company**（搬家公司 📦）：`mv`
+- **sharingan**（写轮眼 🖨️）：`cp`
+- **inventory_check**（仓储检查 📊）：`df` / `du`
+- **my_turf_my_rules**（我的地盘我做主 🔓）：`chmod`
+- **peek_a_boo**（管中窥豹 👀）：`head`
+- **stalker**（尾行者 🐾）：`tail`
+- 全部 hidden，使用 `counter` + `tool.complete` + `command contains` filter
+- 成就总数 206→213
+
 ### 作弊码 + 创造模式成就 — 2026-06-11
 
 新增两个探测核心文件访问的隐藏成就：

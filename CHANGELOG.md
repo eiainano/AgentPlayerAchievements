@@ -1,5 +1,12 @@
 # Changelog
 
+### 文档同步 + pixel-art-ideas desc 对齐 — 2026-06-12
+
+- **issues-todo.md**: 校正数字（218→213、64→63 隐藏成就）、更新日期
+- **PROGRESS.md**: 数字同步 + 版本对比表 218→213
+- **top10-next-todos**: 推荐系统状态修正为"部分完成"（Near Win/Discovery/Surprise ✅，缺 Challenge），数字同步
+- **pixel-art-ideas.md**: 20 个 Type A desc_cn 同步 YAML（追加风味文字）、`its_learning` 描述重写（旧"幽默模式"→新版"被逗笑"）、`shell_shocker` 引号统一为中文弯引号
+
 ### 修复 sequence_count nudge false-start — 2026-06-11
 
 - `progress-nudge.ts` `sequenceCountProgress` 缺少 evaluator 中已有的 false-start fallback

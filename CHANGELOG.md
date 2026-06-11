@@ -1,5 +1,14 @@
 # Changelog
 
+### 甜蜜与烦恼成就 + first_in_session 模式匹配标志 — 2026-06-11
+
+新增 `sweet_troubles`（甜蜜与烦恼）成就：用户在当前 session 第一条消息中提及伴侣称呼时触发。
+- **YAML**: 新增 `sweet_troubles` 成就（category: hidden, rarity: rare），pattern 覆盖中英文 20 种伴侣称呼
+- **引擎**: `evalPatternMatch` 新增 `first_in_session` 模式，仅检查 scoped window 中第一条匹配事件
+- **类型**: Condition 接口新增 `first_in_session?: boolean`
+- **解析器**: YAML 解析器映射 `first_in_session` 字段
+- **测试**: `genEvents` 支持多词 `|` 分隔 pattern；auditor 总数 203→204
+
 ### 像素画描述系统性完善 — 2026-06-11
 
 三轮审查+改进全部 207 条像素画描述，确保与 YAML 定义的中英文名、描述和 pop culture 梗源对齐：

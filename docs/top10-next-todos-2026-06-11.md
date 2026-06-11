@@ -1,8 +1,8 @@
 # AGPA 接下来最有价值的 Top 10 TODO（更新版）
 
-> 日期：2026-06-11  
+> 日期：2026-06-11 → 2026-06-12 更新  
 > 基于：昨日分析（`top10-next-todos-2026-06-10.md`） + 昨日完成的工作（Questline ✅、14 HIGH Bug 修复 ✅） + 最新状态  
-> 总成就: 218 | 测试: 1078 ✅ | Condition Types: 12 | Sets: 11 | Questlines: 5 ✅
+> 总成就: 213 | 测试: 1078 ✅ | Condition Types: 12 | Sets: 11 | Questlines: 5 ✅
 
 ---
 
@@ -23,21 +23,21 @@
 
 ## Top 10 TODO
 
-### 1. 推荐系统 2.0——从"近锁"升级为"值得玩什么"
+### 1. 推荐系统 2.0——补齐 Challenge 维度
 
-**状态**: 未开始 | 优先级: ★★★★★ | 预估: 中（~2-3 天）
+**状态**: 部分完成（Near Win ✅ / Discovery ✅ / Surprise ✅ — 缺 Challenge） | 优先级: ★★★★☆ | 预估: 小（~0.5-1 天）
 
-这是昨天 #1，**什么都没变，依旧 #1**。Questline 给了"结构"，推荐系统给"指引"。两者互补。
+**6/12 code audit 发现**：`src/utils/recommend.ts` 已有 `recommendNearWin()`、`recommendDiscovery()`、`recommendSurprise()` 三个引擎，通过 `achievement_suggest` MCP tool 暴露。**只剩 Challenge 维度未实现**。
 
 **核心设计：**
-- **Near Win**：离解锁最近的 3 个（已有 progress nudge 雏形，需改造）
-- **Discovery**：推荐一个你还没体验过的功能/玩法
-- **Challenge**：推荐一个略高难但有意思的目标
-- **Surprise**：隐藏成就 hint（不剧透）
+- ~~Near Win~~ ✅（`progress-nudge.ts` 驱动，Dashboard suggest API 已暴露）
+- ~~Discovery~~ ✅（基于未触发事件类型盲区检测）
+- **Challenge** ❌：推荐一个略高难但有意思的目标（如"试试速通铜牌"、"凑齐某个 set"）
+- ~~Surprise~~ ✅（随机隐藏成就 hint，sessionId 确定性种子）
 
-**为什么 Questline 落地不降低此优先级**：Questline 是**静态路径**，推荐是**动态感知**。Questline 不需要知道用户此刻的情况；推荐引擎需要。这是完全不同的产品能力。
+**调整理由**：基础推荐能力已有，完成 Challenge 的增量工作量很小，完成后推荐系统就是完整态。
 
-**价值**：这是最直接提升"每天打开 AGPA 看看有什么可玩"的功能。
+**价值**：唯一的 missing piece，补完后 `achievement_suggest` 就是完整的 4 维度推荐。
 
 ---
 
@@ -50,7 +50,7 @@
 刚刚在 comprehensive code review 中修复了 14 个 HIGH Bug（包括 evaluator 绕过、窗口无视、filter 静默放行等）。这些 Bug 的存在说明：
 
 1. 即使评估引擎看似正常工作，边界情况下可能有错误
-2. 用户面对 218 个成就，没有办法区分"我没达标"和"系统没算对"
+2. 用户面对 213 个成就，没有办法区分"我没达标"和"系统没算对"
 3. 如果用户不信任进度，整个成就系统的产品价值会打折扣
 
 **建议能力（Dashboard Modal／CLI explain 子命令）：**
@@ -93,7 +93,7 @@
 
 昨天是 #4，**保持不变**。Questline、动画、称号/徽章都落地后，下一个最明显的视觉缺口就是像素画 icon。
 
-**建议试点范围（不做 218 张）：**
+**建议试点范围（不做 213 张）：**
 - Onboarding 线 10-15 个成就
 - 最高稀有度 5 个（Legendary × 1, Mythic × 2, Epic × 2）
 - 1-2 个完整 set（如 bug_catcher 5 个）
@@ -126,7 +126,7 @@
 
 **状态**: 未开始 | 优先级: ★★★☆☆ | 预估: 中（~2-3 天）
 
-218 个成就已足够大，不追求机械扩容。但昨天完成的 **5 个 Questline**（Bug Hunter、Toolsmith、Builder、Night Shift、Polyglot）暴露了一个问题：
+213 个成就已足够大，不追求机械扩容。但昨天完成的 **5 个 Questline**（Bug Hunter、Toolsmith、Builder、Night Shift、Polyglot）暴露了一个问题：
 
 有些 stage 只有 2-3 个成就，路径感不够充实。
 
@@ -202,12 +202,14 @@
 
 ---
 
+> **6/12 更新**：代码审计发现 `src/utils/recommend.ts` 已有 Near Win/Discovery/Surprise 三引擎，通过 `achievement_suggest` MCP tool 暴露。推荐系统基础能力已完成，仅缺 Challenge 维度。
+
 ## 如果只能先做 3 个
 
 ### 产品价值优先
-1. **推荐系统 2.0**——发现的价值 > 路径的价值
-2. **成就可解释层**——信任 > 功能
-3. **像素画试点**——视觉收藏欲是最直接的产品完成度提升
+1. **成就可解释层**——信任 > 功能（今建议系统已有基础，explain 成为更紧迫的体验缺口）
+2. **像素画试点**——视觉收藏欲是最直接的产品完成度提升
+3. **推荐系统 Challenge 维度**——补全最后一块
 
 ### 工程健康优先
 1. **文档真相源自动化**——再手工同步一次就说明方案有问题了
@@ -220,7 +222,7 @@
 
 | 昨日 # | 条目 | 今日状态 | 变化 |
 |--------|------|---------|------|
-| 1 | 推荐系统 2.0 | 未开始 → 仍是 #1 | → |
+| 1 | 推荐系统 2.0 | 未开始 → **部分完成**（Near Win/Discovery/Surprise ✅，缺 Challenge） | → 降级 |
 | 2 | Questline | ✅ **已落地** | ✂ 移除 |
 | 3 | 成就作者工具链 | 未开始 → #8 | ↓ (优先度被 explain/像素画/修复超越) |
 | 4 | 像素画试点 | 未开始 → #5 | ↓ (推荐+explain 优先级更高) |

@@ -1,6 +1,6 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-11 | 总成就数: 218 | 条件类型: 12 | Tests: 1078 (1078 ✅ / 43 files) | 0 不可达 ✅ | 0 审计错误 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | Logo 像素画 + Dashboard 集成 ✅ | 语言自动检测 ✅ | CLI 25 命令 ✅ | agpa uninstall ✅ | 跨平台通知增强 ✅ | macOS JXA 通知 ✅ | Dashboard 导出按钮 ✅ | 共享主题常量 ✅ | LLM 审计脚本 ✅ | Legendary/Mythic 卡片动画 ✅ | 称号 & 徽章系统 ✅ | 响应式布局 ✅ | 全球统计 opt-in 🚫 暂缓 | 隐藏成就 64 | tip/hint 系统 ✅
+> 最后更新: 2026-06-12 | 总成就数: 213 | 条件类型: 12 | Tests: 1078 (1078 ✅ / 43 files) | 0 不可达 ✅ | 0 审计错误 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | Logo 像素画 + Dashboard 集成 ✅ | 语言自动检测 ✅ | CLI 25 命令 ✅ | agpa uninstall ✅ | 跨平台通知增强 ✅ | macOS JXA 通知 ✅ | Dashboard 导出按钮 ✅ | 共享主题常量 ✅ | LLM 审计脚本 ✅ | Legendary/Mythic 卡片动画 ✅ | 称号 & 徽章系统 ✅ | 响应式布局 ✅ | 全球统计 opt-in 🚫 暂缓 | 隐藏成就 63 | tip/hint 系统 ✅
 
 ---
 

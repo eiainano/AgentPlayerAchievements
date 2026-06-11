@@ -2321,8 +2321,8 @@ definitions:
   - id: cheat_code
     name: Cheat Code
     name_cn: 作弊码
-    description: Read one of the 10 core files of the achievement system. You're peeking under the hood.
-    description_cn: 读取了成就系统的 10 大核心文件之一。你在偷看引擎盖下的秘密。
+    description: Read one of the core files of the achievement system. You're peeking under the hood.
+    description_cn: 读取了成就系统的核心文件之一。你在偷看引擎盖下的秘密。
     icon: 🎮
     category: hidden
     rarity: rare
@@ -2330,15 +2330,15 @@ definitions:
     conditions:
       - type: counter
         event: file.read
-        filter: file_path contains 'achievement-definitions.yaml' || file_path contains 'src/engine/evaluator.ts' || file_path contains 'src/engine/types.ts' || file_path contains 'src/engine/engine.ts' || file_path contains 'src/engine/store.ts' || file_path contains 'src/engine/yaml-parser.ts' || file_path contains 'src/cli/hook.ts' || file_path contains 'src/main.ts' || file_path contains 'src/dashboard/' || file_path contains '/tests/'
+        filter: file_path contains 'achievement-definitions.yaml' || file_path contains 'src/engine/evaluator.ts' || file_path contains 'src/engine/types.ts' || file_path contains 'src/engine/engine.ts' || file_path contains 'src/engine/store.ts' || file_path contains 'src/engine/yaml-parser.ts' || file_path contains 'src/cli/hook.ts' || file_path contains 'src/main.ts' || file_path contains 'src/dashboard/' || file_path contains '/tests/' || file_path contains 'src/utils/notify.ts' || file_path contains 'src/utils/validate.ts' || file_path contains 'src/utils/profile.ts' || file_path contains '/docs/' || file_path contains 'CHANGELOG.md'
         operator: ">="
         value: 1
         window: all
   - id: creative_mode
     name: Creative Mode
     name_cn: 创造模式
-    description: Edited one of the 10 core files of the achievement system. Creative freedom — unlocked.
-    description_cn: 编辑了成就系统的 10 大核心文件之一。创造模式——已解锁。
+    description: Edited one of the core files of the achievement system. Creative freedom — unlocked.
+    description_cn: 编辑了成就系统的核心文件之一。创造模式——已解锁。
     icon: 🛠️
     category: hidden
     rarity: epic
@@ -2346,7 +2346,7 @@ definitions:
     conditions:
       - type: counter
         event: file.edit
-        filter: file_path contains 'achievement-definitions.yaml' || file_path contains 'src/engine/evaluator.ts' || file_path contains 'src/engine/types.ts' || file_path contains 'src/engine/engine.ts' || file_path contains 'src/engine/store.ts' || file_path contains 'src/engine/yaml-parser.ts' || file_path contains 'src/cli/hook.ts' || file_path contains 'src/main.ts' || file_path contains 'src/dashboard/' || file_path contains '/tests/'
+        filter: file_path contains 'achievement-definitions.yaml' || file_path contains 'src/engine/evaluator.ts' || file_path contains 'src/engine/types.ts' || file_path contains 'src/engine/engine.ts' || file_path contains 'src/engine/store.ts' || file_path contains 'src/engine/yaml-parser.ts' || file_path contains 'src/cli/hook.ts' || file_path contains 'src/main.ts' || file_path contains 'src/dashboard/' || file_path contains '/tests/' || file_path contains 'src/utils/notify.ts' || file_path contains 'src/utils/validate.ts' || file_path contains 'src/utils/profile.ts' || file_path contains '/docs/' || file_path contains 'CHANGELOG.md'
         operator: ">="
         value: 1
         window: all

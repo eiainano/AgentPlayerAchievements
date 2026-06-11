@@ -245,6 +245,7 @@ function buildCondition(type: ConditionType, cond: Record<string, unknown>): Con
     from_filter: str(cond, 'from_filter'),
     to_filter: str(cond, 'to_filter'),
     cross_day: cond.cross_day === true || undefined,
+    first_in_session: cond.first_in_session === true || undefined,
   } satisfies Condition;
 }
 

@@ -110,6 +110,7 @@ export interface Condition {
   threshold?: number;
   // pattern_match
   role?: string;
+  first_in_session?: boolean;
   // threshold (metric expressions)
   metric?: string;
   // distinct_count

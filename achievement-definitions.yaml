@@ -2303,6 +2303,21 @@ definitions:
       - type: pattern_match
         event: user.message
         pattern: damn|shit|fuck|crap|bloody|damnit|what the hell|靠|妈的|卧槽|操
+  - id: sweet_troubles
+    name: Sweet & Troubles
+    name_cn: 甜蜜与烦恼
+    description: Your first message in this session mentioned your significant other. Sweet, but also a bit of trouble.
+    description_cn: 你在本 session 的第一条消息就提到了另一半——甜蜜，也是烦恼。
+    icon: 💕
+    category: hidden
+    rarity: rare
+    hidden: true
+    conditions:
+      - type: pattern_match
+        event: user.message
+        pattern: 我老公|我老婆|我女朋友|我男朋友|我媳妇|我丈夫|我对象|我家那位|我太太|我先生|my husband|my wife|my girlfriend|my boyfriend|my fiancé|my fiancée|my fiance|my fiancee|my partner|my spouse|my significant other|my hubby|my wifey
+        window: single_session
+        first_in_session: true
   - id: tl_dr
     name: TL;DR
     name_cn: 太长不看

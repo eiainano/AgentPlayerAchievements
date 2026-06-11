@@ -785,6 +785,22 @@ function evalPatternMatch(events: TrackedEvent[], cond: Condition): EvaluationRe
   let regex: RegExp;
   try { regex = new RegExp(regexSrc, 'i'); } catch { return { met: false, progress: 0, target: 1 }; }
 
+  // first_in_session: only check the FIRST matching event type in the scoped window
+  if (cond.first_in_session) {
+    for (const e of events) {
+      if (cond.event && e.event_type !== cond.event) continue;
+      if (cond.role && e.payload?.role !== cond.role) continue;
+      for (const val of Object.values(e.payload || {})) {
+        if (typeof val === 'string' && regex.test(val)) {
+          return { met: true, progress: 1, target: 1 };
+        }
+      }
+      // Only first match counts — stop after checking one event
+      return { met: false, progress: 0, target: 1 };
+    }
+    return { met: false, progress: 0, target: 1 };
+  }
+
   for (const e of events) {
     if (cond.event && e.event_type !== cond.event) continue;
     if (cond.role && e.payload?.role !== cond.role) continue;

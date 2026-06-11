@@ -345,6 +345,10 @@ function genEvents(cond: Condition): TrackedEvent[] {
           content = "I'm sorry I can't do that";
         } else if (pat.includes('humor')) {
           content = 'humor_detected response';
+        } else if (pat.includes('|')) {
+          // Multi-alternation pattern — use the first full alternation
+          const firstAlt = pat.split('|')[0]!.trim();
+          content = firstAlt || 'match';
         } else {
           // Use the first simple word from the pattern as matching content
           const words = pat.match(/[a-zA-Z_]+/g);

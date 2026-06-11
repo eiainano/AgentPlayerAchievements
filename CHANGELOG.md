@@ -1,5 +1,22 @@
 # Changelog
 
+### 像素画描述系统性完善 — 2026-06-11
+
+三轮审查+改进全部 207 条像素画描述，确保与 YAML 定义的中英文名、描述和 pop culture 梗源对齐：
+- **Bug 修复**: 删除 `cerberus` 在 Workflow 节中的重复行；修正 `whale_song`/`deepseek_dabbler` 中文名互换
+- **P1 梗缺失 (8)**: `three_company`→足球帽子戏法；`parallel_universe`→Zerg虫族母巢；`code_talker`→二战Navajo密码员；`u_turn`→重制版游戏卡带；`im_root`→阿西莫夫三定律；`wake_up_samurai`→赛博朋克霓虹色调；`task_creator`→Windows任务管理器；`tool_time`→普罗米修斯盗火
+- **P2 通用化 (11)**: `read_manual` 书结蜘蛛网；`error_resilient` 烈火锻造哑铃；`task_updater` 看板移任务；`file_purger` 春日开窗大扫除；`token_titan` 收银台结账；`command_baby`/`command_master` 丰富命令细节；`session_veteran`/`session_centurion` 修正 emoji；`delegator` 悠闲喝咖啡；`speed_run_bronze` 主动秒表
+- **P3 小幅完善 (35)**: 时间标记补全（night_owl +3:00钟）、emoji修正、色调修正、梗彩蛋（thanos打响指、im_sorry_dave HAL字幕、hooks_master心形双关）、4 条 questline stage 引用实际子成就
+- **第一轮 (19)**: 新增 49 条缺失像素画 + quality fix（first_try Smooth Criminal MJ、copy_paste_king 论文戏仿等）+ 4 条可选润色
+
+### 成就提示 + Dashboard 外观系统 — 2026-06-11
+
+为 9 个成就添加教育性 `tip`/`tip_cn` 字段，实现从已完成套装解锁视觉外观的外观系统：
+- **YAML**: auto_mode, big_refactor, arrow_keys_edit, self_fix, debug_chain, tool_diversity, offline_first, tdd_champion, git_flow, js_ts_debug 添加 tip
+- **API**: `buildCosmeticsResponse()` 从已完成套装提取 showcase_border/stat_counter/animation/theme
+- **前端**: 角色头像区渲染 stat counter（提交数、Bug 数），应用展示框金色光晕和 Polar Night 暗色主题，Speedrun 套装加速 gacha 动画
+- **测试**: 修复 banner 字体选择测试的环境变量隔离
+
 ### 文档数字同步 — 2026-06-11
 
 根据代码核查同步 `docs/` 中过时数字：

@@ -1,5 +1,11 @@
 # Changelog
 
+### 修复 sequence_count nudge false-start — 2026-06-11
+
+- `progress-nudge.ts` `sequenceCountProgress` 缺少 evaluator 中已有的 false-start fallback
+- Pattern `['A','B']` 流 `'A','A','B'` 时 evaluator 正确计数 1，nudge 显示 0
+- 补了一行代码 + 新测试，1077→1078 tests
+
 ### 7 个 Shell 命令成就 — 2026-06-11
 
 新增 7 个基于 shell 命令触发的隐藏成就，与已有的危险命令成就风格一致：

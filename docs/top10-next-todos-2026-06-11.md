@@ -2,7 +2,7 @@
 
 > 日期：2026-06-11  
 > 基于：昨日分析（`top10-next-todos-2026-06-10.md`） + 昨日完成的工作（Questline ✅、14 HIGH Bug 修复 ✅） + 最新状态  
-> 总成就: 208 | 测试: 1064/1067 ✅（3 Banner 测试回归） | Condition Types: 12 | Sets: 11 | Questlines: 5 ✅
+> 总成就: 218 | 测试: 1077 ✅ | Condition Types: 12 | Sets: 11 | Questlines: 5 ✅
 
 ---
 
@@ -50,7 +50,7 @@
 刚刚在 comprehensive code review 中修复了 14 个 HIGH Bug（包括 evaluator 绕过、窗口无视、filter 静默放行等）。这些 Bug 的存在说明：
 
 1. 即使评估引擎看似正常工作，边界情况下可能有错误
-2. 用户面对 208 个成就，没有办法区分"我没达标"和"系统没算对"
+2. 用户面对 218 个成就，没有办法区分"我没达标"和"系统没算对"
 3. 如果用户不信任进度，整个成就系统的产品价值会打折扣
 
 **建议能力（Dashboard Modal／CLI explain 子命令）：**
@@ -109,7 +109,7 @@
 
 昨天是 #4，**保持不变**。Questline、动画、称号/徽章都落地后，下一个最明显的视觉缺口就是像素画 icon。
 
-**建议试点范围（不做 208 张）：**
+**建议试点范围（不做 218 张）：**
 - Onboarding 线 10-15 个成就
 - 最高稀有度 5 个（Legendary × 1, Mythic × 2, Epic × 2）
 - 1-2 个完整 set（如 bug_catcher 5 个）
@@ -142,7 +142,7 @@
 
 **状态**: 未开始 | 优先级: ★★★☆☆ | 预估: 中（~2-3 天）
 
-208 个成就已足够大，不追求机械扩容。但昨天完成的 **5 个 Questline**（Bug Hunter、Toolsmith、Builder、Night Shift、Polyglot）暴露了一个问题：
+218 个成就已足够大，不追求机械扩容。但昨天完成的 **5 个 Questline**（Bug Hunter、Toolsmith、Builder、Night Shift、Polyglot）暴露了一个问题：
 
 有些 stage 只有 2-3 个成就，路径感不够充实。
 

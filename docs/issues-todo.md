@@ -1,6 +1,6 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-11 | 总成就数: 208 | 条件类型: 12 | Tests: 1067 (1067 ✅ / 43 files) | 0 不可达 ✅ | 0 审计错误 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | Logo 像素画 + Dashboard 集成 ✅ | 语言自动检测 ✅ | CLI 25 命令 ✅ | agpa uninstall ✅ | 跨平台通知增强 ✅ | macOS JXA 通知 ✅ | Dashboard 导出按钮 ✅ | 共享主题常量 ✅ | LLM 审计脚本 ✅ | Legendary/Mythic 卡片动画 ✅ | 称号 & 徽章系统 ✅ | 响应式布局 ✅ | 全球统计 opt-in 🚫 暂缓 | 隐藏成就 54 | tip/hint 系统 ✅
+> 最后更新: 2026-06-11 | 总成就数: 218 | 条件类型: 12 | Tests: 1077 (1077 ✅ / 43 files) | 0 不可达 ✅ | 0 审计错误 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | Logo 像素画 + Dashboard 集成 ✅ | 语言自动检测 ✅ | CLI 25 命令 ✅ | agpa uninstall ✅ | 跨平台通知增强 ✅ | macOS JXA 通知 ✅ | Dashboard 导出按钮 ✅ | 共享主题常量 ✅ | LLM 审计脚本 ✅ | Legendary/Mythic 卡片动画 ✅ | 称号 & 徽章系统 ✅ | 响应式布局 ✅ | 全球统计 opt-in 🚫 暂缓 | 隐藏成就 64 | tip/hint 系统 ✅
 
 ---
 
@@ -49,7 +49,7 @@
 - **Layer A（数值/窗口/操作符一致性）** — 从 EN + CN 描述中提取数字、窗口、操作符，与 conditions 逐项比对
 - **Layer B（语义模式匹配）** — condition type ↔ 描述意图（"N different" → distinct_count, "N consecutive" → streak 等）、window 必填检查、event ↔ 主语映射、filter 必填提示
 - **LLM 标记启发式** — set_completion、多类型条件、无数字描述、pattern_match/ratio → 标记为 `needsLLMReview`
-- **51 测试** (`tests/verify/auditor.test.ts`) — 覆盖所有 Layer A/B 模式 + 真实 YAML 集成（208 成就 → 0 错误）
+- **51 测试** (`tests/verify/auditor.test.ts`) — 覆盖所有 Layer A/B 模式 + 真实 YAML 集成（218 成就 → 0 错误）
 - **CI 集成** — `hasErrors(report)` 返回 true 时 CI 阻断；warnings 仅输出
 
 ### Phase 2: LLM 审计脚本 (`scripts/audit-achievements.ts`)
@@ -57,7 +57,7 @@
 - **LLM 审计管道** — `buildSystemPrompt()` 详解 12 种 condition type + window 类型 + 6 项检查（B-Semantic/B-Event/B-Window/B-Operator/C-Missing/C-Extra）
 - **双 Provider 支持** — Anthropic（tool_use 结构化输出）和 OpenAI 兼容（response_format json_object）
 - **智能分批** — 默认 20 成就/批，ANTHROPIC_API_KEY 或 OPENAI_API_KEY 自动检测
-- **Phase 1 联动** — 默认仅审计 `needsLLMReview` 标记成就；`--all` 全部 208 个
+- **Phase 1 联动** — 默认仅审计 `needsLLMReview` 标记成就；`--all` 全部 218 个
 - **Dry-run 模式** — 检查 prompt 结构不调用 API
 - **结构化报告** — `verdict: "pass" | "warn" | "fail"` 判定 + 逐项详情 + 改进建议
 - **38 测试** (`tests/scripts/audit-achievements.test.ts`) — prompt 构建、schema 验证、分组合并、CLI 解析全覆盖
@@ -109,7 +109,7 @@
 - **已修 4 核心文件**: `profile.ts`（+`profileMetaSchema`）、`poll.ts`、`history.ts`、`import.ts` + `validate.ts`
 - **合理保留 11 处**: store.ts/config.ts（已有 safeParse 后置）、hook.ts（受控源/try-catch）、doctor/verify（诊断必须容忍残缺）、server.ts（泛型 body parser）、init.ts（readJSON 尾部逗号清理）、package.json reads（自有文件 always valid）
 
-**测试**: 1067/1067 ✅ | **TypeScript**: 2 预存错误未受影响 ✅
+**测试**: 1077/1077 ✅ | **TypeScript**: 2 预存错误未受影响 ✅
 
 ---
 
@@ -271,10 +271,10 @@ Dashboard 新增 📸 Share 按钮，生成 Steam 风格成就卡片 PNG：
 
 ## P3 — YAML 质量 / 资产
 
-- [x] **Hidden 分类** — 54 个（208 个总成就中约 26.0%）。41→21→35→46→54（经过多次重归类又部分回退）。剩余 54 个全是真彩蛋。
-- [ ] **手动 review 全部 208 条 pixelArtDesc** — `docs/pixel-art-ideas.md` 中每个成就的像素画描述，逐条审阅和修改。改完后重跑 `npx tsx scripts/generate-pixel-art.ts` 即可用最新描述生图。
-- [ ] **像素画 icon 资产暂缺** — `scripts/generate-pixel-art.ts` 已就绪（Gemini 3.1 Nano Banana 2），`docs/pixel-art-ideas.md` 含所有 208 个成就的描述。下一步：review 描述 → 生成全部 208 张 → 选 The Beginning（14 个）做 Dashboard icon 试点。方案：32×32 pixel art PNG → `public/icons/` → YAML `icon: { src, alt }` → Dashboard `iconHtml()` 渲染。emoji 和 pixel art 并存，渐进替换。
-- [x] **Set 名称只有英文** — 9→11 个 set，全部添加 `name_cn`，套装页中英双语切换。Set 系统重构：合并散装 set，扩充合理 set。`git_flow`（7→9）、`agent_commander`（5→7）、`creators_forge`（5→6）、`polar_night`（2→3）、`endurance`（5→7）、`linguist`（新增 9）。74/208 有归属。
+- [x] **Hidden 分类** — 64 个（218 个总成就中约 29.4%）。41→21→35→46→54→64（经过多次重归类又部分回退）。剩余 64 个全是真彩蛋。
+- [ ] **手动 review 全部 218 条 pixelArtDesc** — `docs/pixel-art-ideas.md` 中每个成就的像素画描述，逐条审阅和修改。改完后重跑 `npx tsx scripts/generate-pixel-art.ts` 即可用最新描述生图。
+- [ ] **像素画 icon 资产暂缺** — `scripts/generate-pixel-art.ts` 已就绪（Gemini 3.1 Nano Banana 2），`docs/pixel-art-ideas.md` 含所有 218 个成就的描述。下一步：review 描述 → 生成全部 218 张 → 选 The Beginning（14 个）做 Dashboard icon 试点。方案：32×32 pixel art PNG → `public/icons/` → YAML `icon: { src, alt }` → Dashboard `iconHtml()` 渲染。emoji 和 pixel art 并存，渐进替换。
+- [x] **Set 名称只有英文** — 9→11 个 set，全部添加 `name_cn`，套装页中英双语切换。Set 系统重构：合并散装 set，扩充合理 set。`git_flow`（7→9）、`agent_commander`（5→7）、`creators_forge`（5→6）、`polar_night`（2→3）、`endurance`（5→7）、`linguist`（新增 9）。74/218 有归属。
 
 ---
 

@@ -238,6 +238,7 @@ npm run dashboard -- 8080  # 自定义端口
 | `achievement_stats` | 查看统计（等级、XP、完成率） |
 | `achievement_showcase` | 管理展示柜 |
 | `achievement_config` | 读写配置（语言等） |
+| `achievement_suggest` | 推荐成就（Near Win / Discovery / Surprise） |
 
 ## 六、跨工具成就
 

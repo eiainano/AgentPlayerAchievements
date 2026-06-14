@@ -1,5 +1,15 @@
 # Changelog
 
+### 成就可解释层 (Explain Layer) — 2026-06-15
+
+- **`src/utils/explain.ts`**: 核心解释引擎 `explainAchievement()`，纯函数，复用 `evaluateCondition()` + `matchFilter()` 保证进度准确性，独立 trace pass 收集排除事件（最多 5 条/条件）+ 排除原因（filter/role/window/field_value）
+- **MCP tool**: `achievement_explain` — Agent 对话中调用，返回条件拆解 + progress + 排除追踪；hidden 成就只暴露 hint
+- **CLI**: `agpa explain <id> [--json] [--profile <name>]` — 终端格式化输出，稀有度着色，进度条
+- **类型**: `ExclusionTrace` / `ConditionExplanation` / `AchievementExplanation` 三个新 interface
+- **不修改**: evaluator.ts、store.ts、hook.ts、Dashboard 均未动，不影响现有评估/事件链路
+- **测试**: +32 测试（`tests/utils/explain.test.ts`），覆盖全部 12 condition types + hidden 保护 + 排除追踪
+- **issues-todo.md**: Event Log 增长从 P2→监控（6/15 复审：当前性能足够，增量方案复杂度 > 收益）
+
 ### 文档同步 + pixel-art-ideas desc 对齐 — 2026-06-12
 
 - **issues-todo.md**: 校正数字（218→213、64→63 隐藏成就）、更新日期

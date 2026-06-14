@@ -202,7 +202,7 @@ function main(): void {
 
   if (opts.json) {
     if (expl.hidden && !expl.unlocked) {
-      // Mask conditions for hidden achievements
+      // Engine already masks conditions + description. Return minimal JSON.
       console.log(JSON.stringify({
         achievement_id: expl.achievement_id,
         hidden: true,

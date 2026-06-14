@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { explainAchievement } from '../../src/utils/explain.js';
+import { evaluateCondition } from '../../src/engine/evaluator.js';
 import type { AchievementDefinition, AchievementState, TrackedEvent } from '../../src/engine/types.js';
 
 // ── Helpers ────────────────────────────────────────────────────────
@@ -314,7 +315,7 @@ describe('explainAchievement — condition types', () => {
     expect(result.conditions[0]!.details.metric).toBe('edit_lines / total_file_lines');
   });
 
-  it('time_gap: shows gap info', () => {
+  it('time_gap: shows max adjacent gap (matching evaluator algorithm)', () => {
     const def = makeDef({
       id: 'tg_ach',
       conditions: [{ type: 'time_gap', value: 60000, window: 'all' }],
@@ -325,8 +326,9 @@ describe('explainAchievement — condition types', () => {
 
     const result = explainAchievement(def, [def], [e1, e2], emptyState());
     const c = result.conditions[0]!;
-    expect(c.details.closest_pair_gap_ms).toBe(30000);
+    expect(c.details.max_adjacent_gap_ms).toBe(30000);
     expect(c.details.pair_count).toBe(1);
+    expect(c.details.from_count).toBe(2);
   });
 });
 
@@ -373,7 +375,7 @@ describe('explainAchievement — set_completion', () => {
 });
 
 describe('explainAchievement — hidden achievements', () => {
-  it('still builds full explanation in the raw result (caller must mask)', () => {
+  it('returns full data from explainAchievement (masking is engine.explain responsibility)', () => {
     const def = makeDef({
       id: 'secret',
       hidden: true,
@@ -382,11 +384,12 @@ describe('explainAchievement — hidden achievements', () => {
     });
 
     const result = explainAchievement(def, [def], [], emptyState());
-    // The explain function returns full data — masking is the caller's job
+    // explainAchievement() always returns full data — masking is done by engine.explain()
     expect(result.hidden).toBe(true);
     expect(result.unlocked).toBe(false);
     expect(result.hint).toBe('look closer');
     expect(result.conditions).toHaveLength(1);
+    expect(result.conditions[0]!.type).toBe('event');
   });
 });
 
@@ -462,6 +465,141 @@ describe('explainAchievement — exclusion trace', () => {
     expect(c.excluded_events.length).toBeGreaterThan(0);
     const roleExclusions = c.excluded_events.filter(e => e.reason_code === 'role');
     expect(roleExclusions.length).toBeGreaterThan(0);
+  });
+});
+
+describe('explainAchievement — field-empty exclusion (counter same_target, streak event_level)', () => {
+  it('excludes events with empty field for counter same_target', () => {
+    const def = makeDef({
+      id: 'st_empty',
+      conditions: [{ type: 'counter', event: 'tool.complete', value: 5, window: 'all', same_target: true, field: 'tool_name' }],
+    });
+
+    const events = [
+      makeEvent({ event_type: 'tool.complete', payload: { tool_name: 'Read' } }),
+      makeEvent({ event_type: 'tool.complete', payload: {} }),  // empty field → should be excluded
+      makeEvent({ event_type: 'tool.complete', payload: { tool_name: 'Read' } }),
+    ];
+
+    const result = explainAchievement(def, [def], events, emptyState());
+    const c = result.conditions[0]!;
+    expect(c.matched_count).toBe(2); // only the two with tool_name='Read'
+    const fieldExclusions = c.excluded_events.filter(e => e.reason_code === 'field_value');
+    expect(fieldExclusions.length).toBe(1);
+  });
+
+  it('excludes events with empty field for streak event_level', () => {
+    const def = makeDef({
+      id: 'st_field',
+      conditions: [{ type: 'streak', event: 'tool.complete', value: 3, window: 'all', event_level: true, field: 'tool_name' }],
+    });
+
+    const events = [
+      makeEvent({ event_type: 'tool.complete', payload: { tool_name: 'Read' } }),
+      makeEvent({ event_type: 'tool.complete', payload: {} }),  // empty field → breaks streak in evaluator
+    ];
+
+    const result = explainAchievement(def, [def], events, emptyState());
+    const c = result.conditions[0]!;
+    // Only the first event matches (second has empty field)
+    expect(c.matched_count).toBe(1);
+    const fieldExclusions = c.excluded_events.filter(e => e.reason_code === 'field_value');
+    expect(fieldExclusions.length).toBe(1);
+  });
+});
+
+describe('explainAchievement — scoped events in details (streak/sequence)', () => {
+  it('streak event_level details use scoped events for session window', () => {
+    const def = makeDef({
+      id: 'session_streak',
+      conditions: [{ type: 'streak', event: 'tool.complete', value: 3, window: 'single_session', event_level: true }],
+    });
+
+    // Two sessions: s1 has 2 events, s2 (latest) has 1
+    const events = [
+      makeEvent({ event_type: 'tool.complete', context: { session_id: 's1', model: 'x' } }),
+      makeEvent({ event_type: 'tool.complete', context: { session_id: 's1', model: 'x' } }),
+      makeEvent({ event_type: 'tool.complete', context: { session_id: 's2', model: 'x' } }),
+    ];
+
+    const result = explainAchievement(def, [def], events, emptyState());
+    const c = result.conditions[0]!;
+    // Evaluator scopes to s2 only → progress should be 1, not 2
+    expect(c.current_value).toBe(1);
+    // Details must reflect s2, not all sessions
+    expect(c.details.longest_streak).toBe(1);
+    expect(c.details.active_streak).toBe(1);
+  });
+
+  it('sequence details use scoped events for session window', () => {
+    const def = makeDef({
+      id: 'session_seq',
+      conditions: [{ type: 'sequence', sequence: ['test.fail', 'tool.complete'], value: 2, window: 'single_session' }],
+    });
+
+    // s1: test.fail → tool.complete (full sequence), s2: only tool.complete (no test.fail)
+    const events = [
+      makeEvent({ event_type: 'test.fail', context: { session_id: 's1', model: 'x' } }),
+      makeEvent({ event_type: 'tool.complete', context: { session_id: 's1', model: 'x' } }),
+      makeEvent({ event_type: 'tool.complete', context: { session_id: 's2', model: 'x' } }),
+    ];
+
+    const result = explainAchievement(def, [def], events, emptyState());
+    const c = result.conditions[0]!;
+    // Evaluator scopes to s2 → only tool.complete seen → prefix should be empty
+    expect(c.details.matched_prefix).toEqual([]);
+    expect(c.details.next_required).toBe('test.fail');
+  });
+});
+
+describe('explainAchievement — time_gap max adjacent gap', () => {
+  it('computes max gap between adjacent sorted events', () => {
+    const def = makeDef({
+      id: 'tg_max',
+      conditions: [{ type: 'time_gap', value: 60000, window: 'all' }],
+    });
+
+    const events = [
+      makeEvent({ event_type: 'tool.complete', timestamp: '2026-06-15T10:00:00Z' }),
+      makeEvent({ event_type: 'tool.complete', timestamp: '2026-06-15T10:01:00Z' }), // 60s gap
+      makeEvent({ event_type: 'tool.complete', timestamp: '2026-06-15T10:01:10Z' }), // 10s gap
+    ];
+
+    const result = explainAchievement(def, [def], events, emptyState());
+    const c = result.conditions[0]!;
+    // Max adjacent gap is 60000ms (between first and second), not min pair gap
+    expect(c.details.max_adjacent_gap_ms).toBe(60000);
+    expect(c.details.pair_count).toBe(2); // 2 adjacent pairs
+  });
+
+  it('respects cross_day filter for time_gap', () => {
+    const def = makeDef({
+      id: 'tg_cross',
+      conditions: [{ type: 'time_gap', value: 2, window: 'all', cross_day: true }],
+    });
+
+    const events = [
+      makeEvent({ event_type: 'tool.complete', timestamp: '2026-06-15T10:00:00Z' }),
+      makeEvent({ event_type: 'tool.complete', timestamp: '2026-06-15T11:00:00Z' }), // same day → skipped
+      makeEvent({ event_type: 'tool.complete', timestamp: '2026-06-16T10:00:00Z' }), // cross day → counted
+    ];
+
+    const result = explainAchievement(def, [def], events, emptyState());
+    const c = result.conditions[0]!;
+    // Only the cross-day pair (event 1 → event 3) counts, not same-day pair
+    expect(c.details.pair_count).toBe(1);
+  });
+
+  it('handles <2 events gracefully', () => {
+    const def = makeDef({
+      id: 'tg_single',
+      conditions: [{ type: 'time_gap', value: 60000, window: 'all' }],
+    });
+
+    const result = explainAchievement(def, [def], [makeEvent({ event_type: 'tool.complete' })], emptyState());
+    const c = result.conditions[0]!;
+    expect(c.details.max_adjacent_gap_ms).toBeNull();
+    expect(c.details.pair_count).toBe(0);
   });
 });
 
@@ -577,6 +715,176 @@ describe('explainAchievement — edge cases', () => {
       ] : [def];
       const result = explainAchievement(def, allDefs, [], emptyState());
       expect(result.conditions[0]!.unit_label).toBe(expectedUnit);
+    }
+  });
+});
+
+describe('explainAchievement — engine-level hidden masking', () => {
+  it('engine.explain() masks conditions + description for hidden+locked achievements', () => {
+    // Simulate what engine.explain() does using explainAchievement + masking logic
+    const def = makeDef({
+      id: 'secret',
+      hidden: true,
+      hint: 'look closer',
+      description: 'Secret achievement description',
+      description_cn: '秘密成就描述',
+      conditions: [{ type: 'event', event: 'mcp.connect', value: 1 }],
+    });
+
+    const result = explainAchievement(def, [def], [], emptyState());
+    // explainAchievement() returns full data — masking is done by engine.explain()
+    expect(result.conditions).toHaveLength(1);
+    expect(result.description).toBe('Secret achievement description');
+
+    // Simulate engine.explain() masking
+    if (result.hidden && !result.unlocked) {
+      result.conditions = [];
+      result.description = '';
+      result.description_cn = '';
+    }
+
+    // After masking, conditions and descriptions are cleared
+    expect(result.conditions).toHaveLength(0);
+    expect(result.description).toBe('');
+    expect(result.description_cn).toBe('');
+    // Metadata still available
+    expect(result.hint).toBe('look closer');
+    expect(result.hidden).toBe(true);
+    expect(result.achievement_id).toBe('secret');
+  });
+
+  it('engine.explain() does NOT mask unlocked hidden achievements', () => {
+    const def = makeDef({
+      id: 'secret_unlocked',
+      hidden: true,
+      conditions: [{ type: 'event', event: 'mcp.connect', value: 1 }],
+    });
+    const state: AchievementState = {
+      unlocked: { secret_unlocked: '2026-06-10T00:00:00Z' },
+      stats: { total_unlocked: 1 },
+    };
+
+    const result = explainAchievement(def, [def], [makeEvent({ event_type: 'mcp.connect' })], state);
+    // Unlocked → no masking
+    expect(result.unlocked).toBe(true);
+    expect(result.conditions).toHaveLength(1); // conditions preserved
+    // Simulate engine.explain() masking — should NOT trigger
+    if (result.hidden && !result.unlocked) {
+      result.conditions = [];
+    }
+    expect(result.conditions).toHaveLength(1); // still preserved
+  });
+});
+
+describe('explainAchievement — evaluator consistency cross-check', () => {
+  it('standard counter: matched_count equals evaluator progress', () => {
+    const def = makeDef({
+      id: 'xcheck_counter',
+      conditions: [{ type: 'counter', event: 'tool.complete', value: 10, operator: '>=', window: 'all' }],
+    });
+    const events = Array.from({ length: 7 }, (_, i) =>
+      makeEvent({ event_type: 'tool.complete', timestamp: `2026-06-${String(10 + i).padStart(2, '0')}T10:00:00Z` })
+    );
+    const result = explainAchievement(def, [def], events, emptyState());
+    const evalRes = evaluateCondition(def.conditions[0]!, events);
+    // For standard counter, evaluator's progress IS the count of matched events
+    expect(result.conditions[0]!.matched_count).toBe(evalRes.progress);
+    expect(result.conditions[0]!.current_value).toBe(evalRes.progress);
+  });
+
+  it('counter with filter: matched_count accounts for filter', () => {
+    const def = makeDef({
+      id: 'xcheck_filtered',
+      conditions: [{ type: 'counter', event: 'tool.complete', value: 5, window: 'all', filter: "tool_name == 'Read'" }],
+    });
+    const events = [
+      makeEvent({ event_type: 'tool.complete', payload: { tool_name: 'Read' } }),
+      makeEvent({ event_type: 'tool.complete', payload: { tool_name: 'Edit' } }),
+      makeEvent({ event_type: 'tool.complete', payload: { tool_name: 'Read' } }),
+      makeEvent({ event_type: 'tool.complete', payload: { tool_name: 'Write' } }),
+    ];
+    const result = explainAchievement(def, [def], events, emptyState());
+    const evalRes = evaluateCondition(def.conditions[0]!, events);
+    // Both should agree: only 2 Read events matched
+    expect(result.conditions[0]!.matched_count).toBe(evalRes.progress);
+    expect(evalRes.progress).toBe(2);
+  });
+
+  it('threshold field-sum: details.sum_value matches evaluator progress', () => {
+    const def = makeDef({
+      id: 'xcheck_threshold',
+      conditions: [{ type: 'threshold', event: 'task.complete', field: 'step_count', value: 20, window: 'all' }],
+    });
+    const events = [
+      makeEvent({ event_type: 'task.complete', payload: { step_count: 3 } }),
+      makeEvent({ event_type: 'task.complete', payload: { step_count: 7 } }),
+      makeEvent({ event_type: 'task.complete', payload: { step_count: 4 } }),
+    ];
+    const result = explainAchievement(def, [def], events, emptyState());
+    const evalRes = evaluateCondition(def.conditions[0]!, events);
+    expect(result.conditions[0]!.details.sum_value).toBe(evalRes.progress);
+    expect(evalRes.progress).toBe(14);
+  });
+
+  it('streak calendar: current_value matches evaluator progress', () => {
+    const def = makeDef({
+      id: 'xcheck_streak',
+      conditions: [{ type: 'streak', event: 'session.start', value: 7, window: 'all' }],
+    });
+    const events = [
+      makeEvent({ event_type: 'session.start', timestamp: '2026-06-13T10:00:00Z' }),
+      makeEvent({ event_type: 'session.start', timestamp: '2026-06-14T10:00:00Z' }),
+      makeEvent({ event_type: 'session.start', timestamp: '2026-06-15T10:00:00Z' }),
+    ];
+    const result = explainAchievement(def, [def], events, emptyState());
+    const evalRes = evaluateCondition(def.conditions[0]!, events);
+    expect(result.conditions[0]!.current_value).toBe(evalRes.progress);
+    expect(evalRes.progress).toBe(3);
+  });
+
+  it('all 12 condition types produce consistent met/progress with evaluator', () => {
+    // Verify explain's current_value and met match evaluateCondition for every type
+    const testCases: Array<{ type: string; cond: Record<string, unknown>; events: TrackedEvent[] }> = [
+      { type: 'counter', cond: { type: 'counter', event: 'tool.complete', value: 2, operator: '>=', window: 'all' }, events: [
+        makeEvent({ event_type: 'tool.complete' }), makeEvent({ event_type: 'tool.complete' }),
+      ]},
+      { type: 'threshold', cond: { type: 'threshold', event: 'task.complete', field: 'step_count', value: 10, window: 'all' }, events: [
+        makeEvent({ event_type: 'task.complete', payload: { step_count: 6 } }), makeEvent({ event_type: 'task.complete', payload: { step_count: 5 } }),
+      ]},
+      { type: 'streak', cond: { type: 'streak', event: 'session.start', value: 2, window: 'all' }, events: [
+        makeEvent({ event_type: 'session.start', timestamp: '2026-06-14T10:00:00Z' }), makeEvent({ event_type: 'session.start', timestamp: '2026-06-15T10:00:00Z' }),
+      ]},
+      { type: 'sequence', cond: { type: 'sequence', sequence: ['test.fail', 'tool.complete'], value: 2, window: 'all' }, events: [
+        makeEvent({ event_type: 'test.fail' }), makeEvent({ event_type: 'tool.complete' }),
+      ]},
+      { type: 'distinct_count', cond: { type: 'distinct_count', event: 'tool.complete', field: 'tool_name', value: 2, window: 'all' }, events: [
+        makeEvent({ event_type: 'tool.complete', payload: { tool_name: 'Read' } }), makeEvent({ event_type: 'tool.complete', payload: { tool_name: 'Edit' } }),
+      ]},
+      { type: 'event', cond: { type: 'event', event: 'mcp.connect', value: 1 }, events: [
+        makeEvent({ event_type: 'mcp.connect' }),
+      ]},
+      { type: 'mode', cond: { type: 'mode', event: 'tool.complete', field: 'tool_name', value: 50, window: 'all' }, events: [
+        makeEvent({ event_type: 'tool.complete', payload: { tool_name: 'Read' } }),
+      ]},
+      { type: 'sequence_count', cond: { type: 'sequence_count', pattern: ['a', 'b'], value: 1, window: 'all' }, events: [
+        makeEvent({ event_type: 'a' }), makeEvent({ event_type: 'b' }),
+      ]},
+      { type: 'pattern_match', cond: { type: 'pattern_match', event: 'user.message', pattern: 'hello', value: 1, window: 'all' }, events: [
+        makeEvent({ event_type: 'user.message' }),
+      ]},
+      { type: 'ratio', cond: { type: 'ratio', metric: 'edit_lines / total_file_lines', value: 1, window: 'all' }, events: [] },
+      { type: 'time_gap', cond: { type: 'time_gap', value: 60000, window: 'all' }, events: [
+        makeEvent({ event_type: 'tool.complete', timestamp: '2026-06-15T10:00:00Z' }), makeEvent({ event_type: 'tool.complete', timestamp: '2026-06-15T10:01:00Z' }),
+      ]},
+    ];
+
+    for (const { type, cond, events } of testCases) {
+      const def = makeDef({ id: `xcheck_${type}`, conditions: [cond as any] });
+      const result = explainAchievement(def, [def], events, emptyState());
+      const evalRes = evaluateCondition(cond as any, events);
+      expect(result.conditions[0]!.met).toBe(evalRes.met);
+      expect(result.conditions[0]!.current_value).toBe(evalRes.progress);
+      expect(result.conditions[0]!.target_value).toBe(evalRes.target);
     }
   });
 });

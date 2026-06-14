@@ -201,9 +201,16 @@ function collectExclusions(
       continue;
     }
 
-    // Check field value for types that require it
-    if (cond.field && (cond.type === 'distinct_count' || cond.type === 'mode')) {
-      const fv = getField(e, cond.field);
+    // Check field value for types that require it.
+    // Evaluator skips empty-field events for: distinct_count, mode,
+    // counter (same_target), streak (event_level).
+    const needsFieldCheck = cond.field && (
+      cond.type === 'distinct_count' || cond.type === 'mode' ||
+      (cond.type === 'counter' && cond.same_target) ||
+      (cond.type === 'streak' && cond.event_level)
+    );
+    if (needsFieldCheck) {
+      const fv = getField(e, cond.field!);
       if (!fv) {
         if (excluded.length < MAX_EXCLUSIONS) {
           excluded.push(makeExclusion(e, 'field_value', cond, bounds.start));
@@ -233,15 +240,13 @@ function collectExclusions(
 
 // ── Type-specific details ────────────────────────────────────────
 
-const RARITY_ORDER_LIST = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'mythic'];
-
 function isSessionWin(cond: Condition): boolean {
   return cond.window === 'single_session' || cond.window === 'same_session';
 }
 
 function buildDetails(
   cond: Condition,
-  allEvents: TrackedEvent[],
+  scopedEvents: TrackedEvent[],
   matched: TrackedEvent[],
 ): Record<string, unknown> {
   switch (cond.type) {
@@ -284,7 +289,7 @@ function buildDetails(
         const wMs = sw ? 0 : parseWindowMs(cond.window || '24h');
         const n = Date.now();
         let realMax = 0, realCur = 0;
-        for (const e of allEvents) {
+        for (const e of scopedEvents) {
           const isMatch = e.event_type === cond.event
             && (sw || n - new Date(e.timestamp).getTime() <= wMs)
             && (!cond.filter || matchFilter(e, cond.filter))
@@ -315,7 +320,7 @@ function buildDetails(
       const n = Date.now();
       const prefix: string[] = [];
       let si = 0;
-      for (const e of allEvents) {
+      for (const e of scopedEvents) {
         if (si >= seq.length) break;
         if (!sw && cond.window && n - new Date(e.timestamp).getTime() > wMs) continue;
         if (e.event_type === seq[si]) { prefix.push(seq[si]!); si++; }
@@ -374,15 +379,33 @@ function buildDetails(
     }
 
     case 'time_gap': {
-      let minGapMs = Infinity, pairCount = 0;
-      for (let i = 0; i < matched.length; i++) {
-        for (let j = i + 1; j < matched.length; j++) {
-          const gap = Math.abs(new Date(matched[j]!.timestamp).getTime() - new Date(matched[i]!.timestamp).getTime());
-          if (gap < minGapMs) minGapMs = gap;
-          pairCount++;
+      // Match evaluator: sort by timestamp, scan adjacent pairs, compute max gap.
+      // The evaluator measures the largest gap between consecutive matching events.
+      if (matched.length < 2) return { from_count: matched.length, max_adjacent_gap_ms: null, pair_count: 0, cross_day: !!cond.cross_day };
+      const sorted = [...matched].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      const fromFilter = cond.from_filter || null;
+      const toFilter = cond.to_filter || null;
+      const crossDay = cond.cross_day === true;
+      let maxGapMs = 0;
+      let pairCount = 0;
+      for (let i = 1; i < sorted.length; i++) {
+        const prev = sorted[i - 1]!;
+        const curr = sorted[i]!;
+        const t1 = new Date(prev.timestamp).getTime();
+        const t2 = new Date(curr.timestamp).getTime();
+        const gap = t2 - t1; // timestamps are sorted ⇒ non-negative
+        // Apply pairwise filters if configured (matching evaluator)
+        if (fromFilter && !matchFilter(prev, fromFilter)) continue;
+        if (toFilter && !matchFilter(curr, toFilter)) continue;
+        if (crossDay) {
+          const d1 = prev.timestamp.slice(0, 10);
+          const d2 = curr.timestamp.slice(0, 10);
+          if (d1 === d2) continue; // skip same-day pairs
         }
+        pairCount++;
+        if (gap > maxGapMs) maxGapMs = gap;
       }
-      return { from_count: matched.length, closest_pair_gap_ms: minGapMs === Infinity ? null : minGapMs, pair_count: pairCount, cross_day: !!cond.cross_day };
+      return { from_count: matched.length, max_adjacent_gap_ms: maxGapMs || null, pair_count: pairCount, cross_day: !!cond.cross_day };
     }
 
     default: return {};
@@ -452,7 +475,7 @@ function explainOneCondition(
     excluded_count: excludedCount,
     total_scoped_events: totalScoped,
     excluded_events: excluded,
-    details: buildDetails(cond, events, matched),
+    details: buildDetails(cond, scoped, matched),
   };
 }
 

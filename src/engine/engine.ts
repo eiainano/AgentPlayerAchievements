@@ -275,11 +275,21 @@ export class AchievementEngine {
     };
   }
 
-  /** Explain why an achievement is locked/unlocked — pure read, no side effects */
+  /** Explain why an achievement is locked/unlocked — pure read, no side effects.
+   *  Hidden + locked achievements have their condition details masked here so that
+   *  all consumers (MCP, CLI, Dashboard) get the same protection automatically. */
   explain(achievementId: string): AchievementExplanation | null {
     const def = this.definitions.find(d => d.id === achievementId);
     if (!def) return null;
-    return explainAchievement(def, this.definitions, this.events, this.state);
+    const raw = explainAchievement(def, this.definitions, this.events, this.state);
+    // Mask condition details for hidden achievements that are still locked.
+    // Consumers (MCP tool, CLI) no longer need to duplicate this logic.
+    if (raw.hidden && !raw.unlocked) {
+      raw.conditions = [];
+      raw.description = '';
+      raw.description_cn = '';
+    }
+    return raw;
   }
 
   /** Reload state + events from disk (for long-running servers like Dashboard) */

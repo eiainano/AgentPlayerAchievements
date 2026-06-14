@@ -29,7 +29,8 @@ export function registerExplainTool(server: McpServer, getEngine: () => Achievem
       const output: Record<string, unknown> = {};
 
       if (explanation.hidden && !explanation.unlocked) {
-        // Hidden + locked: only reveal hint, mask all conditions
+        // Hidden + locked: engine already masks conditions + description.
+        // Return a minimal clean response with hint and bilingual guidance.
         output.achievement_id = explanation.achievement_id;
         output.hidden = true;
         output.unlocked = false;

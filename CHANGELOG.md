@@ -1,5 +1,15 @@
 # Changelog
 
+### 可解释层 Bug 修复 + 隐藏保护加固 — 2026-06-15
+
+- **`collectExclusions` field-empty 检查扩展**: `counter(same_target)` 和 `streak(event_level)` 的空 field 事件现在正确标记为 `field_value` 排除，不再错误计入 `matched_count`
+- **`buildDetails` scope 修复**: streak(event_level) 和 sequence 的 detail 计算改用 scoped events，session/task-windowed 条件不再错误显示全历史数据
+- **`buildDetails` time_gap 重写**: 从 O(n²) min-pair-gap 改为 O(n) max-adjacent-gap，与 evaluator 算法一致；新增 `from_filter`/`to_filter`/`cross_day` 支持；字段 `closest_pair_gap_ms`→`max_adjacent_gap_ms`
+- **隐藏保护移至 engine 层**: `engine.explain()` 统一处理 `hidden && !unlocked` masking（conditions=[], description=''），MCP/CLI 不再各自实现
+- **Evaluator 一致性 cross-check**: 对全部 12 condition types 验证 explain 的 met/progress/target 与 `evaluateCondition()` 一致
+- **测试**: +14 测试（field-empty 排除、scoped details、time_gap max-gap、engine masking、evaluator cross-check）；explain 测试 46 个，总测试 1138 个 — 全绿零 regression
+- **文件**: `src/utils/explain.ts`、`src/engine/engine.ts`、`src/tools/explain.ts`（注释）、`src/cli/explain.ts`（注释）、`tests/utils/explain.test.ts`
+
 ### 成就可解释层 (Explain Layer) — 2026-06-15
 
 - **`src/utils/explain.ts`**: 核心解释引擎 `explainAchievement()`，纯函数，复用 `evaluateCondition()` + `matchFilter()` 保证进度准确性，独立 trace pass 收集排除事件（最多 5 条/条件）+ 排除原因（filter/role/window/field_value）

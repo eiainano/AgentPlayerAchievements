@@ -190,6 +190,64 @@ export interface EvaluationResult {
   target: number;
 }
 
+// ── Explain layer types ──────────────────────────────────────────
+
+export type ExclusionReasonCode = 'event_type' | 'filter' | 'role' | 'window' | 'field_value';
+
+export interface ExclusionTrace {
+  event_id: string;
+  timestamp: string;
+  event_type: string;
+  tool_name?: string;
+  reason_code: ExclusionReasonCode;
+  reason: string;          // human-readable English
+  reason_cn: string;       // human-readable Chinese
+}
+
+export interface ConditionExplanation {
+  index: number;            // 1-based condition index within the achievement
+  type: string;
+  met: boolean;
+  // Progress
+  current_value: number;
+  target_value: number;
+  progress_pct: number;
+  unit_label: string;
+  // Scope
+  event_type: string;
+  filter_expr: string;
+  field: string;
+  window_raw: string;
+  window_label: string;
+  window_start: string;     // ISO date or '' for lifetime
+  window_end: string;       // ISO date or ''
+  // Counts
+  matched_count: number;
+  excluded_count: number;
+  total_scoped_events: number;
+  // Exclusion trace (max 5)
+  excluded_events: ExclusionTrace[];
+  // Type-specific details
+  details: Record<string, unknown>;
+}
+
+export interface AchievementExplanation {
+  achievement_id: string;
+  name: string;
+  name_cn: string;
+  description: string;
+  description_cn: string;
+  icon: string;
+  rarity: string;
+  category: string;
+  hidden: boolean;
+  unlocked: boolean;
+  unlocked_at: string;
+  hint: string;
+  hint_cn: string;
+  conditions: ConditionExplanation[];
+}
+
 export interface MigrationRecord {
   from: number;
   to: number;

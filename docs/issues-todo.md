@@ -1,6 +1,6 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-12 | 总成就数: 213 | 条件类型: 12 | Tests: 1078 (1078 ✅ / 43 files) | 0 不可达 ✅ | 0 审计错误 ✅ | Kilo Code / OpenCode 双通道覆盖 ✅ | Logo 像素画 + Dashboard 集成 ✅ | 语言自动检测 ✅ | CLI 25 命令 ✅ | agpa uninstall ✅ | 跨平台通知增强 ✅ | macOS JXA 通知 ✅ | Dashboard 导出按钮 ✅ | 共享主题常量 ✅ | LLM 审计脚本 ✅ | Legendary/Mythic 卡片动画 ✅ | 称号 & 徽章系统 ✅ | 响应式布局 ✅ | 全球统计 opt-in 🚫 暂缓 | 隐藏成就 63 | tip/hint 系统 ✅
+> 最后更新: 2026-06-15 | 总成就数: 218 | 隐藏成就: 64 | 条件类型: 12 | Tests: 1078 (43 文件) | 0 不可达 ✅ | Event Log 增长 → 监控 🚫 | 推荐系统 3/4 (缺 Challenge → 不做) | Questlines: 5 ✅
 
 ---
 
@@ -256,7 +256,7 @@ Dashboard 新增 📸 Share 按钮，生成 Steam 风格成就卡片 PNG：
 
 ## P2 — 数据与体验缺口
 
-- [ ] **Event Log 无界增长** — `store.load()` 全量读入内存，无轮转/截断/归档。长期 MCP Server 运行累积数万行 log 后 poll/stats/reload 性能逐步下降。建议方案：configurable max age/line count + log rotation / checkpoint compaction。（6/11 全面复审发现）
+- [ ] **Event Log 无界增长** — `store.load()` 全量读入内存，无轮转/截断/归档。6/15 复审结论：**暂缓，监控**。当前全量加载 <50ms per call，Dashboard 短时使用 + MCP 短连接下不构成实际问题。增量加载方案（line-pointer + event_id 去重）已设计但引入状态同步复杂度，正确性风险高于性能收益。触发条件：event.log > 50,000 行且有长运行 Dashboard 用户报告卡顿。（6/11 全面复审发现 → 6/15 降级为监控）
 - [x] **中文描述（`description_cn`）大面积缺失** — Dashboard 双语切换已就绪，但大多数成就只有英文。通过脚本逐条翻译并添加 138 条 description_cn，中文模式下完整显示中文描述。
 - [x] **Dashboard 默认 0 成就解锁** — 新用户（或 `rm state.json` 后）Dashboard 全空。解决方案：添加入门引导卡片（6 个 onboarding 成就 + 如何获取指引），解锁成就后自动消失。同时添加开发者一键重置按钮（CSRF 防护）方便测试。
 - [x] **issues-todo 上次更新 5/31，跟进 6 项 evaluator bugfix** — streak window/same_target/distinct_count op/ratio scope/Hermes session/nested Condition。+3 测试（106→109）。

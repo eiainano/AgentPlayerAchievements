@@ -68,6 +68,7 @@ const COMMANDS: Subcommand[] = [
   { name: 'upgrade',    description: 'Check for updates and upgrade AGPA',                                 usage: 'agpa upgrade [--check]',                     module: './upgrade.ts' },
   { name: 'watch',      description: 'Real-time achievement progress monitor',                             usage: 'agpa watch [--poll <sec>] [--profile <name>]', module: './watch.ts' },
   { name: 'history',    description: 'Browse raw event log entries',                                       usage: 'agpa history [--N <n>] [--event <type>] [--today] [--json] [--profile <name>]', module: './history.ts' },
+  { name: 'explain',    description: 'Show why an achievement is locked/unlocked — condition breakdown',    usage: 'agpa explain <id> [--json] [--profile <name>]', module: './explain.ts' },
 ];
 
 // ── Help ─────────────────────────────────────────────────────────────────
@@ -75,7 +76,7 @@ const COMMANDS: Subcommand[] = [
 const COMMAND_GROUPS: Array<{ title: string; names: string[] }> = [
   { title: 'Setup',     names: ['init', 'uninstall', 'verify', 'doctor', 'config'] },
   { title: 'Dashboard', names: ['dashboard', 'web'] },
-  { title: 'View',      names: ['stats', 'progress', 'activity', 'search', 'suggest'] },
+  { title: 'View',      names: ['stats', 'progress', 'activity', 'search', 'suggest', 'explain'] },
   { title: 'Profiles',  names: ['profile', 'showcase'] },
   { title: 'Data',      names: ['export', 'import', 'reset'] },
   { title: 'Tools',     names: ['sound', 'banner', 'mcp', 'completion', 'upgrade', 'watch', 'history'] },

@@ -10,7 +10,9 @@ import type {
   TrackedEvent, EventType, EventPayload,
   AchievementDefinition, AchievementState, AchievementStats,
   EngineOptions, SetDefinition, QuestlineDefinition,
+  AchievementExplanation,
 } from './types.js';
+import { explainAchievement } from '../utils/explain.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
@@ -271,6 +273,13 @@ export class AchievementEngine {
       level,
       total_xp: totalXp,
     };
+  }
+
+  /** Explain why an achievement is locked/unlocked — pure read, no side effects */
+  explain(achievementId: string): AchievementExplanation | null {
+    const def = this.definitions.find(d => d.id === achievementId);
+    if (!def) return null;
+    return explainAchievement(def, this.definitions, this.events, this.state);
   }
 
   /** Reload state + events from disk (for long-running servers like Dashboard) */

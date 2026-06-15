@@ -1,5 +1,11 @@
 # Changelog
 
+### 描述一致性审计 + 像素画审查 — 2026-06-16
+
+**文档新增 (2)**:
+- `docs/description-lang-audit-2026-06-16.md` — 213 成就中英文描述 LLM 逐对审核。结果: 0 Mismatch, 54 Minor（A-趣味尾巴漏译 36 个, B-语义偏差 14 个, C-本地化 2 个, D-对齐 2 个），含逐项修复建议和优先级
+- `docs/pixel-art-review-2026-06-16.md` — 213 成就像素画描述按 4 项原则审查（名关联/描述关联/流行文化梗/无关细节）。结果: 1 Critical (`dual_wielder` 漏 One Piece Zoro 梗), 1 Significant (`permission_granted` "门禁卡"名称与画面脱节), 5 Moderate, 3 Minor，0 遗漏（全部 213 个 YAML 成就都有像素画条目 ✅）
+
 ### Dashboard 审计修复 — 2026-06-15
 
 **Bug 修复 (5)**:

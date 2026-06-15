@@ -453,6 +453,115 @@ describe('Layer B: Filter requirements', () => {
   });
 });
 
+// ── Layer C: Event reachability ──────────────────────────────────────
+
+describe('Layer C: Event reachability', () => {
+  it('passes for known hook_auto event', () => {
+    const d = def({
+      id: 'hook_event',
+      description: 'Used a tool.',
+      conditions: [{ type: 'counter', event: 'tool.complete', operator: '>=', value: 1 }],
+    });
+    const report = auditAchievements([d]);
+    const cFindings = report.findings.filter(f => f.layer === 'C');
+    expect(cFindings).toHaveLength(0);
+  });
+
+  it('passes for known engine_auto event', () => {
+    const d = def({
+      id: 'engine_event',
+      description: 'Unlocked an achievement.',
+      conditions: [{ type: 'counter', event: 'achievement.unlocked', operator: '>=', value: 1 }],
+    });
+    const report = auditAchievements([d]);
+    const cFindings = report.findings.filter(f => f.layer === 'C');
+    expect(cFindings).toHaveLength(0);
+  });
+
+  it('passes for known manual event', () => {
+    const d = def({
+      id: 'manual_event',
+      description: 'Reviewed code.',
+      conditions: [{ type: 'counter', event: 'code.review_completed', operator: '>=', value: 1 }],
+    });
+    const report = auditAchievements([d]);
+    const cFindings = report.findings.filter(f => f.layer === 'C');
+    expect(cFindings).toHaveLength(0);
+  });
+
+  it('passes for known dashboard event', () => {
+    const d = def({
+      id: 'dashboard_event',
+      description: 'Opened dashboard.',
+      conditions: [{ type: 'counter', event: 'dashboard.opened', operator: '>=', value: 1 }],
+    });
+    const report = auditAchievements([d]);
+    const cFindings = report.findings.filter(f => f.layer === 'C');
+    expect(cFindings).toHaveLength(0);
+  });
+
+  it('passes for skill.invoke (recently added manual event)', () => {
+    const d = def({
+      id: 'skill_invoke_test',
+      description: 'Invoked a skill.',
+      conditions: [{ type: 'distinct_count', event: 'skill.invoke', field: 'skill_name', operator: '>=', value: 5 }],
+    });
+    const report = auditAchievements([d]);
+    const cFindings = report.findings.filter(f => f.layer === 'C');
+    expect(cFindings).toHaveLength(0);
+  });
+
+  it('errors for event with no known emitter', () => {
+    const d = def({
+      id: 'phantom_event',
+      description: 'Used a mystery feature.',
+      conditions: [{ type: 'counter', event: 'mysterious.unheard_of_event', operator: '>=', value: 1 }],
+    });
+    const report = auditAchievements([d]);
+    const cErrors = report.findings.filter(f => f.layer === 'C' && f.severity === 'error');
+    expect(cErrors.length).toBeGreaterThan(0);
+    expect(cErrors[0]!.message).toContain('mysterious.unheard_of_event');
+  });
+
+  it('skips events on set_completion-only achievements (no event field)', () => {
+    const d = def({
+      id: 'set_only',
+      description: 'All common achievements.',
+      conditions: [{ type: 'set_completion', rarity: 'common' }],
+    });
+    const report = auditAchievements([d]);
+    const cFindings = report.findings.filter(f => f.layer === 'C');
+    expect(cFindings).toHaveLength(0);
+  });
+
+  it('skips future achievements', () => {
+    const d = def({
+      id: 'future_ach_c',
+      description: 'Something with a mystery event.',
+      conditions: [{ type: 'counter', event: 'future.unobtainium', operator: '>=', value: 1 }],
+      future: true,
+    });
+    const report = auditAchievements([d]);
+    const cFindings = report.findings.filter(f => f.layer === 'C');
+    expect(cFindings).toHaveLength(0);
+  });
+
+  it('finds a phantom event among real ones', () => {
+    const d = def({
+      id: 'mixed_events',
+      description: 'Used tools and mystery features.',
+      conditions: [
+        { type: 'counter', event: 'tool.complete', operator: '>=', value: 5 },
+        { type: 'counter', event: 'phantom.nonexistent', operator: '>=', value: 1 },
+      ],
+    });
+    const report = auditAchievements([d]);
+    const cErrors = report.findings.filter(f => f.layer === 'C' && f.severity === 'error');
+    expect(cErrors.length).toBe(1);
+    expect(cErrors[0]!.message).toContain('phantom.nonexistent');
+  });
+});
+
 // ── LLM flagging ─────────────────────────────────────────────────────
 
 describe('LLM flagging heuristic', () => {

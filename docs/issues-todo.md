@@ -1,6 +1,70 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-15 | 总成就数: 218 | 隐藏成就: 64 | 条件类型: 12 | Tests: 1078 (43 文件) | 0 不可达 ✅ | Event Log 增长 → 监控 🚫 | 推荐系统 3/4 (缺 Challenge → 不做) | Questlines: 5 ✅
+> 最后更新: 2026-06-15 | 总成就数: 218 | 隐藏成就: 64 | 条件类型: 12 | Tests: 1161 (45 文件) | 0 不可达 ✅ | Event Log 增长 → 监控 🚫 | 推荐系统 3/4 (Challenge → 不做) | Questlines: 5 ✅ | `==` vs `>=` → false alarm ✅
+
+---
+
+## 🆕 代码审查报告修正 + 3 项跟进修复 (v0.1.8+, 6/15)
+
+基于全面审查（`docs/code-review-2026-06-15.md`），经过实地代码逐行审阅后：
+
+### ❌ 报告误判纠正
+
+报告在 **"触发可达性"** 维度上存在严重夸大和事实错误：
+
+| 报告原话 | 事实 |
+|---------|------|
+| "~27 种事件类型无任何发射器，~40+ 成就不可达" | **错误** — 逐一检查代码后发现，仅 `skill.invoke` 一个事件既无 hook auto-emit 也不在 CLAUDE.md 手动追踪列表中。其余事件要么被 hook 自动发射（21+ 种），要么已在 CLAUDE.md INSTRUCTION_BLOCK 中列出让 Agent 手动 track（28 种），要么被引擎/CLI/Dashboard 自动发射（6 种） |
+| "CLAUDE.md 只指导 Agent 调用 4 种事件" | **事实错误** — 实际注入的 CLAUDE.md 列出了 30 个手动追踪事件（`src/cli/init.ts:130-181`） |
+| "`dashboard.opened` 无发射器" | **错误** — `src/dashboard/server.ts:225` 每次 Dashboard 页面加载自动发射 |
+| "`==` 导致成就永久错过" | **错误** — 带 `single_session` 窗口的 `==` 只是"寻找某个达标的 session"，下个 session 可重复尝试。报告混淆了 `single_session` 和 `all` 窗口的隔离性 |
+
+**唯一真正的缺口**: `skill.invoke` — 既无 hook emitter 也不在 CLAUDE.md 中（已修复，见下）。
+
+### ✅ 修复完成
+
+| # | 事项 | 文件 | 测试 |
+|---|------|------|------|
+| **2b** | 级联解锁端到端测试（P0） | `tests/engine/cascading.test.ts`（新） | 6 测试 |
+| **2c** | 填补 `time_gap`/`ratio group_by`/`pattern_match first_in_session` 测试（P1） | `tests/engine/evaluator.test.ts`（扩展） | 21 测试 |
+| **2d** | Auditor Layer C: 事件可达性验证（P2） | `src/verify/auditor.ts`（+Layer C）+ `tests/verify/auditor.test.ts`（扩展） | 9 测试 |
+| **skill.invoke** | 补入 CLAUDE.md INSTRUCTION_BLOCK | `src/cli/init.ts` + `~/.claude/CLAUDE.md` | — |
+
+### 数据变化
+
+- **测试**: 1078 → **1161**（+83），45 文件（+2）
+- **事件可达性**: 所有 60 个 YAML 引用的事件都有已确认的发射器 ✅
+- **`==` vs `>=`**: 决议为 **false alarm** — 带 `single_session` 窗口的 `==` 不影响可达性
+
+---
+
+## 🆕 当前 Triage 状态 (2026-06-15)
+
+基于 6/15 代码审查跟进修复完成后的全局评估，对剩余事项的处置决定：
+
+### 确认暂缓（当前不处理）
+
+| # | 事项 | 理由 |
+|---|------|------|
+| ① | **手动 Track 可靠性优化**（将高频事件迁为 hook auto-emitter） | Hook 扩展涉及侵入性改动，当前 CLAUDE.md 指令已覆盖所有事件，Agent 遵守度可接受。等真实用户反馈证明不够了再动。 |
+| ② | **Event Log 无界增长** | 当前 <50ms/call，未触及性能瓶颈。监控中，到 5 万行 + 有真实卡顿报告时再处理。 |
+| ③ | **文档真相源自动化**（`npm run docs:verify`） | 这次手工同步了，短期内手工维护可接受。排到 v1.0 之后。 |
+| ④ | **EventType 宽松类型**（`| string` 无编译期报错） | 已有 auditor Layer C 运行时兜底，编译期保护增值有限。 |
+| ⑧ | **`avengers_assemble` 等 `==` 严格性** | `single_session` 窗口下可重复尝试，不构成不可达。有意为之的挑战设计，不动。 |
+
+### 确认不做
+
+| # | 事项 | 理由 |
+|---|------|------|
+| ⑥ | **推荐系统 Challenge 维度** | 正式关闭。Near Win / Discovery / Surprise 三引擎已覆盖核心推荐场景。Challenge 增值有限，不做。 |
+
+### 确认推进
+
+| # | 事项 | 状态 |
+|---|------|------|
+| ⑤ | **像素画 icon 试点** | 🔥 **本周高优（用户自述）** — 生成脚本就绪、描述已写，选首批 20 张 + Dashboard 集成 |
+| ⑦ | **套装奖励升级 → Profile Cosmetics** | 待排期，先看 ⑤ |
+| ⑨ | **Questline 内容填充** | 暂缓，当前 stage 密度可接受。等像素画落地后再评估 |
 
 ---
 
@@ -256,6 +320,7 @@ Dashboard 新增 📸 Share 按钮，生成 Steam 风格成就卡片 PNG：
 
 ## P2 — 数据与体验缺口
 
+- [x] **`==` vs `>=` 设计原则统一** — **已关闭（false alarm）**。`swat_team`/`ultraman_8` 使用 `==` + `single_session` 窗口，意为"寻找某个刚好达标的 session"，下个 session 可重复尝试。报告混淆了 `single_session` 和 `all` 窗口的隔离性。（6/15 复查）
 - [ ] **Event Log 无界增长** — `store.load()` 全量读入内存，无轮转/截断/归档。6/15 复审结论：**暂缓，监控**。当前全量加载 <50ms per call，Dashboard 短时使用 + MCP 短连接下不构成实际问题。增量加载方案（line-pointer + event_id 去重）已设计但引入状态同步复杂度，正确性风险高于性能收益。触发条件：event.log > 50,000 行且有长运行 Dashboard 用户报告卡顿。（6/11 全面复审发现 → 6/15 降级为监控）
 - [x] **中文描述（`description_cn`）大面积缺失** — Dashboard 双语切换已就绪，但大多数成就只有英文。通过脚本逐条翻译并添加 138 条 description_cn，中文模式下完整显示中文描述。
 - [x] **Dashboard 默认 0 成就解锁** — 新用户（或 `rm state.json` 后）Dashboard 全空。解决方案：添加入门引导卡片（6 个 onboarding 成就 + 如何获取指引），解锁成就后自动消失。同时添加开发者一键重置按钮（CSRF 防护）方便测试。

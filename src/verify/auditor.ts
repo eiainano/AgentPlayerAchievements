@@ -698,9 +698,130 @@ function parseWindowMs(w: string): number {
   }
 }
 
+// ── Layer C: Event reachability ───────────────────────────────────────
+
+/**
+ * Events emitted by hook.ts mapEvents() — automatic, no agent action needed.
+ */
+const HOOK_AUTO_EVENTS = new Set([
+  'tool.complete', 'conversation.message',
+  'file.read', 'file.create', 'file.write', 'file.edit', 'file.delete', 'file.language_used',
+  'image.read', 'image.upload',
+  'command.run', 'git.commit', 'git.add', 'git.pr_created', 'git.bisect', 'git.push',
+  'merge.conflict_resolved',
+  'mcp.tool_call',
+  'task.create', 'task.update',
+  'tool.failure', 'error.occurred',
+  'tool.requested',
+  'user.prompt', 'user.message',
+  'agent.spawn', 'agent.end',
+  'session.start', 'session.end',
+  'task.complete', 'context.compacted',
+]);
+
+/**
+ * Events emitted automatically by engine.ts / hook CLI — not manual.
+ */
+const ENGINE_AUTO_EVENTS = new Set([
+  'achievement.unlocked',
+  'deepseek.conversation',
+  'token.consumed',
+  'session.stats',
+  'user.message.batch',
+]);
+
+/**
+ * Events emitted by dashboard server.ts on page load.
+ */
+const DASHBOARD_EVENTS = new Set([
+  'dashboard.opened',
+]);
+
+/**
+ * Events listed in CLAUDE.md INSTRUCTION_BLOCK (src/cli/init.ts).
+ * Agent is instructed to call achievement_track for these.
+ * Also includes events that were recently added as manual tracking
+ * (like skill.invoke, function.edited).
+ */
+const MANUAL_TRACK_EVENTS = new Set([
+  'help.accessed',
+  'permission.mode_changed', 'permission.dangerously_skipped',
+  'tool.deny',
+  'model.switch',
+  'plan.mode_entered',
+  'automode.start',
+  'code.review_requested', 'code.review_completed',
+  'test.pass', 'test.fail',
+  'command.slash_used',
+  'file.revert',
+  'mcp.connect', 'mcp.server_used',
+  'agent.self_fix', 'agent.created',
+  'skill.created', 'skill.published', 'skill.invoke',
+  'plugin.installed',
+  'hook.configured',
+  'command.created',
+  'template.created',
+  'config.file_edited',
+  'worktree.created',
+  'function.edited',
+  'agent.mode_activated',
+  'output.edit',
+]);
+
+/**
+ * All known emitter sources combined for fast lookup.
+ */
+const ALL_KNOWN_EMITTERS = new Set<string>();
+for (const set of [HOOK_AUTO_EVENTS, ENGINE_AUTO_EVENTS, DASHBOARD_EVENTS, MANUAL_TRACK_EVENTS]) {
+  for (const e of set) ALL_KNOWN_EMITTERS.add(e);
+}
+
+/** Human-readable label for each emitter category */
+function emitterCategory(event: string): string {
+  if (HOOK_AUTO_EVENTS.has(event)) return 'hook_auto';
+  if (ENGINE_AUTO_EVENTS.has(event)) return 'engine_auto';
+  if (DASHBOARD_EVENTS.has(event)) return 'dashboard';
+  if (MANUAL_TRACK_EVENTS.has(event)) return 'manual';
+  return 'none';
+}
+
+/**
+ * Extract all unique event types referenced by conditions in a definition.
+ * Returns empty array for set_completion-only achievements (they don't reference events).
+ */
+function extractConditionEvents(def: AchievementDefinition): string[] {
+  const events = new Set<string>();
+  for (const c of def.conditions) {
+    if (c.event) events.add(c.event);
+  }
+  return [...events];
+}
+
+function checkLayerC(def: AchievementDefinition): AuditFinding[] {
+  const findings: AuditFinding[] = [];
+  const referencedEvents = extractConditionEvents(def);
+
+  for (const event of referencedEvents) {
+    const cat = emitterCategory(event);
+    if (cat === 'none') {
+      findings.push({
+        id: def.id,
+        layer: 'C',
+        severity: 'error',
+        field: `conditions.event: "${event}"`,
+        message: `Event "${event}" has no emitter in the codebase (not in hook auto-map, engine auto-emit, dashboard, or manual tracking list)`,
+        expected: `${event} should have at least one emitter source`,
+        actual: 'no emitter found',
+      });
+    }
+  }
+
+  return findings;
+}
+
 // ── LLM flagging heuristic ───────────────────────────────────────────
 
-function shouldFlagForLLM(def: AchievementDefinition, layerA: AuditFinding[], layerB: AuditFinding[]): boolean {
+function shouldFlagForLLM(def: AchievementDefinition, layerA: AuditFinding[], layerB: AuditFinding[], layerC: AuditFinding[]): boolean {
   // set_completion conditions — complex cross-achievement logic
   if (def.conditions.some(c => c.type === 'set_completion')) return true;
 
@@ -717,8 +838,8 @@ function shouldFlagForLLM(def: AchievementDefinition, layerA: AuditFinding[], la
   if (def.conditions.some(c => c.type === 'pattern_match' || c.type === 'ratio')) return true;
 
   // Has errors or multiple warnings
-  if (layerA.some(f => f.severity === 'error') || layerB.some(f => f.severity === 'error')) return true;
-  if (layerA.length + layerB.length >= 2) return true;
+  if (layerA.some(f => f.severity === 'error') || layerB.some(f => f.severity === 'error') || layerC.some(f => f.severity === 'error')) return true;
+  if (layerA.length + layerB.length + layerC.length >= 2) return true;
 
   // Explicit marker
   if ((def as unknown as Record<string, unknown>).needs_llm_review === true) return true;
@@ -739,11 +860,12 @@ export function auditAchievements(defs: AchievementDefinition[]): AuditReport {
 
     const layerA = checkLayerA(def);
     const layerB = checkLayerB(def);
-    const allForDef = [...layerA, ...layerB];
+    const layerC = checkLayerC(def);
+    const allForDef = [...layerA, ...layerB, ...layerC];
 
     allFindings.push(...allForDef);
 
-    if (shouldFlagForLLM(def, layerA, layerB)) {
+    if (shouldFlagForLLM(def, layerA, layerB, layerC)) {
       needsLLM.push(def.id);
     }
 

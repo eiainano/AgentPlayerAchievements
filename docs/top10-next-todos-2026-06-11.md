@@ -3,6 +3,13 @@
 > 日期：2026-06-11 → 2026-06-12 更新  
 > 基于：昨日分析（`top10-next-todos-2026-06-10.md`） + 昨日完成的工作（Questline ✅、14 HIGH Bug 修复 ✅） + 最新状态  
 > 总成就: 213 | 测试: 1078 ✅ | Condition Types: 12 | Sets: 11 | Questlines: 5 ✅
+>
+> **⚠️ 2026-06-15 事后修正**：此文件的排序已过时。当前 Triage 见 `docs/issues-todo.md`「当前 Triage 状态」节。核心变化：
+> - ✅ Explain Layer（#2）已落地（`agpa explain` 命令）
+> - ✅ 推荐系统 Challenge（#1）→ 关闭，不做
+> - 🔴 文档真相源自动化（#4）→ 暂缓，排 v1.0+
+> - 🔥 像素画试点（#5）→ **本周高优**
+> - 🔴 Questline 内容填充（#9）→ 暂缓
 
 ---
 

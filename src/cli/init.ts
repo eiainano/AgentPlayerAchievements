@@ -154,6 +154,7 @@ Call \`achievement_track\` when you observe these:
 - Create agent/subagent → \`agent.created\` with \`{ agent_type }\`
 - Create skill → \`skill.created\` with \`{ skill_name }\`
 - Publish skill → \`skill.published\` with \`{ skill_name }\`
+- Invoke a skill → \`skill.invoke\` with \`{ skill_name }\`
 - Create slash command → \`command.created\` with \`{ command_name }\`
 - Create template → \`template.created\` with \`{ template_name }\`
 - Edit config/settings → \`config.file_edited\` with \`{ file_path }\`

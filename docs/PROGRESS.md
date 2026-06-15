@@ -1,10 +1,36 @@
 # AGPA 开发进度
 
-> 最后更新: 2026-06-12
+> 最后更新: 2026-06-15
 
 ## 总体状态
 
-v0.1.8 完成。25 个 CLI 命令，5 个 Agent 双通道覆盖，**213 个成就**，**1078 个测试（1078 通过 / 43 文件）**。
+v0.1.8 完成。25 个 CLI 命令，5 个 Agent 双通道覆盖，**218 个成就**，**1161 个测试（1161 通过 / 45 文件）**。
+
+### 当前 Triage（2026-06-15）
+
+**暂缓（不处理）：**
+- 手动 Track 可靠性优化 — 暂不动，等用户反馈
+- Event Log 无界增长 — 监控中，<50ms/call 不构成问题
+- 文档真相源自动化 — 排 v1.0+
+- EventType 宽松类型 — auditor Layer C 已兜底
+- `==` vs `>=` — false alarm
+
+**已关闭：**
+- 推荐系统 Challenge 维度 — 不做了。Near Win / Discovery / Surprise 三引擎已够用。
+
+**推进中：**
+- 像素画 icon 试点 — 🔥 本周高优
+
+**暂缓：**
+- Questline 内容填充 — 等像素画落地后再评估
+
+**本次新增 (2026-06-15 代码审查跟进):**
+- **报告修正**：`docs/code-review-2026-06-15.md` 的"触发可达性"评分（2/5）被夸大——经实地代码逐一审查后，仅 `skill.invoke` 一个事件是真缺口
+- **skill.invoke 修复**：补入 `src/cli/init.ts` INSTRUCTION_BLOCK 和 `~/.claude/CLAUDE.md`，Agent 被明确告知手动 track
+- **2b: 级联解锁端到端测试**：新文件 `tests/engine/cascading.test.ts`（6 测试），覆盖 bootstrap、双轮/三轮 poll 级联、持久化 reload
+- **2c: 填补条件类型测试空白**：`time_gap`（9）、`ratio group_by`（6）、`pattern_match first_in_session`（6），共 21 新增测试
+- **2d: Auditor Layer C 事件可达性验证**：`src/verify/auditor.ts` 新增 Layer C，归类 4 类发射源（hook_auto 30/engine_auto 5/dashboard 1/manual 29），9 测试验证已知/未知事件 + 边界
+- **`==` vs `>=` 决议**：false alarm — `single_session` 窗口下的 `==` 不影响可达性，无需修改
 
 **本次新增 (2026-06-09 Legendary/Mythic 卡片动画 + 称号 & 徽章):**
 - **Legendary 呼吸光效**：成就网格卡片 4s 边框光晕呼吸脉冲（`legendary-breathe`），与 `name-glow` 叠加

@@ -630,6 +630,325 @@ describe('evalStreak window / field / same_target', () => {
     expect(evaluateCondition(condLe, events).met).toBe(true);
   });
 
+  // ── time_gap ───────────────────────────────────────────────────────
+
+  describe('time_gap', () => {
+    const baseEvent = (ts: string) => makeEvent('user.message', { timestamp: ts });
+
+    it('met when gap >= value (default unit: hours)', () => {
+      const events = [
+        baseEvent('2025-01-01T10:00:00Z'),
+        baseEvent('2025-01-01T13:00:00Z'), // 3h gap
+      ];
+      const cond: Condition = { type: 'time_gap', event: 'user.message', value: 3, operator: '>=' };
+      expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 3, target: 3 });
+    });
+
+    it('not met when gap < value', () => {
+      const events = [
+        baseEvent('2025-01-01T10:00:00Z'),
+        baseEvent('2025-01-01T11:00:00Z'), // 1h gap
+      ];
+      const cond: Condition = { type: 'time_gap', event: 'user.message', value: 3, operator: '>=' };
+      expect(evaluateCondition(cond, events).met).toBe(false);
+    });
+
+    it('supports unit="m" (minutes)', () => {
+      const events = [
+        baseEvent('2025-01-01T10:00:00Z'),
+        baseEvent('2025-01-01T10:30:00Z'), // 30min
+      ];
+      const cond: Condition = { type: 'time_gap', event: 'user.message', value: 20, unit: 'm', operator: '>=' };
+      expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 30, target: 20 });
+    });
+
+    it('supports unit="d" (days)', () => {
+      const events = [
+        baseEvent('2025-01-01T10:00:00Z'),
+        baseEvent('2025-01-03T10:00:00Z'), // 2d
+      ];
+      const cond: Condition = { type: 'time_gap', event: 'user.message', value: 2, unit: 'd', operator: '>=' };
+      expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: true, progress: 2, target: 2 });
+    });
+
+    it('not met with < 2 matching events', () => {
+      const events = [baseEvent('2025-01-01T10:00:00Z')];
+      const cond: Condition = { type: 'time_gap', event: 'user.message', value: 1 };
+      expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: false, progress: 0, target: 1 });
+    });
+
+    it('not met when value <= 0', () => {
+      const events = [
+        baseEvent('2025-01-01T10:00:00Z'),
+        baseEvent('2025-01-01T11:00:00Z'),
+      ];
+      const cond: Condition = { type: 'time_gap', event: 'user.message', value: 0 };
+      expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: false, progress: 0, target: 0 });
+    });
+
+    it('from_filter: only pairs where first event matches filter', () => {
+      const events = [
+        makeEvent('user.message', { timestamp: '2025-01-01T09:00:00Z', payload: { hour: 9 } }),
+        makeEvent('user.message', { timestamp: '2025-01-01T22:00:00Z', payload: { hour: 22 } }),
+        makeEvent('user.message', { timestamp: '2025-01-02T07:00:00Z', payload: { hour: 7 } }),
+      ];
+      // from_filter: hour >= 21 → only pairs where the FIRST event was sent at 21:00+
+      const cond: Condition = {
+        type: 'time_gap', event: 'user.message',
+        from_filter: 'hour >= 21',
+        value: 1, operator: '>=',
+      };
+      const result = evaluateCondition(cond, events);
+      // Pair1: first=9h (not >=21) → skip. Pair2: first=22h (>=21) → count=1
+      expect(result.met).toBe(true);
+      expect(result.progress).toBe(1);
+    });
+
+    it('to_filter: only pairs where second event matches filter', () => {
+      const events = [
+        makeEvent('user.message', { timestamp: '2025-01-01T22:00:00Z', payload: { hour: 22 } }),
+        makeEvent('user.message', { timestamp: '2025-01-02T06:00:00Z', payload: { hour: 6 } }),
+        makeEvent('user.message', { timestamp: '2025-01-02T08:00:00Z', payload: { hour: 8 } }),
+      ];
+      // to_filter: hour >= 7 → only pairs where the SECOND event was at 07:00+
+      const cond: Condition = {
+        type: 'time_gap', event: 'user.message',
+        to_filter: 'hour >= 7',
+        value: 1, operator: '>=',
+      };
+      const result = evaluateCondition(cond, events);
+      // Pair1: second=6h (<7) → skip. Pair2: second=8h (>=7) → count=1
+      expect(result.met).toBe(true);
+      expect(result.progress).toBe(1);
+    });
+
+    it('cross_day: only counts pairs across different calendar days', () => {
+      const events = [
+        baseEvent('2025-01-01T22:00:00Z'),
+        baseEvent('2025-01-01T23:00:00Z'), // same day as prev → skip
+        baseEvent('2025-01-02T01:00:00Z'), // different day from prev → count=1
+        baseEvent('2025-01-02T02:00:00Z'), // same day as prev → skip
+      ];
+      const cond: Condition = {
+        type: 'time_gap', event: 'user.message',
+        cross_day: true,
+        value: 1, operator: '>=',
+      };
+      const result = evaluateCondition(cond, events);
+      // Pair (idx1: 01-01→01-01) same day skip
+      // Pair (idx2: 01-01→01-02) cross day → count=1
+      // Pair (idx3: 01-02→01-02) same day skip
+      expect(result.met).toBe(true);
+      expect(result.progress).toBe(1);
+    });
+
+    it('from_filter + to_filter + cross_day together', () => {
+      const events = [
+        makeEvent('user.message', { timestamp: '2025-01-01T09:00:00Z', payload: { hour: 9 } }),
+        makeEvent('user.message', { timestamp: '2025-01-01T22:00:00Z', payload: { hour: 22 } }),
+        makeEvent('user.message', { timestamp: '2025-01-02T08:00:00Z', payload: { hour: 8 } }),
+      ];
+      // Night Burn pattern: from hour>=21, to hour>=7, cross_day
+      const cond: Condition = {
+        type: 'time_gap', event: 'user.message',
+        from_filter: 'hour >= 21',
+        to_filter: 'hour >= 7',
+        cross_day: true,
+        value: 1, operator: '>=',
+      };
+      const result = evaluateCondition(cond, events);
+      // Pair1: first=9h (no from filter) → skip
+      // Pair2: first=22h (>=21 ✓), second=8h (>=7 ✓), cross_day (01-01→01-02 ✓) → count=1
+      expect(result.met).toBe(true);
+      expect(result.progress).toBe(1);
+    });
+  });
+
+  // ── ratio with group_by ────────────────────────────────────────────
+
+  describe('ratio with group_by', () => {
+    it('group_by deduplicates: first event denominator, last event numerator', () => {
+      // File edited 3 times: before_lines grows, total_file_lines shrinks
+      const events = [
+        makeEvent('file.edit', { payload: { file_path: 'a.ts', before_lines: 100, total_file_lines: 80 } }),
+        makeEvent('file.edit', { payload: { file_path: 'a.ts', before_lines: 80, total_file_lines: 60 } }),
+        makeEvent('file.edit', { payload: { file_path: 'a.ts', before_lines: 60, total_file_lines: 40 } }),
+      ];
+      // Without group_by: (80+60+40)/(100+80+60) = 180/240 = 0.75
+      // With group_by: first.before_lines=100, last.total_file_lines=40 → 40/100 = 0.40
+      const cond: Condition = {
+        type: 'ratio', event: 'file.edit',
+        numerator: 'total_file_lines', denominator: 'before_lines',
+        group_by: 'file_path',
+        operator: '==', value: 0.4,
+      };
+      const result = evaluateCondition(cond, events);
+      expect(result.met).toBe(true);
+      // 40/100 = 0.4 → progress=40, target=40
+      expect(result.progress).toBe(40);
+    });
+
+    it('group_by: multiple groups each contribute first/last', () => {
+      const events = [
+        makeEvent('file.edit', { payload: { file_path: 'a.ts', before_lines: 100, total_file_lines: 60 } }),
+        makeEvent('file.edit', { payload: { file_path: 'a.ts', before_lines: 60, total_file_lines: 30 } }),
+        makeEvent('file.edit', { payload: { file_path: 'b.ts', before_lines: 200, total_file_lines: 100 } }),
+      ];
+      // Group a: first.before=100, last.total=30
+      // Group b: first.before=200, last.total=100
+      // Total: (30+100)/(100+200) = 130/300 = 0.433 → progress=43
+      const cond: Condition = {
+        type: 'ratio', event: 'file.edit',
+        numerator: 'total_file_lines', denominator: 'before_lines',
+        group_by: 'file_path',
+        operator: '==', value: 0.433,
+      };
+      const result = evaluateCondition(cond, events);
+      expect(result.met).toBe(false); // 0.433 != 0.4 exactly... hmm
+      expect(result.progress).toBe(43);
+    });
+
+    it('without group_by: all events summed (control)', () => {
+      const events = [
+        makeEvent('file.edit', { payload: { file_path: 'a.ts', before_lines: 100, total_file_lines: 80 } }),
+        makeEvent('file.edit', { payload: { file_path: 'a.ts', before_lines: 80, total_file_lines: 60 } }),
+        makeEvent('file.edit', { payload: { file_path: 'a.ts', before_lines: 60, total_file_lines: 40 } }),
+      ];
+      // Sum: (80+60+40)/(100+80+60) = 180/240 = 0.75
+      const cond: Condition = {
+        type: 'ratio', event: 'file.edit',
+        numerator: 'total_file_lines', denominator: 'before_lines',
+        operator: '==', value: 0.75,
+      };
+      const result = evaluateCondition(cond, events);
+      expect(result.met).toBe(true);
+      expect(result.progress).toBe(75);
+    });
+
+    it('denominator=0 returns not met', () => {
+      const events = [
+        makeEvent('input', { payload: { paste: '10', total: '0' } }),
+      ];
+      const cond: Condition = {
+        type: 'ratio', event: 'input',
+        numerator: 'paste', denominator: 'total',
+        operator: '>=', value: 0.5,
+      };
+      expect(evaluateCondition(cond, events)).toEqual<EvaluationResult>({ met: false, progress: 0, target: 0.5 });
+    });
+
+    it('empty group_by key is skipped', () => {
+      const events = [
+        makeEvent('file.edit', { payload: { file_path: '', before_lines: 100, total_file_lines: 50 } }),
+      ];
+      const cond: Condition = {
+        type: 'ratio', event: 'file.edit',
+        numerator: 'total_file_lines', denominator: 'before_lines',
+        group_by: 'file_path',
+        operator: '>=', value: 0.5,
+      };
+      // Empty key → skipped → denominator=0 → not met
+      expect(evaluateCondition(cond, events).met).toBe(false);
+    });
+
+    it('group_by respects event filter before grouping', () => {
+      const events = [
+        makeEvent('file.edit', { payload: { file_path: 'a.ts', before_lines: 100, total_file_lines: 50 } }),
+        makeEvent('other.event', { payload: { file_path: 'a.ts', before_lines: 100, total_file_lines: 50 } }),
+      ];
+      const cond: Condition = {
+        type: 'ratio', event: 'file.edit',
+        numerator: 'total_file_lines', denominator: 'before_lines',
+        group_by: 'file_path',
+        operator: '==', value: 0.5,
+      };
+      // Only file.edit events grouped → 1 file, 50/100 = 0.5
+      expect(evaluateCondition(cond, events).met).toBe(true);
+    });
+  });
+
+  // ── pattern_match with first_in_session ───────────────────────────
+
+  describe('pattern_match with first_in_session', () => {
+    it('first event matches → unlocked', () => {
+      const events = [
+        makeEvent('user.message', { payload: { content: '我刚交了女朋友' } }),
+        makeEvent('user.message', { payload: { content: '无关内容' } }),
+      ];
+      const cond: Condition = {
+        type: 'pattern_match', event: 'user.message',
+        pattern: '女朋友|男朋友',
+        first_in_session: true,
+      };
+      expect(evaluateCondition(cond, events).met).toBe(true);
+    });
+
+    it('first event does NOT match (second would) → locked', () => {
+      const events = [
+        makeEvent('user.message', { payload: { content: '今天天气真好' } }),
+        makeEvent('user.message', { payload: { content: '我刚交了女朋友' } }),
+      ];
+      const cond: Condition = {
+        type: 'pattern_match', event: 'user.message',
+        pattern: '女朋友|男朋友',
+        first_in_session: true,
+      };
+      // First event ("今天天气真好") doesn't match → immediate false
+      expect(evaluateCondition(cond, events).met).toBe(false);
+    });
+
+    it('no events at all → locked', () => {
+      const cond: Condition = {
+        type: 'pattern_match', event: 'user.message',
+        pattern: 'hello',
+        first_in_session: true,
+      };
+      expect(evaluateCondition(cond, []).met).toBe(false);
+    });
+
+    it('filtered event type, first match passes', () => {
+      const events = [
+        makeEvent('other.event', { payload: { content: 'hello' } }),
+        makeEvent('user.message', { payload: { content: 'hello' } }),
+        makeEvent('user.message', { payload: { content: 'world' } }),
+      ];
+      const cond: Condition = {
+        type: 'pattern_match', event: 'user.message',
+        pattern: 'hello',
+        first_in_session: true,
+      };
+      // First user.message event has content='hello' → match
+      expect(evaluateCondition(cond, events).met).toBe(true);
+    });
+
+    it('first_in_session with role filter', () => {
+      const events = [
+        makeEvent('conversation.message', { payload: { role: 'user', content: 'hello' } }),
+        makeEvent('conversation.message', { payload: { role: 'assistant', content: 'Hi there!' } }),
+      ];
+      // first_in_session filters by role=agent: first event with role=agent is "Hi there!"
+      const cond: Condition = {
+        type: 'pattern_match', event: 'conversation.message',
+        role: 'assistant', pattern: 'Hi',
+        first_in_session: true,
+      };
+      expect(evaluateCondition(cond, events).met).toBe(true);
+    });
+
+    it('without first_in_session: any event can match (control)', () => {
+      const events = [
+        makeEvent('user.message', { payload: { content: '今天天气真好' } }),
+        makeEvent('user.message', { payload: { content: '我刚交了女朋友' } }),
+      ];
+      const cond: Condition = {
+        type: 'pattern_match', event: 'user.message',
+        pattern: '女朋友|男朋友',
+      };
+      // Without first_in_session, it scans all events — second one matches
+      expect(evaluateCondition(cond, events).met).toBe(true);
+    });
+  });
+
   it('ratio respects time window and filter', () => {
     const now = new Date();
     const recent = new Date(now.getTime() - 3600000).toISOString();

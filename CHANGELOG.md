@@ -1,5 +1,15 @@
 # Changelog
 
+### 代码审查跟进修复 + 报告修正 — 2026-06-15
+
+- **报告修正**: `docs/code-review-2026-06-15.md` 的"触发可达性"评分经实地代码逐行审查后判定为夸大——唯一真正的缺口是 `skill.invoke`（已修复），其余均有发射源
+- **skill.invoke 补入 CLAUDE.md**: `src/cli/init.ts` INSTRUCTION_BLOCK + `~/.claude/CLAUDE.md` 新增 `skill.invoke` 手动 track 指令
+- **2b: 级联解锁测试 (P0)**: 新文件 `tests/engine/cascading.test.ts`（6 测试），覆盖 bootstrap、三轮 poll 级联、持久化
+- **2c: 填测试空白 (P1)**: `tests/engine/evaluator.test.ts` 新增 21 测试——`time_gap`(9)、`ratio group_by`(6)、`pattern_match first_in_session`(6)
+- **2d: Auditor Layer C (P2)**: `src/verify/auditor.ts` 新增事件可达性验证层，4 类发射源（hook_auto 30/engine_auto 5/dashboard 1/manual 29），9 测试
+- **`==` vs `>=`**: 决议为 false alarm——`single_session` 窗口下的 `==` 不影响可达性
+- **测试**: 1078 → 1161（+83），43 → 45 文件
+
 ### 成就系统全面代码审查报告 — 2026-06-15
 
 - **新增文档**: `docs/code-review-2026-06-15.md` — 三个维度的全面审查：

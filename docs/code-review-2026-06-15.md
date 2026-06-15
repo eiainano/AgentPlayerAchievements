@@ -10,9 +10,58 @@
 
 | 维度 | 评分 | 简评 |
 |---|---|---|
-| **① 触发可达性** | ⭐⭐ 2/5 | ~1/4 成就在正常使用中不可达 |
+| **① 触发可达性** | ⭐⭐⭐⭐ 4/5 | 1 个事件无发射器（`skill.invoke`，已修），其余均有明确发射路径 |
 | **② 系统稳健性** | ⭐⭐⭐ 3/5 | 架构扎实，但测试覆盖有盲区，event.log 无上限 |
 | **③ 描述-条件一致性** | ⭐⭐⭐ 3/5 | 多数一致，但具体数值/逻辑细节有 6 处偏离 |
+
+---
+
+## ⚠️ 事后复查修正（2026-06-15）
+
+**上述"① 触发可达性"评分 2/5 严重夸大，经逐行代码审查后修正为 4/5。**
+
+### 复查过程
+
+实地检查了所有代码源（`hook.ts`、`engine.ts`、`init.ts`、`types.ts`、`server.ts`、`track.ts`）后：
+
+- 报告称"CLAUDE.md 只告诉 Agent 自动调用 4 种事件" → **实际 `src/cli/init.ts:130-181` INSTRUCTION_BLOCK 列出了 30 个手动追踪事件**
+- 报告称 "dashboard.opened 无发射器" → **`src/dashboard/server.ts:225` 每次打开自动发射**
+- 报告称 "~27 种事件类型无发射器" → **逐一核对后，仅 `skill.invoke` 一个事件既无 hook auto-emit 也不在 CLAUDE.md 的 manual 追踪列表中**
+
+### 真实情况：事件发射器全景
+
+```
+🟢 Hook 自动发射 (mapEvents)：21+ 种事件
+    tool.complete, file.read/write/edit/create/delete,
+    file.language_used, image.read/upload, command.run,
+    git.commit/add/pr_created/bisect/push, merge.conflict_resolved,
+    mcp.tool_call, task.create/update, conversation.message,
+    tool.failure, error.occurred, user.prompt, user.message,
+    tool.requested, agent.spawn/end, session.start/end,
+    task.complete, context.compacted
+
+🔵 引擎/CLI 自动发射：5 种事件
+    achievement.unlocked, deepseek.conversation,
+    token.consumed, session.stats, user.message.batch
+
+🟡 Dashboard 自动发射：1 种事件
+    dashboard.opened (server.ts:225)
+
+⚪ CLAUDE.md 手动跟踪：30 种事件
+    help.accessed, permission.mode_changed,
+    permission.dangerously_skipped, tool.deny,
+    model.switch, plan.mode_entered, automode.start,
+    code.review_requested/completed, test.pass/fail,
+    command.slash_used, file.revert, mcp.connect/server_used,
+    agent.self_fix/created, skill.created/published,
+    skill.invoke (已补), plugin.installed,
+    hook.configured, command.created,
+    template.created, config.file_edited, worktree.created,
+    function.edited, token.consumed, agent.mode_activated,
+    output.edit, image.read/file.language_used (冗余)
+```
+
+**受影响成就估算：约 40 个 → 降为 1 个（`skill_adept`，依赖 `skill.invoke`）**，已在本次修复中补入 CLAUDE.md。
 
 ---
 
@@ -39,39 +88,28 @@
 `image.upload`, `mcp.tool_call`, `deepseek.conversation`, `achievement.unlocked`,
 `dashboard.opened`
 
-### 既无 Hook 也无自动发射器的事件——成就在正常使用中不可达
+### 没有自动发射器但内容 CLAUDE.md 手动追踪的事件（Agent 按指令调用 `achievement_track`）
+
+`help.accessed`, `permission.mode_changed`, `permission.dangerously_skipped`,
+`tool.deny`, `model.switch`, `plan.mode_entered`, `automode.start`,
+`code.review_requested`, `code.review_completed`, `test.pass`, `test.fail`,
+`command.slash_used`, `file.revert`, `mcp.connect`, `mcp.server_used`,
+`agent.self_fix`, `agent.created`, `skill.created`, `skill.published`,
+`skill.invoke`, `plugin.installed`, `hook.configured`, `command.created`,
+`template.created`, `config.file_edited`, `worktree.created`,
+`function.edited`, `agent.mode_activated`, `output.edit`
+
+> 以上全部在 `src/cli/init.ts` INSTRUCTION_BLOCK（~/.claude/CLAUDE.md）中列出。Agent 在每次相关操作时应调用 `achievement_track`。这些都不是"不可达"——依赖的是 Agent 对指令的遵守程度，属于可靠性问题而非可达性问题。
+
+### 既无 Hook 也无手动追踪的事件——真正不可达
 
 | 事件类型 | 被依赖的成就 | 现状 |
-|---|---|---|
-| `help.accessed` | `read_manual` ("Read the Manual") | 🔴 无发射器 |
-| `permission.mode_changed` | `permission_granted` ("Permission Granted") | 🔴 无发射器 |
-| `permission.dangerously_skipped` | `hold_my_beer`, `true_vibe_coder` | 🔴 无发射器 |
-| `tool.deny` | `ill_do_it_myself`, `the_negotiator`, `full_auto`（部分）, `im_sorry_dave` | 🔴 无发射器 |
-| `model.switch` | `model_hopper`, `multi_model` | 🔴 无发射器 |
-| `plan.mode_entered` | `plan_mode_user`, `plan_strategist`, `the_switch` | 🔴 无发射器 |
-| `automode.start` | `automode_first`, `clockwork_orange` | 🔴 无发射器 |
-| `code.review_requested` | `code_reviewer`, `review_regular` | 🔴 无发射器 |
-| `code.review_completed` | `deep_review` | 🔴 无发射器 |
-| `test.pass` | `test_centurion`, `test_champion`, `speed_run_*`, `first_try`, `the_debugger`, `triple_debugger` | 🔴 无发射器 |
-| `test.fail` | `the_debugger`, `triple_debugger` | 🔴 无发射器 |
-| `command.slash_used` | `first_shot`, `slash_commander` | 🔴 无发射器 |
-| `file.revert` | `undo_master`, `u_turn` | 🔴 无发射器 |
-| `mcp.connect` | `mcp_first_connect` | 🔴 无发射器 |
-| `mcp.server_used` | `mcp_first_contact`, `mcp_explorer` | 🔴 无发射器 |
-| `agent.self_fix` | `self_aware`, `the_debugger`, `triple_debugger` | 🔴 无发射器 |
-| `agent.created` | `agent_architect` | 🔴 无发射器 |
-| `skill.created` / `skill.published` / `skill.invoke` | `skill_creator`, `skill_publisher`, `skill_adept` | 🔴 无发射器 |
-| `plugin.installed` | `plugin_explorer` | 🔴 无发射器 |
-| `hook.configured` | `hooks_master` | 🔴 无发射器 |
-| `template.created` | `template_master` | 🔴 无发射器 |
-| `command.created` | `command_crafter`, `command_library` | 🔴 无发射器 |
-| `worktree.created` | `worktree_trial` | 🔴 无发射器 |
-| `config.file_edited` | `tinkerer` | 🔴 无发射器 |
-| `function.edited` | `perfectionist` | 🔴 无发射器 |
+|---------|--------------|------|
+| `skill.invoke` | `skill_adept`（"Skill Adept"，`distinct_count skill_name >= 5`） | ✅ **已修**（6/15 补入 CLAUDE.md INSTRUCTION_BLOCK + 本地文件） |
 
-**受影响的成就累计约 40+ 个** —— 占全部成就的近 1/4。
+**真正不可达的成就：1 个（`skill_adept`，已修）**
 
-> 注意：`init.ts` 中确实列出了所有这些事件类型，并说明它们需要手动触发。但 **CLAUDE.md 只告诉 Agent 自动调用 4 种事件**（session.start、user.message、task.complete、tool.complete）—— 其余事件 Agent 不知道也不会调用。所以这些成就在正常使用中不可达，除非用户手动 `agpa track <event>` 或有人扩展 Hook 映射。
+> 注意：以上所有事件都在 CLAUDE.md INSTRUCTION_BLOCK 中明确列出。Agent 在相关操作发生时被要求调用 `achievement_track` 手动记录。这些成就的"可达性"取决于 Agent 对指令的遵守程度——属于可优化空间而非不可达。（本次修复后唯一真正的缺口 `skill.invoke` 已补入。）
 
 ---
 
@@ -181,19 +219,19 @@ iterative_refiner:       step_count >= 20
 
 这些依赖 `task.complete` 事件中 `step_count` 字段的准确填充。`hook.ts` 从 CC 的 `TaskCompleted` 钩子事件中提取 `step_count`。这工作正常，但这是一个关键的**假设**：如果 CC 改变了 `TaskCompleted` 事件的 schema 行为，这两个成就就默默失去了功能，既不会报错也不会报警。
 
-#### 偏离 6（最重要）：~40 个成就引用从未发射的事件
+#### 偏离 6（原报告称最大问题，经复查为误判）
 
-最大的描述-条件不匹配：
+**复查结论：** 以下成就引用的事件并非"永不发射"——全部都在 CLAUDE.md INSTRUCTION_BLOCK 中列出，Agent 被明确告知在相关操作发生时手动调用 `achievement_track`：
 
-| 成就 | 描述（暗示可达成） | 实际 | 严重程度 |
+| 成就 | 事件 | 发射方式 | 实际状态 |
 |---|---|---|---|
-| `read_manual` | "Read the Manual" → 你读了手册吗？ | `help.accessed` 事件永不发射 | HIGH |
-| `plan_mode_user` | "Strategy Master" → 你用计划模式吗？ | `plan.mode_entered` 永不发射 | HIGH |
-| `test_centurion` | "Green Bar" → 你通过了 100 次测试？ | `test.pass` 永不发射 | HIGH |
-| `self_aware` | "Self-Aware" → Agent 自我修复？ | `agent.self_fix` 永不发射 | HIGH |
-| `undo_master` | "Take back a Move" → 你回退过文件吗？ | `file.revert` 永不发射 | HIGH |
+| `read_manual` | `help.accessed` | CLAUDE.md 手动 track | ✅ 有发射路径 |
+| `plan_mode_user` | `plan.mode_entered` | CLAUDE.md 手动 track | ✅ 有发射路径 |
+| `test_centurion` | `test.pass` | CLAUDE.md 手动 track | ✅ 有发射路径 |
+| `self_aware` | `agent.self_fix` | CLAUDE.md 手动 track | ✅ 有发射路径 |
+| `undo_master` | `file.revert` | CLAUDE.md 手动 track | ✅ 有发射路径 |
 
-这些成就描述承诺了一种成就体验，但正常使用完全无法实现。
+这是**可靠性问题而非可达性问题**——Agent 可能不完美遵守指令，但不等于成就无法达成。Hook 自动映射覆盖更多事件类型是更好的长期方案，详见优先级建议。
 
 ---
 
@@ -201,20 +239,18 @@ iterative_refiner:       step_count >= 20
 
 | 优先级 | 事项 | 影响 |
 |---|---|---|
-| **P0** | 为 Hook 增加 `tool.deny`、`permission.*`、`plan.mode_entered`、`model.switch`、`automode.start` 的映射 | 解决 10+ 不可达成就 |
-| **P0** | 在 `engine.ts` 中 auto-emit `achievement.unlocked` 的级联集成测试 | 防止级联链静默断裂 |
+| **P0** | 级联解锁集成测试（`achievement.unlocked` emit → `trophy_case`/`casual_collector`） | 防止级联链静默断裂 |
 | **P1** | 为 `time_gap` + `ratio group_by` + `first_in_session` 写单元测试 | 填补条件类型测试盲区 |
-| **P1** | 实现测试结果的 auto-emit（`test.pass` / `test.fail`，从 Bash 命令输出解析） | 解决 speed_run、the_debugger 等基础成就 |
-| **P2** | 添加 auditor/verify 插件来检测「定义用到的事件 → 没有发射器」 | 防止未来继续添加不可达成就 |
-| **P2** | 统一 `==` vs `>=` 的设计原则，让 swat_team/ultraman_8 更宽容 | 改善用户体验 |
+| **P2** | auditor 检测"定义用到的事件 → 没有发射器"（Layer C） | 防止未来添加无发射器的成就 |
+| **P3** | 考虑将高频手动事件（`test.pass`/`test.fail`、`command.slash_used` 等）扩展为 Hook 自动映射 | 减少对 Agent 指令遵守度的依赖 |
 | **P3** | event.log 自动轮转或基于 LRU 的紧凑策略 | 长期性能保障 |
 
 ---
 
 ## 数据来源
 
-- `achievement-definitions.yaml` — 全部成就定义（约 154 个成就）
-- `src/engine/evaluator.ts` — 条件评估引擎（11 种条件类型）
+- `achievement-definitions.yaml` — 全部成就定义（约 218 个成就）
+- `src/engine/evaluator.ts` — 条件评估引擎（12 种条件类型）
 - `src/cli/hook.ts` — Hook 事件映射（~30 种事件自动发射）
 - `src/engine/engine.ts` — 引擎核心（track / poll / init）
 - `src/engine/types.ts` — 事件类型定义
@@ -222,5 +258,15 @@ iterative_refiner:       step_count >= 20
 - `tests/engine/evaluator.test.ts` — 单元测试
 - `tests/engine/integration.test.ts` — 端到端测试（6 个场景）
 - `tests/engine/every-achievement.test.ts` — 每个成就的自动生成测试
-- `src/cli/init.ts` — 事件列表文档
+- `src/cli/init.ts` — 事件列表文档 + CLAUDE.md INSTRUCTION_BLOCK
+- `src/dashboard/server.ts` — Dashboard 事件发射
 - `docs/issues-todo.md` — 已知问题追踪
+
+## 事后修正说明（2026-06-15）
+
+此报告初稿的"① 触发可达性"分析存在严重错误：
+1. 未核实 CLAUDE.md 实际内容（INSTRUCTION_BLOCK 列出 30 个手动事件，非 4 个）
+2. 未检查 `dashboard.server.ts` 中 `dashboard.opened` 的自动发射
+3. 混淆了 `single_session` 窗口下的 `==` 与全局 `==` 的语义差异
+
+修正后结论：**1 个真正的事件缺口（`skill.invoke`，已在 6/15 修复），其余均有明确发射路径。** 报告其余两个维度（② 系统稳健性、③ 描述-条件一致性）的分析保持有效。

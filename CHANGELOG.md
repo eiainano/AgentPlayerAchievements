@@ -1,5 +1,13 @@
 # Changelog
 
+### 成就系统全面代码审查报告 — 2026-06-15
+
+- **新增文档**: `docs/code-review-2026-06-15.md` — 三个维度的全面审查：
+  - **① 触发可达性 (2/5)**: 发现 ~27 种事件类型无任何发射器，导致约 40+ 成就（近 1/4）正常使用中不可达。根源是 `CLAUDE.md` 只指导 Agent 调用 4 种事件，其余既无 Hook 映射也无人为触发
+  - **② 系统稳健性 (3/5)**: 核心架构扎实（多进程安全、fail-closed 过滤器、Zod 验证），但 `time_gap` / `ratio group_by` / `pattern_match first_in_session` 三个条件类型零单元测试覆盖，`achievement.unlocked` 级联链无集成测试，`event.log` 无上限增长
+  - **③ 描述-条件一致性 (3/5)**: 多数一致，6 处偏离——`==` 严格等号令成就可能永久错过、`template_master` 阈值 `>1` 与描述不符、`im_sorry_dave` 双重条件未说明、40+ 成就有名无实
+- **优先级建议**: 7 项从 P0-P3，P0 两项（Hook 事件映射补充 + 级联链集成测试）
+
 ### 可解释层 Bug 修复 + 隐藏保护加固 — 2026-06-15
 
 - **`collectExclusions` field-empty 检查扩展**: `counter(same_target)` 和 `streak(event_level)` 的空 field 事件现在正确标记为 `field_value` 排除，不再错误计入 `matched_count`

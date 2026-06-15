@@ -163,6 +163,8 @@ export function createServer(port: number, defaultProfile: string): http.Server 
   // Cache engine instances per profile — shared across all requests
   const engineCache = new Map<string, AchievementEngine>();
   const serverStartTime = Date.now();
+  // Track which profiles have already emitted dashboard.opened this server session
+  const openedTracked = new Set<string>();
 
   function getEngine(profileName: string): AchievementEngine {
     let cached = engineCache.get(profileName);
@@ -222,7 +224,12 @@ export function createServer(port: number, defaultProfile: string): http.Server 
           }
         }
       }
-      engine.track('dashboard.opened', { session_duration_ms: sessDurationMs });
+      // Track dashboard.opened only once per server-session per profile,
+      // not on every 10s auto-poll request.
+      if (!openedTracked.has(resolvedProfile)) {
+        openedTracked.add(resolvedProfile);
+        engine.track('dashboard.opened', { session_duration_ms: sessDurationMs });
+      }
       engine.reload();
       engine.reloadDefinitions();
       const showcaseData = buildShowcaseResponse(engine);

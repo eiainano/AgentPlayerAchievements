@@ -979,6 +979,18 @@ function setupGlobalHandlers() {
 
 // ── Auto-Poll (10s) ───────────────────────────────────
 
+/** Check whether stat fields that affect VISUAL CONTENT have changed.
+ *  Excludes unstable fields like `total_events` that increment constantly
+ *  but show the same number to the user. Returns false = safe to update
+ *  numbers in-place without a DOM rebuild. */
+function hasVisualChange(oldStats, newStats) {
+  if (!oldStats || !newStats) return true;
+  return oldStats.unlocked !== newStats.unlocked
+    || oldStats.level !== newStats.level
+    || oldStats.total_xp !== newStats.total_xp
+    || oldStats.completion_pct !== newStats.completion_pct;
+}
+
 function startAutoPoll() {
   setInterval(async () => {
     try {
@@ -994,35 +1006,67 @@ function startAutoPoll() {
       const freshIds = [...newUnlocked].filter(id => !lastUnlockedIds.has(id));
       lastUnlockedIds = newUnlocked;
 
-      // Detect any stats change
-      const oldUnlockedCount = dashboardData.stats?.unlocked || 0;
       const hasNewUnlocks = freshIds.length > 0;
-      const statsChanged = JSON.stringify(dashboardData.stats) !== JSON.stringify(newData.stats);
+      const changed = hasNewUnlocks || hasVisualChange(dashboardData?.stats, newData.stats);
 
-      if (hasNewUnlocks || statsChanged) {
+      if (changed) {
         dashboardData = newData;
         updateAmbientIntensity(newData);
-        // Gacha reveal for new unlocks
-        const freshAchs = [];
-        for (const id of freshIds) {
-          const ach = newData.achievements.find(a => a.id === id);
-          if (ach) freshAchs.push(ach);
-        }
 
-        if (freshAchs.length > 0) {
-          triggerHeroBurst();
-          window.gachaQueue.enqueue(freshAchs, {
-            onDrain: function() {
-              if (!isModalOpen) renderAll(newData);
-            },
-          });
+        if (hasNewUnlocks) {
+          // Content changed — gacha + full render
+          const freshAchs = [];
+          for (const id of freshIds) {
+            const ach = newData.achievements.find(a => a.id === id);
+            if (ach) freshAchs.push(ach);
+          }
+          if (freshAchs.length > 0) {
+            triggerHeroBurst();
+            window.gachaQueue.enqueue(freshAchs, {
+              onDrain: function() {
+                if (!isModalOpen) renderAll(newData);
+              },
+            });
+          } else {
+            if (!isModalOpen) renderAll(newData);
+          }
         } else {
-          // No gacha (stats-only change), render immediately
-          if (!isModalOpen) renderAll(newData);
+          // Stats-only change — update numbers in place, no DOM rebuild
+          if (!isModalOpen) updateStatsInPlace(newData);
         }
       }
     } catch {}
   }, 10000);
+}
+
+/** Update stat numbers, streak, and heatmap without rebuilding the DOM.
+ *  Called on every poll cycle when only stats have changed (no new unlocks). */
+function updateStatsInPlace(data) {
+  const stats = data.stats;
+  const unlockedCount = data.achievements.filter(a => a.unlocked).length;
+
+  // Stat big numbers — update textContent in-place
+  const values = [
+    stats.level || 1,
+    stats.total_xp || 0,
+    unlockedCount,
+    stats.completion_pct || 0,
+    stats.total_events || 0,
+  ];
+  const els = document.querySelectorAll('.stat-big-value');
+  if (els.length === values.length) {
+    els.forEach((el, i) => {
+      const v = values[i];
+      el.dataset.target = String(v);
+      el.textContent = Number(v).toLocaleString();
+    });
+  }
+
+  // Streak card — lightweight DOM update
+  renderStreakCard(stats.streak, stats.streak_multiplier || 1.0);
+
+  // Heatmap — lightweight grid cell rebuild
+  renderHeatmap(stats.heatmap);
 }
 
 // ── Helpers ──────────────────────────────────────────

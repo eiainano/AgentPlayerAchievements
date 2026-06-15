@@ -89,6 +89,9 @@ body[data-cosmetic-theme="dark"] .nav-link.active {
   --gold: #f5b800;
   --gold-glow: rgba(245, 184, 0, .35);
   --accent: #3b7ec0;
+  --primary: #4fc3f7;
+  --card-bg: var(--bg-card);
+  --text-primary: var(--text);
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
@@ -5012,4 +5015,64 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
     text-align: left;
     min-width: auto;
   }
+}
+
+/* ── Page Loading Spinner ──────────────────────────────────── */
+.page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  transition: opacity .35s ease;
+}
+.page-loader.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.page-loader-spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: loader-spin .7s linear infinite;
+}
+@keyframes loader-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Back-to-Top Button ────────────────────────────────────── */
+.back-to-top {
+  position: fixed;
+  bottom: 80px;  /* above GitHub star button (bottom:24px) + recommend widget */
+  right: 28px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  color: var(--text-dim);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity .25s, transform .25s, border-color .25s, color .25s;
+  box-shadow: 0 4px 16px rgba(0,0,0,.25);
+}
+.back-to-top.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.back-to-top:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  box-shadow: 0 4px 20px var(--gold-glow);
 }

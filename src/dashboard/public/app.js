@@ -425,7 +425,6 @@ const I18N = {
     heatmap_title: 'Activity',
     heatmap_less: 'Less',
     heatmap_more: 'More',
-    stat_complete: 'Complete',
     filter_all: 'All',
     filter_unlocked: 'Unlocked',
     filter_locked: 'Locked',
@@ -741,6 +740,69 @@ function apiUrl(path) {
   return `${path}${sep}profile=${encodeURIComponent(currentProfile)}`;
 }
 
+// ── Grid filter memo — skip recompute when inputs unchanged ──
+let _gridMemo = { key: '', items: null };
+
+function computeFilteredItems(data) {
+  const key = [currentFilter, currentCategory || '', currentSearch, currentSort, currentRarity || '',
+    data.achievements ? data.achievements.length : 0,
+    data.achievements ? data.achievements.filter(function(a){return a.unlocked}).length : 0
+  ].join('|');
+  if (_gridMemo.key === key && _gridMemo.items) return _gridMemo.items;
+  _gridMemo.key = key;
+  _gridMemo.items = filterAndSort(data);
+  return _gridMemo.items;
+}
+
+function filterAndSort(data) {
+  var items = data.achievements;
+
+  if (currentFilter === 'unlocked') items = items.filter(function(a) { return a.unlocked; });
+  else if (currentFilter === 'locked') items = items.filter(function(a) { return !a.unlocked; });
+
+  if (currentCategory) items = items.filter(function(a) { return a.category === currentCategory; });
+
+  if (currentSearch) {
+    var q = currentSearch.toLowerCase();
+    items = items.filter(function(a) {
+      return a.id.toLowerCase().indexOf(q) !== -1 ||
+        a.name.toLowerCase().indexOf(q) !== -1 ||
+        (a.name_cn || '').toLowerCase().indexOf(q) !== -1 ||
+        a.description.toLowerCase().indexOf(q) !== -1 ||
+        (a.description_cn || '').toLowerCase().indexOf(q) !== -1;
+    });
+  }
+
+  if (currentRarity) {
+    items = items.filter(function(a) { return a.rarity === currentRarity; });
+  }
+
+  if (currentSort !== 'default') {
+    var sorted = items.slice();
+    switch (currentSort) {
+      case 'rarity':
+        sorted.sort(function(a, b) { return (RARITY_ORDER[b.rarity] || 0) - (RARITY_ORDER[a.rarity] || 0); });
+        break;
+      case 'recent':
+        sorted.sort(function(a, b) {
+          if (a.unlocked && !b.unlocked) return -1;
+          if (!a.unlocked && b.unlocked) return 1;
+          if (a.unlocked && b.unlocked) {
+            return new Date(b.unlocked_at).getTime() - new Date(a.unlocked_at).getTime();
+          }
+          return 0;
+        });
+        break;
+      case 'name':
+        sorted.sort(function(a, b) { return displayName(a).localeCompare(displayName(b)); });
+        break;
+    }
+    items = sorted;
+  }
+
+  return items;
+}
+
 // ── Icon render helper ─────────────────────────────────
 
 // ── Pixel Art Renderer (browser) ─────────────────────────
@@ -917,6 +979,17 @@ function setupGlobalHandlers() {
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && isModalOpen) {
       closeModal();
+      return;
+    }
+    // Enter/Space on achievement card opens modal (keyboard a11y)
+    if ((e.key === 'Enter' || e.key === ' ') && !isModalOpen && pickSlot === null) {
+      const card = e.target.closest('.ach-card');
+      if (card) {
+        e.preventDefault();
+        const achId = card.dataset.id;
+        const ach = dashboardData?.achievements.find(a => a.id === achId);
+        if (ach) openModal(ach);
+      }
     }
   });
 
@@ -957,9 +1030,16 @@ function setupGlobalHandlers() {
 
   renderAll(data);
 
+  // Hide page loading spinner
+  const loader = document.getElementById('page-loader');
+  if (loader) { loader.classList.add('hidden'); setTimeout(function() { loader.remove(); }, 400); }
+
   // Ambient background effects
   initAmbientParticles();
   updateAmbientIntensity(data);
+
+  // Back-to-top button
+  initBackToTop();
 
   // Gacha reveal for recently unlocked (within 5 min)
   const now = Date.now();
@@ -1808,11 +1888,11 @@ function renderAchievements(data) {
     const searchInput = document.getElementById('search-input');
     const searchClear = document.getElementById('search-clear');
     if (searchInput) {
-      searchInput.addEventListener('input', () => {
+      searchInput.addEventListener('input', debounce(function() {
         currentSearch = searchInput.value.trim();
         if (searchClear) searchClear.style.display = currentSearch ? 'flex' : 'none';
         renderGrid(data);
-      });
+      }, 250));
     }
     if (searchClear) {
       searchClear.addEventListener('click', () => {
@@ -1904,55 +1984,7 @@ function renderGrid(data) {
   const grid = document.getElementById('achievement-grid');
   if (!grid) return;
 
-  let items = data.achievements;
-
-  // Step 1: Filter by unlock state
-  if (currentFilter === 'unlocked') items = items.filter(a => a.unlocked);
-  else if (currentFilter === 'locked') items = items.filter(a => !a.unlocked);
-
-  // Step 2: Filter by category
-  if (currentCategory) items = items.filter(a => a.category === currentCategory);
-
-  // Step 3: Filter by search query
-  if (currentSearch) {
-    const q = currentSearch.toLowerCase();
-    items = items.filter(a =>
-      a.id.toLowerCase().includes(q) ||
-      a.name.toLowerCase().includes(q) ||
-      (a.name_cn || '').toLowerCase().includes(q) ||
-      a.description.toLowerCase().includes(q) ||
-      (a.description_cn || '').toLowerCase().includes(q)
-    );
-  }
-
-  // Step 4: Filter by rarity
-  if (currentRarity) {
-    items = items.filter(a => a.rarity === currentRarity);
-  }
-
-  // Step 5: Sort
-  if (currentSort !== 'default') {
-    const sorted = [...items];
-    switch (currentSort) {
-      case 'rarity':
-        sorted.sort((a, b) => (RARITY_ORDER[b.rarity] || 0) - (RARITY_ORDER[a.rarity] || 0));
-        break;
-      case 'recent':
-        sorted.sort((a, b) => {
-          if (a.unlocked && !b.unlocked) return -1;
-          if (!a.unlocked && b.unlocked) return 1;
-          if (a.unlocked && b.unlocked) {
-            return new Date(b.unlocked_at).getTime() - new Date(a.unlocked_at).getTime();
-          }
-          return 0;
-        });
-        break;
-      case 'name':
-        sorted.sort((a, b) => displayName(a).localeCompare(displayName(b)));
-        break;
-    }
-    items = sorted;
-  }
+  let items = computeFilteredItems(data);
 
   const inPickMode = pickSlot !== null;
   grid.className = inPickMode ? 'achievement-grid picking' : 'achievement-grid';
@@ -1996,7 +2028,7 @@ function renderGrid(data) {
 
     const cardColor = locked ? '' : `--card-color:var(--rarity-${a.rarity});`;
     const cornerOrnament = !locked && (a.rarity === 'mythic') ? '<span class="ach-corner-mythic">✦</span>' : '';
-    return `<div class="ach-card${lockedClass}${pickableClass}${demoClass}" data-rarity="${a.rarity}" data-id="${escAttr(a.id)}" style="${cardColor}--delay:${idx * 30}ms">
+    return `<div class="ach-card${lockedClass}${pickableClass}${demoClass}" data-rarity="${a.rarity}" data-id="${escAttr(a.id)}" style="${cardColor}--delay:${idx * 30}ms" tabindex="0" role="button" aria-label="${escAttr(nameDisplay)}">
       <div class="ach-stripe"></div>
       ${cornerOrnament}
       ${pinBtn}
@@ -2188,8 +2220,7 @@ function renderSets(data) {
   grid.innerHTML = data.sets.map(set => {
     const pct = set.total > 0 ? (set.completed / set.total) * 100 : 0;
     const highestRarity = set.achievements.reduce((best, a) => {
-      const order = { mythic: 6, legendary: 5, epic: 4, rare: 3, uncommon: 2, common: 1 };
-      return (order[a.rarity] || 0) > (order[best] || 0) ? a.rarity : best;
+      return (RARITY_ORDER[a.rarity] || 0) > (RARITY_ORDER[best] || 0) ? a.rarity : best;
     }, 'common');
 
     const membersHtml = set.achievements.map(a =>
@@ -2412,8 +2443,7 @@ function renderTimeline(data) {
     const milestonesHtml = g.milestones.map(m => `<div class="tl-milestone">${m}</div>`).join('');
 
     const bestRarity = g.items.reduce((best, e) => {
-      const order = { common: 0, uncommon: 1, rare: 2, epic: 3, legendary: 4, mythic: 5 };
-      return (order[e.ach.rarity] || 0) > (order[best] || 0) ? e.ach.rarity : best;
+      return (RARITY_ORDER[e.ach.rarity] || 0) > (RARITY_ORDER[best] || 0) ? e.ach.rarity : best;
     }, 'common');
 
     return `<div class="timeline-entry" data-rarity="${bestRarity}">
@@ -2428,9 +2458,16 @@ function renderTimeline(data) {
 // ── Insights ──────────────────────────────────────────
 
 function renderInsights(data) {
+  // Reset animation flag so rebuilt canvases don't replay the intro animation
+  const ids = ['chart-sessions', 'chart-tools', 'chart-tasks', 'chart-heatmap'];
+  for (const id of ids) {
+    const c = document.getElementById(id);
+    if (c) c._animated = true; // suppress animation on DOM rebuild
+  }
+
   const daily = data.stats?.daily_stats;
   if (!daily || daily.length < 2) {
-    for (const id of ['chart-sessions', 'chart-tools', 'chart-tasks', 'chart-heatmap']) {
+    for (const id of ids) {
       const canvas = document.getElementById(id);
       if (canvas) {
         setupRetinaCanvas(canvas);
@@ -2683,9 +2720,17 @@ function drawTimeHeatmap(canvasId, data) {
   const cellH = ph / 7;
   const levels = [0.1, 0.3, 0.6, 1.0];
 
+  // Normalize: find peak hour across all days
+  let maxVal = 1;
   for (let day = 0; day < 7; day++) {
     for (let h = 0; h < 24; h++) {
-      const intensity = 1 > 0 ? Math.min(grid[day][h] / 1, 1) : 0;
+      if (grid[day][h] > maxVal) maxVal = grid[day][h];
+    }
+  }
+
+  for (let day = 0; day < 7; day++) {
+    for (let h = 0; h < 24; h++) {
+      const intensity = maxVal > 0 ? Math.min(grid[day][h] / maxVal, 1) : 0;
       let fill = 'rgba(128,128,128,0.06)';
       if (intensity > levels[3]) fill = 'rgba(79,195,247,0.7)';
       else if (intensity > levels[2]) fill = 'rgba(79,195,247,0.45)';
@@ -2715,6 +2760,40 @@ function drawTimeHeatmap(canvasId, data) {
 
 function escAttr(s) {
   return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;');
+}
+
+// ── Simple debounce for input-driven renders ────────────────
+function debounce(fn, ms) {
+  let timer = null;
+  return function() {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(function() { fn.apply(this, arguments); }, ms);
+  };
+}
+
+// ── Back-to-Top ──────────────────────────────────────────
+
+function initBackToTop() {
+  var btn = document.getElementById('back-to-top');
+  if (!btn) {
+    btn = document.createElement('button');
+    btn.id = 'back-to-top';
+    btn.className = 'back-to-top';
+    btn.innerHTML = '↑';
+    btn.setAttribute('aria-label', 'Back to top');
+    btn.onclick = function() { window.scrollTo({ top: 0, behavior: 'smooth' }); };
+    document.body.appendChild(btn);
+  }
+  var ticking = false;
+  window.addEventListener('scroll', function() {
+    if (!ticking) {
+      requestAnimationFrame(function() {
+        btn.classList.toggle('visible', window.scrollY > 500);
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
 }
 
 // ── Toast ────────────────────────────────────────────
@@ -2803,16 +2882,34 @@ function generateCard() {
   var btn = document.getElementById('share-btn');
   if (!btn) return;
   btn.disabled = true;
-  btn.textContent = '⏳ Generating...';
+  btn.textContent = '⏳ Loading...';
 
   try {
     if (typeof html2canvas === 'undefined') {
-      alert('This feature requires an internet connection to load html2canvas.');
-      btn.disabled = false;
-      btn.textContent = '📸 Share';
+      // Lazy-load html2canvas on first use (saves ~200KB on every page load)
+      var script = document.createElement('script');
+      script.src = '/lib/html2canvas.min.js';
+      script.onload = function() {
+        btn.textContent = '⏳ Generating...';
+        generateCardCore(btn);
+      };
+      script.onerror = function() {
+        alert('Failed to load html2canvas. Please check your internet connection.');
+        btn.disabled = false;
+        btn.textContent = '📸 Share';
+      };
+      document.head.appendChild(script);
       return;
     }
 
+    generateCardCore(btn);
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = '📸 Share';
+  }
+}
+
+function generateCardCore(btn) {
     fetch(apiUrl('/api/card'))
       .then(function(res) {
         if (!res.ok) throw new Error('API error: ' + res.status);
@@ -2914,6 +3011,10 @@ function exportData() {
     });
 }
 
+// ── Shareable card HTML renderer ──────────────────────────
+// This runs in an isolated #card-preview container (not the dashboard DOM).
+// Uses local helpers instead of global escHtml/t() to keep card rendering
+// self-contained — the card is captured as a PNG via html2canvas.
 function buildCardHTML(data) {
   function esc(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -3035,11 +3136,13 @@ let carouselTimer = null;
 let carouselFrameCount = 0;
 
 function escHtml(s) {
-  if (typeof escHtml._cache === 'undefined') {
-    escHtml._cache = true;
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
-  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  s = String(s);
+  if (!escHtml._map) { escHtml._map = Object.create(null); }
+  var cached = escHtml._map[s];
+  if (cached !== undefined) return cached;
+  var result = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  escHtml._map[s] = result;
+  return result;
 }
 
 function initRecommendWidget() {
@@ -3047,13 +3150,8 @@ function initRecommendWidget() {
   const panel = document.getElementById('recommend-panel');
   if (!toggle || !panel) return;
 
-  // Probability gate — badge only appears with chance p on each page load
-  const p = 0.2; // default recommend_probability, matches config.ts
-  if (Math.random() >= p) {
-    const widget = document.getElementById('recommend-widget');
-    if (widget) widget.style.display = 'none';
-    return;
-  }
+  // Always show the toggle button; auto-expand only 20% of the time (surprise delight)
+  const autoExpand = Math.random() < 0.2;
 
   toggle.addEventListener('click', () => {
     const widget = document.getElementById('recommend-widget');
@@ -3065,6 +3163,8 @@ function initRecommendWidget() {
       .then(data => { if (data.recommend) startCarousel(data.recommend); })
       .catch(() => {});
   });
+
+  if (autoExpand) { toggle.click(); }
 
   // ESC key closes the panel
   document.addEventListener('keydown', e => {

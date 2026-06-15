@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
+  <!-- Apply saved theme before first paint to prevent flash -->
+  <script>(()=>{const t=localStorage.getItem('agpa-theme');const p=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t||p)})()</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="dev-token" content="__DEV_TOKEN__">
+  <meta name="description" content="AGPA — Gamified achievement tracking for AI coding agents. Track your Claude Code, Hermes, OpenClaw, Kilo Code, and OpenCode activity with Steam-style achievements.">
+  <link rel="preload" href="/styles.css" as="style">
   <title>AGPA — Agent Player Achievements</title>
   <!-- Inline critical CSS — prevents flash on first paint -->
   <style>
@@ -14,12 +18,13 @@
   </style>
   <link rel="stylesheet" href="/styles.css">
   <link rel="icon" type="image/png" href="/favicon.png">
-  <script src="/lib/html2canvas.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Space+Mono:wght@400;700&family=Lexend:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Space+Mono:wght@400;700&family=Lexend:wght@500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 </head>
 <body>
+  <!-- Loading spinner — hidden once first API response arrives -->
+  <div id="page-loader" class="page-loader"><div class="page-loader-spinner"></div></div>
   <!-- Navigation -->
   <nav id="top-nav">
     <div class="nav-inner">

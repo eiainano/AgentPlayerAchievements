@@ -197,8 +197,9 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
               editPayload.delta_lines = nLines - eLines;
               // Boolean feature flags for achievement conditions (no raw content stored in event log)
               // Mitosis: file exactly doubled in size (total_file_lines == 2 * before_lines)
-              editPayload.has_doubled_lines = editPayload.before_lines > 0 &&
-                editPayload.total_file_lines === editPayload.before_lines * 2;
+              const bLines = (editPayload.before_lines as number) || 0;
+              const ttlLines = (editPayload.total_file_lines as number) || 0;
+              editPayload.has_doubled_lines = bLines > 0 && ttlLines === bLines * 2;
               // Detect Transformer Multi-Head Attention code patterns:
               //   PyTorch:  nn.MultiheadAttention, F.scaled_dot_product_attention
               //   TF/Keras: MultiHeadAttention
@@ -297,10 +298,13 @@ export function mapEvents(hookEvent: string, data: HookStdin): Array<{ event_typ
         results.push({ event_type: 'task.update', payload: updatePayload });
       }
       break;
-    case 'PostToolUseFailure':
-      results.push({ event_type: 'tool.failure', payload: { ...base } });
-      results.push({ event_type: 'error.occurred', payload: { ...base } });
+    case 'PostToolUseFailure': {
+      const fp: Record<string, unknown> = { ...base };
+      if (typeof ti.error === 'string') fp.error = ti.error;
+      results.push({ event_type: 'tool.failure', payload: fp });
+      results.push({ event_type: 'error.occurred', payload: fp });
       break;
+    }
     case 'UserPromptSubmit': {
       const promptText = (ti.prompt_text as string) || (data.prompt_text as string) || '';
       if (promptText) {
@@ -697,6 +701,11 @@ export const HERMES_TOOL_MAP: Record<string, string> = {
  * - Maps event names: post_tool_call → PostToolUse
  * - Maps tool names: write_file → Write, read_file → Read, etc.
  * - Maps field names: tool_input.path → tool_input.file_path
+ *
+ * NOTE: Hermes hook data does not include success/error fields for tool
+ * calls. Unlike OpenClaw and KiloCode, failed tool calls cannot be
+ * auto-routed to PostToolUseFailure. tool.failure and error.occurred
+ * events must be tracked manually by the agent via achievement_track().
  */
 export function normalizeHermesStdin(raw: Record<string, unknown>): HookStdin {
   const event = HERMES_EVENT_MAP[raw.hook_event_name as string] || raw.hook_event_name as string;
@@ -778,7 +787,7 @@ interface OpenClawStdin {
  *   error           → tool_input.error  (for after_tool_call failures)
  */
 export function normalizeOpenClawStdin(raw: OpenClawStdin): HookStdin {
-  const event = OPENCLAW_EVENT_MAP[raw.hook_event_name] || raw.hook_event_name;
+  let event = OPENCLAW_EVENT_MAP[raw.hook_event_name] || raw.hook_event_name;
 
   let toolName = (raw.toolName || '') as string;
   toolName = OPENCLAW_TOOL_MAP[toolName] || toolName;
@@ -793,6 +802,11 @@ export function normalizeOpenClawStdin(raw: OpenClawStdin): HookStdin {
   if (typeof params.description === 'string') ti.description = params.description;
   // Capture error from after_tool_call for tool.failure detection
   if (typeof raw.error === 'string' && raw.error) ti.error = raw.error;
+
+  // Route failed tool calls to PostToolUseFailure (OpenClaw provides success + error)
+  if (event === 'PostToolUse' && (raw.success === false || (typeof raw.error === 'string' && raw.error))) {
+    event = 'PostToolUseFailure';
+  }
 
   return {
     hook_event_name: event,
@@ -856,7 +870,7 @@ interface KilocodeStdin {
  *   error           → tool_input.error
  */
 export function normalizeKilocodeStdin(raw: KilocodeStdin): HookStdin {
-  const event = KILOCODE_EVENT_MAP[raw.hook_event_name] || raw.hook_event_name;
+  let event = KILOCODE_EVENT_MAP[raw.hook_event_name] || raw.hook_event_name;
 
   let toolName = (raw.toolName || '') as string;
   // Map known tool aliases, leave MCP tools (mcp__*) unchanged
@@ -877,6 +891,11 @@ export function normalizeKilocodeStdin(raw: KilocodeStdin): HookStdin {
   if (typeof params.file_path === 'string' && !ti.file_path) ti.file_path = params.file_path;
   // Capture error for tool.failure detection
   if (typeof raw.error === 'string' && raw.error) ti.error = raw.error;
+
+  // Route failed tool calls to PostToolUseFailure (KiloCode provides success + error)
+  if (event === 'PostToolUse' && (raw.success === false || (typeof raw.error === 'string' && raw.error))) {
+    event = 'PostToolUseFailure';
+  }
 
   return {
     hook_event_name: event,

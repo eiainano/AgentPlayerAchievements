@@ -1,5 +1,28 @@
 # Changelog
 
+### 发布就绪准备 (P0) — 2026-06-15
+
+- **README 数字同步 (EN + CN)**: 成就 183→213、测试 897→1176、测试文件 33→45、条件类型 11→12、分类 10→11(含 Endurance)、运行时依赖 3→4(含 figlet)、各分类计数全部精确更新
+- **CI 矩阵扩展**: Node 版本矩阵 22→[18, 20, 22]；push 分支 main→[main, dev]；验证 engine.json 声明的 `>=18` 断言
+- **npm 发布修复**:
+  - `package.json` `files` 字段：`04-成就定义清单.yaml`（不存在）→ `achievement-definitions.yaml` + `LICENSE` + `README.zh-CN.md`
+  - `tsx` 从 devDependencies 提升到 dependencies（`bin` 入口依赖 `#!/usr/bin/env -S npx tsx`，全局安装后 `agpa` 命令可用）
+  - `npm pack --dry-run` 验证：358 KB 压缩 / 1.4 MB 解压 / 90 文件，无内部脚本泄露
+- **README 文件名修复**: 项目结构 block 中 `04-成就定义清单.yaml` → `achievement-definitions.yaml`
+
+### 非 CC 工具事件缺口修复 + 引擎电池 enrichment — 2026-06-15
+
+- **Cross-tool 事件覆盖审计**：发现 6/15 代码审查的"0 不可达"结论仅对 CC 用户成立——Hermes/OpenClaw/KiloCode 有 20 个成就因 5 类事件无发射器而不可达。修复后 **0 真正不可达**，~12 个靠 CLAUDE.md 指令覆盖（agent 严格执行即可解锁，属于手动 track 可靠性范畴，非功能缺口）
+- **翻译层失败路由**: `normalizeOpenClawStdin()`/`normalizeKilocodeStdin()` — `success=false` 或 `error` 非空 → `hook_event_name` 覆写为 `PostToolUseFailure`，自动 emit `tool.failure` + `error.occurred`（之前失败也路由为 `PostToolUse`，只产 `tool.complete`）
+- **mapEvents PostToolUseFailure**: error 文本现在注入 `tool.failure`/`error.occurred` payload（此前 payload 无错误信息）
+- **Hermes JSDoc**: 注明 Hermes 无 success/error 字段，失败事件只能通过 CLAUDE.md 手动 track
+- **CLAUDE.md 指令扩展**: `INSTRUCTION_BLOCK` 新增 5 条手动 track 条目：`user.prompt`(带 char_count/word_count/has_code_block/has_question_mark)、`tool.failure`、`error.occurred`、`agent.spawn`、`context.compacted`
+- **Marker v1→v2 升级**: `INIT_DATA` 6 处 marker 更新；`injectInstructions()` 新增 v1→v2 升级逻辑——检测到旧块时自动替换为新块，避免指令重复；`~/.claude/CLAUDE.md` 已升级
+- **引擎电池 enrichment**: `engine.ts track()` 对 `user.message` 自动注入 `on_battery`/`battery_pct`（条件 `!('on_battery' in payload)` 避免重复），4 行代码全通道修复 `last_stand` 成就
+- **TypeScript 修复**: `AuditFinding.layer` 新增 `'C'` 联合类型 + `hook.ts` `before_lines`/`total_file_lines` unknown 值断言，`tsc --noEmit` 零错误
+- **Auditor 同步**: `MANUAL_TRACK_EVENTS` 补入 5 事件；Layer C 追加 per-tool-source 覆盖限制注释
+- **测试**: 1161 → 1176（+15），hook.test.ts +10 测试（OpenClaw/KiloCode 失败路由 + error payload + Hermes 确认无路由），init.test.ts +6 测试（block 内容 + v1→v2 升级 + idempotent）
+
 ### 代码审查跟进修复 + 报告修正 — 2026-06-15
 
 - **报告修正**: `docs/code-review-2026-06-15.md` 的"触发可达性"评分经实地代码逐行审查后判定为夸大——唯一真正的缺口是 `skill.invoke`（已修复），其余均有发射源

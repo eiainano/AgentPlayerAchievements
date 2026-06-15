@@ -59,7 +59,7 @@ export const INIT_DATA: Record<string, InitToolData> = {
       return cfg;
     },
     instructionFiles: [
-      { path: path.join(homedir(), '.claude', 'CLAUDE.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING -->' },
+      { path: path.join(homedir(), '.claude', 'CLAUDE.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING v2 -->' },
     ],
   },
   'kilo-code': {
@@ -75,7 +75,7 @@ export const INIT_DATA: Record<string, InitToolData> = {
       return cfg;
     },
     instructionFiles: [
-      { path: path.join(process.cwd(), 'AGENTS.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING -->' },
+      { path: path.join(process.cwd(), 'AGENTS.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING v2 -->' },
     ],
   },
   'hermes': {
@@ -86,7 +86,7 @@ export const INIT_DATA: Record<string, InitToolData> = {
       return cfg;
     },
     instructionFiles: [
-      { path: path.join(process.cwd(), 'AGENTS.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING -->' },
+      { path: path.join(process.cwd(), 'AGENTS.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING v2 -->' },
     ],
   },
   'opencode': {
@@ -102,7 +102,7 @@ export const INIT_DATA: Record<string, InitToolData> = {
       return cfg;
     },
     instructionFiles: [
-      { path: path.join(process.cwd(), 'AGENTS.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING -->' },
+      { path: path.join(process.cwd(), 'AGENTS.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING v2 -->' },
     ],
   },
   'openclaw': {
@@ -119,15 +119,15 @@ export const INIT_DATA: Record<string, InitToolData> = {
       return cfg;
     },
     instructionFiles: [
-      { path: path.join(process.cwd(), 'AGENTS.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING -->' },
-      { path: path.join(homedir(), '.openclaw', 'workspace', 'TOOLS.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING -->' },
+      { path: path.join(process.cwd(), 'AGENTS.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING v2 -->' },
+      { path: path.join(homedir(), '.openclaw', 'workspace', 'TOOLS.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING v2 -->' },
     ],
   },
 };
 
 // ── Instruction template ──────────────────────────────────────────────
 
-const INSTRUCTION_BLOCK = `<!-- AGPA ACHIEVEMENT TRACKING -->
+const INSTRUCTION_BLOCK = `<!-- AGPA ACHIEVEMENT TRACKING v2 -->
 ## 🏆 Achievement Tracking (AGPA)
 
 This project uses AGPA (Agent Player Achievements). Most tool/file/session events are auto-tracked via CC hooks.
@@ -138,6 +138,7 @@ Call \`achievement_track\` when you observe these:
 
 **Each user turn (before processing):**
 - Each time the user sends you a message → \`user.message\`
+- For non-CC tools, after receiving user's message → \`user.prompt\` with \`{ char_count, word_count, has_code_block, has_question_mark }\` (compute from the user's message text)
 
 **When you do something:**
 - Read an image file → \`image.read\` (auto: any Read of png/jpg/gif/svg counts)
@@ -165,6 +166,10 @@ Call \`achievement_track\` when you observe these:
 - Revert a file → \`file.revert\` with \`{ file_path }\`
 - Switch from plan mode to agent mode → \`agent.mode_activated\`
 - Fix your own bug successfully → \`agent.self_fix\` with \`{ fix_description }\`
+- Tool call fails → \`tool.failure\` with \`{ tool_name, error }\` (auto on CC/OpenClaw/KiloCode; manual fallback for Hermes)
+- Agent encounters an error → \`error.occurred\` with \`{ error }\` (manual fallback)
+- Context window compacted → \`context.compacted\` (manual for non-CC tools)
+- Sub-agent spawned → \`agent.spawn\` with \`{ agent_type }\` (manual for non-CC tools)
 
 **When user does something you can see:**
 - User switches model → \`model.switch\` with \`{ from, to }\`
@@ -579,10 +584,21 @@ export function injectInstructions(filePath: string, marker: string): boolean {
   const dir = path.dirname(filePath);
   fs.mkdirSync(dir, { recursive: true });
 
+  const oldMarker = '<!-- AGPA ACHIEVEMENT TRACKING -->';
+
   let content = '';
   if (fs.existsSync(filePath)) {
     content = fs.readFileSync(filePath, 'utf-8');
     if (content.includes(marker)) return false;
+
+    // Upgrade: replace old v1 block with new v2 block (avoid duplication)
+    if (marker !== oldMarker && content.includes(oldMarker)) {
+      const idx = content.indexOf(oldMarker);
+      content = content.slice(0, idx).trimEnd();
+      const sep = content ? '\n\n' : '';
+      fs.writeFileSync(filePath, content + sep + INSTRUCTION_BLOCK + '\n');
+      return true;
+    }
   }
 
   const sep = content.trimEnd() ? '\n\n' : '';

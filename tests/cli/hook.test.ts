@@ -370,6 +370,24 @@ describe('mapEvents', () => {
       expect(results[0]!.payload.tool_name).toBe('Bash');
       expect(results[1]!.payload.tool_name).toBe('Bash');
     });
+
+    it('includes error text in failure payloads when tool_input has error', () => {
+      const data = {
+        hook_event_name: 'PostToolUseFailure',
+        tool_name: 'Bash',
+        tool_input: { command: 'bad', error: 'command not found: bad' },
+      };
+      const results = mapEvents('PostToolUseFailure', data);
+      expect(results[0]!.payload.error).toBe('command not found: bad');
+      expect(results[1]!.payload.error).toBe('command not found: bad');
+    });
+
+    it('omits error field when tool_input has no error', () => {
+      const data = { hook_event_name: 'PostToolUseFailure', tool_name: 'Read' };
+      const results = mapEvents('PostToolUseFailure', data);
+      expect(results[0]!.payload).not.toHaveProperty('error');
+      expect(results[1]!.payload).not.toHaveProperty('error');
+    });
   });
 
   // ── PreToolUse ───────────────────────────────────────────────────
@@ -974,6 +992,49 @@ describe('normalizeOpenClawStdin', () => {
       expect(result.hook_event_name).toBe('some_unknown_hook');
     });
   });
+
+  describe('failure routing', () => {
+    it('routes to PostToolUseFailure when success is false', () => {
+      const result = normalizeOpenClawStdin({
+        hook_event_name: 'after_tool_call',
+        toolName: 'bash',
+        params: { command: 'bad' },
+        success: false,
+        error: 'command not found',
+      });
+      expect(result.hook_event_name).toBe('PostToolUseFailure');
+      expect(result.tool_input?.error).toBe('command not found');
+    });
+
+    it('routes to PostToolUseFailure when error is set (without success)', () => {
+      const result = normalizeOpenClawStdin({
+        hook_event_name: 'after_tool_call',
+        toolName: 'read_file',
+        params: { path: '/missing' },
+        error: 'ENOENT',
+      });
+      expect(result.hook_event_name).toBe('PostToolUseFailure');
+    });
+
+    it('stays as PostToolUse when success is true and no error', () => {
+      const result = normalizeOpenClawStdin({
+        hook_event_name: 'after_tool_call',
+        toolName: 'read_file',
+        params: { path: '/tmp/x' },
+        success: true,
+      });
+      expect(result.hook_event_name).toBe('PostToolUse');
+    });
+
+    it('stays as PostToolUse when success and error are absent', () => {
+      const result = normalizeOpenClawStdin({
+        hook_event_name: 'after_tool_call',
+        toolName: 'read_file',
+        params: { path: '/tmp/x' },
+      });
+      expect(result.hook_event_name).toBe('PostToolUse');
+    });
+  });
 });
 
 // ── normalizeKilocodeStdin ────────────────────────────────────────
@@ -1245,6 +1306,38 @@ describe('normalizeKilocodeStdin', () => {
       expect(result.tool_input).toBeUndefined();
     });
   });
+
+  describe('failure routing', () => {
+    it('routes to PostToolUseFailure when success is false', () => {
+      const result = normalizeKilocodeStdin({
+        hook_event_name: 'tool.execute.after',
+        toolName: 'bash',
+        params: { command: 'bad' },
+        success: false,
+        error: 'command not found',
+      });
+      expect(result.hook_event_name).toBe('PostToolUseFailure');
+    });
+
+    it('routes to PostToolUseFailure when error is set (without success)', () => {
+      const result = normalizeKilocodeStdin({
+        hook_event_name: 'tool.execute.after',
+        toolName: 'read',
+        params: { filePath: '/missing' },
+        error: 'ENOENT',
+      });
+      expect(result.hook_event_name).toBe('PostToolUseFailure');
+    });
+
+    it('stays as PostToolUse when success and error are absent', () => {
+      const result = normalizeKilocodeStdin({
+        hook_event_name: 'tool.execute.after',
+        toolName: 'read',
+        params: { filePath: '/tmp/x' },
+      });
+      expect(result.hook_event_name).toBe('PostToolUse');
+    });
+  });
 });
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1475,6 +1568,19 @@ describe('normalizeHermesStdin', () => {
         hook_event_name: 'hermes_future_event' as any,
       });
       expect(result.hook_event_name).toBe('hermes_future_event');
+    });
+  });
+
+  describe('failure routing (none)', () => {
+    it('does NOT route to PostToolUseFailure — Hermes lacks success/error fields', () => {
+      // Hermes post_tool_call always maps to PostToolUse, regardless of outcome.
+      // tool.failure + error.occurred must be tracked manually on Hermes.
+      const result = normalizeHermesStdin({
+        hook_event_name: 'post_tool_call',
+        tool_name: 'bash',
+        tool_input: { command: 'bad' },
+      });
+      expect(result.hook_event_name).toBe('PostToolUse');
     });
   });
 });

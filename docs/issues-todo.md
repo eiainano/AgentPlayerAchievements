@@ -1,6 +1,35 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-15 | 总成就数: 218 | 隐藏成就: 64 | 条件类型: 12 | Tests: 1161 (45 文件) | 0 不可达 ✅ | Event Log 增长 → 监控 🚫 | 推荐系统 3/4 (Challenge → 不做) | Questlines: 5 ✅ | `==` vs `>=` → false alarm ✅
+> 最后更新: 2026-06-15 | 总成就数: 218 | 隐藏成就: 64 | 条件类型: 12 | Tests: 1176 (45 文件) | CC: 0 不可达 ✅ | 非 CC: 0 不可达，~12 依赖 agent 遵守度 | last_stand: 已修复 ✅ | Event Log 增长 → 监控 🚫
+
+---
+
+> **可达性定义**: "不可达" = 事件完全无发射器，agent 无论如何都解不了。"依赖 agent 遵守度" = 发射器存在（CLAUDE.md 手动 track 指令），agent 执行了就能解。当前非 CC 的 ~12 个属于后者，不是功能缺口。
+
+## 🆕 非 CC 工具事件缺口修复 (v0.1.8+, 6/15)
+
+此前代码审查声明"0 不可达"仅对 CC 成立。全面 cross-tool 审计发现 **20 个成就对 Hermes / OpenClaw / KiloCode 不可达**，根因 5 类事件无发射器。
+
+### ✅ 修复完成
+
+| 事件 | 修复方式 | 影响成就数 | 状态 |
+|------|---------|:---------:|:----:|
+| `tool.failure` + `error.occurred` | 翻译层：OpenClaw/KiloCode `success=false` → `PostToolUseFailure`；mapEvents 加入 error 文本 payload | 6 | ✅ auto（Hermes 靠 CLAUDE.md 手动） |
+| `user.prompt` | CLAUDE.md 手动 track 指令（agent 计算 char_count/word_count/has_code_block/has_question_mark） | 5 | ⚠️ agent 遵守度 |
+| `agent.spawn` | CLAUDE.md 手动 track 指令 | 7 | ⚠️ agent 遵守度 |
+| `context.compacted` | CLAUDE.md 手动 track 指令 | 1 | ⚠️ agent 遵守度 |
+| `user.message`(battery) | `engine.ts track()` 自动 enrichment，所有通道受益 | 1 | ✅ auto |
+
+> ⚠️ = 非功能缺口。发射器存在（CLAUDE.md 指令），agent 严格执行即可解锁。归类为手动 track 可靠性问题，已暂缓。
+
+### 涉及文件
+
+- `src/cli/hook.ts` — normalizeOpenClawStdin/KiloCodeStdin 失败路由 + PostToolUseFailure error payload
+- `src/cli/init.ts` — INSTRUCTION_BLOCK 5 新事件 + marker v1→v2 + injectInstructions 升级逻辑
+- `src/engine/engine.ts` — `track()` user.message 电池自动 enrichment（修复 `last_stand`）
+- `src/verify/auditor.ts` — MANUAL_TRACK_EVENTS 同步 + Layer C 限制注释
+- `tests/cli/hook.test.ts` — +10 测试
+- `tests/cli/init.test.ts` — +6 测试
 
 ---
 

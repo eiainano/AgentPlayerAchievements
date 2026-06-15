@@ -19,8 +19,8 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
-  <a href="#"><img src="https://img.shields.io/badge/achievements-183-blueviolet" alt="183 achievements"></a>
-  <a href="#"><img src="https://img.shields.io/badge/tests-897-green" alt="897 tests"></a>
+  <a href="#"><img src="https://img.shields.io/badge/achievements-213-blueviolet" alt="213 achievements"></a>
+  <a href="#"><img src="https://img.shields.io/badge/tests-1176-green" alt="1176 tests"></a>
   <a href="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml"><img src="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="#"><img src="https://img.shields.io/badge/node-%E2%89%A518-brightgreen" alt="Node >= 18"></a>
   <a href="#"><img src="https://img.shields.io/badge/CLI-24_commands-orange" alt="24 CLI commands"></a>
@@ -43,7 +43,7 @@
 
 - **Auto-tracking** — every tool call, file edit, and git commit logged automatically
 - **Steam-style dashboard** — XP bar, levels, streaks, heatmaps, achievement showcase
-- **183 achievements** across 10 categories — from "Hello World" to "Completionist"
+- **213 achievements** across 11 categories — from "Hello World" to "Completionist"
 - **Instant feedback** — terminal popups, macOS notifications, 8-bit sounds on unlock
 
 ---
@@ -74,7 +74,7 @@ Your Coding Session
   ├─ You code, agent responds — every action is tracked
   │   └─ dual-channel: MCP tools + Hook events
   │
-  ├─ Session ends → engine evaluates 183 achievements
+  ├─ Session ends → engine evaluates 213 achievements
   │   └─ unlocked? → macOS notification 🎉
   │
   └─ agpa dashboard → view, sort, filter, share
@@ -87,7 +87,7 @@ Your Coding Session
 | **Hook CLI** | Tool hooks (subprocess via stdin) | file.read/write/edit, tool.complete, git.commit, session.start/end, task.complete, agent.spawn |
 | **MCP Server** | STDIO protocol (5 tools) | image.read, file.language_used, plan.mode_entered, user.message, automode.start |
 
-Both channels write to the same `~/.agent-achievements/` event log. The engine evaluates 11 condition types against 183 achievements.
+Both channels write to the same `~/.agent-achievements/` event log. The engine evaluates 12 condition types against 213 achievements.
 
 > [!NOTE]
 > **Zero overhead.** The Hook CLI is a sub-millisecond subprocess. The MCP server runs on STDIO with no network calls. All data stays on your machine.
@@ -95,7 +95,7 @@ Both channels write to the same `~/.agent-achievements/` event log. The engine e
 ## Features
 
 - 🎮 **Achievement Dashboard** — XP bar, level, streak, activity heatmap, rarity breakdown, showcase
-- 🏆 **183 Achievements** across 10 categories (Onboarding, Tool Mastery, Milestones, Skill, Style, Workflow, Creator, Hidden, Challenge, Community)
+- 🏆 **213 Achievements** across 11 categories (Onboarding, Tool Mastery, Milestones, Skill, Style, Workflow, Creator, Hidden, Challenge, Community, Endurance)
 - 🔥 **GitHub-style heatmap** — 4 months of coding activity at a glance
 - 📸 **Share Card** — dark/light themed, bilingual (EN/ZH), downloadable PNG
 - 🔊 **8-bit sound effects** — rarity-graded retro sounds for unlocks
@@ -266,15 +266,16 @@ agpa web              # alias for dashboard
 | # | Category | Count | Highlight |
 |---|----------|:-----:|-----------|
 | 1 | Onboarding | 14 | Hello World, first tool call, first PR |
-| 2 | Tool Mastery | 30 | Read/Edit/Bash skill thresholds |
-| 3 | Milestones | 18 | task count, streak, token usage |
-| 4 | Skill | 14 | chain reactions, debugger, one-shots |
-| 5 | Style | 10 | minimalist, night owl, copy-paste king |
-| 6 | Workflow | 19 | PRs, CI/CD, code review, merge conflict |
+| 2 | Tool Mastery | 38 | Read/Edit/Bash skill thresholds |
+| 3 | Milestones | 19 | task count, streak, token usage |
+| 4 | Skill | 17 | chain reactions, debugger, one-shots |
+| 5 | Style | 17 | minimalist, night owl, copy-paste king |
+| 6 | Workflow | 29 | PRs, CI/CD, code review, merge conflict |
 | 7 | Creator | 9 | slash commands, skills, agents, hooks |
-| 8 | Hidden | 20 | easter eggs and surprise unlocks |
-| 9 | Challenge | 10 | speed runs, multi-model, no-edit streaks |
-| 10 | Community | 10 | completionist tiers, cross-tool collector |
+| 8 | Hidden | 47 | easter eggs and surprise unlocks |
+| 9 | Challenge | 13 | speed runs, multi-model, no-edit streaks |
+| 10 | Community | 9 | completionist tiers, cross-tool collector |
+| 11 | Endurance | 1 | marathon sessions, long streaks |
 
 ## Dashboard
 
@@ -343,7 +344,7 @@ src/
 │   └── ...                  # 13 more CLI commands
 ├── engine/
 │   ├── engine.ts            # Core engine (track / poll / stats)
-│   ├── evaluator.ts         # 11 condition type evaluators
+│   ├── evaluator.ts         # 12 condition type evaluators
 │   ├── store.ts             # JSONL event log + state persistence
 │   ├── types.ts             # TypeScript interfaces
 │   └── yaml-parser.ts       # YAML achievement definition parser
@@ -358,7 +359,7 @@ src/
 └── helpers.ts               # Shared utilities
 
 pixel-art-output/            # Logo + achievement pixel art
-04-成就定义清单.yaml          # 183 achievement definitions (authoritative)
+achievement-definitions.yaml   # 213 achievement definitions (authoritative)
 scripts/                     # dev tools (logo gen, pixel art gen, sounds)
 ```
 
@@ -367,21 +368,19 @@ scripts/                     # dev tools (logo gen, pixel art gen, sounds)
 ```bash
 npm install          # install dependencies (3 runtime deps)
 npm run build        # tsc --noEmit
-npm test             # 845 tests, 33 files
+npm test             # 1176 tests, 45 files
 npm run dashboard    # start dev dashboard
 npm run demo         # generate MVP data
 ```
 
 ## Dependencies
 
-- **Runtime** (3): `@modelcontextprotocol/sdk` · `yaml` · `zod`
+- **Runtime** (4): `@modelcontextprotocol/sdk` · `yaml` · `zod` · `figlet`
 - **Dev**: `typescript` · `vitest` · `tsx`
 - **Optional** (macOS): `terminal-notifier` — system notifications for unlocks
 
-No heavy frameworks. No database. Pure in-memory engine with JSONL file storage.
-
 > [!NOTE]
-> **Deliberately minimal.** Three runtime dependencies, zero network calls at runtime. The engine is ~500 lines of pure functions — easy to audit, impossible to break.
+> **Deliberately minimal.** Four runtime dependencies, zero network calls at runtime. The engine is pure functions with JSONL storage — easy to audit, impossible to break.
 
 ## FAQ
 
@@ -431,5 +430,5 @@ MIT — see [LICENSE](LICENSE)
 ---
 
 <p align="center">
-  <sub>Built for developers who love gamification. 183 achievements and counting.</sub>
+  <sub>Built for developers who love gamification. 213 achievements and counting.</sub>
 </p>

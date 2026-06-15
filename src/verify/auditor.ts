@@ -15,7 +15,7 @@ import type { AchievementDefinition, Condition } from '../engine/types.js';
 
 export interface AuditFinding {
   id: string;
-  layer: 'A' | 'B';
+  layer: 'A' | 'B' | 'C';
   severity: 'error' | 'warn';
   field: string;        // e.g. "description", "description_cn", "conditions[0].value"
   message: string;
@@ -701,6 +701,16 @@ function parseWindowMs(w: string): number {
 // ── Layer C: Event reachability ───────────────────────────────────────
 
 /**
+ * Checks whether each event referenced in achievement conditions has
+ * at least one emitter source (hook_auto, engine_auto, dashboard, manual).
+ *
+ * LIMITATION: Does NOT check per-tool-source coverage. An event may be
+ * emitted only for CC hooks but not for Hermes/OpenClaw/KiloCode.
+ * Per-tool coverage is addressed by ensuring all events have a manual
+ * tracking fallback via the INSTRUCTION_BLOCK (src/cli/init.ts).
+ */
+
+/**
  * Events emitted by hook.ts mapEvents() — automatic, no agent action needed.
  */
 const HOOK_AUTO_EVENTS = new Set([
@@ -766,6 +776,11 @@ const MANUAL_TRACK_EVENTS = new Set([
   'function.edited',
   'agent.mode_activated',
   'output.edit',
+  'user.prompt',
+  'tool.failure',
+  'error.occurred',
+  'agent.spawn',
+  'context.compacted',
 ]);
 
 /**

@@ -5,6 +5,7 @@ import { parseYAML } from './yaml-parser.js';
 import { evaluateAll } from './evaluator.js';
 import { Store } from './store.js';
 import { computeStats } from './stats.js';
+import { getBatteryStatus } from '../utils/battery.js';
 import type { AgentToolStats } from './stats.js';
 import type {
   TrackedEvent, EventType, EventPayload,
@@ -127,6 +128,11 @@ export class AchievementEngine {
     }
     if (eventType === 'task.complete' && this.sessionStartTime != null) {
       enrichedPayload.elapsed_ms = Date.now() - this.sessionStartTime;
+    }
+    // Auto-enrich user.message with battery status (covers manual-track + non-CC tools)
+    if (eventType === 'user.message' && !('on_battery' in enrichedPayload)) {
+      const battery = getBatteryStatus();
+      if (battery) Object.assign(enrichedPayload, battery);
     }
     // Auto-detect model from model.switch events so context.model stays accurate
     if (eventType === 'model.switch' && typeof payload.to === 'string' && payload.to) {

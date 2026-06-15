@@ -65,6 +65,36 @@
 
 ---
 
+## ⚠️ 第二次复查：非 CC 工具覆盖（2026-06-15）
+
+上述复查和修正的结论——"0 不可达，所有事件都有发射器"——**仅对 CC 用户成立**。同日的 cross-tool 审计发现：
+
+### Hermes / OpenClaw / KiloCode 用户的缺口
+
+| 事件 | 为什么 CC 有而非 CC 没有 | 影响成就 |
+|------|------------------------|:------:|
+| `tool.failure` + `error.occurred` | 翻译层始终路由为 `PostToolUse`，不走 `PostToolUseFailure`（尽管数据中有 `success`+`error`） | 6 |
+| `user.prompt` | 非 CC 无 `UserPromptSubmit` hook | 5 |
+| `agent.spawn` | 非 CC 无 `SubagentStart` hook | 7 |
+| `context.compacted` | 非 CC 无 `PostCompact` hook | 1 |
+| `user.message`(battery) | `last_stand` 需要 `on_battery`/`battery_pct` | 1 |
+
+### 修复（同日完成）
+
+| 修复 | 方式 |
+|------|------|
+| `tool.failure` + `error.occurred` → OpenClaw/KiloCode | 翻译层：`success=false` → `PostToolUseFailure`，**auto-emit** |
+| `user.prompt` / `agent.spawn` / `context.compacted` | CLAUDE.md INSTRUCTION_BLOCK 追加 5 条指令，agent 手动 `achievement_track` |
+| `last_stand` | `engine.ts track()` 对 `user.message` 自动注入电池状态，全通道受益 |
+
+### 修复后结论
+
+**0 真正不可达**（所有事件都有发射器）。~12 个成就依赖 CLAUDE.md 指令——发射器存在，agent 严格执行即可解锁，属于手动 track 可靠性范畴（已在 issues-todo 暂缓），**不是功能缺口**。
+
+> **术语澄清**: "不可达" = 事件完全无发射器，agent 无论如何都解不了。"依赖 agent 遵守度" = 发射器存在（CLAUDE.md 指令），agent 照做就能解。
+
+---
+
 ## ① 所有成就都能被正常触发吗？
 
 **结论：不能。大量成就不可达。**

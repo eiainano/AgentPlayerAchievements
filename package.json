@@ -28,22 +28,24 @@
   },
   "files": [
     "src/",
-    "04-成就定义清单.yaml",
-    "AGENTS.md",
-    "README.md"
+    "achievement-definitions.yaml",
+    "README.md",
+    "README.zh-CN.md",
+    "LICENSE",
+    "AGENTS.md"
   ],
   "engines": {
     "node": ">=18"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "tsx": "^4.19.0",
     "typescript": "^5.6.0",
     "vitest": "^4.1.6"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
     "figlet": "^1.11.0",
+    "tsx": "^4.19.0",
     "yaml": "^2.9.0",
     "zod": "^4.4.3"
   }

@@ -416,11 +416,11 @@ describe('injectInstructions', () => {
 
   it('creates missing file with instruction block → returns true', () => {
     const filePath = path.join(tmp, 'subdir', 'test.md');
-    const result = injectInstructions(filePath, '<!-- AGPA ACHIEVEMENT TRACKING -->');
+    const result = injectInstructions(filePath, '<!-- AGPA ACHIEVEMENT TRACKING v2 -->');
     expect(result).toBe(true);
     const content = fs.readFileSync(filePath, 'utf-8');
     // injectInstructions writes INSTRUCTION_BLOCK (full AGPA text), not just the marker
-    expect(content).toContain('<!-- AGPA ACHIEVEMENT TRACKING -->');
+    expect(content).toContain('<!-- AGPA ACHIEVEMENT TRACKING v2 -->');
     expect(content).toContain('Achievement Tracking');
   });
 
@@ -428,18 +428,62 @@ describe('injectInstructions', () => {
     const filePath = path.join(tmp, 'test.md');
     fs.mkdirSync(tmp, { recursive: true });
     fs.writeFileSync(filePath, '# My Project\n\nSome content\n', 'utf-8');
-    const result = injectInstructions(filePath, '<!-- AGPA ACHIEVEMENT TRACKING -->');
+    const result = injectInstructions(filePath, '<!-- AGPA ACHIEVEMENT TRACKING v2 -->');
     expect(result).toBe(true);
     const content = fs.readFileSync(filePath, 'utf-8');
     expect(content).toContain('# My Project');
-    expect(content).toContain('<!-- AGPA ACHIEVEMENT TRACKING -->');
+    expect(content).toContain('<!-- AGPA ACHIEVEMENT TRACKING v2 -->');
   });
 
   it('returns false if marker already present (idempotent)', () => {
     const filePath = path.join(tmp, 'test.md');
     fs.mkdirSync(tmp, { recursive: true });
-    fs.writeFileSync(filePath, '<!-- AGPA ACHIEVEMENT TRACKING -->\nSome content\n', 'utf-8');
-    const result = injectInstructions(filePath, '<!-- AGPA ACHIEVEMENT TRACKING -->');
+    fs.writeFileSync(filePath, '<!-- AGPA ACHIEVEMENT TRACKING v2 -->\nSome content\n', 'utf-8');
+    const result = injectInstructions(filePath, '<!-- AGPA ACHIEVEMENT TRACKING v2 -->');
     expect(result).toBe(false);
+  });
+
+  it('replaces old v1 block with v2 block on upgrade', () => {
+    const filePath = path.join(tmp, 'test.md');
+    fs.mkdirSync(tmp, { recursive: true });
+    fs.writeFileSync(filePath, '# Project\n\n<!-- AGPA ACHIEVEMENT TRACKING -->\nold instructions', 'utf-8');
+    const result = injectInstructions(filePath, '<!-- AGPA ACHIEVEMENT TRACKING v2 -->');
+    expect(result).toBe(true);
+    const content = fs.readFileSync(filePath, 'utf-8');
+    expect(content).toContain('v2');
+    expect(content).not.toContain('old instructions');
+    expect(content).toContain('# Project');
+  });
+
+  it('block includes user.prompt manual tracking instructions', () => {
+    const filePath = path.join(tmp, 'test.md');
+    const result = injectInstructions(filePath, '<!-- AGPA ACHIEVEMENT TRACKING v2 -->');
+    expect(result).toBe(true);
+    const content = fs.readFileSync(filePath, 'utf-8');
+    expect(content).toContain('user.prompt');
+  });
+
+  it('block includes tool.failure manual tracking instructions', () => {
+    const filePath = path.join(tmp, 'test.md');
+    const result = injectInstructions(filePath, '<!-- AGPA ACHIEVEMENT TRACKING v2 -->');
+    expect(result).toBe(true);
+    const content = fs.readFileSync(filePath, 'utf-8');
+    expect(content).toContain('tool.failure');
+  });
+
+  it('block includes agent.spawn manual tracking instructions', () => {
+    const filePath = path.join(tmp, 'test.md');
+    const result = injectInstructions(filePath, '<!-- AGPA ACHIEVEMENT TRACKING v2 -->');
+    expect(result).toBe(true);
+    const content = fs.readFileSync(filePath, 'utf-8');
+    expect(content).toContain('agent.spawn');
+  });
+
+  it('block includes context.compacted manual tracking instructions', () => {
+    const filePath = path.join(tmp, 'test.md');
+    const result = injectInstructions(filePath, '<!-- AGPA ACHIEVEMENT TRACKING v2 -->');
+    expect(result).toBe(true);
+    const content = fs.readFileSync(filePath, 'utf-8');
+    expect(content).toContain('context.compacted');
   });
 });

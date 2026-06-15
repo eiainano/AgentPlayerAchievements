@@ -3,7 +3,7 @@
 ## Commands
 
 ```
-npm run test       # vitest (1043 tests, 42 files)
+npm run test       # vitest (1176 tests, 45 files)
 npm run build      # tsc --noEmit
 npm run dashboard  # start on :3867, then open browser (supports --profile <name>)
 npm run demo       # generate MVP data + stats
@@ -11,7 +11,7 @@ npm run doctor     # diagnose system state
 npm run profile    # manage achievement profiles (create <name> | list)
 ```
 
-Unified CLI via `bin` field (npm link): 24 commands — `agpa init | uninstall | verify | doctor | config | dashboard | web | profile <create|list|switch|softwares> | showcase | demo | stats | progress | reset | search | suggest | sound | activity | export | import | mcp | completion | upgrade | watch | history`
+Unified CLI via `bin` field (npm link): 25 commands — `agpa init | uninstall | verify | doctor | config | dashboard | web | profile <create|list|switch|softwares> | showcase | demo | stats | progress | reset | search | suggest | sound | activity | export | import | mcp | completion | upgrade | watch | history`
 
 ## Architecture
 
@@ -63,16 +63,16 @@ Useful for quick testing: `echo '{"hook_event_name":"PostToolUse","tool_name":"R
 - **版本号永远沿用 0.1.x**（0.1.4 → 0.1.5 → 0.1.6 …），除非用户明确说要跳大版本号。不要自行升 0.2、1.0 等。
 - The YAML file (`achievement-definitions.yaml`) is the **authoritative data source**. If you add a condition field, update `types.ts` Condition interface AND `yaml-parser.ts` buildCondition().
 - **After each commit + push, update `CHANGELOG.md`** with the changes you just pushed. Don't batch changes across multiple commits — update it with each push.
-- No new npm dependencies without strong reason. We have exactly 3: mcp-sdk, yaml, zod.
+- No new npm dependencies without strong reason. We have exactly 5: mcp-sdk, yaml, zod, figlet, tsx (tsx is runtime — needed by `bin` shebang for global install).
 - ESM only (`"type": "module"`). No CommonJS.
 - All JSON parsing uses `safeParse()` from `src/utils/validate.ts` — never raw `JSON.parse()`.
 - Notifications go through `src/utils/notify.ts` — not duplicated in hook.ts and poll.ts.
 - Hook stdin parsing happens exactly once (cached), then `mapEvents()` transforms.
 
-## The YAML Condition Types (all 11 implemented)
+## The YAML Condition Types (all 12 implemented)
 
 counter, threshold, streak, sequence, distinct_count, event, mode,
-sequence_count, pattern_match, ratio, set_completion
+sequence_count, pattern_match, ratio, set_completion, time_gap
 
 If evaluator behavior seems wrong, check src/engine/evaluator.ts — each type has its own `eval*()` function now (no more fall-through hacks).
 
@@ -94,6 +94,39 @@ If evaluator behavior seems wrong, check src/engine/evaluator.ts — each type h
 用户说"文档核查"或"根据代码核查文档"时执行此操作。
 
 `docs/issues-todo.md` tracks all known bugs, gaps, and data inconsistencies in the achievement system. Always read it before starting evaluator or YAML work.
+
+## Releasing
+
+### 首次公开发布（两步，顺序不可颠倒）
+
+```
+1. GitHub: Settings → Danger Zone → Make public  ← 这才是"开源"
+2. npm publish                                    ← 方便安装
+```
+
+**为什么不能只 npm publish**：npm 页面会显示 Repository 链接指向 GitHub。仓库 private 则该链接 404，用户体验很差。必须先公开仓库，再发 npm。
+
+**npm publish 前提检查清单**：
+
+| 检查项 | 命令/位置 | 通过标准 |
+|--------|----------|:--------:|
+| `tsc` 零错误 | `npx tsc --noEmit` | 输出为空 |
+| 测试全绿 | `npm test` | 1176/1176 |
+| `files` 包含 YAML | `npm pack --dry-run` | 列表中有 `achievement-definitions.yaml` |
+| `tsx` 在 dependencies | `package.json` | `dependencies.tsx` 存在 |
+| bin shebang 正确 | `head -1 src/cli/index.ts` | `#!/usr/bin/env -S npx tsx` |
+| CI badge 仓库名正确 | `README.md` | `eiainano/AgentPlayerAchievements` |
+| `engines.node` 与 CI 一致 | `package.json` + `.github/workflows/ci.yml` | `>=18` ↔ `[18, 20, 22]` |
+
+### npm publishing 名词解释
+
+- **scoped package** — 包名带 `@组织名/` 前缀（如 `@eiainano/agpa`），默认 private，需要 `--access public` 才能公开。`agpa` 无前缀（unscoped），默认就是公开的，不需要额外参数。
+- **OTP** — npm 账号开启 2FA 后，`npm publish` 需要一次性验证码。命令行传 `--otp=123456` 或用 Authenticator app 交互式输入。没开 2FA 则不需要。
+- **`npm pack --dry-run`** — 模拟打包，显示哪些文件会被发布，不实际发布。每次改 `files` 字段后必跑。
+
+### 发布后的 README badge 自检
+
+`README.md` 中的 CI badge URL 由 GitHub 仓库名决定。如果将来改仓库名，badge 会默默坏掉（404 图片），没有报错。发布后第一时间打开 GitHub 主页确认所有 badge 显示正常。
 
 ## Documentation Index
 

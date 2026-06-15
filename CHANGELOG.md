@@ -1,5 +1,10 @@
 # Changelog
 
+### README 竞品分析 — 2026-06-16
+
+**文档新增 (1)**:
+- `docs/readme-competitive-analysis-2026-06-16.md` — 对比 25 个 GitHub Top MCP/Agent 项目的 README 最佳实践。AGPA README 综合评分 5.3/10 vs top-5 平均 6.6/10。识别 12 个改进方向: P0 (视觉效果缺失、无导航栏) , P1 (无用户评价、无安全专区、无对比表), P2 (无环境变量文档、无文档索引), P3 (CLI 表格化、Changelog 链接、徽章扩展、赞助信息)
+
 ### 描述一致性审计 + 像素画审查 — 2026-06-16
 
 **文档新增 (2)**:

@@ -1,5 +1,40 @@
 # Changelog
 
+### Dashboard 审计修复 — 2026-06-15
+
+**Bug 修复 (5)**:
+- B1: 时间热力图强度计算 — `1 > 0 ? grid[day][h] / 1 : 0`（永远满强度，二元色块）→ 先算 `maxVal` 做归一化
+- B2: 3 个缺失 CSS 变量 — `:root` 补充 `--primary: #4fc3f7`、`--card-bg: var(--bg-card)`、`--text-primary: var(--text)`，修复 Recommend 面板边框、Questline 进度条、Insights 卡片背景
+- B4: Theme Flash — `<head>` 最前面加 inline `<script>` 读取 localStorage 在首帧前设 `data-theme`，消除 light 主题刷新暗闪
+- B6: 删除重复的 `stat_complete: 'Complete'` (I18N.en)
+- B7: Insights canvas 在 `renderAll` DOM 重建后不再重播入场动画
+
+**UX 改进 (6)**:
+- U1: 页面加载 spinner（CSS-only），首次 API 返回后淡出
+- U3: 搜索输入 250ms debounce，不再每次按键重建 DOM
+- U5: Recommend 面板改为始终显示 toggle 按钮（保留 20% 自动展开）
+- U6: 回到顶部按钮（scrollY > 500 出现，固定 bottom:80px right:28px）
+- U7: 成就卡片 `tabindex="0" role="button"`，Enter/Space 打开 modal
+
+**性能优化 (5)**:
+- P1: html2canvas 200KB 从同步加载改为 `generateCard()` 时动态 `<script>` 注入
+- P2: Google Fonts `<link>` 加 `media="print" onload="this.media='all'"`
+- P3+P4: 成就过滤结果缓存 (`_gridMemo` keyed by filter/category/search/sort/rarity + item count)，仅输入变化时重算
+- P5: `<meta name="description">` + `<link rel="preload" href="/styles.css">`
+
+**代码质量 (3)**:
+- C3: `RARITY_ORDER` 统一（消除 `renderSets` / `renderTimeline` 中的 2 处内联 `order` 对象）
+- B3: `escHtml()` 从假缓存改为 `_map` 对象缓存（输入→输出 memoization）
+- C1: `buildCardHTML` 添加注释说明独立的卡片渲染管线
+
+文件: `src/dashboard/public/app.js` +171/-77, `src/dashboard/public/index.html` +9/-0, `src/dashboard/public/styles.css` +63/-0
+
+### Poll 优化: 脏检查 + 去重 dashboard.opened — 2026-06-15
+
+- **全量重渲染消除**: autopoll 从 `JSON.stringify(stats)` 替换为 `hasVisualChange()`，只检查 `unlocked/level/total_xp/completion_pct` 4 个字段。无新解锁时调用 `updateStatsInPlace()` 只更新数字 textContent + streak/heatmap，不重建 DOM 或重播入场动画。~90% 的轮询周期不再触达成就网格/套装/时间线/走势图
+- **dashboard.opened 去重**: 每次 `/api/data` 请求都会记一条 `dashboard.opened`（10s 轮询 → 每分钟 6 条虚高），改为每个 profile 在每次 server 进程中只第一次记数。避免成就条件被轮询流量错误解锁
+- 文件: `src/dashboard/public/app.js` +71/-20, `src/dashboard/server.ts` +9/-1
+
 ### 发布就绪准备 (P0) — 2026-06-15
 
 - **README 数字同步 (EN + CN)**: 成就 183→213、测试 897→1176、测试文件 33→45、条件类型 11→12、分类 10→11(含 Endurance)、运行时依赖 3→4(含 figlet)、各分类计数全部精确更新

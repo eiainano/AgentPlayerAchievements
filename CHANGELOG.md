@@ -1,5 +1,15 @@
 # Changelog
 
+### Dashboard UI 修复 — 2026-06-17
+
+- **主题切换**: Polar Night 装扮在白天模式下不再覆盖 CSS 变量；自动填充展示柜后不再重置暗色装扮
+- **稀有度颜色统一**: JS `RARITY_COLORS` 与 CSS `--rarity-*` 变量同步；成就详情 badge 边框色从错乱硬编码改为匹配稀有度
+- **热力图**: 删除右侧图例、月份/周几标签；格子动态填满卡片；`overflow:visible` 修复 tooltip 截断
+- **连击卡片**: 新增 "当前连续"/"历史最高记录" 标签；右侧数字字号与左侧统一(42px)；右侧加 "天" 单位；multiplier 格式改为 "XP ×1.9"；"今天已编码" 移至左上角
+- **动画开关 tooltip**: CSS `::after` 伪元素实现，往下弹出，中英文说明
+- **Questline/Set 间距**: `.questlines-stack` 加 `margin-bottom: 24px`
+- **修复**: `generateCardCore` 多余 catch 块（导致 JS 语法错误）、`totalColumns` 作用域 bug
+
 ### 修复像素画描述 — 2026-06-17
 
 - **pixel-art-ideas.md**: 修复 5 处像素画描述——dual_wielder（三刀流→Zoro）、permission_granted（控制面板→门禁卡）、execute_order_66（加闪电天罚）、rubber_duck（浴缸→办公桌）、its_learning（简化去冗余）

@@ -3,6 +3,8 @@
 ### 修复像素画描述 — 2026-06-17
 
 - **pixel-art-ideas.md**: 修复 5 处像素画描述——dual_wielder（三刀流→Zoro）、permission_granted（控制面板→门禁卡）、execute_order_66（加闪电天罚）、rubber_duck（浴缸→办公桌）、its_learning（简化去冗余）
+- **pixel-art-ideas.md**: 追加修复 4 处——fifth_element（致敬同名电影）、oops_all_bash（纯终端全屏命令）、agent_collector（花花公子兔子头 logo）、pipemaster（马力欧水管工）
+- **pixel-art-review-2026-06-16.md**: 全部 8 项标记已修复，YAML 数量同步到 218
 
 ### 修复 YAML ID 冲突 — 2026-06-16
 

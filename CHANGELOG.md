@@ -1,5 +1,27 @@
 # Changelog
 
+### README Phase 1 改进 + 五语言国际化 — 2026-06-16
+
+**README 改进 (7)**:
+- 导航栏: 9 节点快速跳转行（EN + zh-CN/ES/KO/JA 五语言均含本地化锚点）
+- CLI 命令: 代码块 → 可扫描表格（20 条命令 + `agpa --help` 提示）
+- 文档索引: 新增 📚 Documentation 章节，链接 7 篇核心文档 + CHANGELOG
+- 安全与隐私: 新增 🔒 Security & Privacy 章节（本地优先/可审计/STDIO 隔离/Hook 沙箱/供应链 6 点）
+- 环境变量: 新增 🌐 Environment Variables 参考表（11 个 AGPA_* 变量）
+- 徽章行: 从 6 个扩展到 9 个（+GitHub stars / last-commit / i18n）
+- CHANGELOG 链接: 在文档索引表中
+
+**国际化 (4)**:
+- `README.zh-CN.md` — 同步到与英文版完全一致（之前落后 4KB）
+- `README.es.md` — 新建（西班牙语）
+- `README.ko.md` — 新建（韩语）
+- `README.ja.md` — 新建（日语）
+- 每份 README 含统一的 5 语言切换器: EN | 中文 | ES | 한국어 | 日本語
+
+**对照分析评分**: README 总分从 5.3/10 → ~7.8/10（P1 全部完成 + P3 部分完成）
+
+**工程约定**: CLAUDE.md 新增"每次改 README 后同步翻译"规则
+
 ### README 竞品分析 — 2026-06-16
 
 **文档新增 (1)**:

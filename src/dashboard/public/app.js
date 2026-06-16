@@ -15,6 +15,15 @@ function toggleTheme() {
   const theme = toggle.checked ? 'dark' : 'light';
   document.documentElement.setAttribute('data-theme', theme);
   localStorage.setItem('agpa-theme', theme);
+  // Cosmetic theme (e.g. Polar Night) only applies to dark mode —
+  // remove it when switching to light so CSS variables from [data-theme="light"] win
+  if (theme === 'light' && document.body.dataset.cosmeticTheme) {
+    document.body._prevCosmeticTheme = document.body.dataset.cosmeticTheme;
+    delete document.body.dataset.cosmeticTheme;
+  } else if (theme === 'dark' && document.body._prevCosmeticTheme) {
+    document.body.dataset.cosmeticTheme = document.body._prevCosmeticTheme;
+    delete document.body._prevCosmeticTheme;
+  }
   // Swap nav logo to match theme
   const logo = document.getElementById('nav-logo');
   if (logo) {
@@ -407,7 +416,9 @@ const I18N = {
     xp_label: '{xp} XP • Level {level}',
     streak_title: 'Coding Streak',
     streak_days: 'days',
+    streak_current_label: 'Current streak',
     streak_best: 'Best',
+    streak_best_label: 'All-time best',
     streak_today_done: 'Coded today ✓',
     streak_today_pending: 'Not yet today',
     streak_mult_tip: 'streak bonus',
@@ -532,7 +543,7 @@ const I18N = {
     github_star: 'Star us on GitHub',
     // Toggles
     toggle_sound: 'Sound effects',
-    toggle_animations: 'Animations',
+    toggle_animations: 'Animations — OFF = simple mode (no particles, no gacha reveal). ON = full animations with glow, particles & card flip effects',
     toggle_theme: 'Dark / Light theme',
     // Loading
     loading: '⏳ Loading...',
@@ -586,7 +597,9 @@ const I18N = {
     xp_label: '{xp} XP • {level} 级',
     streak_title: '编码连胜',
     streak_days: '天',
+    streak_current_label: '当前连续',
     streak_best: '最高纪录',
+    streak_best_label: '历史最高记录',
     streak_today_done: '今天已编码 ✓',
     streak_today_pending: '今天还没写代码',
     streak_mult_tip: '连胜加成',
@@ -709,7 +722,7 @@ const I18N = {
     github_star: '在 GitHub 上 Star 我们',
     // Toggles
     toggle_sound: '音效',
-    toggle_animations: '动画效果',
+    toggle_animations: '动画效果 — 关闭 = 精简模式（无粒子、无翻开特效）。开启 = 完整动画（光晕、粒子、卡片翻转）',
     toggle_theme: '深色 / 浅色主题',
     // Loading
     loading: '⏳ 加载中...',
@@ -1287,8 +1300,8 @@ function triggerHeroBurst() {
 }
 
 const RARITY_COLORS = {
-  common: '#969696', uncommon: '#64C864', rare: '#4285F4',
-  epic: '#B446F0', legendary: '#FF8C00', mythic: '#FF3232',
+  common: '#7eb8da', uncommon: '#3b7ec0', rare: '#e0b020',
+  epic: '#e87830', legendary: '#a858f0', mythic: '#f04050',
 };
 function rarityColor(r) { return RARITY_COLORS[r] || RARITY_COLORS.common; }
 
@@ -1661,7 +1674,7 @@ function renderStreakCard(streak, multiplier) {
   if (multEl) {
     if (multiplier > 1.0) {
       const pct = Math.round((multiplier - 1.0) * 100);
-      multEl.textContent = '×' + multiplier.toFixed(1);
+      multEl.textContent = 'XP ×' + multiplier.toFixed(1);
       multEl.title = '+' + pct + '% XP (' + t('streak_mult_tip') + ')';
       multEl.className = 'streak-multiplier active';
     } else {
@@ -1699,49 +1712,59 @@ function renderHeatmap(heatmap) {
   // Pad so grid starts on Monday (day=1); if first day is Sunday(0), pad 6; Monday(1), pad 0
   const frontPad = startDow === 0 ? 6 : startDow - 1;
 
-  // Row labels: show Mon/Wed/Fri
-  const ROW_LABELS = ['', t('heatmap_mon'), '', t('heatmap_wed'), '', t('heatmap_fri'), ''];
-  rowLabels.innerHTML = ROW_LABELS.map(l => `<span>${l}</span>`).join('');
+  // Row labels: show Mon/Wed/Fri (if element present)
+  if (rowLabels) {
+    const ROW_LABELS = ['', t('heatmap_mon'), '', t('heatmap_wed'), '', t('heatmap_fri'), ''];
+    rowLabels.innerHTML = ROW_LABELS.map(l => `<span>${l}</span>`).join('');
+  }
 
   // Build column labels (month names at first column of each month)
-  const months_abbr_en = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const months_abbr_zh = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-  const months = currentLang === 'zh' ? months_abbr_zh : months_abbr_en;
-  const colLabelSpans = [];
-  // Collect week boundaries
-  const weeks = [];
-  let weekStart = frontPad > 0 ? -frontPad : 0;
-  for (let i = 0; i < days.length; i++) {
-    const d = new Date(days[i].date);
-    const dow = d.getDay(); // 0=Sun
-    if (dow === 1 || i === 0) {
-      // Start of week (Monday) — record month
-      colLabelSpans.push({ idx: weeks.length, month: months[d.getMonth()], label: months[d.getMonth()] });
+  if (colLabels) {
+    const months_abbr_en = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const months_abbr_zh = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+    const months = currentLang === 'zh' ? months_abbr_zh : months_abbr_en;
+    const colLabelSpans = [];
+    // Collect week boundaries
+    const weeks = [];
+    let weekStart = frontPad > 0 ? -frontPad : 0;
+    for (let i = 0; i < days.length; i++) {
+      const d = new Date(days[i].date);
+      const dow = d.getDay(); // 0=Sun
+      if (dow === 1 || i === 0) {
+        // Start of week (Monday) — record month
+        colLabelSpans.push({ idx: weeks.length, month: months[d.getMonth()], label: months[d.getMonth()] });
+      }
+      if (dow === 0) {
+        weeks.push(i - weekStart + 1);
+        weekStart = i + 1;
+      }
     }
-    if (dow === 0) {
-      weeks.push(i - weekStart + 1);
-      weekStart = i + 1;
+
+    // Deduplicate adjacent month labels
+    const deduped = [];
+    for (const cl of colLabelSpans) {
+      const last = deduped[deduped.length - 1];
+      if (!last || last.month !== cl.month) deduped.push(cl);
     }
-  }
 
-  // Deduplicate adjacent month labels
-  const deduped = [];
-  for (const cl of colLabelSpans) {
-    const last = deduped[deduped.length - 1];
-    if (!last || last.month !== cl.month) deduped.push(cl);
+    const cols = Math.ceil((frontPad + days.length) / 7);
+    colLabels.innerHTML = Array.from({ length: cols }, (_, i) => {
+      const match = deduped.find(cl => cl.idx === i);
+      return `<span class="heatmap-col-label">${match ? match.label : ''}</span>`;
+    }).join('');
   }
-
-  const totalColumns = Math.ceil((frontPad + days.length) / 7);
-  colLabels.innerHTML = Array.from({ length: totalColumns }, (_, i) => {
-    const match = deduped.find(cl => cl.idx === i);
-    return `<span class="heatmap-col-label">${match ? match.label : ''}</span>`;
-  }).join('');
 
   // Build cells
+  const totalColumns = Math.ceil((frontPad + days.length) / 7);
+  // Compute cell size to fill the card (card padding: 18px top/bottom, 22px left/right)
+  const cardWidth = card.clientWidth;
+  const availableWidth = cardWidth - 44; // 22px × 2 padding
+  const gap = 3;
+  const cellSize = Math.floor((availableWidth - gap * (totalColumns - 1)) / totalColumns);
   const cells = [];
   // Front pad empty cells
   for (let i = 0; i < frontPad; i++) {
-    cells.push('<div class="heatmap-cell" data-level="0"></div>');
+    cells.push(`<div class="heatmap-cell" data-level="0"></div>`);
   }
   // Date cells
   for (const d of days) {
@@ -1749,7 +1772,9 @@ function renderHeatmap(heatmap) {
     const tooltip = dStr + ' · ' + (d.count === 1 ? t('heatmap_session', { count: d.count }) : t('heatmap_sessions', { count: d.count }));
     cells.push(`<div class="heatmap-cell" data-level="${d.level}" data-tooltip="${escHtml(tooltip)}"></div>`);
   }
-  grid.style.gridTemplateColumns = `repeat(${totalColumns}, 14px)`;
+  grid.style.gridTemplateColumns = `repeat(${totalColumns}, ${cellSize}px)`;
+  grid.style.gridTemplateRows = `repeat(7, ${cellSize}px)`;
+  grid.style.gap = `${gap}px`;
   grid.innerHTML = cells.join('');
 
   // Scroll to right edge (most recent)
@@ -1839,7 +1864,8 @@ function renderProfile(data) {
   // ── Theme cosmetic (Polar Night) ──
   {
     const theme = data.cosmetics?.theme;
-    if (theme && theme.value) {
+    // Only apply cosmetic theme in dark mode — it has no light variant
+    if (theme && theme.value && document.documentElement.getAttribute('data-theme') !== 'light') {
       document.body.dataset.cosmeticTheme = theme.value;
     } else {
       delete document.body.dataset.cosmeticTheme;
@@ -2825,19 +2851,13 @@ function drawTimeHeatmap(canvasId, data) {
   const pw = W - pad.left - pad.right;
   const ph = H - pad.top - pad.bottom - 24;
 
-  const grid = Array.from({ length: 7 }, () => Array(24).fill(0));
-  const daily = data.stats?.daily_stats;
+  // Use real hourly activity from the API (7×24 grid: day-of-week × hour)
+  // Falls back to empty grid if data is unavailable (shows "no data" message)
+  const grid = data.stats?.hourly_activity || Array.from({ length: 7 }, () => Array(24).fill(0));
   let hasData = false;
-
-  if (daily && daily.length > 0) {
-    for (const d of daily) {
-      const dow = new Date(d.date + 'T12:00:00Z').getDay();
-      if (d.sessions > 0) {
-        hasData = true;
-        for (let h = 9; h <= 18; h++) {
-          grid[dow][h] += d.sessions;
-        }
-      }
+  for (let day = 0; day < 7 && !hasData; day++) {
+    for (let h = 0; h < 24 && !hasData; h++) {
+      if (grid[day][h] > 0) hasData = true;
     }
   }
 
@@ -3103,10 +3123,6 @@ function generateCardCore(btn) {
         btn.disabled = false;
         btn.textContent = '📸 Share';
       });
-  } catch (err) {
-    btn.disabled = false;
-    btn.textContent = '📸 Share';
-  }
 }
 
 // ── Data Export ──────────────────────────────────────────────────────

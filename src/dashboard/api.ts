@@ -120,6 +120,8 @@ export interface DashboardStats {
   usage_xp: number;
   usage_breakdown?: UsageBreakdown;
   daily_stats?: Array<{ date: string; sessions: number; tool_calls: number; tasks: number }>;
+  /** 7×24 grid: hourly_activity[dayOfWeek][hour] = event count (0=Sun…6=Sat) */
+  hourly_activity?: number[][];
 }
 
 export interface QuestlineStageItem {
@@ -716,6 +718,20 @@ export function buildCosmeticsResponse(
   };
 }
 
+/** Compute a 7×24 grid of event counts by day-of-week (0=Sun) and hour (0–23). */
+export function computeHourlyActivity(events: TrackedEvent[]): number[][] {
+  const grid: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0));
+  for (const e of events) {
+    if (!e.timestamp) continue;
+    const d = new Date(e.timestamp);
+    if (isNaN(d.getTime())) continue;
+    const dow = d.getDay(); // 0=Sun … 6=Sat
+    const hour = d.getHours();
+    grid[dow]![hour]!++;
+  }
+  return grid;
+}
+
 export function buildApiResponse(
   definitions: AchievementDefinition[],
   state: AchievementState,
@@ -795,6 +811,7 @@ export function buildApiResponse(
       usage_xp: usageBreakdown.usage_xp,
       usage_breakdown: usageBreakdown,
       daily_stats: dailyStats,
+      hourly_activity: computeHourlyActivity(events),
     },
     timeline: buildTimeline(state.unlocked),
     sets: setItems,

@@ -87,10 +87,10 @@
           <span class="switch-track"><span class="switch-knob"></span></span>
           <span class="switch-label">🔊</span>
         </label>
-        <label class="switch" data-i18n-title="toggle_animations" title="Animations">
+        <label class="switch">
           <span class="switch-label">✨</span>
           <input type="checkbox" id="anim-toggle" checked>
-          <span class="switch-track"><span class="switch-knob"></span></span>
+          <span class="switch-track" data-i18n-title="toggle_animations" title="Animations"><span class="switch-knob"></span></span>
           <span class="switch-label">🎴</span>
         </label>
         <label class="switch" data-i18n-title="toggle_theme" title="Dark / Light theme">
@@ -147,15 +147,17 @@
       <div class="hero-cards-row">
         <div class="streak-card" id="streak-card">
           <div class="streak-left">
+            <span class="streak-label" data-i18n="streak_current_label">Current streak</span>
             <span class="streak-icon">🔥</span>
             <span class="streak-count" id="streak-current">0</span>
             <span class="streak-unit" data-i18n="streak_days">days</span>
           </div>
           <div class="streak-vsplit"></div>
           <div class="streak-right">
+            <span class="streak-label" data-i18n="streak_best_label">All-time best</span>
             <span class="streak-best-icon">📅</span>
-            <span class="streak-best-label" data-i18n="streak_best">Best</span>
             <span class="streak-best-num" id="streak-longest">0</span>
+            <span class="streak-unit" data-i18n="streak_days">days</span>
           </div>
           <span class="streak-multiplier" id="streak-multiplier"></span>
           <span class="streak-today" id="streak-today"></span>
@@ -181,20 +183,9 @@
           </div>
           <div class="heatmap-body">
             <div class="heatmap-grid-wrapper">
-              <div class="heatmap-row-labels" id="heatmap-row-labels"></div>
               <div class="heatmap-scroll">
-                <div class="heatmap-col-labels" id="heatmap-col-labels"></div>
                 <div class="heatmap-grid" id="heatmap-grid"></div>
               </div>
-            </div>
-            <div class="heatmap-legend heatmap-legend-v">
-              <span class="heatmap-legend-label" data-i18n="heatmap_more">More</span>
-              <span class="heatmap-legend-cell" data-level="4"></span>
-              <span class="heatmap-legend-cell" data-level="3"></span>
-              <span class="heatmap-legend-cell" data-level="2"></span>
-              <span class="heatmap-legend-cell" data-level="1"></span>
-              <span class="heatmap-legend-cell" data-level="0"></span>
-              <span class="heatmap-legend-label" data-i18n="heatmap_less">Less</span>
             </div>
           </div>
         </div>

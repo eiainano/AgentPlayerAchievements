@@ -677,6 +677,35 @@ body::before {
   flex-shrink: 0;
   box-shadow: inset 0 1px 3px rgba(0,0,0,.25), inset 0 0 0 1px rgba(0,0,0,.08);
 }
+/* CSS tooltip — macOS suppresses native <span> title tooltips, so we roll our own */
+.switch-track::after {
+  content: attr(title);
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 400;
+  line-height: 1.5;
+  max-width: 320px;
+  white-space: normal;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s ease;
+  z-index: 9999;
+  box-shadow: 0 4px 16px rgba(0,0,0,.3);
+}
+.switch-track:hover::after,
+.switch-track:focus-visible::after {
+  opacity: 1;
+}
 [data-theme="light"] .switch-track {
   box-shadow: inset 0 1px 3px rgba(0,0,0,.1), inset 0 0 0 1px rgba(0,0,0,.04);
 }
@@ -962,6 +991,14 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
   gap: 2px;
 }
 
+.streak-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-weight: 500;
+  letter-spacing: .2px;
+  margin-bottom: 2px;
+}
+
 .streak-icon {
   font-size: 22px;
   line-height: 1;
@@ -1017,11 +1054,12 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
 .streak-best-icon { font-size: 16px; line-height: 1; }
 
 .streak-best-num {
-  font-size: 32px;
+  font-size: 42px;
   font-weight: 700;
   color: var(--text);
   font-family: var(--font-score);
   font-variant-numeric: tabular-nums;
+  letter-spacing: -1px;
   line-height: 1;
 }
 
@@ -1035,7 +1073,7 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
 
 .streak-today {
   position: absolute;
-  top: 8px; right: 12px;
+  top: 8px; left: 12px;
   font-size: 10px;
   font-weight: 600;
   padding: 3px 10px;
@@ -1131,7 +1169,7 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
 }
 
 .heatmap-scroll {
-  overflow-x: auto;
+  overflow: visible;
   scrollbar-width: none;
 }
 .heatmap-scroll::-webkit-scrollbar { display: none; }
@@ -1155,14 +1193,11 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
 
 .heatmap-grid {
   display: grid;
-  grid-template-rows: repeat(7, 14px);
   grid-auto-flow: column;
   gap: 3px;
 }
 
 .heatmap-cell {
-  width: 14px;
-  height: 14px;
   border-radius: 3px;
   cursor: default;
   position: relative;
@@ -1200,11 +1235,7 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
 }
 
 .heatmap-legend {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 8px;
-  justify-content: flex-end;
+  display: none;
 }
 
 /* Vertical legend (card side panel) */
@@ -3070,11 +3101,11 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
 }
 
 .modal-badge.category { color: var(--text-dim); }
-.modal-badge.rarity-common { color: var(--rarity-common); border-color: rgba(150,150,150,.25); }
-.modal-badge.rarity-uncommon { color: var(--rarity-uncommon); border-color: rgba(78,196,110,.25); }
-.modal-badge.rarity-rare { color: var(--rarity-rare); border-color: rgba(80,144,240,.25); }
-.modal-badge.rarity-epic { color: var(--rarity-epic); border-color: rgba(180,92,240,.25); }
-.modal-badge.rarity-legendary { color: var(--rarity-legendary); border-color: rgba(240,152,32,.25); }
+.modal-badge.rarity-common { color: var(--rarity-common); border-color: rgba(126,184,218,.25); }
+.modal-badge.rarity-uncommon { color: var(--rarity-uncommon); border-color: rgba(59,126,192,.25); }
+.modal-badge.rarity-rare { color: var(--rarity-rare); border-color: rgba(224,176,32,.25); }
+.modal-badge.rarity-epic { color: var(--rarity-epic); border-color: rgba(232,120,48,.25); }
+.modal-badge.rarity-legendary { color: var(--rarity-legendary); border-color: rgba(168,88,240,.25); }
 .modal-badge.rarity-mythic { color: var(--rarity-mythic); border-color: rgba(240,64,80,.25); }
 
 .modal-desc {
@@ -4852,6 +4883,7 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-bottom: 24px;
 }
 
 .questline-card {

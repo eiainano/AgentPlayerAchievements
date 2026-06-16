@@ -411,10 +411,10 @@ class GachaQueue {
       return;
     }
 
-    // Check simple animations mode
+    // Check simple animations mode — skip auto-triggered gacha but allow explicit replays
     var animToggle = document.getElementById('anim-toggle');
-    if (animToggle && !animToggle.checked) {
-      // Simple mode: skip all gacha
+    if (animToggle && !animToggle.checked && !(this._enqueueOpts && this._enqueueOpts.noAutoDismiss)) {
+      // Simple mode (auto): skip gacha, keep track of unlocks silently
       this.queue = [];
       this.isPlaying = false;
       this.currentReveal = null;

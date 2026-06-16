@@ -1,5 +1,14 @@
 # Changelog
 
+### Dashboard i18n 全面补齐 — 2026-06-16
+
+- **app.js I18N 表**: 124→165 key（+41），EN↔ZH 零缺失。移除全部 `L()` 内联双语函数，替换 ~15 处硬编码字符串为 `t()`（旅程空状态、热力图标签、档案弹窗描述、demo 标签、加载按钮、分享卡片等）
+- **index.html**: `data-i18n` 属性 30→41 个，新增 `data-i18n-title` 3 处（音效/动画/主题开关、档案弹窗关闭按钮）
+- **tour.js**: 导览 4 步标题/描述改用 `t()` 动态获取（`tour_step{1-4}_title/desc`），支持中英切换
+- **customize page**: 新增独立 `I18N_CZ` + `tc()` i18n 层（44 key），替换 ~21 处硬编码字符串（统计/按钮/提示/编辑栏），`customize.html` 新增 12 个 `data-i18n` 属性
+- **热力图 i18n**: 星期缩写（Mon/Wed/Fri→周一/周三/周五）、月份缩写（Jan→1月）、session 提示词全部走 `t()`
+- **验证**: tsc 零错误，1203/1203 测试全绿，app.js 165:165 + customize.js 44:44 中英 key 完全对称
+
 ### 社区成就 Pack 基础设施 — 2026-06-16
 
 - **Pack 加载引擎**: 扫描 `~/.agent-achievements/packs/*.yaml`，冲突检测（core vs pack vs pack），错误包隔离不阻断

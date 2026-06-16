@@ -1,5 +1,20 @@
 # Changelog
 
+### 社区成就 Pack 基础设施 — 2026-06-16
+
+- **Pack 加载引擎**: 扫描 `~/.agent-achievements/packs/*.yaml`，冲突检测（core vs pack vs pack），错误包隔离不阻断
+- **`parsePackYAML()`**: 新增 YAML 解析导出函数，校验 `pack:` 元数据、拒绝 `sets`/`questlines`、warn 未知事件类型
+- **`isKnownEventType()`**: 基于 auditor Layer C emitter 列表的 42+ 事件校验
+- **Engine**: 新增 `packs[]`/`packDefinitions[]`/`loadPacks()`/`getPackInfo()`，`init()` 和 `reloadDefinitions()` 追加 pack 加载
+- **类型扩展**: `PackMetadata` 接口、`AchievementDefinition.pack_id`、`EngineOptions.packsDir`
+- **CLI**: `agpa pack list` / `agpa pack info` 命令，注册到 "Packs" 帮助分组
+- **Dashboard API**: `AchievementItem.pack_name` 标识非核心成就，`DashboardData.packs` 元数据数组
+- **测试**: 27 个 pack loading 测试（解析/冲突/异常隔离/删除保留/评估），1203 全绿
+- **文档**: `docs/creating-achievements.md`（~500 行，12 种条件类型 + 42+ 事件目录 + filter 语法 + 窗口 + 最佳实践）
+- **社区模板**: GitHub issue/PR 模板（`achievement-idea.md` / `new-pack.md`）
+- **示例**: `examples/example-pack.yaml`（2 个成就的 demo pack，counter + distinct_count）
+- **README**: 更新 badge（218/1203/25）、新增 Community Packs 章节 + nav 链接 + CLI 命令行，5 语言同步
+
 ### Dashboard 性能优化 — 2026-06-16
 
 - `renderAll` 只重建当前可见 tab（IntersectionObserver 追踪活跃 section），auto-poll 和 scoped 调用省 ~60% DOM/Canvas 操作。语言切换传 `full=true` 保持全量

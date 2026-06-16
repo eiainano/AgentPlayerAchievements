@@ -4288,7 +4288,7 @@ questlines:
         achievements: [streak_30, token_1m, wake_up_samurai]
 
   # ── Polyglot ────────────────────────────────────────────────
-  - id: polyglot
+  - id: polyglot_quest
     name: "Polyglot"
     name_cn: "语言通才"
     icon: "🌐"

@@ -1,5 +1,9 @@
 # Changelog
 
+### 修复像素画描述 — 2026-06-17
+
+- **pixel-art-ideas.md**: 修复 5 处像素画描述——dual_wielder（三刀流→Zoro）、permission_granted（控制面板→门禁卡）、execute_order_66（加闪电天罚）、rubber_duck（浴缸→办公桌）、its_learning（简化去冗余）
+
 ### 修复 YAML ID 冲突 — 2026-06-16
 
 - **achievement-definitions.yaml**: 探索线 `polyglot` ID 与 Milestones 成就 `polyglot` 冲突（YAML 218 条行 / 217 个唯⼀ ID），重命名为 `polyglot_quest`，现为 218 行 / 218 唯⼀

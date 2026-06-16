@@ -19,11 +19,11 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
-  <a href="#"><img src="https://img.shields.io/badge/logros-213-blueviolet" alt="213 logros"></a>
-  <a href="#"><img src="https://img.shields.io/badge/tests-1176-green" alt="1176 tests"></a>
+  <a href="#"><img src="https://img.shields.io/badge/logros-218-blueviolet" alt="218 logros"></a>
+  <a href="#"><img src="https://img.shields.io/badge/tests-1203-green" alt="1203 tests"></a>
   <a href="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml"><img src="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="#"><img src="https://img.shields.io/badge/node-%E2%89%A518-brightgreen" alt="Node >= 18"></a>
-  <a href="#"><img src="https://img.shields.io/badge/CLI-24_comandos-orange" alt="24 comandos CLI"></a>
+  <a href="#"><img src="https://img.shields.io/badge/CLI-25_comandos-orange" alt="25 comandos CLI"></a>
   <a href="https://github.com/eiainano/AgentPlayerAchievements"><img src="https://img.shields.io/github/stars/eiainano/AgentPlayerAchievements?style=flat&logo=github" alt="GitHub stars"></a>
   <a href="https://github.com/eiainano/AgentPlayerAchievements/commits/dev"><img src="https://img.shields.io/github/last-commit/eiainano/AgentPlayerAchievements/dev" alt="Último commit"></a>
   <a href="README.es.md"><img src="https://img.shields.io/badge/i18n-5_idiomas-blue" alt="i18n: 5 idiomas"></a>
@@ -39,6 +39,7 @@
   <a href="#características">Características</a> ·
   <a href="#herramientas-compatibles">Herramientas</a> ·
   <a href="#comandos-cli">Comandos CLI</a> ·
+  <a href="#paquetes-comunitarios">Paquetes Comunitarios</a> ·
   <a href="#panel">Panel</a> ·
   <a href="#documentación">Documentación</a> ·
   <a href="#seguridad-y-privacidad">Seguridad</a> ·
@@ -58,7 +59,7 @@
 
 - **Seguimiento automático** — cada llamada de herramienta, edición de archivo y commit de git registrado automáticamente
 - **Panel estilo Steam** — barra de XP, niveles, rachas, heatmaps, vitrina de logros
-- **213 logros** en 11 categorías — desde "Hello World" hasta "Completionist"
+- **218 logros** en 11 categorías — desde "Hello World" hasta "Completionist"
 - **Retroalimentación instantánea** — ventanas emergentes en terminal, notificaciones macOS, sonidos 8-bit al desbloquear
 
 ---
@@ -89,7 +90,7 @@ Tu Sesión de Programación
   ├─ Tú programas, el agente responde — cada acción se registra
   │   └─ doble canal: herramientas MCP + eventos Hook
   │
-  ├─ Fin de sesión → el motor evalúa 213 logros
+  ├─ Fin de sesión → el motor evalúa 218 logros
   │   └─ ¿desbloqueado? → notificación macOS 🎉
   │
   └─ agpa dashboard → ver, ordenar, filtrar, compartir
@@ -102,7 +103,7 @@ Tu Sesión de Programación
 | **Hook CLI** | Hooks de herramienta (subproceso vía stdin) | file.read/write/edit, tool.complete, git.commit, session.start/end, task.complete, agent.spawn |
 | **Servidor MCP** | Protocolo STDIO (5 herramientas) | image.read, file.language_used, plan.mode_entered, user.message, automode.start |
 
-Ambos canales escriben en el mismo registro de eventos `~/.agent-achievements/`. El motor evalúa 12 tipos de condiciones contra 213 logros.
+Ambos canales escriben en el mismo registro de eventos `~/.agent-achievements/`. El motor evalúa 12 tipos de condiciones contra 218 logros.
 
 > [!NOTE]
 > **Cero sobrecarga.** El Hook CLI es un subproceso de menos de un milisegundo. El servidor MCP se ejecuta sobre STDIO sin llamadas de red. Todos los datos permanecen en tu máquina.
@@ -110,7 +111,7 @@ Ambos canales escriben en el mismo registro de eventos `~/.agent-achievements/`.
 ## Características
 
 - 🎮 **Panel de Logros** — barra de XP, nivel, racha, heatmap de actividad, distribución por rareza, vitrina
-- 🏆 **213 Logros** en 11 categorías (Introducción, Maestría de Herramientas, Hitos, Habilidad, Estilo, Flujo de Trabajo, Creador, Ocultos, Desafío, Comunidad, Resistencia)
+- 🏆 **218 Logros** en 11 categorías (Introducción, Maestría de Herramientas, Hitos, Habilidad, Estilo, Flujo de Trabajo, Creador, Ocultos, Desafío, Comunidad, Resistencia)
 - 🔥 **Heatmap estilo GitHub** — 4 meses de actividad de programación de un vistazo
 - 📸 **Tarjeta para Compartir** — tema oscuro/claro, bilingüe (EN/ZH), descargable como PNG
 - 🔊 **Efectos de sonido 8-bit** — sonidos retro clasificados por rareza al desbloquear
@@ -275,8 +276,20 @@ OpenClaw soporta un sistema de plugins para seguimiento a nivel de hooks. `agpa 
 | `agpa import` | Importar desde copia de seguridad |
 | `agpa mcp` | Iniciar servidor MCP (modo stdio) |
 | `agpa web` | Alias de `agpa dashboard` |
+| `agpa pack` | Listar o inspeccionar paquetes de logros comunitarios |
 
 > Referencia CLI completa: `agpa --help`
+
+## Paquetes Comunitarios
+
+Cualquier persona puede crear y compartir paquetes de logros. Coloca un archivo YAML en `~/.agent-achievements/packs/` para instalarlo:
+
+```bash
+agpa pack list              # listar paquetes instalados
+agpa pack info <id>         # mostrar detalles del paquete
+```
+
+Consulta [Creación de Paquetes de Logros](docs/creating-achievements.md) para conocer el formato, el catálogo de eventos y los 12 tipos de condición.
 
 ## Categorías de Logros
 
@@ -376,7 +389,7 @@ src/
 └── helpers.ts               # Utilidades compartidas
 
 pixel-art-output/            # Logo + pixel art de logros
-achievement-definitions.yaml   # 213 definiciones de logros (fuente autoritativa)
+achievement-definitions.yaml   # 218 definiciones de logros (fuente autoritativa)
 scripts/                     # herramientas de desarrollo (gen de logo, pixel art, sonidos)
 ```
 
@@ -385,7 +398,7 @@ scripts/                     # herramientas de desarrollo (gen de logo, pixel ar
 ```bash
 npm install          # instalar dependencias (3 dependencias runtime)
 npm run build        # tsc --noEmit
-npm test             # 1176 tests, 45 archivos
+npm test             # 1203 tests, 45 archivos
 npm run dashboard    # iniciar panel de desarrollo
 npm run demo         # generar datos MVP
 ```
@@ -484,5 +497,5 @@ MIT — consulta [LICENSE](LICENSE)
 ---
 
 <p align="center">
-  <sub>Construido para desarrolladores que aman la gamificación. 213 logros y contando.</sub>
+  <sub>Construido para desarrolladores que aman la gamificación. 218 logros y contando.</sub>
 </p>

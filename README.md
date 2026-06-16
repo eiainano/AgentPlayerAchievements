@@ -19,11 +19,11 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
-  <a href="#"><img src="https://img.shields.io/badge/achievements-213-blueviolet" alt="213 achievements"></a>
-  <a href="#"><img src="https://img.shields.io/badge/tests-1176-green" alt="1176 tests"></a>
+  <a href="#"><img src="https://img.shields.io/badge/achievements-218-blueviolet" alt="218 achievements"></a>
+  <a href="#"><img src="https://img.shields.io/badge/tests-1203-green" alt="1203 tests"></a>
   <a href="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml"><img src="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="#"><img src="https://img.shields.io/badge/node-%E2%89%A518-brightgreen" alt="Node >= 18"></a>
-  <a href="#"><img src="https://img.shields.io/badge/CLI-24_commands-orange" alt="24 CLI commands"></a>
+  <a href="#"><img src="https://img.shields.io/badge/CLI-25_commands-orange" alt="25 CLI commands"></a>
   <a href="https://github.com/eiainano/AgentPlayerAchievements"><img src="https://img.shields.io/github/stars/eiainano/AgentPlayerAchievements?style=flat&logo=github" alt="GitHub stars"></a>
   <a href="https://github.com/eiainano/AgentPlayerAchievements/commits/dev"><img src="https://img.shields.io/github/last-commit/eiainano/AgentPlayerAchievements/dev" alt="Last commit"></a>
   <a href="README.zh-CN.md"><img src="https://img.shields.io/badge/i18n-5_languages-blue" alt="i18n: 5 languages"></a>
@@ -39,6 +39,7 @@
   <a href="#features">Features</a> ·
   <a href="#supported-tools">Supported Tools</a> ·
   <a href="#cli-commands">CLI Commands</a> ·
+  <a href="#community-packs">Community Packs</a> ·
   <a href="#dashboard">Dashboard</a> ·
   <a href="#documentation">Documentation</a> ·
   <a href="#security--privacy">Security & Privacy</a> ·
@@ -58,7 +59,7 @@
 
 - **Auto-tracking** — every tool call, file edit, and git commit logged automatically
 - **Steam-style dashboard** — XP bar, levels, streaks, heatmaps, achievement showcase
-- **213 achievements** across 11 categories — from "Hello World" to "Completionist"
+- **218 achievements** across 11 categories — from "Hello World" to "Completionist"
 - **Instant feedback** — terminal popups, macOS notifications, 8-bit sounds on unlock
 
 ---
@@ -89,7 +90,7 @@ Your Coding Session
   ├─ You code, agent responds — every action is tracked
   │   └─ dual-channel: MCP tools + Hook events
   │
-  ├─ Session ends → engine evaluates 213 achievements
+  ├─ Session ends → engine evaluates 218 achievements
   │   └─ unlocked? → macOS notification 🎉
   │
   └─ agpa dashboard → view, sort, filter, share
@@ -102,7 +103,7 @@ Your Coding Session
 | **Hook CLI** | Tool hooks (subprocess via stdin) | file.read/write/edit, tool.complete, git.commit, session.start/end, task.complete, agent.spawn |
 | **MCP Server** | STDIO protocol (5 tools) | image.read, file.language_used, plan.mode_entered, user.message, automode.start |
 
-Both channels write to the same `~/.agent-achievements/` event log. The engine evaluates 12 condition types against 213 achievements.
+Both channels write to the same `~/.agent-achievements/` event log. The engine evaluates 12 condition types against 218 achievements.
 
 > [!NOTE]
 > **Zero overhead.** The Hook CLI is a sub-millisecond subprocess. The MCP server runs on STDIO with no network calls. All data stays on your machine.
@@ -110,7 +111,7 @@ Both channels write to the same `~/.agent-achievements/` event log. The engine e
 ## Features
 
 - 🎮 **Achievement Dashboard** — XP bar, level, streak, activity heatmap, rarity breakdown, showcase
-- 🏆 **213 Achievements** across 11 categories (Onboarding, Tool Mastery, Milestones, Skill, Style, Workflow, Creator, Hidden, Challenge, Community, Endurance)
+- 🏆 **218 Achievements** across 11 categories (Onboarding, Tool Mastery, Milestones, Skill, Style, Workflow, Creator, Hidden, Challenge, Community, Endurance)
 - 🔥 **GitHub-style heatmap** — 4 months of coding activity at a glance
 - 📸 **Share Card** — dark/light themed, bilingual (EN/ZH), downloadable PNG
 - 🔊 **8-bit sound effects** — rarity-graded retro sounds for unlocks
@@ -275,8 +276,20 @@ OpenClaw supports a plugin system for hook-level tracking. `agpa init` registers
 | `agpa import` | Import from backup |
 | `agpa mcp` | Start MCP server (stdio mode) |
 | `agpa web` | Alias for `agpa dashboard` |
+| `agpa pack` | List or inspect installed community achievement packs |
 
 > Full CLI reference: `agpa --help`
+
+## Community Packs
+
+Anyone can create and share achievement packs. Drop a YAML file into `~/.agent-achievements/packs/` to install:
+
+```bash
+agpa pack list              # list installed packs
+agpa pack info <id>         # show pack details
+```
+
+See [Creating Achievement Packs](docs/creating-achievements.md) for the pack format spec, event type catalog, and 12 condition types.
 
 ## Achievement Categories
 
@@ -376,7 +389,7 @@ src/
 └── helpers.ts               # Shared utilities
 
 pixel-art-output/            # Logo + achievement pixel art
-achievement-definitions.yaml   # 213 achievement definitions (authoritative)
+achievement-definitions.yaml   # 218 achievement definitions (authoritative)
 scripts/                     # dev tools (logo gen, pixel art gen, sounds)
 ```
 
@@ -385,7 +398,7 @@ scripts/                     # dev tools (logo gen, pixel art gen, sounds)
 ```bash
 npm install          # install dependencies (3 runtime deps)
 npm run build        # tsc --noEmit
-npm test             # 1176 tests, 45 files
+npm test             # 1203 tests, 45 files
 npm run dashboard    # start dev dashboard
 npm run demo         # generate MVP data
 ```
@@ -484,5 +497,5 @@ MIT — see [LICENSE](LICENSE)
 ---
 
 <p align="center">
-  <sub>Built for developers who love gamification. 213 achievements and counting.</sub>
+  <sub>Built for developers who love gamification. 218 achievements and counting.</sub>
 </p>

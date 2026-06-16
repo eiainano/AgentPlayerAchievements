@@ -9,6 +9,138 @@
  * - Batch save with dirty tracking
  */
 
+// ── i18n ──────────────────────────────────────────────────────────────────
+const I18N_CZ = {
+  en: {
+    cz_brand: '🎨 Self-Customize',
+    cz_save_changes: '💾 Save Changes',
+    cz_reload: '🔄 Reload',
+    cz_search_placeholder: 'Search ID / name…',
+    cz_all_categories: 'All Categories',
+    cz_all_rarities: 'All Rarities',
+    cz_only_missing_cn: 'Only missing CN',
+    cz_only_suggestions: 'Only with suggestions',
+    cz_prev: '← Prev',
+    cz_next: 'Next →',
+    cz_empty_title: 'Select an achievement from the list to edit',
+    cz_empty_sub: 'Edit Chinese / English names and descriptions. Use ↑↓ to navigate, Ctrl+S to save.',
+    cz_stat_total: '{n} total',
+    cz_stat_cn: '{n} CN',
+    cz_stat_missing: '{n} missing',
+    cz_stat_suggestions: '{n} suggestions',
+    cz_field_name_en: 'English Name',
+    cz_field_name_zh: 'Chinese Name',
+    cz_field_desc_zh: 'Chinese Description',
+    cz_field_desc_en: 'English Description',
+    cz_field_conditions: 'Conditions',
+    cz_tag_en_editable: 'EN ✏️',
+    cz_tag_zh_editable: '中文 ✏️',
+    cz_tag_en_readonly: 'EN 👁️',
+    cz_tag_readonly: 'Read-only',
+    cz_hint_translate: '— Save the Chinese description and we\'ll translate it to English',
+    cz_placeholder_missing: '(missing)',
+    cz_placeholder_translate: '(will be translated from Chinese)',
+    cz_no_conditions: '(no conditions)',
+    cz_missing_cn: '(missing CN)',
+    cz_dot_missing_title: 'Missing Chinese name',
+    cz_dot_suggestion_title: 'Has suggestions',
+    cz_set_prefix: 'set:',
+    cz_hidden_badge: 'hidden',
+    cz_accept: 'Accept',
+    cz_ignore: 'Ignore',
+    cz_no_matches: 'No matches',
+    cz_toast_reloaded_title: 'Reloaded',
+    cz_toast_reloaded_msg: '{n} achievements loaded',
+    cz_toast_error_title: 'Error',
+    cz_toast_reload_failed: 'Failed to reload achievements',
+    cz_toast_saved_title: 'Saved',
+    cz_toast_saved_msg: '{n} changes written to YAML',
+    cz_toast_save_failed: 'Failed to save changes',
+  },
+  zh: {
+    cz_brand: '🎨 自助编辑',
+    cz_save_changes: '💾 保存修改',
+    cz_reload: '🔄 重新加载',
+    cz_search_placeholder: '搜索 ID / 名称…',
+    cz_all_categories: '所有分类',
+    cz_all_rarities: '所有稀有度',
+    cz_only_missing_cn: '只显示缺少中文的',
+    cz_only_suggestions: '只显示有建议的',
+    cz_prev: '← 上一个',
+    cz_next: '下一个 →',
+    cz_empty_title: '从左侧列表选择成就开始编辑',
+    cz_empty_sub: '编辑中英文名称和描述。用 ↑↓ 导航，Ctrl+S 保存。',
+    cz_stat_total: '{n} 总计',
+    cz_stat_cn: '{n} 有中文',
+    cz_stat_missing: '{n} 缺失',
+    cz_stat_suggestions: '{n} 建议',
+    cz_field_name_en: '英文名称',
+    cz_field_name_zh: '中文名称',
+    cz_field_desc_zh: '中文描述',
+    cz_field_desc_en: '英文描述',
+    cz_field_conditions: '条件',
+    cz_tag_en_editable: 'EN ✏️',
+    cz_tag_zh_editable: '中文 ✏️',
+    cz_tag_en_readonly: 'EN 👁️',
+    cz_tag_readonly: '只读',
+    cz_hint_translate: '— 编辑中文后保存，我们会统一翻译成英文',
+    cz_placeholder_missing: '（缺失）',
+    cz_placeholder_translate: '（保存中文描述后将自动翻译成英文）',
+    cz_no_conditions: '（无条件）',
+    cz_missing_cn: '（缺失中文）',
+    cz_dot_missing_title: '缺少中文名称',
+    cz_dot_suggestion_title: '有编辑建议',
+    cz_set_prefix: '套装:',
+    cz_hidden_badge: '隐藏',
+    cz_accept: '接受',
+    cz_ignore: '忽略',
+    cz_no_matches: '无匹配项',
+    cz_toast_reloaded_title: '已重新加载',
+    cz_toast_reloaded_msg: '已加载 {n} 个成就',
+    cz_toast_error_title: '错误',
+    cz_toast_reload_failed: '重新加载失败',
+    cz_toast_saved_title: '已保存',
+    cz_toast_saved_msg: '已将 {n} 处修改写入 YAML',
+    cz_toast_save_failed: '保存失败',
+  },
+};
+
+let czLang = (function() {
+  var saved = localStorage.getItem('agpa-lang');
+  return saved === 'zh' ? 'zh' : 'en';
+})();
+
+function tc(key, replacements) {
+  var map = I18N_CZ[czLang] || I18N_CZ.en;
+  var str = map[key] || I18N_CZ.en[key] || key;
+  if (replacements) {
+    Object.keys(replacements).forEach(function(k) {
+      str = str.replace('{' + k + '}', replacements[k]);
+    });
+  }
+  return str;
+}
+
+function renderCzI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(function(el) {
+    var key = el.getAttribute('data-i18n');
+    if (key) {
+      // For <button> with child <span>, preserve the child structure
+      var dirtySpan = el.querySelector('#dirty-count');
+      if (dirtySpan) {
+        el.childNodes[0].textContent = tc(key) + ' (';
+      } else {
+        el.textContent = tc(key);
+      }
+    }
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+    var key = el.getAttribute('data-i18n-placeholder');
+    if (key) el.placeholder = tc(key);
+  });
+  document.documentElement.setAttribute('lang', czLang === 'zh' ? 'zh-CN' : 'en');
+}
+
 // ── State ────────────────────────────────────────────────────────────────
 const STATE = {
   achievements: [],       // CustomizeAchievement[]
@@ -75,17 +207,18 @@ async function loadData(silent = false) {
     updateStats();
     renderList();
     if (!silent) {
-      toast('Reloaded', `${data.stats.total} achievements loaded`, 'info');
+      toast(tc('cz_toast_reloaded_title'), tc('cz_toast_reloaded_msg', { n: data.stats.total }), 'info');
     }
   } catch (err) {
     console.error('Failed to load achievements:', err);
-    if (!silent) toast('Error', 'Failed to reload achievements', 'error');
+    if (!silent) toast(tc('cz_toast_error_title'), tc('cz_toast_reload_failed'), 'error');
   }
 }
 
 async function init() {
   bindEvents();
   await loadData(true);
+  renderCzI18n();
 }
 
 // ── Category Filter Population ──────────────────────────────────────────
@@ -126,7 +259,7 @@ function renderList() {
   DOM.achList.innerHTML = '';
 
   if (filtered.length === 0) {
-    DOM.achList.innerHTML = '<li style="padding:12px;color:var(--text-muted);font-size:13px;">No matches</li>';
+    DOM.achList.innerHTML = '<li style="padding:12px;color:var(--text-muted);font-size:13px;">' + tc('cz_no_matches') + '</li>';
     return;
   }
 
@@ -158,7 +291,7 @@ function renderList() {
       cnDiv.textContent = cnDisplay;
     } else {
       cnDiv.style.color = 'var(--danger)';
-      cnDiv.textContent = '(missing CN)';
+      cnDiv.textContent = tc('cz_missing_cn');
     }
 
     infoDiv.appendChild(nameDiv);
@@ -169,13 +302,13 @@ function renderList() {
     if (!cnDisplay) {
       const dot = document.createElement('span');
       dot.className = 'dot missing';
-      dot.title = 'Missing Chinese name';
+      dot.title = tc('cz_dot_missing_title');
       badgesDiv.appendChild(dot);
     }
     if (hasSuggestions) {
       const dot = document.createElement('span');
       dot.className = 'dot suggestion';
-      dot.title = 'Has suggestions';
+      dot.title = tc('cz_dot_suggestion_title');
       badgesDiv.appendChild(dot);
     }
 
@@ -221,7 +354,7 @@ function renderEditor(ach) {
 
   DOM.editHidden.style.display = ach.hidden ? 'inline' : 'none';
   DOM.editSet.style.display = ach.set ? 'inline' : 'none';
-  if (ach.set) DOM.editSet.textContent = `set: ${ach.set}`;
+  if (ach.set) DOM.editSet.textContent = tc('cz_set_prefix') + ' ' + ach.set;
 
   // Editable fields
   DOM.fieldName.value = STATE.dirtyFields.get(`${ach.id}:name`) ?? ach.name;
@@ -238,7 +371,7 @@ function renderEditor(ach) {
   } else {
     const span = document.createElement('span');
     span.className = 'en-placeholder';
-    span.textContent = '(will be translated from Chinese after you save)';
+    span.textContent = tc('cz_placeholder_translate');
     DOM.fieldDescEn.appendChild(span);
   }
 
@@ -301,13 +434,13 @@ function renderSuggestions(achId, field, container, ach) {
     acceptBtn.dataset.field = field;
     acceptBtn.dataset.value = s.suggested;
     acceptBtn.dataset.sid = String(i);
-    acceptBtn.textContent = 'Accept';
+    acceptBtn.textContent = tc('cz_accept');
 
     const rejectBtn = document.createElement('button');
     rejectBtn.className = 'btn reject small';
     rejectBtn.dataset.action = 'reject';
     rejectBtn.dataset.sid = String(i);
-    rejectBtn.textContent = 'Ignore';
+    rejectBtn.textContent = tc('cz_ignore');
 
     actions.appendChild(acceptBtn);
     actions.appendChild(rejectBtn);
@@ -338,7 +471,7 @@ function renderSuggestions(achId, field, container, ach) {
 // ── Conditions Formatting ──────────────────────────────────────────────
 function formatConditions(conditions) {
   if (!conditions || !Array.isArray(conditions) || conditions.length === 0) {
-    return '(no conditions)';
+    return tc('cz_no_conditions');
   }
   return conditions.map(c => {
     const parts = [`[${c.type}]`];
@@ -435,10 +568,10 @@ async function saveAll() {
     updateStats();
     renderList();
 
-    toast('Saved', `${result.updated} changes written to YAML`, 'success');
+    toast(tc('cz_toast_saved_title'), tc('cz_toast_saved_msg', { n: result.updated }), 'success');
   } catch (err) {
     console.error('Save failed:', err);
-    toast('Error', 'Failed to save changes', 'error');
+    toast(tc('cz_toast_error_title'), tc('cz_toast_save_failed'), 'error');
   }
 }
 
@@ -448,10 +581,10 @@ function updateStats() {
   const withoutCn = STATE.achievements.length - withCn;
   const totalSug = STATE.achievements.reduce((sum, a) => sum + a.suggestions.length, 0);
 
-  DOM.statTotal.textContent = `${STATE.achievements.length} total`;
-  DOM.statCn.textContent = `${withCn} CN`;
-  DOM.statMissing.textContent = `${withoutCn} missing`;
-  DOM.statSuggestions.textContent = `${totalSug} suggestions`;
+  DOM.statTotal.textContent = tc('cz_stat_total', { n: STATE.achievements.length });
+  DOM.statCn.textContent = tc('cz_stat_cn', { n: withCn });
+  DOM.statMissing.textContent = tc('cz_stat_missing', { n: withoutCn });
+  DOM.statSuggestions.textContent = tc('cz_stat_suggestions', { n: totalSug });
 }
 
 // ── Toast ───────────────────────────────────────────────────────────────

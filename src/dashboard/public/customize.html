@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="dark">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,16 +10,16 @@
 <body>
   <header id="top-bar">
     <div class="bar-inner">
-      <span class="bar-brand">🎨 Self-Customize</span>
+      <span class="bar-brand" data-i18n="cz_brand">🎨 Self-Customize</span>
       <div class="bar-info">
-        <span id="stat-total">138 total</span>
-        <span id="stat-cn">44 CN</span>
-        <span id="stat-missing">94 missing</span>
-        <span id="stat-suggestions">0 suggestions</span>
+        <span id="stat-total"></span>
+        <span id="stat-cn"></span>
+        <span id="stat-missing"></span>
+        <span id="stat-suggestions"></span>
       </div>
       <div class="bar-actions">
-        <button id="btn-save-all" class="btn primary" disabled>💾 Save Changes (<span id="dirty-count">0</span>)</button>
-        <button id="btn-reload" class="btn">🔄 Reload</button>
+        <button id="btn-save-all" class="btn primary" disabled data-i18n="cz_save_changes">💾 Save Changes (<span id="dirty-count">0</span>)</button>
+        <button id="btn-reload" class="btn" data-i18n="cz_reload">🔄 Reload</button>
       </div>
     </div>
   </header>
@@ -28,13 +28,13 @@
     <!-- Left: Achievement list -->
     <aside id="sidebar">
       <div class="sidebar-toolbar">
-        <input type="search" id="search-input" placeholder="Search ID / name…" autocomplete="off">
+        <input type="search" id="search-input" data-i18n-placeholder="cz_search_placeholder" placeholder="Search ID / name…" autocomplete="off">
         <div class="filter-row">
           <select id="filter-category">
-            <option value="">All Categories</option>
+            <option value="" data-i18n="cz_all_categories">All Categories</option>
           </select>
           <select id="filter-rarity">
-            <option value="">All Rarities</option>
+            <option value="" data-i18n="cz_all_rarities">All Rarities</option>
             <option value="common">Common</option>
             <option value="uncommon">Uncommon</option>
             <option value="rare">Rare</option>
@@ -45,11 +45,11 @@
         </div>
         <label class="toggle-filter">
           <input type="checkbox" id="filter-no-cn" checked>
-          <span>Only missing CN</span>
+          <span data-i18n="cz_only_missing_cn">Only missing CN</span>
         </label>
         <label class="toggle-filter">
           <input type="checkbox" id="filter-suggestions">
-          <span>Only with suggestions</span>
+          <span data-i18n="cz_only_suggestions">Only with suggestions</span>
         </label>
       </div>
       <ul id="ach-list"></ul>
@@ -60,8 +60,8 @@
       <div id="editor-empty" class="editor-state">
         <div class="empty-hint">
           <span class="empty-icon">👈</span>
-          <p>Select an achievement from the list to edit</p>
-          <p class="empty-sub">Edit Chinese / English names and descriptions. Use ↑↓ to navigate, Ctrl+S to save.</p>
+          <p data-i18n="cz_empty_title">Select an achievement from the list to edit</p>
+          <p class="empty-sub" data-i18n="cz_empty_sub">Edit Chinese / English names and descriptions. Use ↑↓ to navigate, Ctrl+S to save.</p>
         </div>
       </div>
 
@@ -78,9 +78,9 @@
         </div>
 
         <div class="editor-nav">
-          <button id="btn-prev" class="btn small">← Prev</button>
+          <button id="btn-prev" class="btn small" data-i18n="cz_prev">← Prev</button>
           <span id="edit-pos">1 / 138</span>
-          <button id="btn-next" class="btn small">Next →</button>
+          <button id="btn-next" class="btn small" data-i18n="cz_next">Next →</button>
         </div>
 
         <div id="edit-fields">

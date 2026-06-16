@@ -32,7 +32,7 @@
         <img src="/agpa-logo-dark-24.png" alt="" class="nav-logo" id="nav-logo">
         <span class="nav-brand-text">AGPA</span>
       </span>
-      <span class="demo-badge" id="demo-badge" style="display:none">🔬 Demo 数据</span>
+      <span class="demo-badge" id="demo-badge" style="display:none" data-i18n="demo_badge_label">🔬 Demo Data</span>
       <!-- Profile selector -->
       <div class="profile-selector">
         <button class="profile-btn" id="profile-btn" onclick="toggleProfileDropdown()">
@@ -81,19 +81,19 @@
             </div>
           </div>
         </div>
-        <label class="switch" title="Sound effects">
+        <label class="switch" data-i18n-title="toggle_sound" title="Sound effects">
           <span class="switch-label">🔇</span>
           <input type="checkbox" id="sound-toggle" checked>
           <span class="switch-track"><span class="switch-knob"></span></span>
           <span class="switch-label">🔊</span>
         </label>
-        <label class="switch" title="Animations">
+        <label class="switch" data-i18n-title="toggle_animations" title="Animations">
           <span class="switch-label">✨</span>
           <input type="checkbox" id="anim-toggle" checked>
           <span class="switch-track"><span class="switch-knob"></span></span>
           <span class="switch-label">🎴</span>
         </label>
-        <label class="switch" title="Theme">
+        <label class="switch" data-i18n-title="toggle_theme" title="Dark / Light theme">
           <span class="switch-label">☀️</span>
           <input type="checkbox" id="theme-toggle">
           <span class="switch-track"><span class="switch-knob"></span></span>
@@ -108,12 +108,12 @@
     <div class="demo-banner-content">
       <span class="demo-banner-icon">🎮</span>
       <div class="demo-banner-text">
-        <div class="demo-banner-title">这是你的 Demo 体验数据</div>
-        <div class="demo-banner-sub">我们用模拟的一天使用历史帮你解锁了 5 个入门成就。探索下面的面板，了解 AGPA 能追踪什么。</div>
+        <div class="demo-banner-title" data-i18n="demo_banner_title">This is your Demo experience data</div>
+        <div class="demo-banner-sub" data-i18n="demo_banner_sub">We've unlocked 5 starter achievements using a simulated day of usage. Explore the panels below to see what AGPA can track.</div>
       </div>
       <div class="demo-banner-actions">
-        <button class="demo-banner-tour-btn" onclick="startTour()">👀 带我逛逛</button>
-        <button class="demo-banner-close-btn" onclick="dismissDemoBanner()">✕ 关闭</button>
+        <button class="demo-banner-tour-btn" onclick="startTour()" data-i18n="demo_banner_tour_btn">👀 Take the tour</button>
+        <button class="demo-banner-close-btn" onclick="dismissDemoBanner()" data-i18n="demo_banner_close_btn">✕ Dismiss</button>
       </div>
     </div>
   </div>
@@ -323,18 +323,18 @@
     <div class="modal-container profile-create-modal" id="profile-modal-container">
       <div class="modal-header">
         <span class="modal-icon-wrap">🏷️</span>
-        <button class="modal-close" onclick="closeProfileModal()" title="Close">✕</button>
+        <button class="modal-close" onclick="closeProfileModal()" data-i18n-title="modal_close" title="Close">✕</button>
       </div>
       <div class="modal-body">
         <div class="modal-title-row">
-          <div class="modal-title" id="profile-modal-title">Create Profile</div>
+          <div class="modal-title" id="profile-modal-title" data-i18n="profile_modal_title">Create Profile</div>
         </div>
         <div class="modal-desc" id="profile-modal-desc"></div>
-        <div class="profile-emoji-picker-label">Choose an icon</div>
+        <div class="profile-emoji-picker-label" data-i18n="profile_modal_emoji_label">Choose an icon</div>
         <div class="profile-emoji-grid" id="profile-emoji-grid"></div>
         <div class="profile-modal-actions">
-          <button class="profile-modal-cancel" onclick="closeProfileModal()">Cancel</button>
-          <button class="profile-modal-confirm" id="profile-modal-confirm" onclick="confirmCreateProfile()">Create</button>
+          <button class="profile-modal-cancel" onclick="closeProfileModal()" data-i18n="profile_modal_cancel">Cancel</button>
+          <button class="profile-modal-confirm" id="profile-modal-confirm" onclick="confirmCreateProfile()" data-i18n="profile_modal_create">Create</button>
         </div>
       </div>
     </div>
@@ -366,7 +366,7 @@
   <!-- ★ GitHub Star floating button -->
   <a href="https://github.com/eiainano/AgentPlayerAchievements" target="_blank" rel="noopener" class="github-star-float" id="github-star-float" title="⭐ Star us on GitHub!">
     <svg class="github-star-icon" viewBox="0 0 24 24" width="18" height="18"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/></svg>
-    <span class="github-star-label" id="github-star-label">Star us on GitHub</span>
+    <span class="github-star-label" id="github-star-label" data-i18n="github_star">Star us on GitHub</span>
   </a>
 </body>
 </html>

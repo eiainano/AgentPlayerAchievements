@@ -13,26 +13,22 @@ var AGPATour = (function() {
   var STEPS = [
     {
       target: '#achievement-grid',
-      title: '📊 成就面板',
-      desc: '每个成就追踪一种 Agent 行为。已解锁的亮起，灰色的等待你去激活。',
+      key: 'tour_step1',
       tab: 'achievements',
     },
     {
       target: '#stats-row',
-      title: '📈 统计面板',
-      desc: '成就进度、分类分布、稀有度一目了然。数字越大越有成就感！',
+      key: 'tour_step2',
       tab: 'profile',
     },
     {
       target: '#timeline',
-      title: '📅 时间线',
-      desc: '回顾你和 Agent 的每一段对话 session，看到成就解锁的时间轴。',
+      key: 'tour_step3',
       tab: 'timeline',
     },
     {
       target: '#insights',
-      title: '🔥 热力图',
-      desc: '像 GitHub 贡献图一样追踪你的 Agent 使用活跃度，每天用了多久一目了然。',
+      key: 'tour_step4',
       tab: 'insights',
     },
   ];
@@ -91,10 +87,13 @@ var AGPATour = (function() {
       clone.style.pointerEvents = 'none';
       document.body.appendChild(clone);
 
+      var stepTitle = (typeof t === 'function') ? t(step.key + '_title') : step.key;
+      var stepDesc = (typeof t === 'function') ? t(step.key + '_desc') : step.key;
+
       tooltip.innerHTML =
         '<div class="tour-tooltip-step">' + (index + 1) + ' / ' + STEPS.length + '</div>' +
-        '<div class="tour-tooltip-title">' + step.title + '</div>' +
-        '<div class="tour-tooltip-desc">' + step.desc + '</div>' +
+        '<div class="tour-tooltip-title">' + stepTitle + '</div>' +
+        '<div class="tour-tooltip-desc">' + stepDesc + '</div>' +
         '<div class="tour-tooltip-btns">' +
           (index > 0
             ? '<button class="tour-btn tour-btn-prev" id="tour-prev">' + (typeof t === 'function' ? t('tour_prev') : '← Previous') + '</button>'

@@ -31,6 +31,9 @@
     "achievement-definitions.yaml",
     "README.md",
     "README.zh-CN.md",
+    "README.es.md",
+    "README.ko.md",
+    "README.ja.md",
     "LICENSE",
     "AGENTS.md"
   ],

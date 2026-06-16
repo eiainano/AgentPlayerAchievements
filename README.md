@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <strong>English</strong>&nbsp;|&nbsp;<a href="./README.zh-CN.md">中文</a>
+  <strong>EN</strong>&nbsp;|&nbsp;<a href="./README.zh-CN.md">中文</a>&nbsp;|&nbsp;<a href="./README.es.md">ES</a>&nbsp;|&nbsp;<a href="./README.ko.md">한국어</a>&nbsp;|&nbsp;<a href="./README.ja.md">日本語</a>
 </p>
 
 <p align="center">
@@ -24,10 +24,25 @@
   <a href="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml"><img src="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="#"><img src="https://img.shields.io/badge/node-%E2%89%A518-brightgreen" alt="Node >= 18"></a>
   <a href="#"><img src="https://img.shields.io/badge/CLI-24_commands-orange" alt="24 CLI commands"></a>
+  <a href="https://github.com/eiainano/AgentPlayerAchievements"><img src="https://img.shields.io/github/stars/eiainano/AgentPlayerAchievements?style=flat&logo=github" alt="GitHub stars"></a>
+  <a href="https://github.com/eiainano/AgentPlayerAchievements/commits/dev"><img src="https://img.shields.io/github/last-commit/eiainano/AgentPlayerAchievements/dev" alt="Last commit"></a>
+  <a href="README.zh-CN.md"><img src="https://img.shields.io/badge/i18n-5_languages-blue" alt="i18n: 5 languages"></a>
 </p>
 
 <p align="center">
   <b>Claude Code</b>&nbsp;·&nbsp;<b>Kilo Code</b>&nbsp;·&nbsp;<b>OpenCode</b>&nbsp;·&nbsp;<b>Hermes</b>&nbsp;·&nbsp;<b>OpenClaw</b>
+</p>
+
+<p align="center">
+  <a href="#quick-start">Quick Start</a> ·
+  <a href="#how-it-works">How It Works</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#supported-tools">Supported Tools</a> ·
+  <a href="#cli-commands">CLI Commands</a> ·
+  <a href="#dashboard">Dashboard</a> ·
+  <a href="#documentation">Documentation</a> ·
+  <a href="#security--privacy">Security & Privacy</a> ·
+  <a href="#faq">FAQ</a>
 </p>
 
 ---
@@ -238,28 +253,30 @@ OpenClaw supports a plugin system for hook-level tracking. `agpa init` registers
 
 ## CLI Commands
 
-```bash
-agpa init             # auto-detect and register with your agent tools
-agpa uninstall        # cleanly remove AGPA from all configured tools
-agpa verify           # check installation correctness
-agpa doctor           # diagnose system state
-agpa dashboard        # start achievement dashboard (localhost:3867)
-agpa stats            # show achievement progress summary
-agpa progress         # list all achievements with status
-agpa profile          # manage achievement profiles
-agpa demo             # generate MVP demo data
-agpa reset            # reset all data
-agpa config           # view/modify config (lang, sound, debug...)
-agpa showcase         # manage showcase (list, pin, unpin, auto-fill)
-agpa search           # search achievements by keyword/rarity/category
-agpa suggest          # suggest next achievement to hunt
-agpa sound            # test sound effects
-agpa activity         # view streak + activity heatmap
-agpa export           # export achievement data
-agpa import           # import from backup
-agpa mcp              # start MCP server (stdio)
-agpa web              # alias for dashboard
-```
+| Command | Description |
+|---------|-------------|
+| `agpa init` | Auto-detect and register with your agent tools |
+| `agpa uninstall` | Cleanly remove AGPA from all configured tools |
+| `agpa verify` | Check installation correctness |
+| `agpa doctor` | Diagnose system state |
+| `agpa dashboard` | Start achievement dashboard (localhost:3867) |
+| `agpa stats` | Show achievement progress summary |
+| `agpa progress` | List all achievements with unlock status |
+| `agpa profile` | Manage achievement profiles (create, list, switch) |
+| `agpa demo` | Generate MVP demo data for testing |
+| `agpa reset` | Reset all tracking data |
+| `agpa config` | View/modify config (lang, sound, debug...) |
+| `agpa showcase` | Manage showcase (list, pin, unpin, auto-fill) |
+| `agpa search` | Search achievements by keyword/rarity/category |
+| `agpa suggest` | Suggest next achievement to hunt |
+| `agpa sound` | Test 8-bit rarity-graded sound effects |
+| `agpa activity` | View streak + 4-month activity heatmap |
+| `agpa export` | Export achievement data as JSON |
+| `agpa import` | Import from backup |
+| `agpa mcp` | Start MCP server (stdio mode) |
+| `agpa web` | Alias for `agpa dashboard` |
+
+> Full CLI reference: `agpa --help`
 
 ## Achievement Categories
 
@@ -381,6 +398,46 @@ npm run demo         # generate MVP data
 
 > [!NOTE]
 > **Deliberately minimal.** Four runtime dependencies, zero network calls at runtime. The engine is pure functions with JSONL storage — easy to audit, impossible to break.
+
+## 📚 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Multi-Tool Setup](docs/multi-tool-setup.md) | Configuring AGPA across 5 supported agent tools |
+| [Achievement Design](docs/design/01-成就分类体系.md) | Achievement taxonomy, naming conventions & YAML field reference |
+| [Engine Architecture](docs/design/05-核心引擎设计.md) | Event flow → condition evaluation → state persistence |
+| [Event Capture Design](docs/design/08-EventCapture落地设计.md) | Dual-channel capture: Hook CLI + MCP server |
+| [Steam Research](docs/design/12-Steam游戏成就设计调研.md) | Survey of achievement systems from 21 popular Steam games |
+| [Issues & TODOs](docs/issues-todo.md) | Known bugs, gaps, and P0–P3 priorities |
+| [Changelog](CHANGELOG.md) | Version history and release notes |
+
+## 🔒 Security & Privacy
+
+- **Local-first** — All event data stays in `~/.agent-achievements/`. No telemetry, no cloud sync, no network calls at runtime.
+- **Auditable** — The engine is pure TypeScript functions operating on JSONL files. No obfuscation, no binary blobs.
+- **Minimal dependencies** — 4 runtime dependencies (`@modelcontextprotocol/sdk`, `yaml`, `zod`, `figlet`) — all widely audited.
+- **STDIO isolation** — The MCP server communicates via standard I/O only. No HTTP endpoints exposed.
+- **Hook sandbox** — The Hook CLI runs as a sub-millisecond subprocess — it cannot persist state or access the network.
+- **Supply chain** — No native modules, no postinstall scripts, no binary downloads at install time.
+
+## 🌐 Environment Variables
+
+| Variable | Description | Default | Values |
+|----------|-------------|---------|--------|
+| `AGPA_PROFILE` | Active profile name | `default` | any string |
+| `AGPA_LANG` | Interface language | `en` | `en`, `zh` |
+| `AGPA_ENABLED_CATEGORIES` | Filter which achievement categories are active | all | comma-separated (e.g. `onboarding,tool_mastery`) |
+| `AGPA_DEBUG` | Enable verbose debug logging | `false` | `true` |
+| `AGPA_SOUND` | Override sound effects | config setting | `on`, `off`, `true`, `false` |
+| `AGPA_SIMPLE_ANIMATIONS` | Use simplified terminal animations | `false` | `true` |
+| `AGPA_BANNER_THEME` | CLI startup banner style | `Arcade` | `Neon`, `Arcade`, `Gold` |
+| `AGPA_TELEMETRY` | Enable anonymous usage telemetry | `false` | `true`, `false` |
+| `AGPA_TELEMETRY_SERVER` | Custom telemetry endpoint URL | `''` (none) | URL string |
+| `AGPA_TOOL_SOURCE` | Override tool source identifier | auto-detected | `claude-code`, `hermes`, `openclaw`, etc. |
+| `AGPA_MODEL` | Current AI model name (for achievements) | `auto` | any model string |
+
+> [!TIP]
+> Environment variables override `config.json` settings. Set them in your shell profile or agent configuration for persistent overrides.
 
 ## FAQ
 

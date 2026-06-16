@@ -68,6 +68,7 @@ Useful for quick testing: `echo '{"hook_event_name":"PostToolUse","tool_name":"R
 - All JSON parsing uses `safeParse()` from `src/utils/validate.ts` — never raw `JSON.parse()`.
 - Notifications go through `src/utils/notify.ts` — not duplicated in hook.ts and poll.ts.
 - Hook stdin parsing happens exactly once (cached), then `mapEvents()` transforms.
+- **每次改 README.md 后，同步翻译** — 用户说"同步翻译"或"把我刚改的 README 同步到其他语言"时，将英文版变更同步到 `README.{zh-CN,es,ko,ja}.md`。五份文件行数必须一致（当前 491 行）。
 
 ## The YAML Condition Types (all 12 implemented)
 

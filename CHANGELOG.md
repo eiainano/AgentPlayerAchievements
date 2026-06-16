@@ -1,5 +1,9 @@
 # Changelog
 
+### 修复 YAML ID 冲突 — 2026-06-16
+
+- **achievement-definitions.yaml**: 探索线 `polyglot` ID 与 Milestones 成就 `polyglot` 冲突（YAML 218 条行 / 217 个唯⼀ ID），重命名为 `polyglot_quest`，现为 218 行 / 218 唯⼀
+
 ### Dashboard i18n 全面补齐 — 2026-06-16
 
 - **app.js I18N 表**: 124→165 key（+41），EN↔ZH 零缺失。移除全部 `L()` 内联双语函数，替换 ~15 处硬编码字符串为 `t()`（旅程空状态、热力图标签、档案弹窗描述、demo 标签、加载按钮、分享卡片等）

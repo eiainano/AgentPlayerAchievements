@@ -1,5 +1,16 @@
 # Changelog
 
+### Dashboard 性能优化 — 2026-06-16
+
+- `renderAll` 只重建当前可见 tab（IntersectionObserver 追踪活跃 section），auto-poll 和 scoped 调用省 ~60% DOM/Canvas 操作。语言切换传 `full=true` 保持全量
+- auto-poll 加 Page Visibility API——tab 切到后台暂停轮询，切回前台恢复。`beforeunload` 清理
+- `escHtml` 字符串缓存 500 条上限，超限清空重建，防止长时间运行泄漏
+- Showcase PUT/DELETE 端点返回更新后数据，前端 `applyShowcase()` 只重绘 hero section，不再 fetch + renderAll
+- `renderInsights` Canvas 节流至 1 小时一次（4 张每日统计图变化缓慢，每 10s 重绘浪费）
+- `/api/data` 移除 auto-poll 中的 `reloadDefinitions()`，YAML 仅在 `/api/customize/reload` 时主动重载（修复了该端点之前不真正 reload 引擎的潜在 bug）
+- Dashboard 版本号从 `package.json` 动态读取，不再硬编码 `'0.1.8'`
+- 删除死代码 `toggleLang()` stub
+
 ### README Phase 1 改进 + 五语言国际化 — 2026-06-16
 
 **README 改进 (7)**:

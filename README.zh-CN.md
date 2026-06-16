@@ -475,7 +475,7 @@ A: 可以。仪表盘中的 `/customize` 页面允许你重命名任何成就。
 
 ## Star 历史
 
-<img alt="Star History Chart" src="https://api.star-history.com/svg?repos=eiainao/AgentPlayerAchievements&theme=dark&type=Date" width="100%">
+<img alt="Star History Chart" src="https://api.star-history.com/svg?repos=eiainao/AgentPlayerAchievements&type=Date" width="100%">
 
 ## 许可
 

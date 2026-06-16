@@ -475,10 +475,7 @@ A: はい。ダッシュボードの `/customize` ページで任意の実績名
 
 ## スター履歴
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=eiainao/AgentPlayerAchievements&theme=dark&type=Date">
-  <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=eiainao/AgentPlayerAchievements&type=Date" width="100%">
-</picture>
+<img alt="Star History Chart" src="https://api.star-history.com/svg?repos=eiainao/AgentPlayerAchievements&theme=dark&type=Date" width="100%">
 
 ## ライセンス
 

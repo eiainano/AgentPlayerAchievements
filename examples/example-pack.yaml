@@ -1,0 +1,56 @@
+# ─────────────────────────────────────────────────────────────────
+# Example Community Pack
+#
+# Drop this file into ~/.agent-achievements/packs/ to install.
+# Then run: agpa pack list
+#          agpa pack info example_pack
+#
+# This pack contains two simple achievements demonstrating
+# the most common condition types.
+# ─────────────────────────────────────────────────────────────────
+
+pack:
+  id: example_pack
+  name: Example Demo Pack
+  author: AGPA Community
+  version: 1.0.0
+  description: Two minimal achievements to show how packs work
+
+definitions:
+  # ── Achievement 1: counter ───────────────────────────────────
+  # The simplest condition type — just count events.
+  # Unlocks after 10 tool calls.
+  - id: demo_tool_user
+    name: Tool User
+    name_cn: 工具使用者
+    description: Use 10 tools
+    description_cn: 使用 10 次工具
+    icon: 🔧
+    category: demo
+    rarity: common
+    progress_trackable: true
+    conditions:
+      - type: counter
+        event: tool.complete
+        operator: ">="
+        value: 10
+        window: all
+
+  # ── Achievement 2: distinct_count ────────────────────────────
+  # Track how many DIFFERENT tools you've used, not total uses.
+  # Unlocks after using 3 different tools (e.g. Read, Write, Bash).
+  - id: demo_tool_diversity
+    name: Tool Diversity
+    name_cn: 工具多样性
+    description: Use 3 different tools
+    description_cn: 使用 3 种不同工具
+    icon: 🧰
+    category: demo
+    rarity: uncommon
+    conditions:
+      - type: distinct_count
+        event: tool.complete
+        field: tool_name
+        operator: ">="
+        value: 3
+        window: all

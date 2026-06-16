@@ -1,5 +1,5 @@
 import * as YAML from 'yaml';
-import type { AchievementDefinition, Condition, ConditionType, PixelArt, PixelArtSize, SetDefinition, SetRewardType, QuestlineDefinition, StageDefinition } from './types.js';
+import type { AchievementDefinition, Condition, ConditionType, PackMetadata, PixelArt, PixelArtSize, SetDefinition, SetRewardType, QuestlineDefinition, StageDefinition } from './types.js';
 
 const VALID_REWARD_TYPES: Set<string> = new Set([
   'title', 'showcase_border', 'stat_counter', 'theme', 'animation', 'badge',
@@ -10,6 +10,57 @@ const VALID_CONDITION_TYPES: Set<string> = new Set([
   'event', 'set_completion', 'ratio', 'pattern_match',
   'mode', 'sequence_count', 'time_gap',
 ]);
+
+/**
+ * Known event types that have at least one emitter source.
+ * Mirrors the Layer C emitter lists in src/verify/auditor.ts.
+ */
+const KNOWN_EVENT_TYPES = new Set([
+  'session.start', 'session.end', 'user.message', 'user.message.batch',
+  'user.prompt', 'token.consumed', 'session.stats', 'conversation.message',
+  'tool.complete', 'tool.failure', 'tool.requested', 'tool.deny',
+  'task.complete', 'task.create', 'task.update',
+  'plan.mode_entered', 'plan.mode_exited',
+  'hook.trigger', 'hook.configured',
+  'mcp.connect', 'mcp.server_used', 'mcp.tool_call',
+  'skill.invoke', 'skill.created', 'skill.published',
+  'agent.spawn', 'agent.complete', 'agent.end', 'agent.self_fix', 'agent.created', 'agent.mode_activated',
+  'automode.start', 'automode.end',
+  'checkpoint.long', 'checkpoint.extreme', 'checkpoint.unusual',
+  'error.occurred', 'model.switch', 'validation.fail',
+  'image.upload', 'image.read',
+  'file.read', 'file.create', 'file.write', 'file.edit', 'file.delete', 'file.language_used', 'file.revert',
+  'command.run', 'command.slash_used', 'command.created',
+  'state.reset', 'config.file_edited',
+  'git.commit', 'git.add', 'git.push', 'git.pr_created', 'git.bisect',
+  'merge.conflict_resolved',
+  'code.review_requested', 'code.review_completed',
+  'deepseek.conversation', 'deepseek.tool_use', 'deepseek.session_start',
+  'achievement.unlocked',
+  'dashboard.opened',
+  'permission.mode_changed', 'permission.dangerously_skipped',
+  'context.compacted',
+  'help.accessed',
+  'test.pass', 'test.fail',
+  'plugin.installed',
+  'template.created',
+  'worktree.created',
+  'function.edited',
+  'output.edit',
+  'event',
+]);
+
+export function isKnownEventType(eventType: string): boolean {
+  return KNOWN_EVENT_TYPES.has(eventType);
+}
+
+/**
+ * Represents a parsed community achievement pack.
+ */
+export interface ParsedPack {
+  pack: PackMetadata;
+  definitions: AchievementDefinition[];
+}
 
 /** Parse YAML icon field: supports emoji string or pixel-art object { src, alt } */
 function parseIconField(raw: unknown): string {
@@ -267,4 +318,68 @@ function parseConditionField(o: Record<string, unknown>, k: string): Condition |
     return buildCondition((v as Record<string, unknown>).type as ConditionType, v as Record<string, unknown>);
   }
   return undefined;
+}
+
+/**
+ * Parse a community achievement pack YAML file.
+ *
+ * Validates the `pack:` metadata block, then reuses parseYAML() to
+ * validate the `definitions:` array. Rejects files with `sets:` or `questlines:`.
+ *
+ * Must be called AFTER parseYAML() has been imported — this reuses its
+ * full condition validation pipeline.
+ */
+export function parsePackYAML(text: string): ParsedPack {
+  const raw = YAML.parse(text) as Record<string, unknown>;
+
+  // Validate pack metadata
+  const packRaw = raw.pack as Record<string, unknown> | undefined;
+  if (!packRaw || typeof packRaw.id !== 'string') {
+    throw new Error('Pack YAML missing required "pack" block with string "id"');
+  }
+  if (!packRaw.name || typeof packRaw.name !== 'string') {
+    throw new Error('Pack YAML missing required "pack.name"');
+  }
+  if (!packRaw.author || typeof packRaw.author !== 'string') {
+    throw new Error('Pack YAML missing required "pack.author"');
+  }
+
+  // Validate pack.id format: lowercase alphanumeric, starting with letter
+  if (!/^[a-z][a-z0-9_-]*$/.test(packRaw.id)) {
+    throw new Error(`Pack id "${packRaw.id}" must be lowercase alphanumeric starting with a letter`);
+  }
+
+  // Reject packs with sets or questlines
+  if (raw.sets != null) {
+    throw new Error(`Pack "${packRaw.id}" may not define "sets" — only core achievements can define sets`);
+  }
+  if (raw.questlines != null) {
+    throw new Error(`Pack "${packRaw.id}" may not define "questlines" — only core achievements can define questlines`);
+  }
+
+  // Parse definitions using the existing full pipeline
+  const { definitions, sets, questlines } = parseYAML(text);
+  if (definitions.length === 0) {
+    throw new Error(`Pack "${packRaw.id}" has no valid definitions`);
+  }
+
+  // Warn on definitions that use unknown event types
+  for (const def of definitions) {
+    for (const cond of def.conditions) {
+      if (cond.event && !isKnownEventType(cond.event)) {
+        console.warn(`[AGPA] Pack "${packRaw.id}" achievement "${def.id}": unknown event type "${cond.event}" — achievement may never unlock`);
+      }
+    }
+  }
+
+  return {
+    pack: {
+      id: String(packRaw.id),
+      name: String(packRaw.name),
+      author: String(packRaw.author),
+      version: typeof packRaw.version === 'string' ? packRaw.version : '0.0.0',
+      description: typeof packRaw.description === 'string' ? packRaw.description : undefined,
+    },
+    definitions,
+  };
 }

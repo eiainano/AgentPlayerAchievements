@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
-import { parseYAML } from './yaml-parser.js';
+import { parseYAML, parsePackYAML } from './yaml-parser.js';
 import { evaluateAll } from './evaluator.js';
 import { Store } from './store.js';
 import { computeStats } from './stats.js';
@@ -10,7 +10,7 @@ import type { AgentToolStats } from './stats.js';
 import type {
   TrackedEvent, EventType, EventPayload,
   AchievementDefinition, AchievementState, AchievementStats,
-  EngineOptions, SetDefinition, QuestlineDefinition,
+  EngineOptions, PackMetadata, SetDefinition, QuestlineDefinition,
   AchievementExplanation,
 } from './types.js';
 import { explainAchievement } from '../utils/explain.js';
@@ -39,10 +39,13 @@ export class AchievementEngine {
   readonly stateDir: string;
   readonly defsPath: string;
   readonly enabledCategories?: string[];
+  private _packsDir: string;
 
   definitions: AchievementDefinition[] = [];
   setDefinitions: SetDefinition[] = [];
   questlineDefinitions: QuestlineDefinition[] = [];
+  packs: PackMetadata[] = [];                        // metadata for all loaded packs
+  packDefinitions: AchievementDefinition[] = [];     // defs from packs only (subset of definitions)
   events: TrackedEvent[] = [];
   state: AchievementState = { unlocked: {}, stats: { total_unlocked: 0 } };
   unlockedThisPoll: AchievementDefinition[] = [];
@@ -62,6 +65,7 @@ export class AchievementEngine {
     this.toolSource = opts.toolSource || process.env.AGPA_TOOL_SOURCE || 'unknown';
     this.sessionId = opts.sessionId || `agpa_${Date.now()}`;
     this.currentModel = process.env.AGPA_MODEL || 'auto';
+    this._packsDir = opts.packsDir || path.join(process.env.HOME || '~', '.agent-achievements', 'packs');
     this.store = new Store(this.stateDir);
   }
 
@@ -89,6 +93,12 @@ export class AchievementEngine {
     this.definitions = this.enabledCategories
       ? parsed.definitions.filter(d => this.enabledCategories!.includes(d.category))
       : parsed.definitions;
+
+    // Load community pack definitions from ~/.agent-achievements/packs/
+    const packResult = this.loadPacks();
+    this.packs = packResult.packs;
+    this.packDefinitions = packResult.definitions;
+    this.definitions.push(...packResult.definitions);
 
     // Load state, events from store
     const { state, events } = this.store.load();
@@ -315,6 +325,75 @@ export class AchievementEngine {
     this.definitions = this.enabledCategories
       ? parsed.definitions.filter(d => this.enabledCategories!.includes(d.category))
       : parsed.definitions;
+
+    // Reload pack definitions: strip old pack defs, re-merge from packs dir
+    this.packs = [];
+    this.packDefinitions = [];
+    const packResult = this.loadPacks();
+    this.packs = packResult.packs;
+    this.packDefinitions = packResult.definitions;
+    this.definitions.push(...packResult.definitions);
+  }
+
+  /**
+   * Scan ~/.agent-achievements/packs/ for .yaml files, parse each as
+   * a community achievement pack, and merge eligible definitions.
+   *
+   * ID conflicts (core vs pack, or pack vs pack) cause the offending pack
+   * to be skipped with a warning. Other packs continue loading.
+   * Unknown event types produce a warning.
+   */
+  loadPacks(): { packs: PackMetadata[]; definitions: AchievementDefinition[] } {
+    const dir = this._packsDir;
+    if (!fs.existsSync(dir)) return { packs: [], definitions: [] };
+
+    const files = fs.readdirSync(dir)
+      .filter(f => f.endsWith('.yaml') || f.endsWith('.yml'))
+      .sort();
+
+    const packs: PackMetadata[] = [];
+    const definitions: AchievementDefinition[] = [];
+    const seenIds = new Set(this.definitions.map(d => d.id));
+
+    for (const file of files) {
+      const filePath = path.join(dir, file);
+      try {
+        const raw = fs.readFileSync(filePath, 'utf-8');
+        const parsed = parsePackYAML(raw);
+
+        // ID conflict detection
+        const conflicts = parsed.definitions.filter(d => seenIds.has(d.id));
+        if (conflicts.length > 0) {
+          console.warn(
+            `[AGPA] Pack "${parsed.pack.id}" (${file}): ID conflict(s): ${conflicts.map(c => c.id).join(', ')} — skipping pack`,
+          );
+          continue;
+        }
+
+        // Annotate definitions with pack_id and merge
+        for (const def of parsed.definitions) {
+          def.pack_id = parsed.pack.id;
+          seenIds.add(def.id);
+        }
+
+        packs.push(parsed.pack);
+        definitions.push(...parsed.definitions);
+      } catch (err) {
+        console.warn(`[AGPA] Failed to load pack ${file}: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
+
+    return { packs, definitions };
+  }
+
+  /** Look up a loaded pack by its ID. Returns null if not found. */
+  getPackInfo(packId: string): { pack: PackMetadata; definitions: AchievementDefinition[] } | null {
+    const pack = this.packs.find(p => p.id === packId);
+    if (!pack) return null;
+    return {
+      pack,
+      definitions: this.packDefinitions.filter(d => d.pack_id === packId),
+    };
   }
 
   resetState(): void {

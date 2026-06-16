@@ -245,6 +245,17 @@ export function createServer(port: number, defaultProfile: string): http.Server 
       // dashboard session adds up.
       const showcaseData = buildShowcaseResponse(engine);
       const includeRecommend = url.searchParams.get('include_recommend') === 'true';
+      const packsData = engine.packs.length > 0
+        ? engine.packs.map(p => ({
+            id: p.id,
+            name: p.name,
+            author: p.author,
+            version: p.version,
+            description: p.description,
+            achievement_count: engine.packDefinitions.filter(d => d.pack_id === p.id).length,
+            unlocked_count: engine.packDefinitions.filter(d => d.pack_id === p.id && engine.state.unlocked[d.id]).length,
+          }))
+        : undefined;
       const data = buildApiResponse(
         engine.definitions,
         engine.state,
@@ -254,7 +265,7 @@ export function createServer(port: number, defaultProfile: string): http.Server 
         engine.setDefinitions,
         engine.questlineDefinitions,
         engine.toolStats(),
-        { includeRecommend },
+        { includeRecommend, packs: packsData },
       );
       data.profile = resolvedProfile;
       data.profile_emoji = getProfileMeta(resolvedProfile).emoji;
@@ -518,7 +529,18 @@ export function createServer(port: number, defaultProfile: string): http.Server 
       }
       engine.resetState();
       engine.init();
-      const data = buildApiResponse(engine.definitions, engine.state, engine.events, [], engine.stats(), engine.setDefinitions, engine.questlineDefinitions, engine.toolStats());
+      const packsData = engine.packs.length > 0
+        ? engine.packs.map(p => ({
+            id: p.id,
+            name: p.name,
+            author: p.author,
+            version: p.version,
+            description: p.description,
+            achievement_count: engine.packDefinitions.filter(d => d.pack_id === p.id).length,
+            unlocked_count: engine.packDefinitions.filter(d => d.pack_id === p.id && engine.state.unlocked[d.id]).length,
+          }))
+        : undefined;
+      const data = buildApiResponse(engine.definitions, engine.state, engine.events, [], engine.stats(), engine.setDefinitions, engine.questlineDefinitions, engine.toolStats(), { packs: packsData });
       data.profile = resolvedProfile;
       data.profile_emoji = getProfileMeta(resolvedProfile).emoji;
       data.is_demo = (resolvedProfile as string) === '_demo';

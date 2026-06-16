@@ -34,6 +34,7 @@ export interface AchievementItem {
   rarity: RarityLevel;
   hidden?: boolean;
   set_id?: string;
+  pack_name?: string;       // set to pack.name if from a community pack; absent for core
   tip?: string;
   tip_cn?: string;
   hint?: string;
@@ -80,6 +81,16 @@ export interface BadgeItem {
   icon: string;
   completed: number;
   total: number;
+}
+
+export interface PackResponse {
+  id: string;
+  name: string;
+  author: string;
+  version: string;
+  description?: string;
+  achievement_count: number;
+  unlocked_count: number;
 }
 
 export type { StreakData, DayActivity, HeatmapData } from '../utils/activity.js';
@@ -178,6 +189,7 @@ export interface DashboardData {
   has_demo?: boolean;
   recommend?: RecommendResponse;
   questlines?: QuestlineItem[];
+  packs?: PackResponse[];
 }
 
 // ── Card API types ────────────────────────────────────────────────────
@@ -277,7 +289,7 @@ function computeProgress(
 export function buildAchievementsResponse(
   definitions: AchievementDefinition[],
   state: AchievementState,
-  opts: { events?: TrackedEvent[]; taskCount?: number },
+  opts: { events?: TrackedEvent[]; taskCount?: number; packNameMap?: Map<string, string> },
 ): AchievementItem[] {
   return definitions.map(def => {
     const unlockedAt = state.unlocked[def.id];
@@ -293,6 +305,7 @@ export function buildAchievementsResponse(
       rarity: def.rarity,
       hidden: def.hidden,
       set_id: def.set_id,
+      pack_name: def.pack_id ? (opts.packNameMap?.get(def.pack_id) || def.pack_id) : undefined,
       tip: def.tip,
       tip_cn: def.tip_cn,
       hint: def.hint,
@@ -712,10 +725,11 @@ export function buildApiResponse(
   setDefinitions: SetDefinition[],
   questlineDefinitions?: QuestlineDefinition[],
   toolStats?: AgentToolStats,
-  opts?: { includeRecommend?: boolean },
+  opts?: { includeRecommend?: boolean; packs?: Array<{ id: string; name: string; author: string; version: string; description?: string; achievement_count: number; unlocked_count: number }> },
 ): DashboardData {
   const taskCount = events.filter(e => e.event_type === 'task.complete').length;
-  const achievements = buildAchievementsResponse(definitions, state, { events, taskCount });
+  const packNameMap = opts?.packs ? new Map(opts.packs.map(p => [p.id, p.name])) : undefined;
+  const achievements = buildAchievementsResponse(definitions, state, { events, taskCount, packNameMap });
 
   // Compute streak data for multiplier
   const streakData = toolStats?.daily
@@ -790,5 +804,6 @@ export function buildApiResponse(
     config: { lang: loadConfig().lang },
     ...(recommend ? { recommend } : {}),
     ...(questlines ? { questlines } : {}),
+    ...(opts?.packs ? { packs: opts.packs } : {}),
   };
 }

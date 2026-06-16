@@ -161,6 +161,14 @@ export interface PixelArt {
   '256'?: PixelArtSize;
 }
 
+export interface PackMetadata {
+  id: string;
+  name: string;
+  author: string;
+  version: string;
+  description?: string;
+}
+
 export interface AchievementDefinition {
   id: string;
   name: string;
@@ -173,6 +181,7 @@ export interface AchievementDefinition {
   hidden?: boolean;
   progress_trackable?: boolean;
   set_id?: string;
+  pack_id?: string;       // set to pack.id if from a community pack; undefined for core
   conditions: Condition[];
   tip?: string;      // educational tip (English), shown after unlock
   tip_cn?: string;   // educational tip (Chinese)
@@ -300,6 +309,7 @@ export interface EngineOptions {
   enabledCategories?: string[];
   toolSource?: string;
   sessionId?: string;
+  packsDir?: string;       // defaults to ~/.agent-achievements/packs/
 }
 
 // ── Questline types ──────────────────────────────────────────

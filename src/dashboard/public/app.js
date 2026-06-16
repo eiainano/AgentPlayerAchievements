@@ -119,16 +119,12 @@ function syncLangPicker() {
   });
 }
 
-function toggleLang() {
-  // stub — kept for backward compat, actual switching via pickLang()
-}
-
 function pickLang(value) {
   if (value === currentLang) return;
   currentLang = value;
   localStorage.setItem('agpa-lang', currentLang);
   syncLangPicker();
-  if (dashboardData) renderAll(dashboardData);
+  if (dashboardData) renderAll(dashboardData, true);
 }
 
 // ── Lang picker dropdown ─────────────────────────────────
@@ -906,19 +902,34 @@ function dismissErrors() {
   if (banner) banner.style.display = 'none';
 }
 
-function renderAll(data) {
+/** Which nav tab is currently active (tracked by IntersectionObserver in renderNav). */
+function getActiveSection() {
+  var link = document.querySelector('.nav-link.active');
+  return link ? link.dataset.section : null;
+}
+
+/** Render dashboard sections. Pass full=true for initial load and lang switches;
+ *  otherwise only the active tab + always-visible sections are rebuilt. */
+function renderAll(data, full) {
   renderErrors = [];
+  // ── Always-visible sections ──
   renderSafe('i18n', () => renderI18n());
   renderSafe('nav', () => renderNav(data));
   renderSafe('demo-banner', () => renderDemoBanner(data));
   renderSafe('profile', () => renderProfile(data));
   renderSafe('visit-tip', () => renderFirstVisitTip(data));
   renderSafe('onboarding', () => renderOnboardingGuide(data));
-  renderSafe('achievements', () => renderAchievements(data));
-  renderSafe('sets', () => renderSets(data));
-  renderSafe('badges', () => renderBadges(data));
-  renderSafe('timeline', () => renderTimeline(data));
-  renderSafe('insights', () => renderInsights(data));
+
+  // ── Tab sections — skip when user is looking at a different tab ──
+  var active = getActiveSection();
+  var all = full || !active; // !active = initial state, render everything
+  if (all || active === 'achievements') renderSafe('achievements', () => renderAchievements(data));
+  if (all || active === 'sets') {
+    renderSafe('sets', () => renderSets(data));
+    renderSafe('badges', () => renderBadges(data));
+  }
+  if (all || active === 'timeline') renderSafe('timeline', () => renderTimeline(data));
+  if (all || active === 'insights') renderSafe('insights', () => renderInsights(data));
 }
 
 // ── Setup global listeners (once) ──────────────────────
@@ -1028,7 +1039,7 @@ function setupGlobalHandlers() {
   // Track initial unlocked IDs
   lastUnlockedIds = new Set(data.achievements.filter(a => a.unlocked).map(a => a.id));
 
-  renderAll(data);
+  renderAll(data, true);
 
   // Hide page loading spinner
   const loader = document.getElementById('page-loader');
@@ -1072,7 +1083,19 @@ function hasVisualChange(oldStats, newStats) {
 }
 
 function startAutoPoll() {
-  setInterval(async () => {
+  let _pollInterval = null;
+
+  function start() { if (!_pollInterval) _pollInterval = setInterval(poll, 10000); }
+  function stop()  { if (_pollInterval) { clearInterval(_pollInterval); _pollInterval = null; } }
+
+  // Pause when tab is hidden (no point polling if nobody's looking)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stop(); else start();
+  });
+  // Also clean up on page unload
+  window.addEventListener('beforeunload', stop);
+
+  async function poll() {
     try {
       const res = await fetch(apiUrl('/api/data'));
       if (!res.ok) return;
@@ -1116,7 +1139,10 @@ function startAutoPoll() {
         }
       }
     } catch {}
-  }, 10000);
+  }
+
+  // Start the first poll immediately
+  start();
 }
 
 /** Update stat numbers, streak, and heatmap without rebuilding the DOM.
@@ -1472,44 +1498,43 @@ function cancelPick() {
   if (dashboardData) renderGrid(dashboardData);
 }
 
+/** Apply showcase data from a PUT/DELETE/POST response — update in-memory
+ *  stats.showcase and rebuild only the hero section (no full fetch+renderAll). */
+function applyShowcase(body) {
+  if (!body.showcase || !dashboardData) return;
+  dashboardData.stats.showcase = body.showcase;
+  renderSafe('profile', () => renderProfile(dashboardData));
+}
+
 async function pinToSlot(achId) {
   if (pickSlot === null) return;
-  const res = await fetch('/api/showcase', {
+  var res = await fetch('/api/showcase', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ slot: pickSlot, achievement_id: achId }),
   });
   if (!res.ok) return;
-  await refreshData();
+  applyShowcase(await res.json());
   pickSlot = null;
-  const banner = document.getElementById('pick-banner');
+  var banner = document.getElementById('pick-banner');
   if (banner) banner.style.display = 'none';
 }
 
 async function clearSlot(slot) {
   if (pickSlot !== null) { cancelPick(); return; }
-  const res = await fetch('/api/showcase', {
+  var res = await fetch('/api/showcase', {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ slot }),
+    body: JSON.stringify({ slot: slot }),
   });
   if (!res.ok) return;
-  await refreshData();
+  applyShowcase(await res.json());
 }
 
 async function autoFillShowcase() {
-  const res = await fetch('/api/showcase/auto', { method: 'POST' });
+  var res = await fetch('/api/showcase/auto', { method: 'POST' });
   if (!res.ok) return;
-  await refreshData();
-}
-
-async function refreshData() {
-  const res = await fetch(apiUrl('/api/data'));
-  if (!res.ok) return;
-  dashboardData = await res.json();
-  if (dashboardData.profile) currentProfile = dashboardData.profile;
-  lastUnlockedIds = new Set(dashboardData.achievements.filter(a => a.unlocked).map(a => a.id));
-  renderAll(dashboardData);
+  applyShowcase(await res.json());
 }
 
 // ── Profile Hero ─────────────────────────────────────
@@ -2458,6 +2483,12 @@ function renderTimeline(data) {
 // ── Insights ──────────────────────────────────────────
 
 function renderInsights(data) {
+  // Throttle: insight canvases are expensive to redraw (4 charts × ~200 cells).
+  // Daily stats change slowly — hourly refresh is more than enough.
+  var now = Date.now();
+  if (renderInsights._lastDraw && (now - renderInsights._lastDraw) < 3600000) return;
+  renderInsights._lastDraw = now;
+
   // Reset animation flag so rebuilt canvases don't replay the intro animation
   const ids = ['chart-sessions', 'chart-tools', 'chart-tasks', 'chart-heatmap'];
   for (const id of ids) {
@@ -3137,11 +3168,14 @@ let carouselFrameCount = 0;
 
 function escHtml(s) {
   s = String(s);
-  if (!escHtml._map) { escHtml._map = Object.create(null); }
+  if (!escHtml._map) { escHtml._map = Object.create(null); escHtml._n = 0; }
   var cached = escHtml._map[s];
   if (cached !== undefined) return cached;
+  // Cap cache at 500 entries to prevent unbounded growth on long sessions
+  if (escHtml._n >= 500) { escHtml._map = Object.create(null); escHtml._n = 0; }
   var result = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   escHtml._map[s] = result;
+  escHtml._n++;
   return result;
 }
 

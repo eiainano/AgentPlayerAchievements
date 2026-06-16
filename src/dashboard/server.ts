@@ -44,6 +44,14 @@ const MIME_TYPES: Record<string, string> = {
   '.ico': 'image/x-icon',
 };
 
+// ── Read version from package.json (once, at module load) ──────────────
+const PKG_PATH = path.resolve(__dirname, '../../package.json');
+function readVersion(): string {
+  try { return JSON.parse(fs.readFileSync(PKG_PATH, 'utf-8')).version || '0.0.0'; }
+  catch { return '0.0.0'; }
+}
+const VERSION = readVersion();
+
 // ── Lazy CDN cache for offline dependency loading ──────────────────────
 
 const HTML2CANVAS_CDN = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
@@ -198,7 +206,7 @@ export function createServer(port: number, defaultProfile: string): http.Server 
         status: 'ok',
         uptime: Math.round((Date.now() - serverStartTime) / 1000),
         profile: resolvedProfile,
-        version: '0.1.8',
+        version: VERSION,
       }));
       return;
     }
@@ -231,7 +239,10 @@ export function createServer(port: number, defaultProfile: string): http.Server 
         engine.track('dashboard.opened', { session_duration_ms: sessDurationMs });
       }
       engine.reload();
-      engine.reloadDefinitions();
+      // NOT calling reloadDefinitions() here — YAML only changes when the user
+      // explicitly edits it. The /api/customize/reload endpoint handles that.
+      // Saving ~5ms of disk I/O per 10s auto-poll across the lifetime of the
+      // dashboard session adds up.
       const showcaseData = buildShowcaseResponse(engine);
       const includeRecommend = url.searchParams.get('include_recommend') === 'true';
       const data = buildApiResponse(
@@ -346,7 +357,7 @@ export function createServer(port: number, defaultProfile: string): http.Server 
       sc.slots[body.slot] = body.achievement_id;
       saveShowcase(engine.stateDir, sc);
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ status: 'ok', slot: body.slot, achievement_id: body.achievement_id }));
+      res.end(JSON.stringify({ status: 'ok', slot: body.slot, achievement_id: body.achievement_id, showcase: buildShowcaseResponse(engine) }));
       return;
     }
 
@@ -367,7 +378,7 @@ export function createServer(port: number, defaultProfile: string): http.Server 
       sc.slots[body.slot] = null;
       saveShowcase(engine.stateDir, sc);
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ status: 'ok', slot: body.slot }));
+      res.end(JSON.stringify({ status: 'ok', slot: body.slot, showcase: buildShowcaseResponse(engine) }));
       return;
     }
 
@@ -383,7 +394,7 @@ export function createServer(port: number, defaultProfile: string): http.Server 
         const payload: Record<string, unknown> = {
           format_version: '1.0',
           exported_at: new Date().toISOString(),
-          source: { tool: 'agpa', version: '0.1.8', profile: resolvedProfile, profile_emoji: meta.emoji },
+          source: { tool: 'agpa', version: VERSION, profile: resolvedProfile, profile_emoji: meta.emoji },
           state: engine.state,
           stats: engine.toolStats(),
           showcase: loadShowcase(engine.stateDir),
@@ -462,8 +473,15 @@ export function createServer(port: number, defaultProfile: string): http.Server 
       return;
     }
 
-    // POST /api/customize/reload — reload YAML from disk
+    // POST /api/customize/reload — reload YAML from disk for all cached engines
     if (url.pathname === '/api/customize/reload' && req.method === 'POST') {
+      // Reload every cached engine's definitions so the dashboard picks up
+      // edits to achievement-definitions.yaml without requiring a restart.
+      for (const [profileName, cachedEngine] of engineCache) {
+        try { cachedEngine.reloadDefinitions(); } catch { /* stale engine, skip */ }
+      }
+      // Also reload the current request's engine
+      try { engine.reloadDefinitions(); } catch { /* ok */ }
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(handleReload()));
       return;

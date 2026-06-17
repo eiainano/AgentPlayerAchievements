@@ -19,11 +19,11 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
-  <a href="#"><img src="https://img.shields.io/badge/logros-218-blueviolet" alt="218 logros"></a>
-  <a href="#"><img src="https://img.shields.io/badge/tests-1203-green" alt="1203 tests"></a>
+  <a href="#"><img src="https://img.shields.io/badge/logros-213-blueviolet" alt="213 logros"></a>
+  <a href="#"><img src="https://img.shields.io/badge/tests-1205-green" alt="1205 tests"></a>
   <a href="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml"><img src="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="#"><img src="https://img.shields.io/badge/node-%E2%89%A518-brightgreen" alt="Node >= 18"></a>
-  <a href="#"><img src="https://img.shields.io/badge/CLI-25_comandos-orange" alt="25 comandos CLI"></a>
+  <a href="#"><img src="https://img.shields.io/badge/CLI-27_comandos-orange" alt="27 comandos CLI"></a>
   <a href="https://github.com/eiainano/AgentPlayerAchievements"><img src="https://img.shields.io/github/stars/eiainano/AgentPlayerAchievements?style=flat&logo=github" alt="GitHub stars"></a>
   <a href="https://github.com/eiainano/AgentPlayerAchievements/commits/dev"><img src="https://img.shields.io/github/last-commit/eiainano/AgentPlayerAchievements/dev" alt="Último commit"></a>
   <a href="README.es.md"><img src="https://img.shields.io/badge/i18n-5_idiomas-blue" alt="i18n: 5 idiomas"></a>
@@ -59,7 +59,7 @@
 
 - **Seguimiento automático** — cada llamada de herramienta, edición de archivo y commit de git registrado automáticamente
 - **Panel estilo Steam** — barra de XP, niveles, rachas, heatmaps, vitrina de logros
-- **218 logros** en 11 categorías — desde "Hello World" hasta "Completionist"
+- **213 logros** en 11 categorías — desde "Hello World" hasta "Completionist"
 - **Retroalimentación instantánea** — ventanas emergentes en terminal, notificaciones macOS, sonidos 8-bit al desbloquear
 
 ---
@@ -90,7 +90,7 @@ Tu Sesión de Programación
   ├─ Tú programas, el agente responde — cada acción se registra
   │   └─ doble canal: herramientas MCP + eventos Hook
   │
-  ├─ Fin de sesión → el motor evalúa 218 logros
+  ├─ Fin de sesión → el motor evalúa 213 logros
   │   └─ ¿desbloqueado? → notificación macOS 🎉
   │
   └─ agpa dashboard → ver, ordenar, filtrar, compartir
@@ -101,9 +101,9 @@ Tu Sesión de Programación
 | Canal | Método | Captura |
 |---------|--------|----------|
 | **Hook CLI** | Hooks de herramienta (subproceso vía stdin) | file.read/write/edit, tool.complete, git.commit, session.start/end, task.complete, agent.spawn |
-| **Servidor MCP** | Protocolo STDIO (5 herramientas) | image.read, file.language_used, plan.mode_entered, user.message, automode.start |
+| **Servidor MCP** | Protocolo STDIO (7 herramientas) | image.read, file.language_used, plan.mode_entered, user.message, automode.start |
 
-Ambos canales escriben en el mismo registro de eventos `~/.agent-achievements/`. El motor evalúa 12 tipos de condiciones contra 218 logros.
+Ambos canales escriben en el mismo registro de eventos `~/.agent-achievements/`. El motor evalúa 12 tipos de condiciones contra 213 logros.
 
 > [!NOTE]
 > **Cero sobrecarga.** El Hook CLI es un subproceso de menos de un milisegundo. El servidor MCP se ejecuta sobre STDIO sin llamadas de red. Todos los datos permanecen en tu máquina.
@@ -111,7 +111,7 @@ Ambos canales escriben en el mismo registro de eventos `~/.agent-achievements/`.
 ## Características
 
 - 🎮 **Panel de Logros** — barra de XP, nivel, racha, heatmap de actividad, distribución por rareza, vitrina
-- 🏆 **218 Logros** en 11 categorías (Introducción, Maestría de Herramientas, Hitos, Habilidad, Estilo, Flujo de Trabajo, Creador, Ocultos, Desafío, Comunidad, Resistencia)
+- 🏆 **213 Logros** en 11 categorías (Introducción, Maestría de Herramientas, Hitos, Habilidad, Estilo, Flujo de Trabajo, Creador, Ocultos, Desafío, Comunidad, Resistencia)
 - 🔥 **Heatmap estilo GitHub** — 4 meses de actividad de programación de un vistazo
 - 📸 **Tarjeta para Compartir** — tema oscuro/claro, bilingüe (EN/ZH), descargable como PNG
 - 🔊 **Efectos de sonido 8-bit** — sonidos retro clasificados por rareza al desbloquear
@@ -277,6 +277,12 @@ OpenClaw soporta un sistema de plugins para seguimiento a nivel de hooks. `agpa 
 | `agpa mcp` | Iniciar servidor MCP (modo stdio) |
 | `agpa web` | Alias de `agpa dashboard` |
 | `agpa pack` | Listar o inspeccionar paquetes de logros comunitarios |
+| `agpa banner` | Cambiar el tema de color del banner CLI (Neon/Arcade/Gold) |
+| `agpa history` | Navegar por las entradas del registro de eventos |
+| `agpa explain` | Mostrar por qué un logro está bloqueado/desbloqueado (desglose de condiciones) |
+| `agpa watch` | Monitor de progreso de logros en tiempo real |
+| `agpa upgrade` | Buscar actualizaciones y actualizar AGPA |
+| `agpa completion` | Generar script de completado de shell (bash/zsh/fish) |
 
 > Referencia CLI completa: `agpa --help`
 
@@ -365,13 +371,14 @@ agpa dashboard --profile work   # iniciar con perfil específico
 ```
 src/
 ├── main.ts                  # Entrada del Servidor MCP (STDIO)
+├── tool-registry.ts         # Registro central de herramientas
 ├── cli/
+│   ├── index.ts             # Entrada CLI unificada (27 comandos)
 │   ├── hook.ts              # Hook CLI (modos track + poll + auto)
 │   ├── init.ts              # Asistente de instalación interactivo
 │   ├── dashboard.ts         # Lanzador del panel
 │   ├── doctor.ts            # Diagnóstico del sistema
-│   ├── mvp.ts               # Generador de datos de demostración
-│   └── ...                  # 13+ comandos CLI adicionales
+│   │   └── ...                  # 22 comandos CLI adicionales
 ├── engine/
 │   ├── engine.ts            # Motor principal (track / poll / stats)
 │   ├── evaluator.ts         # 12 evaluadores de tipos de condición
@@ -383,40 +390,42 @@ src/
 │   ├── api.ts               # Datos de tarjetas, agregación de estadísticas
 │   ├── public/              # Frontend HTML/CSS/JS sin frameworks
 │   └── customize-api.ts     # Endpoint de personalización
-├── tools/                   # Definiciones de herramientas MCP (5 herramientas)
-├── utils/                   # notificaciones, validación, logs, errores, perfiles
+├── tools/                   # Definiciones de herramientas MCP (7 herramientas)
+├── utils/                   # notificaciones, validación, perfiles, pixel-art, batería, etc.
+├── verify/
+│   └── auditor.ts           # Lógica de verificación de logros
 ├── config.ts                # Configuración global
 └── helpers.ts               # Utilidades compartidas
 
 pixel-art-output/            # Logo + pixel art de logros
-achievement-definitions.yaml   # 218 definiciones de logros (fuente autoritativa)
+achievement-definitions.yaml   # 213 definiciones de logros (fuente autoritativa)
 scripts/                     # herramientas de desarrollo (gen de logo, pixel art, sonidos)
 ```
 
 ## Desarrollo
 
 ```bash
-npm install          # instalar dependencias (3 dependencias runtime)
+npm install          # instalar dependencias (5 dependencias runtime)
 npm run build        # tsc --noEmit
-npm test             # 1203 tests, 45 archivos
+npm test             # 1205 tests, 46 archivos
 npm run dashboard    # iniciar panel de desarrollo
 npm run demo         # generar datos MVP
 ```
 
 ## Dependencias
 
-- **Runtime** (4): `@modelcontextprotocol/sdk` · `yaml` · `zod` · `figlet`
+- **Runtime** (5): `@modelcontextprotocol/sdk` · `yaml` · `zod` · `figlet` · 
 - **Desarrollo**: `typescript` · `vitest` · `tsx`
 - **Opcional** (macOS): `terminal-notifier` — notificaciones del sistema para desbloqueos
 
 > [!NOTE]
-> **Deliberadamente mínimo.** Cuatro dependencias runtime, cero llamadas de red en tiempo de ejecución. El motor son funciones puras con almacenamiento JSONL — fácil de auditar, imposible de romper.
+> **Deliberadamente mínimo.** Cinco dependencias runtime, cero llamadas de red en tiempo de ejecución. El motor son funciones puras con almacenamiento JSONL — fácil de auditar, imposible de romper.
 
 ## 📚 Documentación
 
 | Documento | Descripción |
 |----------|-------------|
-| [Configuración Multi-Herramienta](docs/multi-tool-setup.md) | Configurar AGPA en 5 herramientas de agente compatibles |
+| [Configuración Multi-Herramienta](docs/multi-tool-setup.md) | Configurar AGPA en 7 herramientas de agente compatibles |
 | [Diseño de Logros](docs/design/01-成就分类体系.md) | Taxonomía de logros, convenciones de nomenclatura y referencia de campos YAML |
 | [Arquitectura del Motor](docs/design/05-核心引擎设计.md) | Flujo de eventos → evaluación de condiciones → persistencia de estado |
 | [Diseño de Captura de Eventos](docs/design/08-EventCapture落地设计.md) | Captura de doble canal: Hook CLI + Servidor MCP |
@@ -428,7 +437,7 @@ npm run demo         # generar datos MVP
 
 - **Local primero** — Todos los datos de eventos permanecen en `~/.agent-achievements/`. Sin telemetría, sin sincronización en la nube, sin llamadas de red en tiempo de ejecución.
 - **Auditable** — El motor son funciones TypeScript puras que operan sobre archivos JSONL. Sin ofuscación, sin binarios.
-- **Dependencias mínimas** — 4 dependencias runtime (`@modelcontextprotocol/sdk`, `yaml`, `zod`, `figlet`) — todas ampliamente auditadas.
+- **Dependencias mínimas** — 5 dependencias runtime (`@modelcontextprotocol/sdk`, `yaml`, `zod`, `figlet`) — todas ampliamente auditadas.
 - **Aislamiento STDIO** — El servidor MCP se comunica solo por E/S estándar. Sin endpoints HTTP expuestos.
 - **Sandbox de Hooks** — El Hook CLI se ejecuta como un subproceso de menos de un milisegundo — no puede persistir estado ni acceder a la red.
 - **Cadena de suministro** — Sin módulos nativos, sin scripts postinstall, sin descargas de binarios en tiempo de instalación.
@@ -497,5 +506,5 @@ MIT — consulta [LICENSE](LICENSE)
 ---
 
 <p align="center">
-  <sub>Construido para desarrolladores que aman la gamificación. 218 logros y contando.</sub>
+  <sub>Construido para desarrolladores que aman la gamificación. 213 logros y contando.</sub>
 </p>

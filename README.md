@@ -19,11 +19,11 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
-  <a href="#"><img src="https://img.shields.io/badge/achievements-218-blueviolet" alt="218 achievements"></a>
-  <a href="#"><img src="https://img.shields.io/badge/tests-1203-green" alt="1203 tests"></a>
+  <a href="#"><img src="https://img.shields.io/badge/achievements-213-blueviolet" alt="213 achievements"></a>
+  <a href="#"><img src="https://img.shields.io/badge/tests-1205-green" alt="1205 tests"></a>
   <a href="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml"><img src="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="#"><img src="https://img.shields.io/badge/node-%E2%89%A518-brightgreen" alt="Node >= 18"></a>
-  <a href="#"><img src="https://img.shields.io/badge/CLI-25_commands-orange" alt="25 CLI commands"></a>
+  <a href="#"><img src="https://img.shields.io/badge/CLI-27_commands-orange" alt="27 CLI commands"></a>
   <a href="https://github.com/eiainano/AgentPlayerAchievements"><img src="https://img.shields.io/github/stars/eiainano/AgentPlayerAchievements?style=flat&logo=github" alt="GitHub stars"></a>
   <a href="https://github.com/eiainano/AgentPlayerAchievements/commits/dev"><img src="https://img.shields.io/github/last-commit/eiainano/AgentPlayerAchievements/dev" alt="Last commit"></a>
   <a href="README.zh-CN.md"><img src="https://img.shields.io/badge/i18n-5_languages-blue" alt="i18n: 5 languages"></a>
@@ -59,7 +59,7 @@
 
 - **Auto-tracking** — every tool call, file edit, and git commit logged automatically
 - **Steam-style dashboard** — XP bar, levels, streaks, heatmaps, achievement showcase
-- **218 achievements** across 11 categories — from "Hello World" to "Completionist"
+- **213 achievements** across 11 categories — from "Hello World" to "Completionist"
 - **Instant feedback** — terminal popups, macOS notifications, 8-bit sounds on unlock
 
 ---
@@ -90,7 +90,7 @@ Your Coding Session
   ├─ You code, agent responds — every action is tracked
   │   └─ dual-channel: MCP tools + Hook events
   │
-  ├─ Session ends → engine evaluates 218 achievements
+  ├─ Session ends → engine evaluates 213 achievements
   │   └─ unlocked? → macOS notification 🎉
   │
   └─ agpa dashboard → view, sort, filter, share
@@ -101,9 +101,9 @@ Your Coding Session
 | Channel | Method | Captures |
 |---------|--------|----------|
 | **Hook CLI** | Tool hooks (subprocess via stdin) | file.read/write/edit, tool.complete, git.commit, session.start/end, task.complete, agent.spawn |
-| **MCP Server** | STDIO protocol (5 tools) | image.read, file.language_used, plan.mode_entered, user.message, automode.start |
+| **MCP Server** | STDIO protocol (7 tools) | image.read, file.language_used, plan.mode_entered, user.message, automode.start, achievement config, explain |
 
-Both channels write to the same `~/.agent-achievements/` event log. The engine evaluates 12 condition types against 218 achievements.
+Both channels write to the same `~/.agent-achievements/` event log. The engine evaluates 12 condition types against 213 achievements.
 
 > [!NOTE]
 > **Zero overhead.** The Hook CLI is a sub-millisecond subprocess. The MCP server runs on STDIO with no network calls. All data stays on your machine.
@@ -111,7 +111,7 @@ Both channels write to the same `~/.agent-achievements/` event log. The engine e
 ## Features
 
 - 🎮 **Achievement Dashboard** — XP bar, level, streak, activity heatmap, rarity breakdown, showcase
-- 🏆 **218 Achievements** across 11 categories (Onboarding, Tool Mastery, Milestones, Skill, Style, Workflow, Creator, Hidden, Challenge, Community, Endurance)
+- 🏆 **213 Achievements** across 11 categories (Onboarding, Tool Mastery, Milestones, Skill, Style, Workflow, Creator, Hidden, Challenge, Community, Endurance)
 - 🔥 **GitHub-style heatmap** — 4 months of coding activity at a glance
 - 📸 **Share Card** — dark/light themed, bilingual (EN/ZH), downloadable PNG
 - 🔊 **8-bit sound effects** — rarity-graded retro sounds for unlocks
@@ -277,6 +277,12 @@ OpenClaw supports a plugin system for hook-level tracking. `agpa init` registers
 | `agpa mcp` | Start MCP server (stdio mode) |
 | `agpa web` | Alias for `agpa dashboard` |
 | `agpa pack` | List or inspect installed community achievement packs |
+| `agpa banner` | Switch terminal banner color theme (Neon/Arcade/Gold) |
+| `agpa history` | Browse raw event log entries |
+| `agpa explain` | Show why an achievement is locked/unlocked (condition breakdown) |
+| `agpa watch` | Real-time achievement progress monitor |
+| `agpa upgrade` | Check for updates and upgrade AGPA |
+| `agpa completion` | Generate shell completion script (bash/zsh/fish) |
 
 > Full CLI reference: `agpa --help`
 
@@ -365,13 +371,14 @@ agpa dashboard --profile work   # launch with specific profile
 ```
 src/
 ├── main.ts                  # MCP Server entry (STDIO)
+├── tool-registry.ts         # Central tool registration
 ├── cli/
+│   ├── index.ts             # Unified CLI entry (27 commands)
 │   ├── hook.ts              # Hook CLI (track + poll + auto modes)
 │   ├── init.ts              # Interactive install wizard
 │   ├── dashboard.ts         # Dashboard launcher
 │   ├── doctor.ts            # System diagnostic
-│   ├── mvp.ts               # Demo data generator
-│   └── ...                  # 13 more CLI commands
+│   └── ...                  # 22 more CLI commands
 ├── engine/
 │   ├── engine.ts            # Core engine (track / poll / stats)
 │   ├── evaluator.ts         # 12 condition type evaluators
@@ -383,34 +390,36 @@ src/
 │   ├── api.ts               # Card data, stats aggregation
 │   ├── public/              # Zero-framework HTML/CSS/JS frontend
 │   └── customize-api.ts     # Self-customize endpoint
-├── tools/                   # MCP tool definitions (5 tools)
-├── utils/                   # notify, validate, log, errors, profile
+├── tools/                   # MCP tool definitions (8 tools)
+├── utils/                   # notify, validate, profile, pixel-art, battery, etc.
+├── verify/
+│   └── auditor.ts           # Achievement verification logic
 ├── config.ts                # Global configuration
 └── helpers.ts               # Shared utilities
 
 pixel-art-output/            # Logo + achievement pixel art
-achievement-definitions.yaml   # 218 achievement definitions (authoritative)
+achievement-definitions.yaml   # 213 achievement definitions (authoritative)
 scripts/                     # dev tools (logo gen, pixel art gen, sounds)
 ```
 
 ## Development
 
 ```bash
-npm install          # install dependencies (3 runtime deps)
+npm install          # install dependencies (5 runtime deps)
 npm run build        # tsc --noEmit
-npm test             # 1203 tests, 45 files
+npm test             # 1205 tests, 46 files
 npm run dashboard    # start dev dashboard
 npm run demo         # generate MVP data
 ```
 
 ## Dependencies
 
-- **Runtime** (4): `@modelcontextprotocol/sdk` · `yaml` · `zod` · `figlet`
+- **Runtime** (5): `@modelcontextprotocol/sdk` · `yaml` · `zod` · `figlet` · `tsx`
 - **Dev**: `typescript` · `vitest` · `tsx`
 - **Optional** (macOS): `terminal-notifier` — system notifications for unlocks
 
 > [!NOTE]
-> **Deliberately minimal.** Four runtime dependencies, zero network calls at runtime. The engine is pure functions with JSONL storage — easy to audit, impossible to break.
+> **Deliberately minimal.** Five runtime dependencies, zero network calls at runtime. The engine is pure functions with JSONL storage — easy to audit, impossible to break.
 
 ## 📚 Documentation
 
@@ -428,7 +437,7 @@ npm run demo         # generate MVP data
 
 - **Local-first** — All event data stays in `~/.agent-achievements/`. No telemetry, no cloud sync, no network calls at runtime.
 - **Auditable** — The engine is pure TypeScript functions operating on JSONL files. No obfuscation, no binary blobs.
-- **Minimal dependencies** — 4 runtime dependencies (`@modelcontextprotocol/sdk`, `yaml`, `zod`, `figlet`) — all widely audited.
+- **Minimal dependencies** — 5 runtime dependencies (`@modelcontextprotocol/sdk`, `yaml`, `zod`, `figlet`, `tsx`) — all widely audited.
 - **STDIO isolation** — The MCP server communicates via standard I/O only. No HTTP endpoints exposed.
 - **Hook sandbox** — The Hook CLI runs as a sub-millisecond subprocess — it cannot persist state or access the network.
 - **Supply chain** — No native modules, no postinstall scripts, no binary downloads at install time.
@@ -497,5 +506,5 @@ MIT — see [LICENSE](LICENSE)
 ---
 
 <p align="center">
-  <sub>Built for developers who love gamification. 218 achievements and counting.</sub>
+  <sub>Built for developers who love gamification. 213 achievements and counting.</sub>
 </p>

@@ -301,7 +301,7 @@ export class AchievementEngine {
     const streakMultiplier = streakDays <= 1 ? 1.0 : Math.min(2.0, 1.0 + (streakDays - 1) * 0.1);
 
     const totalXp = Math.round((achievementXp + taskCount * 25 + usageXp) * streakMultiplier);
-    const level = Math.floor(Math.sqrt(totalXp / 100));
+    const level = Math.min(20, Math.floor(Math.pow(totalXp / 100, 0.4)));
 
     return {
       total_achievements: total,

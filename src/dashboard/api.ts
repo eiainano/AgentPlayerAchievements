@@ -598,6 +598,7 @@ function buildBadges(
   sets: SetItem[],
   definitions: AchievementDefinition[],
   state: AchievementState,
+  currentLevel: number,
 ): BadgeItem[] {
   const badges: BadgeItem[] = [];
 
@@ -667,6 +668,29 @@ function buildBadges(
         icon: RARITY_ICONS[rarity] || '🏆',
         completed: counts.unlocked,
         total: counts.total,
+      });
+    }
+  }
+
+  // ── Level milestone badges ──
+  const LEVEL_BADGES: Array<{ level: number; badge: string; badge_cn: string; icon: string }> = [
+    { level: 3,  badge: 'Bronze Agent',     badge_cn: '青铜特工', icon: '🥉' },
+    { level: 7,  badge: 'Silver Agent',     badge_cn: '白银特工', icon: '🥈' },
+    { level: 11, badge: 'Gold Agent',       badge_cn: '黄金特工', icon: '🥇' },
+    { level: 15, badge: 'Diamond Agent',    badge_cn: '钻石特工', icon: '💎' },
+    { level: 20, badge: 'Grandmaster',      badge_cn: '宗师',     icon: '👑' },
+  ];
+  for (const lb of LEVEL_BADGES) {
+    if (currentLevel >= lb.level) {
+      badges.push({
+        set_id: `@level_${lb.badge.toLowerCase().replace(/\s+/g, '_')}`,
+        badge: lb.badge,
+        badge_cn: lb.badge_cn,
+        set_name: `Level ${lb.level}`,
+        set_name_cn: `${lb.level} 级`,
+        icon: lb.icon,
+        completed: 1,
+        total: 1,
       });
     }
   }
@@ -805,7 +829,8 @@ export function buildApiResponse(
 
   // Build sets response — needed for sets field and badges
   const setItems = buildSetsResponse(definitions, state, setDefinitions);
-  const badges = buildBadges(setItems, definitions, state);
+  const currentLevel = calcLevel(totalXp);
+  const badges = buildBadges(setItems, definitions, state, currentLevel);
   const cosmetics = buildCosmeticsResponse(setItems, events);
 
   const recommend = (opts?.includeRecommend)

@@ -11,12 +11,16 @@ export const ACHIEVEMENT_XP: Record<RarityLevel, number> = {
   mythic: 1000,
 };
 
+const MAX_LEVEL = 20;
+const LEVEL_EXPONENT = 0.4;
+
 export function calcLevel(totalXp: number): number {
-  return Math.floor(Math.sqrt(totalXp / 100));
+  return Math.min(MAX_LEVEL, Math.floor(Math.pow(totalXp / 100, LEVEL_EXPONENT)));
 }
 
 export function calcXpForLevel(level: number): number {
-  return level * level * 100;
+  if (level >= MAX_LEVEL) return Infinity;
+  return Math.ceil(100 * Math.pow(level, 1 / LEVEL_EXPONENT));
 }
 
 export function calcLevelProgress(totalXp: number): { current: number; target: number } {

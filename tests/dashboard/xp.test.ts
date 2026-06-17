@@ -29,26 +29,26 @@ function makeEvent(
 }
 
 describe('xp', () => {
-  it('calcLevel returns correct level', () => {
+  it('calcLevel returns correct level (capped at 20, ^0.4 curve)', () => {
     expect(calcLevel(0)).toBe(0);
     expect(calcLevel(100)).toBe(1);
-    expect(calcLevel(10000)).toBe(10);
-    expect(calcLevel(250000)).toBe(50);
-    expect(calcLevel(1000000)).toBe(100);
+    expect(calcLevel(10000)).toBe(6);
+    expect(calcLevel(250000)).toBe(20);  // capped
+    expect(calcLevel(1000000)).toBe(20); // capped
   });
 
-  it('calcXpForLevel returns XP needed for level', () => {
+  it('calcXpForLevel returns XP needed for level (^2.5 curve)', () => {
     expect(calcXpForLevel(1)).toBe(100);
-    expect(calcXpForLevel(10)).toBe(10000);
-    expect(calcXpForLevel(50)).toBe(250000);
-    expect(calcXpForLevel(100)).toBe(1_000_000);
+    expect(calcXpForLevel(6)).toBe(8819);
+    expect(calcXpForLevel(10)).toBe(31623);
+    expect(calcXpForLevel(20)).toBe(Infinity);  // capped
   });
 
   it('calcLevelProgress returns current/target for next level', () => {
-    // Level 5 = 2500 XP. At 3000 XP:
+    // Level 3 = 1559 XP. At 3000 XP:
     const result = calcLevelProgress(3000);
-    expect(result.current).toBe(500);  // 3000 - 2500
-    expect(result.target).toBe(3600 - 2500); // xp_for_level(6) - xp_for_level(5)
+    expect(result.current).toBe(1441);  // 3000 - 1559
+    expect(result.target).toBe(1641);   // xp_for_level(4) - xp_for_level(3)
   });
 
   it('ACHIEVEMENT_XP has correct values', () => {

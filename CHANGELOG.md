@@ -1,5 +1,10 @@
 # Changelog
 
+### 新增等级徽章 + 等级曲线重设计 — 2026-06-17
+
+- **等级系统重设计**: 公式从 `sqrt(XP/100)` 改为 `(XP/100)^0.4`，上限 Lv 20（非硬 clamp 而是曲线自然收敛）；`calcXpForLevel` 逆运算调整为 `ceil(100 * n^2.5)`；Lv 20 需要 178,886 XP（≈全成就 + 数千 task + streak），非一日之功
+- **5 个等级徽章**: Bronze Agent (Lv 3)、Silver Agent (Lv 7)、Gold Agent (Lv 11)、Diamond Agent (Lv 15)、Grandmaster (Lv 20)，达到等级自动解锁
+
 ### 新增稀有度全收集徽章 — 2026-06-17
 
 - **6 个稀有度徽章**: 集齐某一稀有度的全部成就后解锁对应徽章（Common / Uncommon / Rare / Epic / Legendary / Mythic Completion），动态计算，支持中英文名；`BadgeItem` 新增 `badge_cn` 字段；排除 future 成就

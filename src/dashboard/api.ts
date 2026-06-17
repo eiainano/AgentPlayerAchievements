@@ -599,6 +599,7 @@ function buildBadges(
   definitions: AchievementDefinition[],
   state: AchievementState,
   currentLevel: number,
+  questlineDefinitions?: QuestlineDefinition[],
 ): BadgeItem[] {
   const badges: BadgeItem[] = [];
 
@@ -692,6 +693,36 @@ function buildBadges(
         completed: 1,
         total: 1,
       });
+    }
+  }
+
+  // ── Questline completion badges ──
+  if (questlineDefinitions) {
+    const defMap = new Map(definitions.map(d => [d.id, d]));
+    for (const ql of questlineDefinitions) {
+      if (ql.reward.type !== 'badge') continue;
+
+      // Check if all achievements across all stages are unlocked
+      let total = 0;
+      let unlocked = 0;
+      for (const stage of ql.stages) {
+        for (const achId of stage.achievements) {
+          total++;
+          if (state.unlocked[achId]) unlocked++;
+        }
+      }
+      if (total > 0 && unlocked >= total) {
+        const firstDef = defMap.get(ql.stages[0]?.achievements[0] || '');
+        badges.push({
+          set_id: `@questline_${ql.id}`,
+          badge: ql.reward.value,
+          set_name: ql.name,
+          set_name_cn: ql.name_cn,
+          icon: firstDef?.icon || ql.icon || '🏆',
+          completed: unlocked,
+          total,
+        });
+      }
     }
   }
 
@@ -830,7 +861,7 @@ export function buildApiResponse(
   // Build sets response — needed for sets field and badges
   const setItems = buildSetsResponse(definitions, state, setDefinitions);
   const currentLevel = calcLevel(totalXp);
-  const badges = buildBadges(setItems, definitions, state, currentLevel);
+  const badges = buildBadges(setItems, definitions, state, currentLevel, questlineDefinitions);
   const cosmetics = buildCosmeticsResponse(setItems, events);
 
   const recommend = (opts?.includeRecommend)

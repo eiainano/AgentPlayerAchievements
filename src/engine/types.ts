@@ -289,6 +289,7 @@ export interface SetDefinition {
   name_cn?: string;
   achievements: string[];
   reward: SetReward;
+  pixel_art?: PixelArtSize;
 }
 
 export interface AchievementStats {

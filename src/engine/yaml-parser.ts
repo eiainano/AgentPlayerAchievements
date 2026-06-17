@@ -169,6 +169,28 @@ export function parseYAML(text: string): { definitions: AchievementDefinition[];
     });
   }
 
+  /**
+   * Parse badge pixel art from YAML. Badges use a 48×24 rectangular format
+   * (2:1 ratio) instead of square achievement pixel art. Validation mirrors
+   * parsePixelArtSize but checks for 24 rows × 48 cols.
+   */
+  function parseBadgePixelArt(raw: unknown): PixelArtSize | undefined {
+    if (typeof raw !== 'object' || raw === null) return undefined;
+    const obj = raw as Record<string, unknown>;
+    const palette = Array.isArray(obj.palette) && obj.palette.every((c: unknown) => typeof c === 'string')
+      ? obj.palette as string[] : null;
+    const data = Array.isArray(obj.data) && obj.data.every((r: unknown) => typeof r === 'string')
+      ? obj.data as string[] : null;
+    if (!palette || !data) return undefined;
+    if (palette.length < 2 || palette.length > 36) return undefined;
+    if (palette[0] !== '⬛') return undefined;
+    if (data.length !== 24) return undefined;
+    if (!data.every(row => row.length === 48)) return undefined;
+    const validChars = new Set(PIXEL_INDEX_CHARS.slice(0, palette.length));
+    if (!data.every(row => row.split('').every(ch => validChars.has(ch)))) return undefined;
+    return { palette, data };
+  }
+
   // Parse sets
   const sets: SetDefinition[] = [];
   if (raw.sets) {
@@ -187,6 +209,7 @@ export function parseYAML(text: string): { definitions: AchievementDefinition[];
           type: rewardType && VALID_REWARD_TYPES.has(rewardType) ? rewardType as SetRewardType : 'badge',
           value: rewardValue,
         },
+        pixel_art: parseBadgePixelArt(entry.pixel_art),
       });
     }
   }

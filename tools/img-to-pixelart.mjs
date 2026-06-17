@@ -18,6 +18,8 @@ import * as path from 'path';
 
 const INDICES = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const MAX_PALETTE = 35; // 0-9 + A-Z = 36 total, index 0 = transparent
+const BADGE_W = 48;
+const BADGE_H = 24;
 
 const THEMES = {
   fire:    ['#7f1d1d','#b91c1c','#ea580c','#fbbf24','#fef08a'],
@@ -159,10 +161,9 @@ function quantize(pixels, width, height) {
   return { palette, data };
 }
 
-// ── Process image at a given size ───────────────────────────────────
+// ── Process image at a given (width × height) ──────────────────────
 
-async function processSize(buffer, size, isMono, themeColors) {
-  const w = size, h = size;
+async function processSize(buffer, w, h, isMono, themeColors) {
 
   if (isMono && themeColors) {
     // For monochrome: render grayscale mask, then colorize
@@ -238,6 +239,20 @@ ${hexCodes}
 ${rows}`;
 }
 
+function badgeToYAML({ palette, data }, indent) {
+  const pfx = ' '.repeat(indent);
+  const paletteYaml = palette.map((c, i) => `${pfx}  - "${c}"`).join('\n');
+  const dataYaml = data.map(r => `${pfx}  - "${r}"`).join('\n');
+  return (
+`${pfx}pixel_art:
+${pfx}  palette:
+${pfx}    - "⬛"                              # index 0: transparent
+${paletteYaml}
+${pfx}  data:
+${dataYaml}`
+  );
+}
+
 function multiToYAML(results) {
   // results = { 48: {palette, data}, 128: {...}, 256: {...} }
   const sizes = Object.keys(results).sort((a,b) => Number(a)-Number(b));
@@ -268,18 +283,16 @@ async function main() {
     console.error('Usage: node img-to-pixelart.mjs <image-path> [options]');
     console.error('Options:');
     console.error('  --theme T     Color theme for monochrome SVGs (default: fire)');
-    console.error('  --sizes S     Comma-separated resolutions (default: 48,128,256)');
+    console.error('  --sizes S     Comma-separated square resolutions (default: 48,128,256)');
+    console.error('  --badge       Generate 48×24 badge pixel art (flat format for sets)');
     console.error(`  Themes: ${Object.keys(THEMES).join(', ')}`);
     process.exit(1);
   }
 
+  const isBadge = args.includes('--badge');
   const source = args[0];
   const themeIdx = args.indexOf('--theme');
   const themeName = themeIdx >= 0 && themeIdx < args.length-1 ? args[themeIdx+1] : 'fire';
-  const sizesIdx = args.indexOf('--sizes');
-  const sizes = sizesIdx >= 0 && sizesIdx < args.length-1
-    ? args[sizesIdx+1].split(',').map(Number)
-    : [48, 128, 256];
 
   const input = await loadImage(source);
   const ext = path.extname(source).toLowerCase();
@@ -287,28 +300,45 @@ async function main() {
   const mono = isSVG ? await isMonochrome(input) : false;
   const theme = mono ? (THEMES[themeName] || THEMES.fire) : null;
 
+  if (isBadge) {
+    console.error(`Input: ${path.basename(source)}  Type: ${isSVG ? 'SVG' : 'Image'}  ${mono ? `(monochrome → theme: ${themeName})` : '(color)'}`);
+    console.error(`Output: ${BADGE_W}×${BADGE_H} badge pixel art`);
+
+    const result = await processSize(input, BADGE_W, BADGE_H, mono, theme);
+    console.error(`  Colors: ${result.palette.length}`);
+
+    console.log(`\n── Terminal Preview (${BADGE_W}×${BADGE_H}) ──\n`);
+    console.log(renderTerminal(result.palette, result.data));
+
+    console.log('\n── Badge YAML (copy into set definition) ──\n');
+    console.log(badgeToYAML(result, 4));
+    console.log(`\n# 48×24 badge · ${mono ? themeName : 'native colors'}`);
+    return;
+  }
+
+  const sizesIdx = args.indexOf('--sizes');
+  const sizes = sizesIdx >= 0 && sizesIdx < args.length-1
+    ? args[sizesIdx+1].split(',').map(Number)
+    : [48, 128, 256];
+
   console.error(`Input: ${path.basename(source)}  Type: ${isSVG ? 'SVG' : 'Image'}  ${mono ? `(monochrome → theme: ${themeName})` : '(color — direct quantization)'}`);
   console.error(`Output sizes: ${sizes.join(', ')}`);
 
-  // Process each size
   const results = {};
   for (const size of sizes) {
-    results[size] = await processSize(input, size, mono, theme);
+    results[size] = await processSize(input, size, size, mono, theme);
     console.error(`  ${size}×${size}: ${results[size].palette.length} colors`);
   }
 
-  // Terminal preview (always uses 48×48 if available)
   if (results[48]) {
     console.log('\n── Terminal Preview (48×48) ──\n');
     console.log(renderTerminal(results[48].palette, results[48].data));
   } else {
-    // Use the smallest available size
     const smallest = Math.min(...sizes);
     console.log(`\n── Terminal Preview (${smallest}×${smallest}) ──\n`);
     console.log(renderTerminal(results[smallest].palette, results[smallest].data));
   }
 
-  // YAML output
   console.log('\n── YAML (multi-resolution) ──\n');
   console.log(multiToYAML(results));
   console.log(`\n# ${Object.keys(results).length} resolutions · ${mono ? themeName : 'native colors'}`);

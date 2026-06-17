@@ -396,6 +396,135 @@ ${rows.map(r => `          - "${r}"`).join('\n')}`;
   });
 });
 
+describe('badge_pixel_art', () => {
+  it('parses 48×24 badge pixel art from set definitions', () => {
+    const yaml = `
+definitions:
+  - id: a1
+    name: A1
+    icon: 🏆
+    category: test
+    rarity: common
+    set: test_set
+    conditions: []
+sets:
+  test_set:
+    name: Test Set
+    achievements: [a1]
+    reward:
+      type: badge
+      value: Test Badge
+    pixel_art:
+      palette:
+        - "⬛"
+        - "#ffd700"
+        - "#b8860b"
+      data:
+${Array.from({length: 24}, (_, i) => {
+  if (i < 3) return '        - "000000000011111111111100000000000000000000000000"';
+  if (i >= 21) return '        - "000000000011111111111100000000000000000000000000"';
+  return '        - "000011111111111111111111111100000000000000000000"';
+}).join('\n')}
+`;
+    const result = parseYAML(yaml);
+    expect(result.sets).toHaveLength(1);
+    const set = result.sets[0]!;
+    expect(set.id).toBe('test_set');
+    expect(set.pixel_art).toBeDefined();
+    expect(set.pixel_art!.palette).toHaveLength(3);
+    expect(set.pixel_art!.palette[0]).toBe('⬛');
+    expect(set.pixel_art!.palette[1]).toBe('#ffd700');
+    expect(set.pixel_art!.data).toHaveLength(24);
+    expect(set.pixel_art!.data[0]).toHaveLength(48);
+  });
+
+  it('rejects badge pixel art with wrong row count', () => {
+    const dataRows = Array.from({length: 20}, () => '        - "' + '0'.repeat(48) + '"').join('\n');
+    const yaml = `
+definitions:
+  - id: a1
+    name: A1
+    icon: 🏆
+    category: test
+    rarity: common
+    set: test_set
+    conditions: []
+sets:
+  test_set:
+    name: Test Set
+    achievements: [a1]
+    reward:
+      type: badge
+      value: Test Badge
+    pixel_art:
+      palette:
+        - "⬛"
+        - "#ffd700"
+      data:
+${dataRows}
+`;
+    const result = parseYAML(yaml);
+    expect(result.sets[0]!.pixel_art).toBeUndefined();
+  });
+
+  it('rejects badge pixel art with wrong column count', () => {
+    const dataRows = Array.from({length: 24}, () => '        - "' + '0'.repeat(32) + '"').join('\n');
+    const yaml = `
+definitions:
+  - id: a1
+    name: A1
+    icon: 🏆
+    category: test
+    rarity: common
+    set: test_set
+    conditions: []
+sets:
+  test_set:
+    name: Test Set
+    achievements: [a1]
+    reward:
+      type: badge
+      value: Test Badge
+    pixel_art:
+      palette:
+        - "⬛"
+        - "#ffd700"
+      data:
+${dataRows}
+`;
+    const result = parseYAML(yaml);
+    expect(result.sets[0]!.pixel_art).toBeUndefined();
+  });
+
+  it('rejects badge pixel art without transparent marker', () => {
+    const dataRows = Array.from({length: 24}, () => '        - "' + '0'.repeat(48) + '"').join('\n');
+    const yaml = `
+definitions:
+  - id: a1
+    name: A1
+    icon: 🏆
+    category: test
+    rarity: common
+    set: test_set
+    conditions: []
+sets:
+  test_set:
+    name: Test Set
+    achievements: [a1]
+    reward:
+      type: badge
+      value: Test Badge
+    pixel_art:
+      palette:
+        - "#ffd700"
+      data:
+${dataRows}
+`;
+    const result = parseYAML(yaml);
+    expect(result.sets[0]!.pixel_art).toBeUndefined();
+  });
+});
+
 // ── ANSI Popup Integration ─────────────────────────────────────────────────
 
 describe('renderPopup with pixel_art', () => {

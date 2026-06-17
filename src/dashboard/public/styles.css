@@ -2294,6 +2294,18 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
   line-height: 1;
   margin-bottom: 10px;
 }
+.badge-card .badge-icon-pixel {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.badge-card .badge-icon-pixel img {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
 
 .badge-card .badge-badge {
   font-size: 13px;

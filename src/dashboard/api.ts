@@ -62,6 +62,7 @@ export interface SetItem {
   completed: number;
   total: number;
   reward: SetReward;
+  pixel_art?: PixelArtSize;
 }
 
 export interface BadgeItem {
@@ -73,6 +74,7 @@ export interface BadgeItem {
   icon: string;
   completed: number;
   total: number;
+  pixel_art?: PixelArtSize;
 }
 
 export interface PackResponse {
@@ -590,6 +592,7 @@ export function buildSetsResponse(
       completed: members.filter(m => state.unlocked[m.id]).length,
       total: members.length,
       reward: setDef?.reward || { type: 'badge', value: '' },
+      pixel_art: setDef?.pixel_art,
     };
   });
 }
@@ -618,6 +621,7 @@ function buildBadges(
       icon: set.achievements[0]?.icon || '🏆',
       completed: set.completed,
       total: set.total,
+      pixel_art: set.pixel_art,
     });
   }
 

@@ -6,6 +6,7 @@ import { evaluateAll } from './evaluator.js';
 import { Store } from './store.js';
 import { computeStats } from './stats.js';
 import { getBatteryStatus } from '../utils/battery.js';
+import { calcStreak } from '../utils/activity.js';
 import type { AgentToolStats } from './stats.js';
 import type {
   TrackedEvent, EventType, EventPayload,
@@ -264,7 +265,8 @@ export class AchievementEngine {
       }
     }
 
-    // Compute XP/level for MCP agent awareness (simplified: achievement XP + task XP, no streak multiplier)
+    // Compute XP/level for MCP agent awareness.
+    // Must stay in sync with dashboard/xp.ts formulas.
     const ACHIEVEMENT_XP: Record<string, number> = {
       common: 50, uncommon: 100, rare: 200, epic: 300, legendary: 500, mythic: 1000,
     };
@@ -275,7 +277,30 @@ export class AchievementEngine {
       }
     }
     const taskCount = this.events.filter(e => e.event_type === 'task.complete').length;
-    const totalXp = achievementXp + taskCount * 25;
+
+    // Usage XP (mirrors calcUsageBreakdown in dashboard/xp.ts)
+    const toolCalls = this.events.filter(e => e.event_type === 'tool.complete').length;
+    const sessions = this.events.filter(e => e.event_type === 'session.start').length;
+    const messages = this.events.filter(e => e.event_type === 'user.message').length;
+    const tokenEvents = this.events.filter(e => e.event_type === 'token.consumed');
+    const totalTokens = tokenEvents.reduce(
+      (sum, e) => sum + ((e.payload.amount as number) || 0), 0,
+    );
+    const toolNames = this.events
+      .filter(e => e.event_type === 'tool.complete')
+      .map(e => e.payload.tool_name as string | undefined)
+      .filter((t): t is string => !!t);
+    const uniqueTools = new Set(toolNames).size;
+    const usageXp = Math.round(Math.sqrt(
+      toolCalls * 4 + sessions * 40 + messages * 20 +
+      (totalTokens / 1000) * 2 + uniqueTools * 80,
+    ));
+
+    // Streak multiplier (mirrors calcStreakMultiplier in dashboard/xp.ts)
+    const streakDays = calcStreak(this.events).current;
+    const streakMultiplier = streakDays <= 1 ? 1.0 : Math.min(2.0, 1.0 + (streakDays - 1) * 0.1);
+
+    const totalXp = Math.round((achievementXp + taskCount * 25 + usageXp) * streakMultiplier);
     const level = Math.floor(Math.sqrt(totalXp / 100));
 
     return {

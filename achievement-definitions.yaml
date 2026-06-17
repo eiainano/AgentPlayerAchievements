@@ -441,7 +441,7 @@ definitions:
     description_cn: 单 session 持续超过 3 小时。不考虑上个卫生间吗？
     icon: 🏃
     category: milestones
-    rarity: uncommon
+    rarity: rare
     hidden: false
     hint: A long, focused session produces more. Go deep.
     hint_cn: 持久的 session 能产出更多。来一次深度工作。
@@ -795,7 +795,7 @@ definitions:
     description_cn: 代码报错，你让agent自己修好了。
     icon: 🐛
     category: skill
-    rarity: common
+    rarity: uncommon
     hidden: false
     hint: Find and fix some bugs
     hint_cn: 找到并修复一些 bug
@@ -867,7 +867,7 @@ definitions:
     description_cn: 同一次 task 中从 Plan 模式切换到非Plan模式，完成最终实现。
     icon: 🎭
     category: skill
-    rarity: common
+    rarity: uncommon
     hidden: false
     hint: Switch models several times within a session
     hint_cn: 在 session 中多次切换模型
@@ -1094,7 +1094,7 @@ definitions:
     description_cn: 粘贴内容 / 总输入 > 50%。
     icon: 📋
     category: style
-    rarity: common
+    rarity: uncommon
     hidden: false
     hint: Copy and paste — you know the drill
     hint_cn: 复制、粘贴……你懂的
@@ -1248,7 +1248,7 @@ definitions:
     description_cn: 你让agent 在终端执行了 250 次命令。
     icon: 💻
     category: tool_mastery
-    rarity: uncommon
+    rarity: rare
     hidden: false
     hint: Let Claude run some shell commands for you
     hint_cn: 让 Claude 帮你跑一些 shell 命令
@@ -1431,7 +1431,7 @@ definitions:
     description_cn: agent 帮你创建了 GitHub Actions workflow 文件。
     icon: ⚙️
     category: workflow
-    rarity: rare
+    rarity: common
     hidden: false
     set: git_flow
     conditions:
@@ -1588,7 +1588,7 @@ definitions:
     description_cn: 累计开启 50 个 session。
     icon: 🪖
     category: workflow
-    rarity: uncommon
+    rarity: rare
     hidden: false
     hint: Accumulate enough sessions to be called a veteran
     hint_cn: 积累足够多的 session 经验
@@ -1683,7 +1683,7 @@ definitions:
     description_cn: agent 独立完成了编码→commit→PR 全过程，你只是看了结果。
     icon: ♻️
     category: workflow
-    rarity: epic
+    rarity: rare
     hidden: false
     conditions:
       - type: sequence
@@ -1722,7 +1722,7 @@ definitions:
     description_cn: agent 成功解决了一次 merge conflict。
     icon: ☮️
     category: workflow
-    rarity: rare
+    rarity: uncommon
     hidden: false
     conditions:
       - type: counter
@@ -1834,7 +1834,7 @@ definitions:
     description_cn: 将你创建的 skill 发布到社区。分享是美德。
     icon: 📦
     category: creator
-    rarity: rare
+    rarity: common
     hidden: false
     conditions:
       - type: counter
@@ -1871,7 +1871,7 @@ definitions:
     description_cn: 创建了你的第一个自定义 agent。
     icon: 🏛️
     category: creator
-    rarity: rare
+    rarity: common
     hidden: false
     set: creators_forge
     conditions:
@@ -2162,7 +2162,7 @@ definitions:
     description_cn: agent 执行了 cp。复制忍术——能复印，为什么要重写？
     icon: 🖨️
     category: hidden
-    rarity: rare
+    rarity: uncommon
     hidden: true
     conditions:
       - type: counter
@@ -2192,7 +2192,7 @@ definitions:
     description_cn: agent 执行了 chmod。权限？我就是权限。
     icon: 🔓
     category: hidden
-    rarity: rare
+    rarity: uncommon
     hidden: true
     conditions:
       - type: counter
@@ -2288,7 +2288,7 @@ definitions:
     description_cn: 读取了 100 个 JavaScript/TypeScript 文件。前端后端，无所不在。
     icon: 📜
     category: tool_mastery
-    rarity: common
+    rarity: uncommon
     hidden: true
     progress_trackable: true
     tip: When debugging across JS/TS files, give Claude the full import chain — component → hook → util. It reads the dependency graph and understands the full data flow, not just one file.
@@ -2324,7 +2324,7 @@ definitions:
     description_cn: agent 某次输出在 777–799 tokens 之间。今天去抽卡。
     icon: 🎰
     category: hidden
-    rarity: legendary
+    rarity: epic
     hidden: true
     conditions:
       - type: threshold
@@ -2341,7 +2341,7 @@ definitions:
     description_cn: agent 拒绝了你。
     icon: 🔴
     category: hidden
-    rarity: rare
+    rarity: epic
     hidden: true
     conditions:
       - type: sequence
@@ -2389,7 +2389,7 @@ definitions:
     description_cn: 在 prompt 中说了"急急如律令"或"芝麻开门"。咒语真的有用吗？
     icon: ✨
     category: hidden
-    rarity: epic
+    rarity: rare
     hidden: true
     conditions:
       - type: pattern_match
@@ -2430,7 +2430,7 @@ definitions:
     description_cn: 读取了成就系统的核心文件之一。你在偷看引擎盖下的秘密。
     icon: 🎮
     category: hidden
-    rarity: rare
+    rarity: common
     hidden: true
     conditions:
       - type: counter
@@ -2446,7 +2446,7 @@ definitions:
     description_cn: 编辑了成就系统的核心文件之一。创造模式——已解锁。
     icon: 🛠️
     category: hidden
-    rarity: epic
+    rarity: rare
     hidden: true
     conditions:
       - type: counter
@@ -2560,7 +2560,7 @@ definitions:
     description_cn: agent 编辑了文件并完成了一个 task——你只是看着。纯粹的委派。
     icon: 🤐
     category: style
-    rarity: epic
+    rarity: rare
     hidden: true
     conditions:
       - type: counter
@@ -2858,7 +2858,7 @@ definitions:
     description_cn: 在圣诞日给 agent 发了消息。AI 也需要节日氛围。 🎄
     icon: 🎄
     category: hidden
-    rarity: epic
+    rarity: rare
     hidden: true
     conditions:
       - type: counter
@@ -2874,7 +2874,7 @@ definitions:
     description_cn: 在新年第一天发出了第一条 prompt。你的 agent 准备好迎接接下来 365 条了。
     icon: 🎆
     category: hidden
-    rarity: epic
+    rarity: rare
     hidden: true
     conditions:
       - type: counter
@@ -2890,7 +2890,7 @@ definitions:
     description_cn: 在情人节和 agent 一起度过。有 terminal 还要什么玫瑰花。
     icon: 💘
     category: hidden
-    rarity: epic
+    rarity: rare
     hidden: true
     conditions:
       - type: counter
@@ -2906,7 +2906,7 @@ definitions:
     description_cn: 春节期间给 agent 发了消息。你的 agent 不要红包，只要干净的代码。
     icon: 🧧
     category: hidden
-    rarity: epic
+    rarity: rare
     hidden: true
     conditions:
       - type: counter
@@ -2922,7 +2922,7 @@ definitions:
     description_cn: 电池快没电了还在用 Agent。真正的战士不需要充电器。
     icon: 🪫
     category: hidden
-    rarity: rare
+    rarity: common
     hidden: true
     conditions:
       - type: counter
@@ -3119,7 +3119,7 @@ definitions:
     description_cn: 同一 session 中 agent 编辑了文件并完成了 3 个 task，你毫无干预。自动驾驶已激活。
     icon: 🪑
     category: challenge
-    rarity: legendary
+    rarity: epic
     hidden: false
     challenge: true
     conditions:
@@ -3140,7 +3140,7 @@ definitions:
     description_cn: 单 session 里完成了 5+ 个 task。进入状态的人，势不可挡。
     icon: 🌪️
     category: challenge
-    rarity: rare
+    rarity: uncommon
     hidden: false
     challenge: true
     hint: Complete multiple tasks in one sitting — momentum is everything
@@ -3412,7 +3412,7 @@ definitions:
     description_cn: agent 累计失败 100 次。它早已不是当初那个菜鸟了。
     icon: 🧘
     category: workflow
-    rarity: mythic
+    rarity: epic
     hidden: false
     conditions:
       - type: counter
@@ -3483,7 +3483,7 @@ definitions:
     description_cn: 从零写了 50 个文件。文字变代码，代码变文件。
     icon: ✍️
     category: tool_mastery
-    rarity: common
+    rarity: uncommon
     hidden: false
     hint: Ask Claude to create new files — each one starts with a blank page
     hint_cn: 让 Claude 从零创建新文件——每一页都从空白开始
@@ -3523,7 +3523,7 @@ definitions:
     description_cn: 同一 session 中恰好 spawn 了 4 个子 agent。四人战术小组。
     icon: 🎯
     category: workflow
-    rarity: common
+    rarity: uncommon
     hidden: false
     hint: Assemble multiple agents to collaborate at once
     hint_cn: 一次性召集多个 agent 来协作
@@ -3580,7 +3580,7 @@ definitions:
     description_cn: 10 次 git 推送。早发多发。
     icon: 🚢
     category: workflow
-    rarity: common
+    rarity: uncommon
     hidden: false
     hint: Push your commits regularly — code not shipped is just a dream
     hint_cn: 记得推送你的 commit——不推上去的代码只是白日梦
@@ -3601,7 +3601,7 @@ definitions:
     description_cn: 写了 50+ 个 Python 文件。是蟒蛇不是巨蟒。
     icon: 🐍
     category: tool_mastery
-    rarity: common
+    rarity: uncommon
     hidden: false
     hint: Work with Python files regularly
     hint_cn: 经常使用 Python 写代码
@@ -3623,7 +3623,7 @@ definitions:
     description_cn: 写了 50+ 个 TypeScript 文件。类型就是火箭燃料。
     icon: 📘
     category: tool_mastery
-    rarity: common
+    rarity: uncommon
     hidden: false
     hint: Work with TypeScript regularly — types pay off in the long run
     hint_cn: 经常使用 TypeScript——类型系统长期来看是值得的
@@ -3645,7 +3645,7 @@ definitions:
     description_cn: 写了 50+ 个 JavaScript 文件。95 年就开始织网。
     icon: 🕸️
     category: tool_mastery
-    rarity: common
+    rarity: uncommon
     hidden: false
     hint: Work with JavaScript files regularly
     hint_cn: 经常使用 JavaScript 写代码
@@ -3817,7 +3817,7 @@ definitions:
     description_cn: 修改了一个 .m 文件。红色药丸还是蓝色药丸？
     icon: 💊
     category: hidden
-    rarity: rare
+    rarity: common
     hidden: true
     progress_trackable: true
     hint: Try editing a MATLAB (.m) file — follow the white rabbit
@@ -3837,7 +3837,7 @@ definitions:
     description_cn: 你在编辑Transformer。汽车人，变形出发！
     icon: 🚚
     category: hidden
-    rarity: rare
+    rarity: common
     hidden: true
     progress_trackable: true
     hint: Edit a .py file containing classic Transformer attention code
@@ -3880,7 +3880,7 @@ definitions:
     description_cn: 编辑了一个文件，行数恰好翻倍。细胞开始分裂了。
     icon: 🧬
     category: hidden
-    rarity: rare
+    rarity: common
     hidden: true
     tip: Ever copy-pasted your own code and called it a refactor? We've all been there.
     tip_cn: 把自己的代码复制粘贴一遍然后叫重构？大家都干过。
@@ -3899,7 +3899,7 @@ definitions:
     description_cn: 正忙着改代码呢，然后……打开了成就面板。当代猎魔人的优先级。
     icon: ♠️
     category: hidden
-    rarity: rare
+    rarity: uncommon
     hidden: true
     progress_trackable: true
     hint: Get deep into a coding session, then check your achievements

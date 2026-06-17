@@ -11,7 +11,7 @@ import type {
 } from '../engine/types.js';
 import type { AgentToolStats } from '../engine/stats.js';
 import { evaluateCondition } from '../engine/evaluator.js';
-import { calcTotalXp, calcLevel, calcLevelProgress, calcUsageBreakdown, XP_PER_TASK, calcStreakMultiplier } from './xp.js';
+import { calcTotalXp, calcLevel, calcLevelProgress, calcUsageBreakdown, XP_PER_TASK, calcStreakMultiplier, ACHIEVEMENT_XP } from './xp.js';
 import type { UsageBreakdown } from './xp.js';
 import { buildTimeline } from './timeline.js';
 import { loadConfig } from '../config.js';
@@ -343,7 +343,9 @@ export function buildCardResponse(
   const taskCount = events.filter(e => e.event_type === 'task.complete').length;
   const taskXp = taskCount * XP_PER_TASK;
   const usageBreakdown = calcUsageBreakdown(events);
-  const achievementXp = (state.stats?.total_unlocked || 0) * 50;
+  const achievementXp = definitions
+    .filter(d => state.unlocked[d.id])
+    .reduce((sum, d) => sum + (ACHIEVEMENT_XP[d.rarity] || 0), 0);
   const totalXp = Math.round((taskXp + achievementXp + (usageBreakdown?.usage_xp || 0)) * cardStreakMultiplier);
   const level = calcLevel(totalXp);
   const xpProgress = calcLevelProgress(totalXp);

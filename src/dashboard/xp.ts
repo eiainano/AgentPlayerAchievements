@@ -83,11 +83,11 @@ export function calcUsageBreakdown(events: TrackedEvent[]): UsageBreakdown {
   const uniqueTools = new Set(toolNames).size;
 
   const usageXP = Math.round(Math.sqrt(
-    toolCalls * 1 +
-    sessions * 10 +
-    messages * 5 +
-    (totalTokens / 1000) * 0.5 +
-    uniqueTools * 20
+    toolCalls * 4 +
+    sessions * 40 +
+    messages * 20 +
+    (totalTokens / 1000) * 2 +
+    uniqueTools * 80
   ));
 
   return {

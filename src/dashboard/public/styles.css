@@ -2294,17 +2294,20 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
   line-height: 1;
   margin-bottom: 10px;
 }
-.badge-card .badge-icon-pixel {
+.badge-card .badge-icon-img {
   display: flex;
   justify-content: center;
+  align-items: center;
+  min-height: 36px;
   margin-bottom: 8px;
 }
-.badge-card .badge-icon-pixel img {
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
+.badge-card .badge-image {
+  display: block;
   max-width: 100%;
   height: auto;
   border-radius: 4px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
 .badge-card .badge-badge {

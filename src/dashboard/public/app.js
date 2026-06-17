@@ -2457,13 +2457,11 @@ function renderBadges(data) {
     const setName = currentLang === 'zh' && b.set_name_cn ? b.set_name_cn : b.set_name;
     const unlockedLabel = t('badge_unlocked', { completed: b.completed, total: b.total });
     const badgeName = currentLang === 'zh' && b.badge_cn ? b.badge_cn : b.badge;
-    const hasPixelArt = b.pixel_art && b.pixel_art.palette && b.pixel_art.data;
+    const iconHtmlStr = b.badge_image
+      ? `<img src="${escAttr(b.badge_image)}" class="badge-image" alt="">`
+      : iconHtml(b.icon, { size: 36 });
     return `<div class="badge-card">
-      <div class="badge-icon${hasPixelArt ? ' badge-icon-pixel' : ''}">${
-        hasPixelArt
-          ? iconHtml(b.icon, { size: 48, pixelArt: b.pixel_art })
-          : iconHtml(b.icon, { size: 36 })
-      }</div>
+      <div class="badge-icon${b.badge_image ? ' badge-icon-img' : ''}">${iconHtmlStr}</div>
       <div class="badge-badge">${escHtml(badgeName)}</div>
       <div class="badge-set-name">${escHtml(setName)}</div>
       <div class="badge-progress">${unlockedLabel}</div>

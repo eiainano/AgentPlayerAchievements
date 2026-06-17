@@ -239,18 +239,39 @@ ${hexCodes}
 ${rows}`;
 }
 
-function badgeToYAML({ palette, data }, indent) {
-  const pfx = ' '.repeat(indent);
-  const paletteYaml = palette.map((c, i) => `${pfx}  - "${c}"`).join('\n');
-  const dataYaml = data.map(r => `${pfx}  - "${r}"`).join('\n');
-  return (
-`${pfx}pixel_art:
-${pfx}  palette:
-${pfx}    - "⬛"                              # index 0: transparent
-${paletteYaml}
-${pfx}  data:
-${dataYaml}`
-  );
+/**
+ * Write a pixel art image as PNG via sharp.
+ * Renders each pixel as a 10×10 block for crisp pixel art.
+ */
+async function renderPixelArtPNG({ palette, data }, outputPath) {
+  const pixelScale = 10;
+  const w = data[0].length * pixelScale;
+  const h = data.length * pixelScale;
+  const rgba = Buffer.alloc(w * h * 4, 0);
+
+  for (let y = 0; y < data.length; y++) {
+    for (let x = 0; x < data[0].length; x++) {
+      const idx = parseInt(data[y][x], 36);
+      if (idx === 0) continue; // transparent
+      const hex = palette[idx];
+      if (!hex || hex === '⬛') continue;
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      // Fill pixelScale × pixelScale block
+      for (let dy = 0; dy < pixelScale; dy++) {
+        for (let dx = 0; dx < pixelScale; dx++) {
+          const pi = ((y * pixelScale + dy) * w + (x * pixelScale + dx)) * 4;
+          rgba[pi] = r; rgba[pi+1] = g; rgba[pi+2] = b; rgba[pi+3] = 255;
+        }
+      }
+    }
+  }
+
+  await sharp(rgba, { raw: { width: w, height: h, channels: 4 } })
+    .png()
+    .toFile(outputPath);
+  console.error(`  Wrote: ${outputPath}`);
 }
 
 function multiToYAML(results) {
@@ -310,9 +331,19 @@ async function main() {
     console.log(`\n── Terminal Preview (${BADGE_W}×${BADGE_H}) ──\n`);
     console.log(renderTerminal(result.palette, result.data));
 
-    console.log('\n── Badge YAML (copy into set definition) ──\n');
-    console.log(badgeToYAML(result, 4));
-    console.log(`\n# 48×24 badge · ${mono ? themeName : 'native colors'}`);
+    // Determine output path
+    const outputIdx = args.indexOf('--output');
+    const baseName = outputIdx >= 0 && outputIdx < args.length-1
+      ? args[outputIdx+1]
+      : path.basename(source, path.extname(source)) + '.png';
+    const badgesDir = path.resolve(process.cwd(), 'pixel-art-output', 'badges');
+    fs.mkdirSync(badgesDir, { recursive: true });
+    const pngPath = path.join(badgesDir, baseName);
+    await renderPixelArtPNG(result, pngPath);
+
+    console.log('\n── YAML → paste into set definition ──\n');
+    console.log(`    badge_image: "badges/${baseName}"`);
+    console.log(`\n# 48×24 badge · ${mono ? themeName : 'native colors'} · written to ${pngPath}`);
     return;
   }
 

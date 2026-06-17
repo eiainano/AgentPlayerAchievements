@@ -1,14 +1,11 @@
 # Changelog
 
-### 徽章像素画流程搭建 — 2026-06-17
+### 徽章图片路径定义 — 2026-06-17
 
-- **徽章像素画尺寸**: 48×24（2:1 长条形缎带），与成就的 48×48 方形像素画区分
-- **数据结构**: `SetDefinition.pixel_art` / `BadgeItem.pixel_art` 字段（复用 `PixelArtSize`）
-- **YAML 解析**: `parseBadgePixelArt()` 验证 24 行 × 48 列，palette 顺序、透明标记、索引字符规则与成就像素画一致
-- **API 传递**: `buildSetsResponse` → `SetItem.pixel_art` → `buildBadges` → `BadgeItem.pixel_art`
-- **Dashboard 渲染**: 有 pixel_art 的徽章卡片显示像素画（48px 高，宽自适应），无则回落为 emoji
-- **转换工具**: `img-to-pixelart.mjs` 新增 `--badge` 模式，48×24 非方形 resize、扁平 YAML 输出
-- **测试**: 4 个新测试覆盖有效解析、行数错误、列数错误、缺透明标记
+- **YAML 存路径不存像素数据**: Set 定义新增 `badge_image` 字段（如 `badge_image: "badges/founder.png"`），指向预渲染的 24×48 徽章图片；`SetDefinition.pixel_art` 移除
+- **Dashboard 渲染**: `renderBadges` 中检测 `badge_image` → `<img>` 标签，无则回退 emoji iconHtml；新增 `.badge-image` / `.badge-icon-img` CSS
+- **转换工具**: `img-to-pixelart.mjs --badge` 将 SVG 处理后写入 `pixel-art-output/badges/` 目录并输出 `badge_image:` YAML；移除废弃的 `sectionToYAML` / `badgeToYAML`
+- **测试**: 4 个 inline pixel_art 测试 → 2 个 `badge_image` 解析/缺省测试
 
 ### Questline 徽章进入 Badges 列表 — 2026-06-17
 

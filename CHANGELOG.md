@@ -1,5 +1,12 @@
 # Changelog
 
+### README 数字同步 + 项目结构更新 — 2026-06-17
+
+- **数字修正**: 成就数 218→213, 测试数 1203→1205, 测试文件数 45→46, CLI 命令数 25→27, MCP 工具数 5→7, 运行时依赖 4→5
+- **CLI 表补充**: 新增 6 条遗漏命令（banner, history, explain, watch, upgrade, completion）
+- **项目结构同步**: 新增 index.ts, tool-registry.ts, verify/auditor.ts；更新 utils/ 描述
+- **多语言同步**: 5 份 README 文件行数统一为 510 行
+
 ### 徽章图片路径定义 — 2026-06-17
 
 - **YAML 存路径不存像素数据**: Set 定义新增 `badge_image` 字段（如 `badge_image: "badges/founder.png"`），指向预渲染的 24×48 徽章图片；`SetDefinition.pixel_art` 移除

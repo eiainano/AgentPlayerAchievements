@@ -1,5 +1,9 @@
 # Changelog
 
+### Questline 徽章进入 Badges 列表 — 2026-06-17
+
+- **Questline 徽章补齐**: `buildBadges()` 新增 `questlineDefinitions` 参数，完成全部 stage 的 questline badge 奖励现在会出现在 Hero 区徽章行和 Badges 页，不再只局限在 questline 卡片内
+
 ### 新增等级徽章 + 等级曲线重设计 — 2026-06-17
 
 - **等级系统重设计**: 公式从 `sqrt(XP/100)` 改为 `(XP/100)^0.4`，上限 Lv 20（非硬 clamp 而是曲线自然收敛）；`calcXpForLevel` 逆运算调整为 `ceil(100 * n^2.5)`；Lv 20 需要 178,886 XP（≈全成就 + 数千 task + streak），非一日之功

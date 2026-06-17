@@ -1,5 +1,9 @@
 # Changelog
 
+### 统一称号和徽章 — 2026-06-17
+
+- **称号合并到徽章**: 移除 `title` reward type，4 个套装称号 + 5 个 Questline 称号全部改为 `badge` type；删除 `TitleItem` 接口、`buildTitlesAndBadges` 函数、`hero-titles-row`/`titles-row` 等 UI 元素；清理残余 CSS 和 i18n key
+
 ### XP/Level 系统修复 + 成就稀有度 Cleanup — 2026-06-17
 
 - **P0 — Card API XP 计算错误**: `buildCardData()` 中所有成就按 50 XP 算（`total_unlocked * 50`），修复为按稀有度映射 `ACHIEVEMENT_XP`；全成就用户卡片 Level 从 10 回到 19

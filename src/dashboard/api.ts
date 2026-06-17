@@ -67,6 +67,7 @@ export interface SetItem {
 export interface BadgeItem {
   set_id: string;
   badge: string;      // reward.value, e.g. "streak_master", "100% Complete"
+  badge_cn?: string;   // Chinese name for dynamic badges
   set_name: string;
   set_name_cn?: string;
   icon: string;
@@ -593,9 +594,14 @@ export function buildSetsResponse(
   });
 }
 
-function buildBadges(sets: SetItem[]): BadgeItem[] {
+function buildBadges(
+  sets: SetItem[],
+  definitions: AchievementDefinition[],
+  state: AchievementState,
+): BadgeItem[] {
   const badges: BadgeItem[] = [];
 
+  // ── Badges from completed sets ──
   for (const set of sets) {
     if (set.completed !== set.total || set.total === 0) continue;
 
@@ -611,6 +617,58 @@ function buildBadges(sets: SetItem[]): BadgeItem[] {
       completed: set.completed,
       total: set.total,
     });
+  }
+
+  // ── Rarity completion badges (dynamic: all achievements of a rarity unlocked) ──
+  const RARITY_LABELS: Record<string, string> = {
+    common: 'Common Completion',
+    uncommon: 'Uncommon Completion',
+    rare: 'Rare Completion',
+    epic: 'Epic Completion',
+    legendary: 'Legendary Completion',
+    mythic: 'Mythic Completion',
+  };
+  const RARITY_LABELS_CN: Record<string, string> = {
+    common: '全普通收集',
+    uncommon: '全优秀收集',
+    rare: '全稀有收集',
+    epic: '全史诗收集',
+    legendary: '全传说收集',
+    mythic: '全神话收集',
+  };
+  const RARITY_ICONS: Record<string, string> = {
+    common: '★',
+    uncommon: '★★',
+    rare: '★★★',
+    epic: '★★★★',
+    legendary: '★★★★★',
+    mythic: '★★★★★★',
+  };
+
+  // Count per rarity: total achievements (only non-future) vs unlocked
+  const rarityCounts: Record<string, { total: number; unlocked: number }> = {};
+  for (const def of definitions) {
+    if (def.future) continue; // future achievements don't count toward completion
+    if (!rarityCounts[def.rarity]) rarityCounts[def.rarity] = { total: 0, unlocked: 0 };
+    rarityCounts[def.rarity]!.total++;
+    if (state.unlocked[def.id]) {
+      rarityCounts[def.rarity]!.unlocked++;
+    }
+  }
+
+  for (const [rarity, counts] of Object.entries(rarityCounts)) {
+    if (counts.total > 0 && counts.unlocked >= counts.total) {
+      badges.push({
+        set_id: `@rarity_${rarity}`,
+        badge: RARITY_LABELS[rarity] || `${rarity} Completion`,
+        badge_cn: RARITY_LABELS_CN[rarity] || `全${rarity}收集`,
+        set_name: `${rarity} achievements`,
+        set_name_cn: `${rarity} 成就`,
+        icon: RARITY_ICONS[rarity] || '🏆',
+        completed: counts.unlocked,
+        total: counts.total,
+      });
+    }
   }
 
   return badges;
@@ -747,7 +805,7 @@ export function buildApiResponse(
 
   // Build sets response — needed for sets field and badges
   const setItems = buildSetsResponse(definitions, state, setDefinitions);
-  const badges = buildBadges(setItems);
+  const badges = buildBadges(setItems, definitions, state);
   const cosmetics = buildCosmeticsResponse(setItems, events);
 
   const recommend = (opts?.includeRecommend)

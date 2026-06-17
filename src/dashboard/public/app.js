@@ -1800,7 +1800,10 @@ function renderProfile(data) {
       if (badgesRow) {
         badgesRow.className = 'hero-badges-row';
         badgesRow.innerHTML = `<span class="hero-section-label badges-label">${t('hero_badges_label')}</span>` +
-          badges.map(b => `<span class="hero-badge">${escHtml(b.badge)}</span>`).join('');
+          badges.map(b => {
+            const bn = currentLang === 'zh' && b.badge_cn ? b.badge_cn : b.badge;
+            return `<span class="hero-badge">${escHtml(bn)}</span>`;
+          }).join('');
         badgesRow.style.display = '';
       }
     }
@@ -2453,9 +2456,10 @@ function renderBadges(data) {
   grid.innerHTML = badges.map(b => {
     const setName = currentLang === 'zh' && b.set_name_cn ? b.set_name_cn : b.set_name;
     const unlockedLabel = t('badge_unlocked', { completed: b.completed, total: b.total });
+    const badgeName = currentLang === 'zh' && b.badge_cn ? b.badge_cn : b.badge;
     return `<div class="badge-card">
       <div class="badge-icon">${iconHtml(b.icon, { size: 36 })}</div>
-      <div class="badge-badge">${escHtml(b.badge)}</div>
+      <div class="badge-badge">${escHtml(badgeName)}</div>
       <div class="badge-set-name">${escHtml(setName)}</div>
       <div class="badge-progress">${unlockedLabel}</div>
     </div>`;

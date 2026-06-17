@@ -470,9 +470,8 @@ const I18N = {
     milestone_set: '🎯 Set complete: {name}',
     tl_sameday: 'on the same day',
     hidden_hint: '\u{1F512} Hidden',
-    hero_titles_label: 'Titles',
     hero_badges_label: 'Badges',
-    hero_no_titles_badges: 'No titles or badges yet — keep vibing on your coding journey!',
+    hero_no_badges: 'No badges yet — complete sets to earn them!',
     pin_title: 'Pin to showcase',
     rarity_common: 'Common',
     rarity_uncommon: 'Uncommon',
@@ -517,7 +516,6 @@ const I18N = {
     export_data: '📦 Export',
     section_badges: '🏅 Badges',
     no_badges: 'No badges yet — complete sets to earn them.',
-    title_tooltip: 'From set: {set}',
     badge_unlocked: '✓ {completed}/{total}',
     tools_hint: '💡 Use "agpa profile softwares" in your terminal to change which tools are tracked.',
     tour_prev: '← Previous',
@@ -649,9 +647,8 @@ const I18N = {
     milestone_set: '🎯 套装完成: {name}',
     tl_sameday: '同一天',
     hidden_hint: '\u{1F512} 隐藏成就',
-    hero_titles_label: '称号',
     hero_badges_label: '徽章',
-    hero_no_titles_badges: '还没有获得称号和徽章哦，继续你的 Vibe Coding 旅程吧！',
+    hero_no_badges: '还没有获得徽章哦，继续你的 Vibe Coding 旅程吧！',
     pin_title: '放入展示柜',
     rarity_common: '普通',
     rarity_uncommon: '优秀',
@@ -696,7 +693,6 @@ const I18N = {
     export_data: '📦 导出',
     section_badges: '🏅 徽章',
     no_badges: '暂无徽章——完成套装来获取。',
-    title_tooltip: '来自套装：{set}',
     badge_unlocked: '✓ {completed}/{total}',
     tools_hint: '💡 在终端中使用 "agpa profile softwares" 来更改要追踪的工具。',
     tour_prev: '← 上一步',
@@ -1787,45 +1783,25 @@ function renderProfile(data) {
 
   renderStreakCard(stats.streak, stats.streak_multiplier || 1.0);
   renderHeatmap(stats.heatmap);
-  renderTitlesRow(data);
 
-  // ── Titles & Badges (from completed set rewards) ──
+  // ── Badges (from completed set rewards) ──
   {
-    const completedSets = (data.sets || []).filter(s => s.completed > 0 && s.completed === s.total && s.reward?.value);
-    const titles = completedSets.filter(s => s.reward.type === 'title').map(s => s.reward.value);
-    const badges = completedSets.filter(s => s.reward.type === 'badge').map(s => s.reward.value);
-
-    const titlesRow = document.getElementById('hero-titles-row');
+    const badges = data.badges || [];
     const badgesRow = document.getElementById('hero-badges-row');
 
-    if (!titles.length && !badges.length) {
+    if (!badges.length) {
       // Empty state — single friendly nudge
-      if (titlesRow) {
-        titlesRow.className = 'hero-titles-row hero-empty-hint';
-        titlesRow.innerHTML = `<span class="hero-empty-msg">${t('hero_no_titles_badges')}</span>`;
-        titlesRow.style.display = '';
-      }
-      if (badgesRow) badgesRow.style.display = 'none';
-    } else {
-      if (titlesRow) {
-        titlesRow.className = 'hero-titles-row';
-        if (titles.length) {
-          titlesRow.innerHTML = `<span class="hero-section-label titles-label">${t('hero_titles_label')}</span>` +
-            titles.map(t => `<span class="hero-title-pill">${escHtml(t)}</span>`).join('<span class="hero-title-sep">·</span>');
-          titlesRow.style.display = '';
-        } else {
-          titlesRow.style.display = 'none';
-        }
-      }
-
       if (badgesRow) {
-        if (badges.length) {
-          badgesRow.innerHTML = `<span class="hero-section-label badges-label">${t('hero_badges_label')}</span>` +
-            badges.map(b => `<span class="hero-badge">${escHtml(b)}</span>`).join('');
-          badgesRow.style.display = '';
-        } else {
-          badgesRow.style.display = 'none';
-        }
+        badgesRow.className = 'hero-badges-row hero-empty-hint';
+        badgesRow.innerHTML = `<span class="hero-empty-msg">${t('hero_no_badges')}</span>`;
+        badgesRow.style.display = '';
+      }
+    } else {
+      if (badgesRow) {
+        badgesRow.className = 'hero-badges-row';
+        badgesRow.innerHTML = `<span class="hero-section-label badges-label">${t('hero_badges_label')}</span>` +
+          badges.map(b => `<span class="hero-badge">${escHtml(b.badge)}</span>`).join('');
+        badgesRow.style.display = '';
       }
     }
   }
@@ -2458,27 +2434,6 @@ function renderQuestlines(data) {
 
 function toggleQuestlineCard(card) {
   card.classList.toggle('expanded');
-}
-
-// ── Titles Row ────────────────────────────────────────
-
-function renderTitlesRow(data) {
-  const row = document.getElementById('titles-row');
-  if (!row) return;
-
-  const titles = data.titles || [];
-  if (titles.length === 0) {
-    row.style.display = 'none';
-    return;
-  }
-
-  row.style.display = 'flex';
-  row.innerHTML = titles.map(title => {
-    const setName = currentLang === 'zh' && title.set_name_cn ? title.set_name_cn : title.set_name;
-    return `<span class="title-pill" data-rarity="${title.rarity}" title="${t('title_tooltip', { set: setName })}">
-      ${iconHtml(title.icon, { size: 16 })} ${escHtml(title.title)}
-    </span>`;
-  }).join('');
 }
 
 // ── Badges Section ─────────────────────────────────────

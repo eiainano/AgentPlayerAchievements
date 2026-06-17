@@ -840,31 +840,12 @@ section.section:nth-of-type(6) { animation-delay: 0.30s; }
   opacity: .55;
 }
 
-.hero-titles-row,
 .hero-badges-row {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   flex-wrap: wrap;
-}
-
-.hero-titles-row { margin-top: 2px; }
-
-.hero-title-pill {
-  font-size: 14px;
-  font-weight: 600;
-  font-family: var(--font-display);
-  color: var(--gold);
-  letter-spacing: -.1px;
-  transition: opacity .3s ease;
-}
-
-.hero-title-sep {
-  color: var(--text-dim);
-  opacity: .25;
-  font-size: 10px;
-  pointer-events: none;
 }
 
 .hero-badge {
@@ -2279,37 +2260,6 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
 
 @media (max-width: 760px) {
   .sets-grid { grid-template-columns: 1fr; }
-}
-
-/* ── Titles Row ─────────────────────────────────────── */
-
-.titles-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  padding: 10px 0 4px;
-}
-
-.title-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 14px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: var(--font-display);
-  letter-spacing: .2px;
-  background: linear-gradient(135deg, #b8860b18, #ffd70018);
-  border: 1px solid rgba(218, 165, 32, .3);
-  color: var(--gold);
-  transition: transform .2s, box-shadow .25s;
-  cursor: default;
-}
-.title-pill:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 12px rgba(218, 165, 32, .15);
 }
 
 /* ── Badges Section ──────────────────────────────────── */
@@ -4807,8 +4757,7 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
   .stat-big-value { font-size: 24px; }
   .stat-ring-value { font-size: 24px; }
 
-  /* Hero titles/badges */
-  .hero-title-pill { font-size: 12px; }
+  /* Hero badges */
   .hero-badge { font-size: 10px; padding: 3px 10px; }
 
   /* Showcase slots — smaller */

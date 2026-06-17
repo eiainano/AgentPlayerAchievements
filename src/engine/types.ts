@@ -276,7 +276,7 @@ export interface AchievementState {
   migration_history?: MigrationRecord[];
 }
 
-export type SetRewardType = 'title' | 'showcase_border' | 'stat_counter' | 'theme' | 'animation' | 'badge';
+export type SetRewardType = 'showcase_border' | 'stat_counter' | 'theme' | 'animation' | 'badge';
 
 export interface SetReward {
   type: SetRewardType;

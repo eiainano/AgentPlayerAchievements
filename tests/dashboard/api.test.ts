@@ -87,7 +87,7 @@ describe('buildQuestlinesResponse', () => {
         { stage: 1, name: 'S1', name_cn: 'S1阶段', achievements: ['ach_a', 'ach_b'] },
         { stage: 2, name: 'S2', name_cn: 'S2阶段', achievements: ['ach_c'] },
       ],
-      reward: { type: 'title', value: 'Winner' },
+      reward: { type: 'badge', value: 'Winner' },
     }];
     const state: any = { unlocked: { ach_a: '2026-01-01T00:00:00Z' } };
     const result = buildQuestlinesResponse(qDefs, defs as any, state);

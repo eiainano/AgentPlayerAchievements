@@ -2,7 +2,7 @@ import * as YAML from 'yaml';
 import type { AchievementDefinition, Condition, ConditionType, PackMetadata, PixelArt, PixelArtSize, SetDefinition, SetRewardType, QuestlineDefinition, StageDefinition } from './types.js';
 
 const VALID_REWARD_TYPES: Set<string> = new Set([
-  'title', 'showcase_border', 'stat_counter', 'theme', 'animation', 'badge',
+  'showcase_border', 'stat_counter', 'theme', 'animation', 'badge',
 ]);
 
 const VALID_CONDITION_TYPES: Set<string> = new Set([

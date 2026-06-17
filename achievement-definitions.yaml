@@ -4049,7 +4049,7 @@ sets:
       - automode_first
       - mcp_first_connect
     reward:
-      type: title
+      type: badge
       value: Founder
   agent_commander:
     name: Agent Commander
@@ -4119,7 +4119,7 @@ sets:
       - hooks_master
       - plugin_explorer
     reward:
-      type: title
+      type: badge
       value: Maker
   tool_connoisseur:
     name: Tool Connoisseur
@@ -4131,7 +4131,7 @@ sets:
       - mcp_explorer
       - shell_shocker
     reward:
-      type: title
+      type: badge
       value: Tool Collector
   speedrun:
     name: Speedrun
@@ -4179,7 +4179,7 @@ sets:
       - smorgasbord
       - full_spectrum
     reward:
-      type: title
+      type: badge
       value: Polyglot
 
 # ═══════════════════════════════════════════════════════════════
@@ -4195,7 +4195,7 @@ questlines:
     description: "From your first bug to debugging mastery"
     description_cn: "从第一只 bug 到调试艺术的掌控者"
     reward:
-      type: title
+      type: badge
       value: "Elite Bug Hunter"
       value_cn: "精英除虫师"
     stages:
@@ -4220,7 +4220,7 @@ questlines:
     description: "Master the tools that shape your workflow"
     description_cn: "精进工具，塑造你的工作流"
     reward:
-      type: title
+      type: badge
       value: "Master Toolsmith"
       value_cn: "工具大师"
     stages:
@@ -4245,7 +4245,7 @@ questlines:
     description: "From hello world to shipping production code"
     description_cn: "从 Hello World 到交付生产代码"
     reward:
-      type: title
+      type: badge
       value: "Master Builder"
       value_cn: "建造大师"
     stages:
@@ -4270,7 +4270,7 @@ questlines:
     description: "Burn the midnight oil, push through the long sessions"
     description_cn: "熬夜奋战，马拉松式编码之旅"
     reward:
-      type: title
+      type: badge
       value: "Night Owl"
       value_cn: "暗夜猫头鹰"
     stages:
@@ -4295,7 +4295,7 @@ questlines:
     description: "Speak every language the machine understands"
     description_cn: "通晓机器语言的万国之民"
     reward:
-      type: title
+      type: badge
       value: "True Polyglot"
       value_cn: "语言通才"
     stages:

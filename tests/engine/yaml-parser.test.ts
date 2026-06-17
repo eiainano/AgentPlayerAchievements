@@ -139,7 +139,7 @@ questlines:
     expect(q.stages).toHaveLength(2);
     expect(q.stages[0]!.stage).toBe(1);
     expect(q.stages[0]!.achievements).toEqual(['test_ach']);
-    expect(q.reward.type).toBe('title');
+    expect(q.reward.type).toBe('badge');
     expect(q.reward.value).toBe('Test Title');
   });
 

@@ -64,15 +64,6 @@ export interface SetItem {
   reward: SetReward;
 }
 
-export interface TitleItem {
-  set_id: string;
-  title: string;      // reward.value, e.g. "Founder", "Polyglot"
-  set_name: string;
-  set_name_cn?: string;
-  icon: string;       // first unlocked member icon
-  rarity: string;     // highest member rarity
-}
-
 export interface BadgeItem {
   set_id: string;
   badge: string;      // reward.value, e.g. "streak_master", "100% Complete"
@@ -184,7 +175,6 @@ export interface DashboardData {
   profile_emoji?: string;
   profiles?: Array<{ name: string; emoji: string; tracked_tools?: string[] }>;
   max_profiles?: number;
-  titles: TitleItem[];
   badges: BadgeItem[];
   cosmetics?: CosmeticsResponse;
   is_demo?: boolean;
@@ -603,50 +593,27 @@ export function buildSetsResponse(
   });
 }
 
-function buildTitlesAndBadges(sets: SetItem[], definitions: AchievementDefinition[]): { titles: TitleItem[]; badges: BadgeItem[] } {
-  const titles: TitleItem[] = [];
+function buildBadges(sets: SetItem[]): BadgeItem[] {
   const badges: BadgeItem[] = [];
 
   for (const set of sets) {
     if (set.completed !== set.total || set.total === 0) continue;
 
     const reward = set.reward;
-    if (!reward || !reward.value) continue;
+    if (!reward || !reward.value || reward.type !== 'badge') continue;
 
-    // Find the highest rarity among members for visual coloring
-    const rarityOrder: Record<string, number> = {
-      common: 0, uncommon: 1, rare: 2, epic: 3, legendary: 4, mythic: 5,
-    };
-    let highestRarity = 'common';
-    for (const m of set.achievements) {
-      if ((rarityOrder[m.rarity] || 0) > (rarityOrder[highestRarity] || 0)) {
-        highestRarity = m.rarity;
-      }
-    }
-
-    if (reward.type === 'title') {
-      titles.push({
-        set_id: set.id,
-        title: reward.value,
-        set_name: set.name,
-        set_name_cn: set.name_cn,
-        icon: set.achievements.find(a => a.unlocked)?.icon || '🏆',
-        rarity: highestRarity,
-      });
-    } else if (reward.type === 'badge') {
-      badges.push({
-        set_id: set.id,
-        badge: reward.value,
-        set_name: set.name,
-        set_name_cn: set.name_cn,
-        icon: set.achievements[0]?.icon || '🏆',
-        completed: set.completed,
-        total: set.total,
-      });
-    }
+    badges.push({
+      set_id: set.id,
+      badge: reward.value,
+      set_name: set.name,
+      set_name_cn: set.name_cn,
+      icon: set.achievements[0]?.icon || '🏆',
+      completed: set.completed,
+      total: set.total,
+    });
   }
 
-  return { titles, badges };
+  return badges;
 }
 
 /** Map stat_counter labels to event types for real-time counting. */
@@ -778,9 +745,9 @@ export function buildApiResponse(
     }
   }
 
-  // Build sets response — needed for sets field and titles/badges
+  // Build sets response — needed for sets field and badges
   const setItems = buildSetsResponse(definitions, state, setDefinitions);
-  const { titles, badges } = buildTitlesAndBadges(setItems, definitions);
+  const badges = buildBadges(setItems);
   const cosmetics = buildCosmeticsResponse(setItems, events);
 
   const recommend = (opts?.includeRecommend)
@@ -817,7 +784,6 @@ export function buildApiResponse(
     },
     timeline: buildTimeline(state.unlocked),
     sets: setItems,
-    titles,
     badges,
     cosmetics,
     config: { lang: loadConfig().lang },

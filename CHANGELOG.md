@@ -1,5 +1,12 @@
 # Changelog
 
+### XP/Level 系统修复 + 成就稀有度 Cleanup — 2026-06-17
+
+- **P0 — Card API XP 计算错误**: `buildCardData()` 中所有成就按 50 XP 算（`total_unlocked * 50`），修复为按稀有度映射 `ACHIEVEMENT_XP`；全成就用户卡片 Level 从 10 回到 19
+- **P1 — Engine/Dashboard XP 双通道一致**: `engine.ts getStats()` 加入 usage XP 计算和 streak multiplier，精确匹配 dashboard 的 `calcTotalXp()`，消除 MCP 通道输出低估
+- **P2 — Usage XP 权重 4x**: toolCalls×1→4, sessions×10→40, messages×5→20, tokens×0.5→2, uniqueTools×20→80
+- **稀有度 Cleanup**: 重新按达成难度评定 38 个成就稀有度（24 降级 + 14 升级），移除 hidden 状态对稀有度的虚高影响；mythic 5→4, legendary 10→8, epic 35→31, rare 48→45, uncommon 59→71, common 56→54
+
 ### Dashboard UI 修复 — 2026-06-17
 
 - **主题切换**: Polar Night 装扮在白天模式下不再覆盖 CSS 变量；自动填充展示柜后不再重置暗色装扮

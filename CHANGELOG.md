@@ -1,5 +1,9 @@
 # Changelog
 
+### 新增稀有度全收集徽章 — 2026-06-17
+
+- **6 个稀有度徽章**: 集齐某一稀有度的全部成就后解锁对应徽章（Common / Uncommon / Rare / Epic / Legendary / Mythic Completion），动态计算，支持中英文名；`BadgeItem` 新增 `badge_cn` 字段；排除 future 成就
+
 ### 统一称号和徽章 — 2026-06-17
 
 - **称号合并到徽章**: 移除 `title` reward type，4 个套装称号 + 5 个 Questline 称号全部改为 `badge` type；删除 `TitleItem` 接口、`buildTitlesAndBadges` 函数、`hero-titles-row`/`titles-row` 等 UI 元素；清理残余 CSS 和 i18n key

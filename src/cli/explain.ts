@@ -201,21 +201,9 @@ function main(): void {
   }
 
   if (opts.json) {
-    if (expl.hidden && !expl.unlocked) {
-      // Engine already masks conditions + description. Return minimal JSON.
-      console.log(JSON.stringify({
-        achievement_id: expl.achievement_id,
-        hidden: true,
-        unlocked: false,
-        hint: expl.hint || null,
-        hint_cn: expl.hint_cn || null,
-        rarity: expl.rarity,
-        message: 'This is a hidden achievement. Condition details are concealed until unlocked.',
-        message_cn: '这是一个隐藏成就，条件详情在解锁前保密。',
-      }, null, 2));
-    } else {
-      console.log(JSON.stringify(expl, null, 2));
-    }
+    // Engine already masks conditions + description for hidden locked achievements.
+    // Always output the consistent explain object — scripts can rely on a single schema.
+    console.log(JSON.stringify(expl, null, 2));
     return;
   }
 

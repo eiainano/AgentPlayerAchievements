@@ -48,11 +48,21 @@ function showConfig(): void {
   console.log('');
 }
 
+function showConfigJSON(): void {
+  const cfg = loadConfig();
+  const profiles = listProfiles();
+  console.log(JSON.stringify({ ...cfg, profiles }, null, 2));
+}
+
 function main(): void {
   const args = process.argv.slice(3); // "agpa", "config", ...
 
-  if (args.length === 0) {
-    showConfig();
+  if (args.length === 0 || (args.length === 1 && args[0] === '--json')) {
+    if (args[0] === '--json') {
+      showConfigJSON();
+    } else {
+      showConfig();
+    }
     process.exit(0);
   }
 

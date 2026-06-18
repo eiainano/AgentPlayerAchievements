@@ -47,6 +47,8 @@ const COMMANDS: CmdInfo[] = [
   { name: 'upgrade',    description: 'Check for updates and upgrade AGPA',            flags: ['--check', '--help'] },
   { name: 'watch',      description: 'Real-time achievement monitor',                 flags: ['--poll', '--profile', '--help'],                       takesValue: ['--poll', '--profile'] },
   { name: 'history',    description: 'Browse raw event log entries',                    flags: ['--N', '--event', '--today', '--json', '--profile', '--help'], takesValue: ['--N', '--event', '--profile'] },
+  { name: 'explain',    description: 'Show why an achievement is locked/unlocked',   flags: ['--json', '--profile', '--help'], takesValue: ['--profile'] },
+  { name: 'pack',       description: 'List or inspect community achievement packs',  subcommands: ['list', 'info'] },
 ];
 
 // ── Short aliases (same as index.ts) ────────────────────────────────────
@@ -106,27 +108,27 @@ complete -F _agpa agpa
 // ── Zsh completion ──────────────────────────────────────────────────────
 
 function generateZsh(): string {
-  const cmdNames = COMMANDS.map(c => c.name).join(' ');
-  const subcmdDefs = COMMANDS
-    .filter(c => c.subcommands)
-    .map(c => {
-      const flags = (c.flags || []).join(' ');
-      return `  "${c.name})": {
-    _describe 'subcommand' subcmds
-  };`;
-    }).join('\n');
-
-  const flagDefs = COMMANDS
-    .filter(c => c.flags && c.flags.length > 0)
-    .map(c => {
-      const flags = c.flags!.filter(f => !SHARED_FLAGS.includes(f)).map(f => {
-        if (c.takesValue?.includes(f)) return `'${f}[${c.description}]:value:'`;
-        return `'${f}[${c.description}]'`;
-      }).join(' ');
-      return `  "${c.name})": {
-    _arguments ${flags}
-  };`;
-    }).join('\n');
+  // For each command, build the case branch with subcommands and/or flags.
+  const cmdBranches = COMMANDS.map(c => {
+    const parts: string[] = [];
+    if (c.subcommands) {
+      parts.push(`          _values "subcommand" ${c.subcommands.join(' ')}`);
+    }
+    if (c.flags && c.flags.length > 0) {
+      const flagList = c.flags
+        .filter(f => !SHARED_FLAGS.includes(f))
+        .map(f => {
+          if (c.takesValue?.includes(f)) return `'${f}[${c.description}]:value:'`;
+          return `'${f}[${c.description}]'`;
+        }).join(' \\\n            ');
+      if (flagList) {
+        parts.push(`          _arguments -s \\\n            ${flagList}`);
+      }
+    }
+    if (parts.length === 0) return `        ${c.name})\n          _default ;;`;
+    const body = parts.map(p => p + ' ;;').join('\n');
+    return `        ${c.name})\n${body}`;
+  }).join('\n');
 
   return `#compdef agpa
 # AGPA zsh completion — place in a directory on $fpath
@@ -137,30 +139,18 @@ _agpa() {
 ${COMMANDS.map(c => `    '${c.name}:${c.description}'`).join('\n')}
   )
 
-  local -a subcmds
-  subcmds=(
-${COMMANDS.filter(c => c.subcommands).map(c => c.subcommands!.map(s => `    '${s}:${c.name} ${s}'`).join('\n')).join('\n')}
-  )
-
   _arguments -C \\
     '--help[Show help]' \\
     '-h[Show help]' \\
     '--version[Print version]' \\
     '-v[Print version]' \\
-    '1: :_values "command" \${commands[@]}' \\
+    '1: :_values "command" \\$commands[@]' \\
     '*:: :->args'
 
   case "$state" in
     args)
       case "$words[1]" in
-        profile)
-          _values "subcommand" \${subcmds[(r)\${words[2]}*]} ;;
-        showcase)
-          _values "subcommand" \${subcmds[(r)\${words[2]}*]} ;;
-        sound)
-          _values "subcommand" \${subcmds[(r)\${words[2]}*]} ;;
-        completion)
-          _values "shell" bash zsh fish ;;
+${cmdBranches}
         *)
           _default ;;
       esac

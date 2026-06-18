@@ -183,6 +183,7 @@ function main(): void {
   const logPath = getEventLogPath(profile === 'default' ? null : profile);
 
   let events = readEvents(logPath);
+  const totalEvents = events.length; // cache — avoid double-read below
 
   if (events.length === 0) {
     if (opts.jsonOutput) {
@@ -214,11 +215,10 @@ function main(): void {
   }
 
   // Text output
-  const total = readEvents(logPath).length;
   const filterDesc = opts.eventFilter ? `matching "${opts.eventFilter}"` : '';
   const todayDesc = opts.todayOnly ? ' today' : '';
 
-  console.log(`\n${B}📜 Event History${R}  ${D}${events.length} of ${total} events${filterDesc}${todayDesc}${R}`);
+  console.log(`\n${B}📜 Event History${R}  ${D}${events.length} of ${totalEvents} events${filterDesc}${todayDesc}${R}`);
   if (profile !== 'default') {
     console.log(`  ${D}Profile: ${profile}${R}`);
   }

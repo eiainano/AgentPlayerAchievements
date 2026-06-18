@@ -96,7 +96,7 @@ ${B}AGPA Upgrade${R} — check for updates and upgrade
 
 Usage:
   agpa upgrade              Check for updates and upgrade interactively
-  agpa upgrade --check      Only check (exit 0 = up-to-date, 1 = update available)
+  agpa upgrade --check      Only check (exit 0=up-to-date, 2=update available)
   agpa upgrade --yes        Auto-upgrade without prompt (non-interactive)
   agpa upgrade --help       Show this help
 
@@ -141,7 +141,7 @@ Current version: ${getCurrentVersion()}
 
   if (checkOnly) {
     console.log(`  Run "${B}agpa upgrade${R}" to upgrade.\n`);
-    process.exit(1);
+    process.exit(2); // exit 2 = update available (distinct from error exit 1)
   }
 
   // ── Auto upgrade with --yes ──────────────────────────────────────────

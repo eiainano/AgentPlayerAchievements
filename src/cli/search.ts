@@ -91,7 +91,13 @@ function matchQuery(def: AchievementDefinition, query: string): boolean {
   return def.id.toLowerCase().includes(q)
     || def.name.toLowerCase().includes(q)
     || (def.name_cn?.toLowerCase().includes(q) ?? false)
+    || (def.name_es?.toLowerCase().includes(q) ?? false)
+    || (def.name_ko?.toLowerCase().includes(q) ?? false)
+    || (def.name_ja?.toLowerCase().includes(q) ?? false)
     || def.description.toLowerCase().includes(q)
+    || (def.description_es?.toLowerCase().includes(q) ?? false)
+    || (def.description_ko?.toLowerCase().includes(q) ?? false)
+    || (def.description_ja?.toLowerCase().includes(q) ?? false)
     || def.category.toLowerCase().includes(q)
     || (def.rarity?.toLowerCase().includes(q) ?? false);
 }

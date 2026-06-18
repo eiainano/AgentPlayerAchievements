@@ -10,6 +10,15 @@
   - `displayName()`/`displayDesc()`、`syncLangPicker()` 全面支持
   - I18N 表新增 ES/KO/JA 的 165 个 UI key 翻译（导航、统计、导览、热力图等）
   - 搜索过滤覆盖 5 语、Modal 改用 `displayName()`、Gacha Reveal 同步
+
+### CLI 6 项修复 — 2026-06-18
+
+- **`agpa config --json`**: 支持 JSON 输出（与其他 6 个命令一致）
+- **`agpa explain --json`**: 统一 hidden/locked 与非 hidden 的 JSON schema，消除脚本解析歧义
+- **`agpa upgrade --check`**: 退出码修正为 exit 2（有更新可用），区别于 error exit 1
+- **`agpa search`**: 搜索覆盖 ES/KO/JA 多语言字段（name_es/ko/ja, description_es/ko/ja）
+- **Zsh completion**: 修复死代码 — 现在所有 27 个命令都有 flag 和子命令补全；补充 explain/pack 命令
+- **`agpa history`**: 消除 event.log 双读（同一次调用读取两次）
   - 配置白名单: `achievement.config lang` 从 `en|zh` 扩展为 `en|zh|es|ko|ja`
 - **CLAUDE.md 指令强化**: Session 结束 MUST 结构化展示成就 + 按 `config.lang` 匹配字段
 - **指令文件路径修复**: Kilo Code/Hermes/OpenCode/OpenClaw 从项目级 `./AGENTS.md` 改为全局路径

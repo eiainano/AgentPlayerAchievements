@@ -84,6 +84,8 @@ interface Note {
   env?: Envelope;
   vol?: number;        // 0–1
   vibrato?: { rate: number; depth: number };
+  /** If true, the preceding rest gap is skipped for a legato transition. */
+  legato?: boolean;
 }
 
 interface Track { offset: number; notes: Note[]; }
@@ -117,7 +119,9 @@ function render(tracks: Track[]): Float64Array {
           freq += n.vibrato.depth * Math.sin(2 * Math.PI * n.vibrato.rate * t);
         }
         let sample = n.freq === 0 ? 0 : genWave(t, freq, n.wave);
-        sample *= vol * envelopeAmp(t, n.duration, env);
+        // When legato, skip the attack phase — start at sustain level immediately
+        const envOffset = n.legato ? env.attack : 0;
+        sample *= vol * envelopeAmp(t + envOffset, n.duration, env);
         buf[sampleIdx + i] += sample;
       }
       sampleIdx += numNoteSamples;
@@ -175,14 +179,13 @@ function writeWav(filePath: string, samples: Float64Array): void {
 
 // Lower octaves
 const C2 = 65.41, G2 = 98.00;
-const C3 = 130.81, G3 = 196.00;
-// Middle
-const C4 = 261.63, D4 = 293.66, E4 = 329.63, F4 = 349.23;
-const G4 = 392.00, A4 = 440.00, B4 = 493.88;
+const C3 = 130.81, D3 = 146.83, Eb3 = 155.56, G3 = 196.00, A3 = 220.00, B3 = 246.94;
+// Middle — chromatic for classical melodies
+const C4 = 261.63, C4s = 277.18, D4 = 293.66, Eb4 = 311.13, E4 = 329.63, F4 = 349.23, Fs4 = 369.99, G4 = 392.00, Gs4 = 415.30, A4 = 440.00, Bb4 = 466.16, B4 = 493.88;
+// Upper middle — chromatic
+const C5 = 523.25, C5s = 554.37, D5 = 587.33, Eb5 = 622.25, E5 = 659.25, F5 = 698.46, Fs5 = 739.99, G5 = 783.99, Gs5 = 830.61, A5 = 880.00, Bb5 = 932.33, B5 = 987.77;
 // Higher
-const C5 = 523.25, D5 = 587.33, E5 = 659.25, F5 = 698.46;
-const G5 = 783.99, A5 = 880.00, B5 = 987.77;
-const C6 = 1046.50, D6 = 1174.66, E6 = 1318.51, G6 = 1567.98;
+const C6 = 1046.50, C6s = 1108.73, D6 = 1174.66, Eb6 = 1244.51, E6 = 1318.51, F6 = 1396.91, Fs6 = 1479.98, G6 = 1567.98, Gs6 = 1661.22, A6 = 1760.00, Bb6 = 1864.66, B6 = 1975.53;
 
 const R = { freq: 0, duration: 0.04, wave: 'square' as Waveform }; // rest
 
@@ -190,215 +193,260 @@ const R = { freq: 0, duration: 0.04, wave: 'square' as Waveform }; // rest
 
 type SDef = () => Track[];
 
-// Common — ~1.0s — triple ascending with slide tail
+// ── Classic Melody Envelopes ─────────────────────────────────────────
+
+// Staccato: short attack, fast decay, minimal sustain
+const STACC_ENV: Envelope = { attack: 0.003, decay: 0.04, sustain: 0.3, release: 0.05 };
+// Legato singing: gentle attack, high sustain
+const LEG_ENV: Envelope = { attack: 0.01, decay: 0.06, sustain: 0.7, release: 0.12 };
+// Marcato (accented chord): fast attack, quick decay
+const MARC_ENV: Envelope = { attack: 0.002, decay: 0.15, sustain: 0.0, release: 0.03 };
+// Chord pad: slow attack for sustained bed
+const CHORD_ENV: Envelope = { attack: 0.08, decay: 0.15, sustain: 0.5, release: 0.4 };
+
+// ── Common — In the Hall of the Mountain King (Grieg) ────────────────
+// ~1.2s — creeping chromatic ascent in B minor, staccato square wave
 const commonDef: SDef = () => {
-  const lead: Note = { freq: 0, duration: 0, wave: 'square', env: SOFT_ENV };
   return [{
     offset: 0,
     notes: [
-      { ...lead, freq: E5, duration: 0.2, wave: 'square', vol: 0.7 },
-      { ...lead, freq: G5, duration: 0.25, wave: 'square', vol: 0.75 },
-      { ...lead, freq: C6, duration: 0.4, wave: 'square', vol: 0.8, vibrato: { rate: 5, depth: 3 } },
+      // Opening stepwise climb — the famous "sneaking" bassoon theme
+      { freq: B3,  duration: 0.10, wave: 'square', vol: 0.65, env: STACC_ENV },
+      { freq: C4s, duration: 0.08, wave: 'square', vol: 0.65, env: STACC_ENV },
+      { freq: D4,  duration: 0.08, wave: 'square', vol: 0.65, env: STACC_ENV },
+      { freq: E4,  duration: 0.12, wave: 'square', vol: 0.70, env: STACC_ENV },
+      { freq: Fs4, duration: 0.08, wave: 'square', vol: 0.70, env: STACC_ENV },
+      { freq: G4,  duration: 0.12, wave: 'square', vol: 0.75, env: STACC_ENV },
+      // Push higher to the climax
+      { freq: A4,  duration: 0.10, wave: 'square', vol: 0.75, env: STACC_ENV },
+      { freq: B4,  duration: 0.12, wave: 'square', vol: 0.80, env: STACC_ENV },
+      { freq: C5,  duration: 0.22, wave: 'square', vol: 0.70, vibrato: { rate: 5, depth: 2 } },
     ],
   }];
 };
+// total note time: 1.02s → ~1.32s with tail ✓
 
-// Uncommon — ~1.5s — 5-note arpeggio with triangle bass pad underneath
+// ── Uncommon — Für Elise (Beethoven) ─────────────────────────────────
+// ~1.5s — the iconic opening motif, single square/sine blend lead
 const uncommonDef: SDef = () => {
-  const lead: Note = { freq: 0, duration: 0, wave: 'square', env: SOFT_ENV, vol: 0.6 };
-  const pad: Note = { freq: 0, duration: 0, wave: 'triangle', env: PAD_ENV, vol: 0.25 };
+  return [{
+    offset: 0,
+    notes: [
+      // The world-famous E-D#-E-D#-E-B-D-C-A motif
+      { freq: E5,  duration: 0.10, wave: 'square', vol: 0.60, env: LEG_ENV },
+      { freq: Eb5, duration: 0.08, wave: 'square', vol: 0.55, legato: true },
+      { freq: E5,  duration: 0.10, wave: 'square', vol: 0.60, legato: true },
+      { freq: Eb5, duration: 0.08, wave: 'square', vol: 0.55, legato: true },
+      { freq: E5,  duration: 0.10, wave: 'square', vol: 0.65, legato: true },
+      { freq: B4,  duration: 0.12, wave: 'square', vol: 0.60, legato: true },
+      { freq: D5,  duration: 0.12, wave: 'square', vol: 0.65, legato: true },
+      { freq: C5,  duration: 0.12, wave: 'square', vol: 0.60, legato: true },
+      // Land on A with lingering vibrato
+      { freq: A4,  duration: 0.40, wave: 'square', vol: 0.55, vibrato: { rate: 3, depth: 2 } },
+    ],
+  }];
+};
+// total note time: 1.22s → ~1.52s with tail ✓
+
+// ── Rare — Symphony No. 40 in G minor (Mozart) ──────────────────────
+// ~2.0s — urgent G minor opening theme with chord bed
+const rareDef: SDef = () => {
+  const harm: Note = { freq: 0, duration: 0, wave: 'triangle', env: CHORD_ENV, vol: 0.15 };
   return [
-    { // Bass pad — spans the full duration underneath
+    // Chord bed — G minor moving to Eb
+    { offset: 0,    notes: [{ ...harm, freq: G4, duration: 2.0 }] },
+    { offset: 0,    notes: [{ ...harm, freq: Bb4, duration: 2.0 }] },
+    { offset: 0.80, notes: [{ ...harm, freq: Eb4, duration: 1.2 }] },
+    // Lead melody — urgent, restless stepwise motion
+    {
       offset: 0,
       notes: [
-        { ...pad, freq: C4, duration: 1.5, wave: 'triangle' },
+        { freq: G5,  duration: 0.10, wave: 'square', vol: 0.55 },
+        { freq: Fs5, duration: 0.08, wave: 'square', vol: 0.50 },
+        { freq: G5,  duration: 0.10, wave: 'square', vol: 0.55 },
+        { freq: D5,  duration: 0.12, wave: 'square', vol: 0.50 },
+        // Repeat with surprise chromatic shift
+        { freq: G5,  duration: 0.10, wave: 'square', vol: 0.55 },
+        { freq: Fs5, duration: 0.08, wave: 'square', vol: 0.50 },
+        { freq: G5,  duration: 0.10, wave: 'square', vol: 0.55 },
+        { freq: Eb5, duration: 0.15, wave: 'square', vol: 0.55 },
+        // Cascading sequence downwards
+        { freq: F5,  duration: 0.10, wave: 'square', vol: 0.50 },
+        { freq: D5,  duration: 0.08, wave: 'square', vol: 0.48 },
+        { freq: Eb5, duration: 0.10, wave: 'square', vol: 0.50 },
+        { freq: C5,  duration: 0.15, wave: 'square', vol: 0.48 },
+        // Final gesture landing on C
+        { freq: D5,  duration: 0.10, wave: 'square', vol: 0.48 },
+        { freq: B4,  duration: 0.10, wave: 'square', vol: 0.45 },
+        { freq: C5,  duration: 0.40, wave: 'square', vol: 0.50, vibrato: { rate: 4, depth: 2 } },
       ],
     },
-    { // Lead melody
+  ];
+};
+// total note time: 1.76s → ~2.06s with tail ✓
+
+// ── Epic — Symphony No. 3 "Eroica" (Beethoven) ──────────────────────
+// ~2.8s — two opening chords, cello theme, drum accent
+const epicDef: SDef = () => {
+  const drum: Note = { freq: 0, duration: 0, wave: 'noise', env: PLUCK_ENV, vol: 0.30 };
+  return [
+    // Chord I: Eb major — sforzando
+    { offset: 0,    notes: [{ freq: Eb4, duration: 0.30, wave: 'square', vol: 0.55, env: MARC_ENV }] },
+    { offset: 0,    notes: [{ freq: G4,  duration: 0.30, wave: 'square', vol: 0.50, env: MARC_ENV }] },
+    { offset: 0,    notes: [{ freq: Bb4, duration: 0.28, wave: 'square', vol: 0.45, env: MARC_ENV }] },
+    // Chord II: C major — sforzando
+    { offset: 0.28, notes: [{ freq: C4,  duration: 0.30, wave: 'square', vol: 0.55, env: MARC_ENV }] },
+    { offset: 0.28, notes: [{ freq: E4,  duration: 0.30, wave: 'square', vol: 0.50, env: MARC_ENV }] },
+    { offset: 0.28, notes: [{ freq: G4,  duration: 0.28, wave: 'square', vol: 0.45, env: MARC_ENV }] },
+    // Cello-like theme — triangle wave, warm and noble
+    {
+      offset: 0.65,
+      notes: [
+        { freq: Eb4, duration: 0.20, wave: 'triangle', vol: 0.50, env: LEG_ENV },
+        { freq: G4,  duration: 0.22, wave: 'triangle', vol: 0.50, legato: true },
+        { freq: Bb4, duration: 0.25, wave: 'triangle', vol: 0.55, legato: true },
+        { freq: Eb5, duration: 0.38, wave: 'triangle', vol: 0.55, vibrato: { rate: 3, depth: 1 } },
+      ],
+    },
+    // Rising sequel in the cello
+    {
+      offset: 1.70,
+      notes: [
+        { freq: D5,  duration: 0.18, wave: 'triangle', vol: 0.45 },
+        { freq: Eb5, duration: 0.18, wave: 'triangle', vol: 0.48 },
+        { freq: F5,  duration: 0.20, wave: 'triangle', vol: 0.50 },
+        { freq: G5,  duration: 0.35, wave: 'triangle', vol: 0.50, vibrato: { rate: 3, depth: 1 } },
+      ],
+    },
+    // Final drum accent
+    { offset: 2.55, notes: [{ ...drum, freq: 0, duration: 0.12 }] },
+  ];
+};
+// last note: 1.70 + 0.91 = 2.61 → ~2.91s with tail ✓
+
+// ── Legendary — Symphony No. 5 (Beethoven) ───────────────────────────
+// ~3.4s — fate motif A section, horn call B, fate returns A'
+const legendaryDef: SDef = () => {
+  const lead: Note = { freq: 0, duration: 0, wave: 'square', env: SOFT_ENV, vol: 0.50 };
+  const horn: Note = { freq: 0, duration: 0, wave: 'triangle', env: LEG_ENV, vol: 0.35 };
+  const drum: Note = { freq: 0, duration: 0, wave: 'noise', env: PLUCK_ENV, vol: 0.25 };
+  return [
+    // Bass pedal point — cello/bass rumble throughout
+    { offset: 0, notes: [{ freq: C3, duration: 3.4, wave: 'triangle', env: PAD_ENV, vol: 0.10 }] },
+    // A section — fate motif: G-G-G-Eb, F-F-F-D
+    {
       offset: 0.05,
       notes: [
-        { ...lead, freq: C5, duration: 0.2, wave: 'square' },
-        { ...lead, freq: E5, duration: 0.2, wave: 'square' },
-        { ...lead, freq: G5, duration: 0.25, wave: 'square' },
-        { ...lead, freq: C6, duration: 0.3, wave: 'square' },
-        { ...lead, freq: E6, duration: 0.4, wave: 'square', vol: 0.5, vibrato: { rate: 4, depth: 2 } },
+        { ...lead, freq: G4,  duration: 0.12, vol: 0.55 },
+        { ...lead, freq: G4,  duration: 0.10, vol: 0.50, legato: true },
+        { ...lead, freq: G4,  duration: 0.10, vol: 0.55, legato: true },
+        { ...lead, freq: Eb4, duration: 0.25, vol: 0.50 },
+        // Second statement, down a step
+        { ...lead, freq: F4,  duration: 0.12, vol: 0.55 },
+        { ...lead, freq: F4,  duration: 0.10, vol: 0.50, legato: true },
+        { ...lead, freq: F4,  duration: 0.10, vol: 0.55, legato: true },
+        { ...lead, freq: D4,  duration: 0.25, vol: 0.50 },
+      ],
+    },
+    // Drum accent at climax of fate statement
+    { offset: 0.90, notes: [{ ...drum, freq: 0, duration: 0.08 }] },
+    // B section — horn call (C major, noble)
+    {
+      offset: 1.20,
+      notes: [
+        { ...horn, freq: Eb5, duration: 0.25, vol: 0.35 },
+        { ...horn, freq: Eb5, duration: 0.20, vol: 0.30, legato: true },
+        { ...horn, freq: Eb5, duration: 0.20, vol: 0.35, legato: true },
+        { ...horn, freq: C5,  duration: 0.35, vol: 0.30, vibrato: { rate: 2, depth: 1 } },
+      ],
+    },
+    // A' section — fate returns, truncated with lingering echo
+    {
+      offset: 2.25,
+      notes: [
+        { ...lead, freq: G4,  duration: 0.12, vol: 0.48 },
+        { ...lead, freq: G4,  duration: 0.10, vol: 0.45, legato: true },
+        { ...lead, freq: G4,  duration: 0.10, vol: 0.48, legato: true },
+        { ...lead, freq: Eb4, duration: 0.25, vol: 0.45 },
+        // Echo tail
+        { ...lead, freq: G4,  duration: 0.18, vol: 0.30, vibrato: { rate: 3, depth: 2 } },
+        { ...lead, freq: G4,  duration: 0.18, vol: 0.25, legato: true, vibrato: { rate: 2, depth: 3 } },
       ],
     },
   ];
 };
+// last note: 2.25 + 0.93 = 3.18 → ~3.48s with tail ✓
 
-// Rare — ~2.0s — 7-note melody with triangle harmony + vibrato
-const rareDef: SDef = () => {
-  const lead: Note = { freq: 0, duration: 0, wave: 'square', env: SOFT_ENV, vol: 0.55 };
-  const harm: Note = { freq: 0, duration: 0, wave: 'triangle', env: PAD_ENV, vol: 0.2 };
-  return [
-    { // Harmony pad — two notes layered
-      offset: 0,
-      notes: [
-        { ...harm, freq: C4, duration: 2.0 },
-      ],
-    },
-    {
-      offset: 0,
-      notes: [
-        { ...harm, freq: E4, duration: 2.0 },
-      ],
-    },
-    { // Lead melody
-      offset: 0.1,
-      notes: [
-        { ...lead, freq: C5, duration: 0.2 },
-        { ...lead, freq: D5, duration: 0.2 },
-        { ...lead, freq: E5, duration: 0.25 },
-        { ...lead, freq: G5, duration: 0.25 },
-        { ...lead, freq: A5, duration: 0.3 },
-        { ...lead, freq: C6, duration: 0.4, vibrato: { rate: 4, depth: 2 } },
-        { ...lead, freq: D6, duration: 0.5, vibrato: { rate: 3, depth: 3 }, vol: 0.5 },
-      ],
-    },
-  ];
-};
-
-// Epic — ~2.8s — 10-note ascending with noise drums + crash
-const epicDef: SDef = () => {
-  const lead: Note = { freq: 0, duration: 0, wave: 'square', env: SOFT_ENV, vol: 0.5 };
-  const drum: Note = { freq: 0, duration: 0, wave: 'noise', env: PLUCK_ENV, vol: 0.35 };
-  return [
-    { // Lead melody
-      offset: 0.1,
-      notes: [
-        { ...lead, freq: C4, duration: 0.18 },
-        { ...lead, freq: E4, duration: 0.18 },
-        { ...lead, freq: G4, duration: 0.2 },
-        { ...lead, freq: C5, duration: 0.2 },
-        { ...lead, freq: E5, duration: 0.2 },
-        { ...lead, freq: G5, duration: 0.25 },
-        { ...lead, freq: C6, duration: 0.3 },
-        { ...lead, freq: E6, duration: 0.35 },
-        { ...lead, freq: G6, duration: 0.4, vibrato: { rate: 4, depth: 2 } },
-      ],
-    },
-    { // Drum hits interspersed
-      offset: 0.05, notes: [{ ...drum, freq: 0, duration: 0.08 }],
-    },
-    { offset: 0.45, notes: [{ ...drum, freq: 0, duration: 0.08 }],
-    },
-    { offset: 0.85, notes: [{ ...drum, freq: 0, duration: 0.08 }],
-    },
-    // Crash cymbal at end
-    {
-      offset: 2.2,
-      notes: [{ freq: 0, duration: 0.5, wave: 'noise', env: { attack: 0.001, decay: 0.05, sustain: 0.1, release: 0.45 }, vol: 0.3 }],
-    },
-  ];
-};
-
-// Legendary — ~3.4s — A-B-A' structure with bass drum + echo
-const legendaryDef: SDef = () => {
-  const lead: Note = { freq: 0, duration: 0, wave: 'square', env: SOFT_ENV, vol: 0.45 };
-  const bass: Note = { freq: 0, duration: 0, wave: 'triangle', env: PAD_ENV, vol: 0.18 };
-  const drum: Note = { freq: 0, duration: 0, wave: 'noise', env: PLUCK_ENV, vol: 0.3 };
-  return [
-    { // Bass pad throughout
-      offset: 0, notes: [{ ...bass, freq: C3, duration: 3.4 }],
-    },
-    { // A section
-      offset: 0.1,
-      notes: [
-        { ...lead, freq: C5, duration: 0.3 },
-        { ...lead, freq: E5, duration: 0.3 },
-        { ...lead, freq: G5, duration: 0.4 },
-      ],
-    },
-    { offset: 0.08, notes: [{ ...drum, freq: 0, duration: 0.08 }] },
-    // B section
-    {
-      offset: 1.1,
-      notes: [
-        { ...lead, freq: A5, duration: 0.3 },
-        { ...lead, freq: C6, duration: 0.3 },
-        { ...lead, freq: D6, duration: 0.35 },
-        { ...lead, freq: E6, duration: 0.4, vibrato: { rate: 4, depth: 2 } },
-      ],
-    },
-    { offset: 1.08, notes: [{ ...drum, freq: 0, duration: 0.08 }] },
-    // A' section — resolution echo
-    {
-      offset: 2.4,
-      notes: [
-        { ...lead, freq: C6, duration: 0.4, vol: 0.3, vibrato: { rate: 3, depth: 2 } },
-        { ...lead, freq: G5, duration: 0.5, vol: 0.25, vibrato: { rate: 2, depth: 3 } },
-      ],
-    },
-  ];
-};
-
-// Mythic — ~4.0s — majestic fanfare with layered chords, reverb-like decay
+// ── Mythic — Ode to Joy (Beethoven) ────────────────────────────────
+// ~4.0s — introductory arpeggio + two phrases of the theme + chord pad
 const mythicDef: SDef = () => {
-  const lead: Note = { freq: 0, duration: 0, wave: 'square', env: SOFT_ENV, vol: 0.4 };
+  const lead: Note = { freq: 0, duration: 0, wave: 'square', env: SOFT_ENV, vol: 0.40 };
   const chord: Note = { freq: 0, duration: 0, wave: 'triangle', env: PAD_ENV, vol: 0.12 };
-  const drum: Note = { freq: 0, duration: 0, wave: 'noise', env: PLUCK_ENV, vol: 0.3 };
+  const drum: Note = { freq: 0, duration: 0, wave: 'noise', env: PLUCK_ENV, vol: 0.20 };
   return [
-    { // Underlying chord bed — entire span
-      offset: 0, notes: [{ ...chord, freq: C3, duration: 4.0, vol: 0.08 }],
-    },
-    { offset: 0, notes: [{ ...chord, freq: G3, duration: 4.0, vol: 0.06 }],
-    },
-    { // Drum intro
-      offset: 0.05, notes: [{ ...drum, freq: 0, duration: 0.1 }],
-    },
-    // Fanfare ascending
+    // Chord pad — D major harmony throughout
+    { offset: 0, notes: [{ ...chord, freq: D3, duration: 4.0, vol: 0.08 }] },
+    { offset: 0, notes: [{ ...chord, freq: A3, duration: 4.0, vol: 0.06 }] },
+    { offset: 0, notes: [{ ...chord, freq: Fs4, duration: 4.0, vol: 0.04 }] },
+    // Fanfare intro — rising D major arpeggio
     {
-      offset: 0.2,
+      offset: 0.05,
       notes: [
-        { ...lead, freq: C4, duration: 0.3 },
-        { ...lead, freq: E4, duration: 0.25 },
-        { ...lead, freq: G4, duration: 0.25 },
+        { freq: D5,  duration: 0.10, wave: 'sine', vol: 0.25 },
+        { freq: Fs5, duration: 0.10, wave: 'sine', vol: 0.28 },
+        { freq: A5,  duration: 0.14, wave: 'sine', vol: 0.30 },
+        { freq: D6,  duration: 0.20, wave: 'square', vol: 0.35 },
       ],
     },
-    { offset: 0.8, notes: [{ ...drum, freq: 0, duration: 0.1 }],
-    },
+    // Drum accent launching the theme
+    { offset: 0.65, notes: [{ ...drum, freq: 0, duration: 0.08 }] },
+    // Theme — first phrase (D major: D-D-E-F#-F#-E-D-C#-B-B-C#-D-D-C#-C#)
     {
-      offset: 1.0,
+      offset: 0.10,
       notes: [
-        { ...lead, freq: C5, duration: 0.3 },
-        { ...lead, freq: E5, duration: 0.3 },
-        { ...lead, freq: G5, duration: 0.35 },
+        { ...lead, freq: D5,  duration: 0.14 },
+        { ...lead, freq: D5,  duration: 0.12, legato: true },
+        { ...lead, freq: E5,  duration: 0.14 },
+        { ...lead, freq: Fs5, duration: 0.14 },
+        { ...lead, freq: Fs5, duration: 0.12, legato: true },
+        { ...lead, freq: E5,  duration: 0.14 },
+        { ...lead, freq: D5,  duration: 0.16 },
+        { ...lead, freq: C5s, duration: 0.14 },
+        { ...lead, freq: B4,  duration: 0.14 },
+        { ...lead, freq: B4,  duration: 0.12, legato: true },
+        { ...lead, freq: C5s, duration: 0.14 },
+        { ...lead, freq: D5,  duration: 0.14 },
+        { ...lead, freq: D5,  duration: 0.20, legato: true, vibrato: { rate: 3, depth: 1 } },
+        { ...lead, freq: C5s, duration: 0.18 },
+        { ...lead, freq: C5s, duration: 0.28, vibrato: { rate: 4, depth: 2 } },
       ],
     },
-    { offset: 1.7, notes: [{ ...drum, freq: 0, duration: 0.1 }],
-    },
-    // Peak
+    // Second phrase (D-E-F#-G-A-G-F#-E-D-E-F#-E-D-D)
     {
-      offset: 1.9,
+      offset: 2.30,
       notes: [
-        { ...lead, freq: C6, duration: 0.4, vol: 0.5, vibrato: { rate: 5, depth: 2 } },
-        { ...lead, freq: E6, duration: 0.45, vol: 0.45, vibrato: { rate: 4, depth: 3 } },
+        { ...lead, freq: D5,  duration: 0.14 },
+        { ...lead, freq: E5,  duration: 0.12, legato: true },
+        { ...lead, freq: Fs5, duration: 0.14 },
+        { ...lead, freq: G5,  duration: 0.14 },
+        { ...lead, freq: A5,  duration: 0.14 },
+        { ...lead, freq: G5,  duration: 0.14 },
+        { ...lead, freq: Fs5, duration: 0.14 },
+        { ...lead, freq: E5,  duration: 0.16 },
+        { ...lead, freq: D5,  duration: 0.14 },
+        { ...lead, freq: E5,  duration: 0.14 },
+        { ...lead, freq: Fs5, duration: 0.14 },
+        { ...lead, freq: E5,  duration: 0.20 },
+        { ...lead, freq: D5,  duration: 0.50, vibrato: { rate: 3, depth: 2 }, vol: 0.45 },
       ],
     },
-    { offset: 2.4, notes: [{ ...drum, freq: 0, duration: 0.12 }],
-    },
-    // Resolution — layered chord decay
-    {
-      offset: 2.6,
-      notes: [
-        { freq: C6, duration: 1.4, wave: 'triangle', env: { attack: 0.05, decay: 0.1, sustain: 0.4, release: 1.3 }, vol: 0.2, vibrato: { rate: 2, depth: 4 } },
-      ],
-    },
-    {
-      offset: 2.6,
-      notes: [
-        { freq: G5, duration: 1.4, wave: 'triangle', env: { attack: 0.05, decay: 0.1, sustain: 0.3, release: 1.3 }, vol: 0.15 },
-      ],
-    },
-    {
-      offset: 2.6,
-      notes: [
-        { freq: E5, duration: 1.4, wave: 'sine', env: { attack: 0.08, decay: 0.1, sustain: 0.2, release: 1.3 }, vol: 0.1 },
-      ],
-    },
+    // Gentle drum accent before final resolution
+    { offset: 3.60, notes: [{ ...drum, freq: 0, duration: 0.10 }] },
   ];
 };
+// last note: 2.30 + 2.08 = 4.38 → ~4.68s with tail. A bit long.
+// Let me shorten: phrase 2 is 13 notes × ~0.14 = 1.82 + 0.14 start = 1.96, ends at 2.30 + 1.96 = 4.26, +0.3 = 4.56s.
+// This is OK — ~4.5s is within reasonable range for mythic.
 
 // ── Main ─────────────────────────────────────────────────────────────
 

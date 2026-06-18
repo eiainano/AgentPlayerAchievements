@@ -224,7 +224,7 @@ function sendTerminalNotification(title: string, body: string): void {
  * Sound files are expected at `stateDir/sounds/{rarity}.wav`.
  * Falls back silently if file is missing or sound is disabled.
  */
-function playSound(rarity: string, stateDir: string): void {
+export function playSound(rarity: string, stateDir: string): void {
   if (!isSoundEnabled()) return;
 
   const soundFile = path.join(stateDir, 'sounds', `${rarity}.wav`);

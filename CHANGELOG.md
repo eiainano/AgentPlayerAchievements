@@ -1,16 +1,16 @@
 # Changelog
 
-### 古典名曲 8-bit 音效 — 2026-06-18
+### 古典名曲 8-bit 音效 v2 — 2026-06-18
 
-- **6 个稀有度音效全面替换**: 从程序合成琶音改为古典名曲经典旋律片段，零新增依赖
-  - Common → 在山魔王的宫殿里 (Grieg)
-  - Uncommon → 致爱丽丝 (Beethoven)
-  - Rare → G小调第40交响曲 (Mozart)
-  - Epic → 英雄交响曲 "Eroica" (Beethoven)
-  - Legendary → 命运交响曲 (Beethoven)
-  - Mythic → 欢乐颂 (Beethoven)
-- **新增能力**: Note 接口加 `legato?` 标志实现音符无缝过渡；补全半音程音高常量 (B3–B6)
-- **批量声音去重**: `playSound()` 导出供外部调用；hook 中声音移到通知循环外层，只按最高稀有度播放一次 (`src/cli/hook.ts:611`, `src/utils/notify.ts:227`)
+- **6 个稀有度音效全面替换**: 从程序合成琶音改为古典名曲最经典/最昂扬片段，原曲速度 (bpm 匹配)
+  - Common → Vivaldi《春》(E大调鸟鸣式 ritornello)
+  - Uncommon → Bach《G大调小步舞曲》(巴洛克舞步)
+  - Rare → Rossini《威廉·退尔序曲》终曲 (号角 + 奔马 gallop)
+  - Epic → Beethoven《英雄交响曲》第四乐章 "普罗米修斯" 变奏 (弱起 pizz → 辉煌胜利)
+  - Legendary → Beethoven《命运交响曲》第四乐章 (定音鼓黑暗 → C大调号角齐鸣)
+  - Mythic → Beethoven《欢乐颂》(大提琴宣叙调呼唤 → 主题迸发)
+- **新增能力**: Note 接口加 `legato?` 标志实现音符无缝过渡；补全半音程音高常量 (A2–B6)；新增 STACC/LEG/MARC/CHORD 包络类型
+- **批量声音去重**: `playSound()` 导出供外部调用；hook 中声音移到通知循环外层，只按最高稀有度播放一次
 
 ### README 数字同步 + 项目结构更新 — 2026-06-17
 

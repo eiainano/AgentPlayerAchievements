@@ -1,5 +1,22 @@
 # Changelog
 
+### ES/KO/JA 多语言支持 + Dashboard 测试覆盖 + 指令增强 — 2026-06-18
+
+- **213 个成就全面中/英/西/韩/日 5 语**: 1278 条翻译（name + description × 3 语言）写入 YAML
+  - 后端全线透传: types.ts → yaml-parser → helpers/FormattedAchievement → api.ts/AchievementItem
+  - 推荐系统同时多语: recommend.ts → RecommendItem, progress-nudge.ts → NearUnlock
+  - Card builder 从硬编码 `useZh` 改为通用 `_name()`/`_desc()` 多语选择函数
+- **Dashboard 语言选择器 5 语切换**: ES/KO/JA 选项 🇪🇸🇰🇷🇯🇵
+  - `displayName()`/`displayDesc()`、`syncLangPicker()` 全面支持
+  - I18N 表新增 ES/KO/JA 的 165 个 UI key 翻译（导航、统计、导览、热力图等）
+  - 搜索过滤覆盖 5 语、Modal 改用 `displayName()`、Gacha Reveal 同步
+  - 配置白名单: `achievement.config lang` 从 `en|zh` 扩展为 `en|zh|es|ko|ja`
+- **CLAUDE.md 指令强化**: Session 结束 MUST 结构化展示成就 + 按 `config.lang` 匹配字段
+- **指令文件路径修复**: Kilo Code/Hermes/OpenCode/OpenClaw 从项目级 `./AGENTS.md` 改为全局路径
+- **Dashboard 前端测试**: 30 个测试覆盖 i18n/displayName/displayDesc/rarityColor/iconHtml/filter/sort
+- **修复**: engine.test.ts flaky test (缓存 stats 缺 poll 前置)
+- 测试 47 文件 1235 全绿，TypeScript 零错误
+
 ### 古典名曲 8-bit 音效 v2 — 2026-06-18
 
 - **6 个稀有度音效全面替换**: 从程序合成琶音改为古典名曲最经典/最昂扬片段，原曲速度 (bpm 匹配)

@@ -206,67 +206,97 @@ const CHORD_ENV: Envelope = { attack: 0.08, decay: 0.15, sustain: 0.5, release: 
 
 // ═══════════════════════════════════════════════════════════════════════
 // Sound definitions — classical masterpieces, 8-bit chip style
+//
+// Common:    Beethoven — Moonlight Sonata (Op. 27 No. 2, I. Adagio)
+// Uncommon:  Vivaldi — Winter (L'Inverno, RV 297, I. Allegro non molto)
+// Rare:      Rossini — William Tell Overture Finale
+// Epic:      Beethoven — Symphony No. 3 "Eroica" Finale
+// Legendary: Beethoven — Symphony No. 5 IV. Allegro
+// Mythic:    Beethoven — Symphony No. 9 IV. Ode to Joy
 // ═══════════════════════════════════════════════════════════════════════
 
 type SDef = () => Track[];
 
-// ── Common — Vivaldi "Spring" (La Primavera) ───────────────────────
-// ~4s — Allegro, the iconic E-major ritornello, bright and birdlike
+// ── Common — Beethoven: Moonlight Sonata (Op. 27 No. 2, I. Adagio) ──
+// ~4s — C# minor, the haunting arpeggio triplets + iconic repeated-note melody
 const commonDef: SDef = () => {
-  const q = 0.42; // quarter at ♩≈144
-  const e = q / 2;
-  return [{
-    offset: 0,
-    notes: [
-      // Birdsong opening — repeated notes, energetic
-      { freq: E5,  duration: q,     wave: 'square', vol: 0.55, env: LEG_ENV },
-      { freq: E5,  duration: e,     wave: 'square', vol: 0.50, legato: true },
-      { freq: E5,  duration: e,     wave: 'square', vol: 0.55, legato: true },
-      { freq: Fs5, duration: q,     wave: 'square', vol: 0.55, env: LEG_ENV },
-      { freq: Gs5, duration: e,     wave: 'square', vol: 0.55 },
-      { freq: Gs5, duration: q,     wave: 'square', vol: 0.58 },
-      // Cascading down
-      { freq: A5,  duration: e,     wave: 'square', vol: 0.58 },
-      { freq: Gs5, duration: e,     wave: 'square', vol: 0.55 },
-      { freq: Fs5, duration: q,     wave: 'square', vol: 0.55 },
-      { freq: E5,  duration: q,     wave: 'square', vol: 0.52 },
-      { freq: Eb5, duration: e,     wave: 'square', vol: 0.48 },
-      // Bright resolution
-      { freq: E5,  duration: q * 1.2, wave: 'square', vol: 0.55 },
-      { freq: Fs5, duration: q * 0.8, wave: 'square', vol: 0.55, legato: true },
-      { freq: Gs5, duration: q * 1.5, wave: 'square', vol: 0.58, vibrato: { rate: 5, depth: 2 } },
-    ],
-  }];
+  const Q = 0.44; // Adagio sostenuto, ♩≈136 (sped up for 8-bit)
+  const T = Q / 3; // triplet eighth
+  return [
+    // Track 1 — arpeggio accompaniment (C# minor: G#3-C#4-E4-G#4)
+    {
+      offset: 0,
+      notes: [
+        { freq: Gs3, duration: T, wave: 'triangle', vol: 0.16, env: SOFT_ENV },
+        { freq: C4s, duration: T, wave: 'triangle', vol: 0.16, legato: true },
+        { freq: E4,  duration: T, wave: 'triangle', vol: 0.16, legato: true },
+        { freq: Gs4, duration: T, wave: 'triangle', vol: 0.16, legato: true },
+        { freq: Gs3, duration: T, wave: 'triangle', vol: 0.16 },
+        { freq: C4s, duration: T, wave: 'triangle', vol: 0.16, legato: true },
+        { freq: E4,  duration: T, wave: 'triangle', vol: 0.16, legato: true },
+        { freq: Gs4, duration: T, wave: 'triangle', vol: 0.16, legato: true },
+        { freq: Gs3, duration: T, wave: 'triangle', vol: 0.16 },
+        { freq: C4s, duration: T, wave: 'triangle', vol: 0.16, legato: true },
+        { freq: E4,  duration: T, wave: 'triangle', vol: 0.16, legato: true },
+        { freq: Gs4, duration: T, wave: 'triangle', vol: 0.16, legato: true },
+      ],
+    },
+    // Track 2 — melody: the slow, hypnotic G#-A-G#-Fx-G#-B
+    {
+      offset: 0,
+      notes: [
+        { freq: Gs4, duration: Q * 1.5, wave: 'square', vol: 0.38, env: LEG_ENV },
+        { freq: A4,  duration: Q * 0.5, wave: 'square', vol: 0.38 },
+        { freq: Gs4, duration: Q * 1.5, wave: 'square', vol: 0.38 },
+        { freq: 0,   duration: Q * 0.5, wave: 'square' },
+        { freq: G4,  duration: Q * 0.5, wave: 'square', vol: 0.35 }, // Fx = G natural
+        { freq: Gs4, duration: Q * 1.5, wave: 'square', vol: 0.38 },
+        { freq: B4,  duration: Q * 2.0, wave: 'square', vol: 0.38, vibrato: { rate: 3, depth: 2 } },
+      ],
+    },
+  ];
 };
 
-// ── Uncommon — Bach Minuet in G (BWV Anh 114) ──────────────────────
-// ~3s — graceful, elegant, the quintessential Baroque dance in G major
+// ── Uncommon — Vivaldi: Winter (L'Inverno, RV 297, I. Allegro non molto) ──
+// ~4s — F minor shivering staccato + dramatic descending violin cry
 const uncommonDef: SDef = () => {
-  const q = 0.45; // quarter at ♩≈133
-  const e = q / 2;
-  return [{
-    offset: 0,
-    notes: [
-      // Anacrusis + phrase 1 — the iconic stepwise ascent
-      { freq: D5,  duration: e,     wave: 'square', vol: 0.45 },
-      { freq: G5,  duration: e,     wave: 'square', vol: 0.50 },
-      { freq: A5,  duration: e,     wave: 'square', vol: 0.50, legato: true },
-      { freq: B5,  duration: e,     wave: 'square', vol: 0.52, legato: true },
-      { freq: C6,  duration: q,     wave: 'square', vol: 0.55 },
-      { freq: D6,  duration: q,     wave: 'square', vol: 0.55 },
-      { freq: B5,  duration: e,     wave: 'square', vol: 0.52 },
-      { freq: G5,  duration: q,     wave: 'square', vol: 0.50 },
-      // Phrase 2 — the answering descent
-      { freq: D6,  duration: e,     wave: 'square', vol: 0.55 },
-      { freq: C6,  duration: e,     wave: 'square', vol: 0.55, legato: true },
-      { freq: B5,  duration: e,     wave: 'square', vol: 0.52, legato: true },
-      { freq: A5,  duration: e,     wave: 'square', vol: 0.50, legato: true },
-      { freq: G5,  duration: q * 0.8, wave: 'square', vol: 0.50 },
-      { freq: Fs5, duration: e,     wave: 'square', vol: 0.48 },
-      // Perfect cadence
-      { freq: G5,  duration: q * 1.6, wave: 'square', vol: 0.50, vibrato: { rate: 3, depth: 2 } },
-    ],
-  }];
+  const e = 0.16; // fast eighth
+  const q = e * 2;
+  return [
+    // Track 1 — "shivering" staccato string tremolos
+    {
+      offset: 0,
+      notes: [
+        { freq: F4,  duration: e * 0.7, wave: 'square', vol: 0.40, env: STACC_ENV },
+        { freq: F4,  duration: e * 0.7, wave: 'square', vol: 0.40 },
+        { freq: F4,  duration: e * 0.7, wave: 'square', vol: 0.40 },
+        { freq: F4,  duration: e * 0.7, wave: 'square', vol: 0.40 },
+        { freq: 0,   duration: e * 1.2, wave: 'square' },
+        { freq: F4,  duration: e * 0.7, wave: 'square', vol: 0.42, env: STACC_ENV },
+        { freq: F4,  duration: e * 0.7, wave: 'square', vol: 0.42 },
+        { freq: F4,  duration: e * 0.7, wave: 'square', vol: 0.42 },
+        { freq: F4,  duration: e * 0.7, wave: 'square', vol: 0.42 },
+        { freq: 0,   duration: e * 1.2, wave: 'square' },
+        { freq: Gs4, duration: e * 0.7, wave: 'square', vol: 0.44, env: STACC_ENV }, // Ab
+        { freq: Gs4, duration: e * 0.7, wave: 'square', vol: 0.44 },
+        { freq: Gs4, duration: e * 0.7, wave: 'square', vol: 0.44 },
+        { freq: Gs4, duration: e * 0.7, wave: 'square', vol: 0.44 },
+      ],
+    },
+    // Track 2 — the wailing descending run (solo violin entry)
+    {
+      offset: e * 12.4,
+      notes: [
+        { freq: C5,  duration: e * 0.8, wave: 'square', vol: 0.50, env: LEG_ENV },
+        { freq: Bb4, duration: e * 0.8, wave: 'square', vol: 0.50, legato: true },
+        { freq: Gs4, duration: e * 0.8, wave: 'square', vol: 0.50, legato: true }, // Ab
+        { freq: G4,  duration: e * 0.8, wave: 'square', vol: 0.50, legato: true },
+        { freq: F4,  duration: e * 0.8, wave: 'square', vol: 0.50, legato: true },
+        { freq: Eb4, duration: q * 0.9, wave: 'square', vol: 0.48, vibrato: { rate: 5, depth: 3 } },
+        { freq: F4,  duration: q * 1.2, wave: 'square', vol: 0.48, vibrato: { rate: 4, depth: 2 } },
+      ],
+    },
+  ];
 };
 
 // ── Rare — Rossini: William Tell Overture (Finale) ─────────────────

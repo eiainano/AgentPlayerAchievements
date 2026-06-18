@@ -11,6 +11,12 @@
   - I18N 表新增 ES/KO/JA 的 165 个 UI key 翻译（导航、统计、导览、热力图等）
   - 搜索过滤覆盖 5 语、Modal 改用 `displayName()`、Gacha Reveal 同步
 
+### 音效 v3: 古典名作换曲 — 2026-06-18
+
+- **Common**: Vivaldi Spring → **Beethoven Moonlight Sonata**（月光奏鸣曲第一乐章，C# 小调琶音 + 标志性同音反复旋律）
+- **Uncommon**: Bach Minuet in G → **Vivaldi Winter**（四季·冬，F 小调颤栗断奏 + 独奏小提琴下行哭腔）
+- Rare/Epic/Legendary/Mythic 不变
+
 ### CLI 6 项修复 — 2026-06-18
 
 - **`agpa config --json`**: 支持 JSON 输出（与其他 6 个命令一致）

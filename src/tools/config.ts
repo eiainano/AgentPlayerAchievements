@@ -10,9 +10,9 @@ const VALID_KEYS: (keyof AppConfig)[] = ['lang', 'telemetry', 'telemetry_server'
 export function registerConfigTool(server: McpServer): void {
   server.tool(
     'achievement.config',
-    'Read/write AGPA configuration. Supported keys: lang (en|zh).',
+    'Read/write AGPA configuration. Supported keys: lang (en|zh|es|ko|ja).',
     {
-      action: z.enum(['get', 'set', 'list']).describe('Action: get a value, set a value, or list all keys. Supported keys: lang (en|zh), telemetry (true|false), telemetry_server (URL).'),
+      action: z.enum(['get', 'set', 'list']).describe('Action: get a value, set a value, or list all keys. Supported keys: lang (en|zh|es|ko|ja), telemetry (true|false), telemetry_server (URL).'),
       key: z.string().optional().describe('Config key (required for get/set)'),
       value: z.string().optional().describe('Config value (required for set)'),
     },
@@ -33,8 +33,8 @@ export function registerConfigTool(server: McpServer): void {
 
         case 'set': {
           if (!k || v === undefined) return formatMcpError(ErrorCodes.INVALID_EVENT, 'key and value are required for set');
-          if (k === 'lang' && v !== 'en' && v !== 'zh') {
-            return formatMcpError(ErrorCodes.INVALID_EVENT, 'lang must be "en" or "zh"');
+          if (k === 'lang' && v !== 'en' && v !== 'zh' && v !== 'es' && v !== 'ko' && v !== 'ja') {
+            return formatMcpError(ErrorCodes.INVALID_EVENT, 'lang must be "en", "zh", "es", "ko", or "ja"');
           }
           if (k === 'telemetry') {
             if (v !== 'true' && v !== 'false') return formatMcpError(ErrorCodes.INVALID_EVENT, 'telemetry must be "true" or "false"');

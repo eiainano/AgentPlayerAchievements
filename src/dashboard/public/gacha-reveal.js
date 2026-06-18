@@ -225,8 +225,8 @@ class GachaReveal {
     // Card front
     const front = document.createElement('div');
     front.className = 'gacha-card-face front';
-    const name = this.ach.name_cn || this.ach.name || this.ach.id;
-    const desc = this.ach.description_cn || this.ach.description || '';
+    const name = (typeof displayName === 'function' ? displayName(this.ach) : this.ach.name) || this.ach.id;
+    const desc = (typeof displayDesc === 'function' ? displayDesc(this.ach) : this.ach.description) || '';
     const icon = this.ach.icon || '\u{1F3C6}';
     const rarityLabel = this.rarity.charAt(0).toUpperCase() + this.rarity.slice(1);
     front.innerHTML = '<div class="gacha-icon-wrap">' + icon +

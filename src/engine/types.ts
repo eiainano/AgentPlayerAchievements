@@ -173,8 +173,14 @@ export interface AchievementDefinition {
   id: string;
   name: string;
   name_cn?: string;
+  name_es?: string;
+  name_ko?: string;
+  name_ja?: string;
   description: string;
   description_cn?: string;
+  description_es?: string;
+  description_ko?: string;
+  description_ja?: string;
   icon: string;
   category: string;
   rarity: RarityLevel;
@@ -185,8 +191,14 @@ export interface AchievementDefinition {
   conditions: Condition[];
   tip?: string;      // educational tip (English), shown after unlock
   tip_cn?: string;   // educational tip (Chinese)
+  tip_es?: string;
+  tip_ko?: string;
+  tip_ja?: string;
   hint?: string;     // unlock clue for locked view (English), does NOT expose exact condition
   hint_cn?: string;  // unlock clue for locked view (Chinese)
+  hint_es?: string;
+  hint_ko?: string;
+  hint_ja?: string;
   pixel_art?: PixelArt;
   unlocked_at?: string;
   future?: boolean;  // pending event/hook support before reachable
@@ -342,6 +354,9 @@ export interface RecommendItem {
   achievement_id: string;
   name: string;
   name_cn?: string;
+  name_es?: string;
+  name_ko?: string;
+  name_ja?: string;
   icon: string;
   rarity: RarityLevel;
 

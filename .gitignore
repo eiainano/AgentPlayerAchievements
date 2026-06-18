@@ -30,3 +30,4 @@ research/
 !src/dashboard/public/agpa-logo-*.png
 !src/dashboard/public/favicon.png
 .vscode/
+.claude/

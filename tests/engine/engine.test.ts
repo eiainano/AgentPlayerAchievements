@@ -284,7 +284,8 @@ describe('AchievementEngine', () => {
     });
 
     it('returns cached stats after poll computes them', () => {
-      // After poll, stats should be cached and returned from cache
+      // Ensure cache is populated first (poll() persists stats)
+      engine.poll();
       const st1 = engine.toolStats();
       const st2 = engine.toolStats();
       expect(st2.last_updated).toBe(st1.last_updated); // same cached version

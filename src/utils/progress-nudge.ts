@@ -18,6 +18,10 @@ import { evaluateMetric, matchFilter } from '../engine/evaluator.js';
 export interface NearUnlock {
   achievement_id: string;
   name: string;
+  name_cn?: string;
+  name_es?: string;
+  name_ko?: string;
+  name_ja?: string;
   icon: string;
   rarity: string;
   current: number;
@@ -319,6 +323,10 @@ export function findNearUnlocks(
     results.push({
       achievement_id: def.id,
       name: def.name,
+      name_cn: def.name_cn,
+      name_es: def.name_es,
+      name_ko: def.name_ko,
+      name_ja: def.name_ja,
       icon: def.icon || '🏆',
       rarity: def.rarity,
       current,

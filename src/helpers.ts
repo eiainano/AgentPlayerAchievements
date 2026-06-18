@@ -29,7 +29,14 @@ export interface FormattedAchievement {
   id: string;
   name: string;
   name_cn?: string;
+  name_es?: string;
+  name_ko?: string;
+  name_ja?: string;
   description: string;
+  description_cn?: string;
+  description_es?: string;
+  description_ko?: string;
+  description_ja?: string;
   icon: string;
   rarity: RarityLevel;
   category: string;
@@ -48,7 +55,14 @@ export function formatAchievement(
     id: ach.id,
     name: ach.name,
     name_cn: ach.name_cn,
+    name_es: ach.name_es,
+    name_ko: ach.name_ko,
+    name_ja: ach.name_ja,
     description: ach.description,
+    description_cn: ach.description_cn,
+    description_es: ach.description_es,
+    description_ko: ach.description_ko,
+    description_ja: ach.description_ja,
     icon: ach.icon,
     rarity: ach.rarity,
     category: ach.category,

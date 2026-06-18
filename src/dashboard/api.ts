@@ -27,8 +27,14 @@ export interface AchievementItem {
   id: string;
   name: string;
   name_cn?: string;
+  name_es?: string;
+  name_ko?: string;
+  name_ja?: string;
   description: string;
   description_cn?: string;
+  description_es?: string;
+  description_ko?: string;
+  description_ja?: string;
   icon: string;
   category: string;
   rarity: RarityLevel;
@@ -37,8 +43,14 @@ export interface AchievementItem {
   pack_name?: string;       // set to pack.name if from a community pack; absent for core
   tip?: string;
   tip_cn?: string;
+  tip_es?: string;
+  tip_ko?: string;
+  tip_ja?: string;
   hint?: string;
   hint_cn?: string;
+  hint_es?: string;
+  hint_ko?: string;
+  hint_ja?: string;
   unlocked: boolean;
   unlocked_at?: string;
   progress?: { current: number; target: number };
@@ -293,8 +305,14 @@ export function buildAchievementsResponse(
       id: def.id,
       name: def.name,
       name_cn: def.name_cn,
+      name_es: def.name_es,
+      name_ko: def.name_ko,
+      name_ja: def.name_ja,
       description: def.description,
       description_cn: def.description_cn,
+      description_es: def.description_es,
+      description_ko: def.description_ko,
+      description_ja: def.description_ja,
       icon: def.icon || '🏆',
       category: def.category,
       rarity: def.rarity,
@@ -303,8 +321,14 @@ export function buildAchievementsResponse(
       pack_name: def.pack_id ? (opts.packNameMap?.get(def.pack_id) || def.pack_id) : undefined,
       tip: def.tip,
       tip_cn: def.tip_cn,
+      tip_es: def.tip_es,
+      tip_ko: def.tip_ko,
+      tip_ja: def.tip_ja,
       hint: def.hint,
       hint_cn: def.hint_cn,
+      hint_es: def.hint_es,
+      hint_ko: def.hint_ko,
+      hint_ja: def.hint_ja,
       unlocked,
       unlocked_at: unlockedAt,
       progress: unlocked ? undefined : computeProgress(def, opts.events || []),
@@ -323,7 +347,21 @@ export function buildCardResponse(
   profileEmoji: string,
   existingStats: any,
 ): CardData {
-  const useZh = config.lang === 'zh';
+  const _lang = config.lang;
+  function _name(d: { name: string; name_cn?: string; name_es?: string; name_ko?: string; name_ja?: string }): string {
+    if (_lang === 'zh' && d.name_cn) return d.name_cn;
+    if (_lang === 'es' && d.name_es) return d.name_es;
+    if (_lang === 'ko' && d.name_ko) return d.name_ko;
+    if (_lang === 'ja' && d.name_ja) return d.name_ja;
+    return d.name;
+  }
+  function _desc(d: { description: string; description_cn?: string; description_es?: string; description_ko?: string; description_ja?: string }): string {
+    if (_lang === 'zh' && d.description_cn) return d.description_cn;
+    if (_lang === 'es' && d.description_es) return d.description_es;
+    if (_lang === 'ko' && d.description_ko) return d.description_ko;
+    if (_lang === 'ja' && d.description_ja) return d.description_ja;
+    return d.description;
+  }
   const setDefMap = new Map(setDefinitions.map(s => [s.id, s]));
 
   // ── Streak multiplier (computed before XP since it affects XP) ─
@@ -370,15 +408,15 @@ export function buildCardResponse(
     cardAchievements.push({
       id: def.id,
       icon: def.icon || '🏆',
-      name: useZh ? (def.name_cn || def.name) : def.name,
-      description: useZh ? (def.description_cn || def.description) : def.description,
+      name: _name(def),
+      description: _desc(def),
       rarity: def.rarity,
       rarity_color: RARITY_CARD_COLORS[def.rarity] || '#7eb8da',
-      rarity_label: useZh
+      rarity_label: _lang === 'zh'
         ? (RARITY_LABELS_ZH[def.rarity] || '普通')
         : (RARITY_LABELS_EN[def.rarity] || 'Common'),
       unlocked_at: state.unlocked[def.id],
-      set_name: setDef ? (useZh ? (setDef.name_cn || setDef.name) : setDef.name) : undefined,
+      set_name: setDef ? _name(setDef) : undefined,
       set_progress: setDef ? `${setCompleted}/${setMembers.length}` : undefined,
       pixel_art_48: def.pixel_art?.['48'],
     });
@@ -402,11 +440,11 @@ export function buildCardResponse(
       cardAchievements.push({
         id: def.id,
         icon: def.icon || '🏆',
-        name: useZh ? (def.name_cn || def.name) : def.name,
-        description: useZh ? (def.description_cn || def.description) : def.description,
+        name: _name(def),
+        description: _desc(def),
         rarity: def.rarity,
         rarity_color: RARITY_CARD_COLORS[def.rarity] || '#7eb8da',
-        rarity_label: useZh ? '进行中' : 'In Progress',
+        rarity_label: _lang === 'zh' ? '进行中' : 'In Progress',
         in_progress: true,
         progress_pct: Math.round(x.ratio * 100),
         progress_text: `${x.result.progress} / ${x.result.target}`,
@@ -440,7 +478,7 @@ export function buildCardResponse(
 
   const milestones: CardMilestone[] = unlockedPairs.slice(0, 3).map(def => ({
     emoji: def.icon || '🏆',
-    name: useZh ? (def.name_cn || def.name) : def.name,
+    name: _name(def),
     rarity: def.rarity,
     rarity_color: RARITY_CARD_COLORS[def.rarity] || '#7eb8da',
     unlocked_at: state.unlocked[def.id] || '',

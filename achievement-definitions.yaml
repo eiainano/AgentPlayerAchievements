@@ -2,8 +2,14 @@ definitions:
   - id: first_contact
     name: Hello World
     name_cn: Hello World
+    name_es: "Hola Mundo"
+    name_ko: "첫인사"
+    name_ja: "ハローワールド"
     description: Start your first agent conversation.
     description_cn: 开启你的第一次Agent对话。
+    description_es: "Inicia tu primera conversación con un agente."
+    description_ko: "에이전트와 첫 대화를 시작하세요."
+    description_ja: "初めてエージェントと会話を始めよう。"
     icon: 👋
     category: onboarding
     rarity: common
@@ -22,8 +28,14 @@ definitions:
   - id: three_company
     name: Hat Trick
     name_cn: 帽子戏法
+    name_es: "Triplete"
+    name_ko: "해트트릭"
+    name_ja: "ハットトリック"
     description: 3 tasks completed — a good start, isn't it?
     description_cn: 累计完成 3 个 task，一个好的开始，不是吗？
+    description_es: "Completaste 3 tareas. Buen comienzo, ¿verdad?"
+    description_ko: "3개의 태스크를 완료했어요. 나쁘지 않은 시작이죠?"
+    description_ja: "3つのタスクを完了。上々の滑り出しですね。"
     icon: 🤝
     category: onboarding
     rarity: common
@@ -43,8 +55,14 @@ definitions:
   - id: tool_time
     name: Prometheus
     name_cn: 普罗米修斯
+    name_es: "Prometeo"
+    name_ko: "프로메테우스"
+    name_ja: "プロメテウス"
     description: Your agent executed its first tool call.
     description_cn: agent 执行了第一个 tool call。
+    description_es: "Tu agente ejecutó su primera llamada a una herramienta."
+    description_ko: "에이전트가 첫 번째 도구 호출을 실행했어요."
+    description_ja: "エージェントが初めてツールを呼び出しました。"
     icon: 🔧
     category: onboarding
     rarity: common
@@ -63,8 +81,14 @@ definitions:
   - id: permission_granted
     name: Permission Granted
     name_cn: 门禁卡
+    name_es: "Permiso Concedido"
+    name_ko: "권한 승인"
+    name_ja: "アクセス許可"
     description: Manually adjusted the agent's permission mode. You're in control.
     description_cn: 手动调整过 agent 的权限模式。控制权，你说了算。
+    description_es: "Ajustaste manualmente el modo de permisos del agente. Tú controlas."
+    description_ko: "에이전트의 권한 모드를 직접 조정했어요. 당신이 주도해요."
+    description_ja: "エージェントの権限モードを手動で変更しました。あなたが主役です。"
     icon: 🔐
     category: onboarding
     rarity: common
@@ -83,8 +107,14 @@ definitions:
   - id: read_manual
     name: Read the Manual
     name_cn: 看说明书
+    name_es: "Leer el Manual"
+    name_ko: "매뉴얼 정독"
+    name_ja: "取扱説明書"
     description: Opened help or documentation. Few people do this.
     description_cn: 打开过 help 或文档。很少有人这么做。
+    description_es: "Abriste la ayuda o documentación. Pocos lo hacen."
+    description_ko: "도움말이나 문서를 열어봤어요. 별로 없는 일이에요."
+    description_ja: "ヘルプやドキュメントを開きました。こんな人はほとんどいません。"
     icon: 📖
     category: onboarding
     rarity: common
@@ -103,8 +133,14 @@ definitions:
   - id: first_sunrise
     name: Once Again
     name_cn: 再接再厉
+    name_es: "Otra Vez"
+    name_ko: "다시 한번"
+    name_ja: "もう一度"
     description: Started 2+ sessions within 24 hours. You and your agent are getting closer.
     description_cn: 24h 内开启 ≥ 2 个 session。你和agent越来越熟悉了。
+    description_es: "Iniciaste 2 sesiones o más en 24 horas. Tú y tu agente se están haciendo amigos."
+    description_ko: "24시간 안에 2회 이상 세션을 시작했어요. 에이전트와 점점 가까워지고 있어요."
+    description_ja: "24時間以内に2回以上セッションを開始。エージェントとの距離が縮まってきた。"
     icon: 🌅
     category: onboarding
     rarity: common
@@ -124,8 +160,14 @@ definitions:
   - id: first_shot
     name: Command & Conquer
     name_cn: 命令与征服
+    name_es: "Comando y Conquista"
+    name_ko: "커맨드 앤 컨커"
+    name_ja: "コマンド＆コンカー"
     description: Used your first slash command.
     description_cn: 使用了第一个 slash command。
+    description_es: "Usaste tu primer comando slash."
+    description_ko: "첫 번째 슬래시 커맨드를 사용했어요."
+    description_ja: "初めてスラッシュコマンドを使いました。"
     icon: 🔫
     category: onboarding
     rarity: common
@@ -144,8 +186,14 @@ definitions:
   - id: model_hopper
     name: Model Taste
     name_cn: 换换口味
+    name_es: "Modelo al Gusto"
+    name_ko: "모델 취향"
+    name_ja: "モデルテイスト"
     description: Switched AI models manually. There's one for every mood.
     description_cn: 手动切换了一次 AI 模型。总有一款适合你。
+    description_es: "Cambiaste de modelo de IA manualmente. Hay uno para cada estado de ánimo."
+    description_ko: "AI 모델을 직접 전환했어요. 기분에 따라 골라보세요."
+    description_ja: "手動でAIモデルを切り替えました。気分に合わせて選べます。"
     icon: 🔄
     category: onboarding
     rarity: common
@@ -164,8 +212,14 @@ definitions:
   - id: worktree_trial
     name: Isolation Area
     name_cn: 隔离区
+    name_es: "Zona de Aislamiento"
+    name_ko: "격리 구역"
+    name_ja: "隔離エリア"
     description: Used worktree isolation. Code safety first.
     description_cn: 使用了worktree 模式工作。代码安全第一。
+    description_es: "Usaste el aislamiento de worktree. La seguridad del código es lo primero."
+    description_ko: "워크트리 격리 기능을 사용했어요. 코드 안전이 최우선이에요."
+    description_ja: "ワークツリー分離機能を使いました。コードの安全が第一です。"
     icon: 🌲
     category: onboarding
     rarity: common
@@ -184,8 +238,14 @@ definitions:
   - id: mcp_first_contact
     name: MCP Plug-in
     name_cn: 场外嘉宾
+    name_es: "Conexión MCP"
+    name_ko: "MCP 연결"
+    name_ja: "MCP接続"
     description: Connected your first MCP server. Your agent's reach just expanded.
     description_cn: 连接了第一个 MCP server。agent 的能力向外延伸了。
+    description_es: "Conectaste tu primer servidor MCP. El alcance de tu agente se acaba de expandir."
+    description_ko: "첫 번째 MCP 서버에 연결했어요. 에이전트의 활동 영역이 넓어졌어요."
+    description_ja: "初めてMCPサーバーに接続しました。エージェントの活躍の場が広がりました。"
     icon: 🔌
     category: onboarding
     rarity: common
@@ -204,8 +264,14 @@ definitions:
   - id: visual_prompt
     name: A Picture's Worth
     name_cn: 有图有真相
+    name_es: "Mil Palabras"
+    name_ko: "그림 천 마디"
+    name_ja: "百聞一見"
     description: Agent read an image you shared. Visual context unlocked.
     description_cn: agent 读取了你分享的图片。视觉上下文已解锁。
+    description_es: "El agente leyó una imagen que compartiste. Contexto visual desbloqueado."
+    description_ko: "에이전트가 당신이 공유한 이미지를 읽었습니다. 시각 정보를 해제했습니다."
+    description_ja: "エージェントが画像を読み取りました。視覚コンテキストを解放。"
     icon: 🖼️
     category: onboarding
     rarity: common
@@ -224,8 +290,14 @@ definitions:
   - id: dashboard_visitor
     name: Window Shopper
     name_cn: 橱窗购物
+    name_es: "Escaparate"
+    name_ko: "쇼윈도"
+    name_ja: "冷やかし"
     description: Opened the achievement Dashboard.
     description_cn: 打开过成就 Dashboard。
+    description_es: "Abriste el Panel de Logros. Solo pasabas por aquí."
+    description_ko: "업적 대시보드를 열었습니다. 그냥 구경만 했어요."
+    description_ja: "実績ダッシュボードを開きました。まだ中を見ただけ。"
     icon: 🪟
     category: onboarding
     rarity: common
@@ -244,8 +316,14 @@ definitions:
   - id: automode_first
     name: Cruise Control
     name_cn: 巡航模式
+    name_es: "Control Crucero"
+    name_ko: "자동 항해"
+    name_ja: "オートパイロット"
     description: Activated automode for the first time. Let the agent steer.
     description_cn: 首次激活 automode。让 agent 自己开一会儿。
+    description_es: "Activaste el modo automático por primera vez. Deja que el agente tome el volante."
+    description_ko: "처음으로 자동 모드를 활성화했습니다. 에이전트에게 운전을 맡기세요."
+    description_ja: "オートモードを初めて起動。エージェントに舵を任せよう。"
     icon: ⛵
     category: onboarding
     rarity: common
@@ -264,8 +342,14 @@ definitions:
   - id: mcp_first_connect
     name: Signal Established
     name_cn: 信号接通
+    name_es: "Señal Establecida"
+    name_ko: "신호 연결됨"
+    name_ja: "通信確立"
     description: Connected to an MCP server for the first time.
     description_cn: 首次连接到 MCP server。
+    description_es: "Te conectaste a un servidor MCP por primera vez."
+    description_ko: "처음으로 MCP 서버에 연결했습니다."
+    description_ja: "初めてMCPサーバーに接続しました。"
     icon: 📡
     category: onboarding
     rarity: common
@@ -284,8 +368,14 @@ definitions:
   - id: task_creator
     name: Task Manager
     name_cn: 任务管理器
+    name_es: "Gestor de Tareas"
+    name_ko: "태스크 마스터"
+    name_ja: "タスクマスター"
     description: Manually created 5 tasks. Organization is a superpower.
     description_cn: 手动创建了 5 个 task。规划是一种超能力。
+    description_es: "Creaste 5 tareas manualmente. La organización es tu superpoder."
+    description_ko: "태스크를 수동으로 5개 만들었습니다. 계획은 초능력입니다."
+    description_ja: "手動で5つのタスクを作成。計画は超能力。"
     icon: 📋
     category: tool_mastery
     rarity: common
@@ -302,8 +392,14 @@ definitions:
   - id: task_updater
     name: Status Report
     name_cn: 进度汇报
+    name_es: "Reporte"
+    name_ko: "진행 보고"
+    name_ja: "進捗報告"
     description: Updated task status 10 times. You track progress like a pro.
     description_cn: 更新了 10 次 task 状态。项目管理，专业水准。
+    description_es: "Actualizaste el estado de tareas 10 veces. Llevas el progreso como un profesional."
+    description_ko: "태스크 상태를 10번 업데이트했습니다. 프로처럼 진행 상황을 추적하네요."
+    description_ja: "タスクステータスを10回更新。進捗管理はお手のもの。"
     icon: 📊
     category: tool_mastery
     rarity: common
@@ -320,8 +416,14 @@ definitions:
   - id: error_resilient
     name: Error Resilient
     name_cn: 容错强者
+    name_es: "Lo Que No Te Mata"
+    name_ko: "끝까지 간다"
+    name_ja: "七転び八起き"
     description: Agent hit 5 errors and kept going. What doesn't kill you…
     description_cn: agent 遭遇 5 次错误依然继续。杀不死你的只会让你更强。
+    description_es: "El agente encontró 5 errores y siguió adelante. Lo que no te mata..."
+    description_ko: "에이전트가 5번의 오류를 겪고도 계속했습니다. 죽이지 못하는 것은 더 강하게 만듭니다."
+    description_ja: "エージェントが5回のエラーを乗り越えて継続。七転び八起き。"
     icon: 🛡️
     category: tool_mastery
     rarity: uncommon
@@ -339,8 +441,14 @@ definitions:
   - id: file_purger
     name: Spring Cleaning
     name_cn: 大扫除
+    name_es: "Limpieza de Primavera"
+    name_ko: "대청소"
+    name_ja: "大掃除"
     description: Deleted 10 files. Sometimes less is more.
     description_cn: 删除了 10 个文件。少即是多。
+    description_es: "Eliminaste 10 archivos. A veces menos es más."
+    description_ko: "파일 10개를 삭제했습니다. 때로는 적을수록 좋습니다."
+    description_ja: "ファイルを10件削除しました。時には少ないほうがいい。"
     icon: 🧹
     category: tool_mastery
     rarity: uncommon
@@ -358,8 +466,14 @@ definitions:
   - id: dual_wielder
     name: Three-Sword Style
     name_cn: 三刀流
+    name_es: "Tres Espadas"
+    name_ko: "삼도류"
+    name_ja: "三刀流"
     description: Used 3+ different tools in a single task. Santoryu — three swords, one warrior.
     description_cn: 同一个 task 里用了 3 种以上不同工具。三刀流——三把刀，一个剑士。
+    description_es: "Usaste 3+ herramientas distintas en una misma tarea. Santoryu: tres espadas, un solo guerrero."
+    description_ko: "단일 태스크에서 3종 이상의 도구를 사용했습니다. 삼도류 — 세 개의 검, 하나의 검사."
+    description_ja: "1つのタスクで3種類以上のツールを使用。三刀流——三本の剣、一人の剣士。"
     icon: ⚔️
     category: tool_mastery
     rarity: common
@@ -380,8 +494,14 @@ definitions:
   - id: double_digits
     name: Double Digits
     name_cn: 两位数
+    name_es: "Dos Dígitos"
+    name_ko: "두 자릿수"
+    name_ja: "二桁"
     description: 10 tasks completed. You're no longer a beginner.
     description_cn: 10 个 task 完成。你已经不是新手了。
+    description_es: "Completaste 10 tareas. Ya no eres un principiante."
+    description_ko: "태스크 10개를 완료했습니다. 이제 초보자가 아니에요."
+    description_ja: "タスクを10個完了。もう初心者じゃない。"
     icon: 🔟
     category: milestones
     rarity: uncommon
@@ -401,8 +521,14 @@ definitions:
   - id: century
     name: Century
     name_cn: 创世纪
+    name_es: "Centuria"
+    name_ko: "세기"
+    name_ja: "世紀"
     description: 100 tasks completed. You wonder how you ever worked without an agent.
     description_cn: 经历了100 个 task。你开始怀疑没有 agent 的日子是怎么过的。
+    description_es: "100 tareas completadas. Te preguntas cómo trabajabas sin un agente."
+    description_ko: "100개의 작업을 완료했습니다. 에이전트 없이 어떻게 일했는지 궁금해집니다."
+    description_ja: "100タスク完了。エージェントなしでどうやって仕事してたか不思議になる。"
     icon: 💯
     category: milestones
     rarity: rare
@@ -419,8 +545,14 @@ definitions:
   - id: millennium
     name: Millennium
     name_cn: 千禧年
+    name_es: "Milenio"
+    name_ko: "천년"
+    name_ja: "千年"
     description: 1,000 tasks completed. You and your agent are now symbiotic.
     description_cn: 经历了1000 个 task。你和 agent 已是一种共生关系。
+    description_es: "1,000 tareas completadas. Tú y tu agente ahora son simbióticos."
+    description_ko: "1,000개의 작업을 완료했습니다. 당신과 에이전트는 이제 공생 관계입니다."
+    description_ja: "1,000タスク完了。あなたとエージェントは共生関係に。"
     icon: 🏆
     category: milestones
     rarity: epic
@@ -437,8 +569,14 @@ definitions:
   - id: marathon
     name: Marathon
     name_cn: 跑马拉松
+    name_es: "Maratón"
+    name_ko: "마라톤"
+    name_ja: "マラソン"
     description: Single session lasting over 3 hours. Maybe take a bathroom break?
     description_cn: 单 session 持续超过 3 小时。不考虑上个卫生间吗？
+    description_es: "Una sesión de más de 3 horas. ¿Hora de ir al baño?"
+    description_ko: "3시간 넘는 단일 세션. 화장실 좀 다녀오시는 게?"
+    description_ja: "3時間超のセッション。トイレ休憩しませんか？"
     icon: 🏃
     category: milestones
     rarity: rare
@@ -459,8 +597,14 @@ definitions:
   - id: streak_7
     name: Streak 7
     name_cn: 连续7天使用
+    name_es: "7 Días Seguidos"
+    name_ko: "7일 연속"
+    name_ja: "7日連続"
     description: 7 consecutive days of use. Your agent is part of your daily routine.
     description_cn: 连续 7 天使用。agent 已经是你的日常。
+    description_es: "7 días seguidos de uso. Tu agente ya es parte de tu día a día."
+    description_ko: "7일 연속 사용. 에이전트가 이미 일상의 일부입니다."
+    description_ja: "7日連続使用。エージェントはもう日常の一部。"
     icon: 🔥
     category: milestones
     rarity: uncommon
@@ -482,8 +626,14 @@ definitions:
   - id: streak_30
     name: Streak 30
     name_cn: 连续30天使用
+    name_es: "30 Días Seguidos"
+    name_ko: "30일 연속"
+    name_ja: "30日連続"
     description: 30 consecutive days of use. It's not just a tool anymore — it's a lifestyle.
     description_cn: 连续 30 天使用。不仅是工具，是生活方式。
+    description_es: "30 días seguidos de uso. Ya no es solo una herramienta, es un estilo de vida."
+    description_ko: "30일 연속 사용. 이제 도구가 아니라 라이프스타일입니다."
+    description_ja: "30日連続使用。もはやツールではなく、ライフスタイル。"
     icon: 📅
     category: milestones
     rarity: rare
@@ -502,8 +652,14 @@ definitions:
   - id: streak_100
     name: Streak 100
     name_cn: 连续 100 天使用
+    name_es: "100 Días Seguidos"
+    name_ko: "100일 연속"
+    name_ja: "100日連続"
     description: 100 consecutive days of use. Are you sure you're not dating your agent?
     description_cn: 连续 100 天使用。你确定自己不是在和Agent谈恋爱？
+    description_es: "100 días seguidos de uso. ¿Seguro que no estás saliendo con tu agente?"
+    description_ko: "100일 연속 사용. 에이전트랑 사귀는 거 아니죠?"
+    description_ja: "100日連続使用。エージェントと付き合ってないよね？"
     icon: 🎬
     category: milestones
     rarity: mythic
@@ -522,8 +678,14 @@ definitions:
   - id: polyglot
     name: Polyglot
     name_cn: 多语言人士
+    name_es: "Políglota"
+    name_ko: "폴리글랏"
+    name_ja: "ポリグロット"
     description: Used 5+ programming languages in agent conversations.
     description_cn: agent 对话涉及过 5 种以上编程语言。
+    description_es: "Usaste 5 lenguajes de programación o más con tu agente."
+    description_ko: "에이전트와의 대화에서 5개 이상의 프로그래밍 언어를 사용했습니다."
+    description_ja: "エージェントとの会話で5言語以上を使用。"
     icon: 🌐
     category: milestones
     rarity: uncommon
@@ -542,8 +704,14 @@ definitions:
   - id: half_century
     name: Half Century
     name_cn: 任务过半百
+    name_es: "Medio Siglo"
+    name_ko: "반세기"
+    name_ja: "半世紀"
     description: 50 tasks completed. You're past the rookie phase.
     description_cn: 50 个 task 完成。你不再是新手了。
+    description_es: "50 tareas completadas. Ya dejaste de ser novato."
+    description_ko: "50개의 작업을 완료했습니다. 이제 신입 단계는 지났습니다."
+    description_ja: "50タスク完了。初心者は卒業。"
     icon: 🪙
     category: milestones
     rarity: rare
@@ -560,8 +728,14 @@ definitions:
   - id: streak_3
     name: Three-Day Streak
     name_cn: 三日连击
+    name_es: "3 Días Seguidos"
+    name_ko: "3일 연속"
+    name_ja: "3日連続"
     description: 3 consecutive days of use. A habit is forming.
     description_cn: 连续 3 天使用。习惯正在养成。比 7 天更近，比明天更远。
+    description_es: "3 días seguidos de uso. Se está formando un hábito."
+    description_ko: "3일 연속 사용. 습관이 생기고 있습니다."
+    description_ja: "3日連続使用。習慣の始まり。"
     icon: 🎩
     category: milestones
     rarity: common
@@ -583,8 +757,14 @@ definitions:
   - id: file_centurion
     name: File Centurion
     name_cn: 文件百夫长
+    name_es: "Centurión de Archivos"
+    name_ko: "파일 백부장"
+    name_ja: "ファイル百人隊長"
     description: Read 100 files cumulatively. You've seen some code.
     description_cn: 累计读取了 100 个文件。你见过的代码可不少了。
+    description_es: "100 archivos leídos en total. Has visto código, y mucho."
+    description_ko: "누적 100개 파일을 읽었습니다. 코드 좀 봤군요."
+    description_ja: "累計100ファイル読了。なかなかのコード量。"
     icon: 📂
     category: milestones
     rarity: uncommon
@@ -604,8 +784,14 @@ definitions:
   - id: token_1m
     name: Token Millionaire
     name_cn: 百万富翁
+    name_es: "Magnate de Tokens"
+    name_ko: "토큰 백만장자"
+    name_ja: "トークン長者"
     description: Consumed 1,000,000 tokens. That's a small novel.
     description_cn: 累计消耗 1,000,000 token。够写一本中篇小说了。
+    description_es: "Has consumido 1.000.000 tokens. Suficiente para una novelita."
+    description_ko: "100만 토큰을 소모했습니다. 소설 한 편 분량입니다."
+    description_ja: "トークンを100万消費。短編小説ほどの量だ。"
     icon: 💎
     category: milestones
     rarity: rare
@@ -623,8 +809,14 @@ definitions:
   - id: test_centurion
     name: Green Bar
     name_cn: 全绿
+    name_es: "Todo Verde"
+    name_ko: "올 그린"
+    name_ja: "オールグリーン"
     description: 100 tests passed. All green, no red.
     description_cn: 累计 100 个测试通过。满屏绿色，赏心悦目。
+    description_es: "100 pruebas superadas. Todo verde, ni una sombra de rojo."
+    description_ko: "테스트 100개 통과. 빨간불 하나 없이 온통 초록."
+    description_ja: "テスト100件パス。赤ゼロ、全面グリーン。"
     icon: ✅
     category: milestones
     rarity: rare
@@ -641,8 +833,14 @@ definitions:
   - id: multi_image_day
     name: Photo Album
     name_cn: 相册日
+    name_es: "Álbum"
+    name_ko: "사진첩"
+    name_ja: "フォトアルバム"
     description: Uploaded 5+ images within 24 hours. Visual thinker.
     description_cn: 24 小时内上传了 5 张以上图片。视觉系思考者。
+    description_es: "Subiste 5 imágenes o más en 24 horas. Todo un visual."
+    description_ko: "24시간 동안 이미지 5개 이상 업로드. 그림으로 말하는 타입."
+    description_ja: "24時間以内に画像5枚以上アップロード。画像で語るタイプ。"
     icon: 🖼️
     category: milestones
     rarity: common
@@ -661,8 +859,14 @@ definitions:
   - id: chain_reaction
     name: Chain Reaction
     name_cn: 链式反应
+    name_es: "Reacción en Cadena"
+    name_ko: "연쇄 반응"
+    name_ja: "連鎖反応"
     description: 5+ tool calls by the agent in a single conversation.
     description_cn: 单次对话中 agent 完成 5 步以上 tool call。
+    description_es: "El agente encadenó 5 o más tool calls en una sola conversación."
+    description_ko: "한 번의 대화에서 에이전트가 도구 호출 5회 이상 연속 성공."
+    description_ja: "1回の会話でエージェントがツール呼び出しを5回以上連鎖。"
     icon: ⛓️
     category: skill
     rarity: common
@@ -682,8 +886,14 @@ definitions:
   - id: full_auto
     name: Full Auto
     name_cn: 自动档
+    name_es: "Plena Autonomía"
+    name_ko: "풀 오토"
+    name_ja: "フルオート"
     description: 10+ tool calls with full autonomy, zero rejections.
     description_cn: 10 步以上 tool调用，全程自主零拒绝。
+    description_es: "10 o más tool calls autónomas, cero rechazos."
+    description_ko: "완전 자율로 도구 호출 10회 이상, 거절 0회."
+    description_ja: "完全自律でツール呼び出し10回以上、拒否ゼロ。"
     icon: 🤖
     category: skill
     rarity: rare
@@ -709,8 +919,14 @@ definitions:
   - id: architect
     name: Architect
     name_cn: 建筑师
+    name_es: "Arquitecto"
+    name_ko: "건축가"
+    name_ja: "アーキテクト"
     description: Agent successfully edited 5+ files in a single task.
     description_cn: 单 task 中 agent 成功编辑了 5 个以上文件。
+    description_es: "El agente modificó 5 archivos o más en una sola tarea."
+    description_ko: "단일 태스크에서 에이전트가 파일 5개 이상을 편집."
+    description_ja: "1タスクでエージェントが5ファイル以上を編集。"
     icon: 🏗️
     category: skill
     rarity: rare
@@ -730,8 +946,14 @@ definitions:
   - id: surgeon
     name: Surgeon
     name_cn: 外科手术
+    name_es: "Cirujano"
+    name_ko: "외과의"
+    name_ja: "外科医"
     description: In a single task, you only changed exactly what was needed.
     description_cn: 单 task中，你只改了恰好需要的那一点点。
+    description_es: "En una sola tarea, tocaste solo lo estrictamente necesario."
+    description_ko: "단일 태스크에서 정말 필요한 부분만 딱 고쳤다."
+    description_ja: "1タスクで、必要な箇所だけを正確に変更。"
     icon: 🩺
     category: skill
     rarity: epic
@@ -753,8 +975,14 @@ definitions:
   - id: seeker
     name: Seeker
     name_cn: 探索者
+    name_es: "Buscador"
+    name_ko: "탐색자"
+    name_ja: "探求者"
     description: 10+ search-type tools used in a single session.
     description_cn: 单 session 中搜索类 tool ≥ 10 次。
+    description_es: "Usaste 10 o más herramientas de búsqueda en una sola sesión."
+    description_ko: "단일 세션에서 검색형 도구 10회 이상 사용."
+    description_ja: "1セッションで検索ツールを10回以上使用。"
     icon: 🔍
     category: skill
     rarity: common
@@ -774,8 +1002,14 @@ definitions:
   - id: self_aware
     name: Self-Aware
     name_cn: 自知之明
+    name_es: "Autoconsciente"
+    name_ko: "자아 인식"
+    name_ja: "自己認識"
     description: Agent triggered a self-fix for the first time. Acknowledged the mistake, fixed it.
     description_cn: agent 首次触发自修复。我犯错了，我修好了。
+    description_es: "El agente se auto-reparó por primera vez. Vio el error y lo corrigió."
+    description_ko: "에이전트가 처음으로 자체 수정을 실행했다. 실수를 인정하고 스스로 고쳤다."
+    description_ja: "エージェントが初めて自己修復を発動。ミスを認めて自分で直した。"
     icon: 🤖💡
     category: skill
     rarity: common
@@ -791,8 +1025,14 @@ definitions:
   - id: the_debugger
     name: The Debugger
     name_cn: 捉虫行动
+    name_es: "El Depurador"
+    name_ko: "디버거"
+    name_ja: "ザ・デバッガー"
     description: Code failed — you let the agent fix it itself.
     description_cn: 代码报错，你让agent自己修好了。
+    description_es: "El código falló y dejaste que el agente lo solucionara solo."
+    description_ko: "코드가 실패했지만, 에이전트가 스스로 고치게 두었다."
+    description_ja: "コードがエラーを吐いても、エージェントに自分で直させた。"
     icon: 🐛
     category: skill
     rarity: uncommon
@@ -813,8 +1053,14 @@ definitions:
   - id: triple_debugger
     name: Triple Debugger
     name_cn: 三重调试
+    name_es: "Depuración Triple"
+    name_ko: "트리플 디버거"
+    name_ja: "三重復旧"
     description: Agent self-recovered from 3+ errors in a single task.
     description_cn: 单 task 中 agent 自修复 ≥ 3 次错误。
+    description_es: "El agente se recuperó por sí solo de 3 o más errores en una sola tarea."
+    description_ko: "단일 작업에서 에이전트가 3회 이상 오류를 스스로 복구함."
+    description_ja: "1つのタスク中にエージェントが3回以上エラーから自己復旧した。"
     icon: 🪲
     category: skill
     rarity: rare
@@ -836,8 +1082,14 @@ definitions:
   - id: tool_completist
     name: Tool Completist
     name_cn: 工具大全
+    name_es: "Juego Completo"
+    name_ko: "도구 완전 정복"
+    name_ja: "全ツール制覇"
     description: Used all core tools (Read / Edit / Write / Bash / Think) in one session.
     description_cn: 单 session 中使用过全部核心 tool（Read / Edit / Write / Bash / Think）。
+    description_es: "Usó todas las herramientas principales (Read / Edit / Write / Bash / Think) en una sola sesión."
+    description_ko: "한 세션에서 모든 핵심 도구(Read/Edit/Write/Bash/Think)를 사용함."
+    description_ja: "1セッションですべてのコアツール（Read / Edit / Write / Bash / Think）を使用した。"
     icon: 🧰
     category: skill
     rarity: rare
@@ -863,8 +1115,14 @@ definitions:
   - id: the_switch
     name: Shift Gears
     name_cn: 模式换档
+    name_es: "Cambio de Marcha"
+    name_ko: "모드 변환"
+    name_ja: "モードチェンジ"
     description: Switched from Plan mode to non-Plan mode in the same task to complete implementation.
     description_cn: 同一次 task 中从 Plan 模式切换到非Plan模式，完成最终实现。
+    description_es: "Cambió del modo Plan a otro modo en la misma tarea para completar la implementación."
+    description_ko: "같은 작업에서 Plan 모드에서 일반 모드로 전환하여 구현을 완료함."
+    description_ja: "同一タスク内でPlanモードから通常モードに切り替えて実装を完了した。"
     icon: 🎭
     category: skill
     rarity: uncommon
@@ -884,8 +1142,14 @@ definitions:
   - id: off_the_grid
     name: Off the Grid
     name_cn: 离线模式
+    name_es: "Sin Buscar"
+    name_ko: "검색 제로"
+    name_ja: "検索ゼロ"
     description: Completed a task without using any search tools (WebSearch / WebFetch).
     description_cn: 完成一个 task，全程未使用搜索工具（WebSearch/WebFetch）。
+    description_es: "Completó una tarea sin usar herramientas de búsqueda (WebSearch / WebFetch)."
+    description_ko: "검색 도구를 전혀 사용하지 않고 작업을 완료함."
+    description_ja: "検索ツールを一切使わずにタスクを完了した。"
     icon: 🏝️
     category: skill
     rarity: uncommon
@@ -907,8 +1171,14 @@ definitions:
   - id: first_try
     name: Smooth Criminal
     name_cn: 尽享丝滑
+    name_es: "Cero Fallos"
+    name_ko: "완벽한 첫걸음"
+    name_ja: "初回完璧"
     description: Agent's first test run passed on the first try — zero failures, smooth as silk.
     description_cn: agent 写完代码后第一次测试就直接通过，中间无失败，非常丝滑。
+    description_es: "La primera prueba del agente pasó a la primera. Cero errores, impecable."
+    description_ko: "에이전트의 첫 번째 테스트가 오류 없이 한 번에 통과. 완벽한 출발."
+    description_ja: "エージェントの初回テストが一発合格。エラーゼロの完璧なスタート。"
     icon: 🐞
     category: skill
     rarity: rare
@@ -935,8 +1205,14 @@ definitions:
   - id: terminal_only
     name: Terminal Only
     name_cn: 纯终端玩法
+    name_es: "Solo Terminal"
+    name_ko: "터미널 장인"
+    name_ja: "ターミナル派"
     description: Completed a task using only terminal commands, zero file edits. Simple, old-school, effective.
     description_cn: 完成一个 task只用终端命令，零文件编辑。简单、老派，但有效。
+    description_es: "Completó una tarea usando solo comandos de terminal, sin editar archivos."
+    description_ko: "파일 편집 없이 터미널 명령어만으로 작업을 완료. 깔끌하고 효과적."
+    description_ja: "ファイル編集ゼロ、ターミナルコマンドのみでタスク完了。シンプルで効果的。"
     icon: 💻
     category: skill
     rarity: epic
@@ -962,8 +1238,14 @@ definitions:
   - id: minimalist
     name: Minimalist
     name_cn: 极简主义
+    name_es: "Minimalista"
+    name_ko: "미니멀리스트"
+    name_ja: "ミニマリスト"
     description: An agent message was 80 characters or fewer. Every word counts.
     description_cn: agent 某条消息长度 ≤ 80 字符，惜字如金。
+    description_es: "Un mensaje del agente fue de 80 caracteres o menos. Cada palabra cuenta."
+    description_ko: "에이전트 메시지가 80자 이하였다. 모든 단어가 중요하다."
+    description_ja: "エージェントのメッセージが80文字以下。一言一句が重い。"
     icon: 🪶
     category: style
     rarity: uncommon
@@ -984,8 +1266,14 @@ definitions:
   - id: novelist
     name: Novelist
     name_cn: 小说家
+    name_es: "Novelista"
+    name_ko: "소설가"
+    name_ja: "小説家"
     description: An agent message was 500+ characters. You're thorough!
     description_cn: agent 某条消息长度 ≥ 500 字符，你很细心！
+    description_es: "Un mensaje del agente superó los 500 caracteres. ¡Muy minucioso!"
+    description_ko: "에이전트 메시지가 500자 이상이었다. 정말 꼭꼭하구나!"
+    description_ja: "エージェントのメッセージが500文字以上。徹底してますね！"
     icon: 📝
     category: style
     rarity: uncommon
@@ -1006,8 +1294,14 @@ definitions:
   - id: one_shot
     name: One Shot
     name_cn: 一发入魂
+    name_es: "Al Primer Intento"
+    name_ko: "원샷"
+    name_ja: "一発入魂"
     description: Completed a task with just one agent query.
     description_cn: 单 task 只问了 agent 一次就完成。
+    description_es: "Completó una tarea con una sola consulta al agente."
+    description_ko: "에이전트에게 단 한 번만 질문하고 작업을 완료함."
+    description_ja: "たった1回のクエリでタスクを完了。"
     icon: 🎯
     category: style
     rarity: rare
@@ -1025,8 +1319,14 @@ definitions:
   - id: iterative_refiner
     name: Iterative Refiner
     name_cn: 慢工出细活
+    name_es: "Paso a Paso"
+    name_ko: "장인 정신"
+    name_ja: "地道な改善"
     description: Single task required 20+ turns to complete.
     description_cn: 单 task 交互 > 20 轮才完成。
+    description_es: "Una sola tarea requirió 20 o más turnos para completarse."
+    description_ko: "단일 작업 완료에 20턴 이상이 걸렸다. 공들여만든 결과물."
+    description_ja: "1つのタスク完了に20ターン以上を要した。"
     icon: 🔄
     category: style
     rarity: rare
@@ -1043,8 +1343,14 @@ definitions:
   - id: night_owl
     name: Night Owl
     name_cn: 夜猫子
+    name_es: "Búho Nocturno"
+    name_ko: "올빼미"
+    name_ja: "夜更かしフクロウ"
     description: Started a session in the wee hours (0:00-5:00). You're a creature of the night.
     description_cn: 某次在凌晨 (0:00-5:00) 启动了 session。你是夜行动物。
+    description_es: "Iniciaste una sesión en la madrugada (0:00-5:00). Eres una criatura de la noche."
+    description_ko: "새벽 시간(0:00-5:00)에 세션을 시작했습니다. 당신은 밤을 지배하는 올빼미입니다."
+    description_ja: "深夜(0:00-5:00)にセッションを開始した。夜の住人ですね。"
     icon: 🦉
     category: style
     rarity: uncommon
@@ -1059,8 +1365,14 @@ definitions:
   - id: weekend_warrior
     name: Not Invited to Party
     name_cn: 开趴不邀请我
+    name_es: "Sin Invitación"
+    name_ko: "파티 불청객"
+    name_ja: "パーティーにお呼びじゃなくて"
     description: Session on the weekend. No party to go to?
     description_cn: session在周末，你没有去参加派对吗？
+    description_es: "Sesión en fin de semana. No tenías una fiesta a la que ir?"
+    description_ko: "주말에 세션을 했습니다. 갈 파티가 없었나요?"
+    description_ja: "週末にセッション。パーティーに呼ばれなかったの？"
     icon: ⚔️
     category: style
     rarity: uncommon
@@ -1075,8 +1387,14 @@ definitions:
   - id: afternoon_tea
     name: Afternoon Tea
     name_cn: 下午茶
+    name_es: "Hora del Té"
+    name_ko: "애프터눈 티"
+    name_ja: "アフタヌーンティー"
     description: Started a session during tea time (3pm-5pm). Tea, biscuits, and code.
     description_cn: 在下午茶时段 (15:00-17:00) 启动了 session。茶、饼干、代码。
+    description_es: "Iniciaste una sesión durante la hora del té (15:00-17:00). Té, galletas y código."
+    description_ko: "오후 티타임(15:00-17:00)에 세션을 시작했습니다. 차, 과자, 코드."
+    description_ja: "ティータイム(15:00-17:00)にセッション開始。紅茶にビスケット、そしてコード。"
     icon: 🫖
     category: style
     rarity: uncommon
@@ -1090,8 +1408,14 @@ definitions:
   - id: copy_paste_king
     name: Copy-Paste is All You Need
     name_cn: Ctrl C + Ctrl V就好了
+    name_es: "Ctrl+C, Ctrl+V y Listo"
+    name_ko: "복붙이면 충분하다"
+    name_ja: "コピペでOK"
     description: Pasted content accounts for over 50% of total input.
     description_cn: 粘贴内容 / 总输入 > 50%。
+    description_es: "El contenido pegado representa más del 50% de tu entrada total."
+    description_ko: "입력의 50% 이상이 붙여넣기입니다. 복붙만으로도 충분하다."
+    description_ja: "入力の50%以上がペーストされた内容。コピペがあれば十分だ。"
     icon: 📋
     category: style
     rarity: uncommon
@@ -1107,8 +1431,14 @@ definitions:
   - id: brevity_scout
     name: Brevity Scout
     name_cn: 简洁侦察兵
+    name_es: "Explorador de la Brevedad"
+    name_ko: "간결 정찰병"
+    name_ja: "簡潔スカウト"
     description: 5 prompts under 10 words. Say more with less.
     description_cn: 累计 5 次 prompt 少于 10 个词。字少事大。
+    description_es: "5 prompts de menos de 10 palabras. Di más con menos."
+    description_ko: "10단어 미만 프롬프트 5회. 적게 말하고 많이 전달하라."
+    description_ja: "10語未満のプロンプトを5回送信。少ない言葉で多くを伝えよ。"
     icon: ✂️
     category: style
     rarity: common
@@ -1127,8 +1457,14 @@ definitions:
   - id: executive_summary
     name: Executive Summary
     name_cn: 执行摘要
+    name_es: "Informe Ejecutivo"
+    name_ko: "임원 보고서"
+    name_ja: "エグゼクティブサマリー"
     description: 25 prompts over 100 words. You leave nothing unsaid.
     description_cn: 累计 25 次 prompt 超过 100 个词。事无巨细，一次说清。
+    description_es: "25 prompts de más de 100 palabras. No dejas nada sin decir."
+    description_ko: "100단어 이상 프롬프트 25회. 할 말은 다 한다."
+    description_ja: "100語以上のプロンプトを25回。言い漏らしは一切なし。"
     icon: 📝
     category: style
     rarity: uncommon
@@ -1147,8 +1483,14 @@ definitions:
   - id: code_talker
     name: Code Talker
     name_cn: 代码语者
+    name_es: "Hablante de Código"
+    name_ko: "코드 토커"
+    name_ja: "コード・トーカー"
     description: 10 prompts contained code blocks. You speak fluent code.
     description_cn: 累计 10 次 prompt 中包含代码块。你直接用代码思考。
+    description_es: "10 prompts con bloques de código. Hablas código con fluidez."
+    description_ko: "코드 블록이 포함된 프롬프트 10회. 코드가 곧 언어입니다."
+    description_ja: "コードブロックを含むプロンプトを10回送信。流暢なコードを操る。"
     icon: 💻
     category: style
     rarity: uncommon
@@ -1167,8 +1509,14 @@ definitions:
   - id: no_questions_asked
     name: No Questions Asked
     name_cn: 不问问题
+    name_es: "Sin Hacer Preguntas"
+    name_ko: "질문 따윈 없다"
+    name_ja: "問答無用"
     description: 3 prompts without a single question mark. You don't ask — you command.
     description_cn: 累计 3 次 prompt 中没有问号。你不是来提问的，是来下指令的。
+    description_es: "3 prompts sin un solo signo de interrogación. No preguntas, ordenas."
+    description_ko: "물음표 없이 프롬프트 3회. 묻지 말고 명령하라."
+    description_ja: "疑問符なしのプロンプトを3回。問答無用で命じよ。"
     icon: ❓
     category: hidden
     rarity: uncommon
@@ -1185,8 +1533,14 @@ definitions:
   - id: infinite_details
     name: Infinite Details
     name_cn: 话痨
+    name_es: "Detalles Infinitos"
+    name_ko: "끝없는 디테일"
+    name_ja: "無限の詳細"
     description: 50,000 characters of prompts sent cumulatively. You've written a novella.
     description_cn: 累计输入 50,000 字符的 prompt。你写的字够出一本书了。
+    description_es: "50,000 caracteres en prompts acumulados. Has escrito una novelita."
+    description_ko: "누적 프롬프트 50,000자. 단편소설 한 편 썼네요."
+    description_ja: "累計50,000文字のプロンプト。もう小説一冊書ける。"
     icon: 📚
     category: style
     rarity: rare
@@ -1204,8 +1558,14 @@ definitions:
   - id: file_whisperer
     name: File Shepherd
     name_cn: 文件牧羊人
+    name_es: "Pastor de Archivos"
+    name_ko: "파일 목자"
+    name_ja: "ファイルシェパード"
     description: Agent has edited 500 files cumulatively.
     description_cn: 累计让 agent 编辑了 500 个文件。
+    description_es: "El agente ha editado 500 archivos en total."
+    description_ko: "에이전트가 누적 500개 파일을 편집했습니다."
+    description_ja: "エージェントが累計500ファイルを編集した。"
     icon: 📁
     category: tool_mastery
     rarity: rare
@@ -1222,8 +1582,14 @@ definitions:
   - id: git_wizard
     name: Git Wizard
     name_cn: Git魔法师
+    name_es: "Mago de Git"
+    name_ko: "Git 마법사"
+    name_ja: "Gitウィザード"
     description: Agent participated in 100 git commits.
     description_cn: agent 参与了 100 次 git commit。
+    description_es: "El agente participó en 100 commits de git."
+    description_ko: "에이전트가 Git 커밋 100회에 참여했습니다."
+    description_ja: "エージェントが100回のGitコミットに参加しました。"
     icon: 🧙
     category: tool_mastery
     rarity: rare
@@ -1244,8 +1610,14 @@ definitions:
   - id: shell_shocker
     name: Ghost in the Shell
     name_cn: 攻“壳”机动队
+    name_es: "Fantasma en la Shell"
+    name_ko: "공각기동대"
+    name_ja: "攻殻機動隊"
     description: You had your agent run 250 terminal commands.
     description_cn: 你让agent 在终端执行了 250 次命令。
+    description_es: "Hiciste que tu agente ejecutara 250 comandos en la terminal."
+    description_ko: "에이전트가 터미널에서 250개의 명령어를 실행하게 했습니다."
+    description_ja: "エージェントに250回のターミナルコマンドを実行させました。"
     icon: 💻
     category: tool_mastery
     rarity: rare
@@ -1267,8 +1639,14 @@ definitions:
   - id: web_wanderer
     name: Webmancer
     name_cn: 网络漫游者
+    name_es: "Navegante"
+    name_ko: "웹 서퍼"
+    name_ja: "ウェブマンサー"
     description: Agent searched the web 100 times.
     description_cn: agent 上网搜索了 100 次。
+    description_es: "El agente buscó en la web 100 veces."
+    description_ko: "에이전트가 웹 검색을 100회 수행했습니다."
+    description_ja: "エージェントが100回ウェブ検索をしました。"
     icon: 🌍
     category: tool_mastery
     rarity: uncommon
@@ -1289,8 +1667,14 @@ definitions:
   - id: parallel_universe
     name: Heart of the Swarm
     name_cn: 虫群之心
+    name_es: "Corazón del Enjambre"
+    name_ko: "군단의 심장"
+    name_ja: "群れの心臓"
     description: Spawned 10+ sub-agents in a single session. Parallel processing at its finest.
     description_cn: 单 session 中 spawn 了 10+ 个子 agent。极致并行。
+    description_es: "Invocaste 10 o más subagentes en una sola sesión. Procesamiento paralelo en su máxima expresión."
+    description_ko: "단일 세션에서 10명 이상의 하위 에이전트를 생성했습니다. 최고의 병렬 처리."
+    description_ja: "1つのセッションで10以上のサブエージェントを生成。究極の並列処理。"
     icon: 🌌
     category: tool_mastery
     rarity: rare
@@ -1306,8 +1690,14 @@ definitions:
   - id: mcp_explorer
     name: MCP Explorer
     name_cn: MCP 探索者
+    name_es: "Explorador MCP"
+    name_ko: "MCP 탐험가"
+    name_ja: "MCPエクスプローラー"
     description: Connected and used 5+ MCP servers.
     description_cn: 连接并使用过 5 个以上 MCP server。
+    description_es: "Te conectaste y usaste 5 o más servidores MCP."
+    description_ko: "5개 이상의 MCP 서버에 연결하여 사용했습니다."
+    description_ja: "5つ以上のMCPサーバーに接続して使用しました。"
     icon: 🔌
     category: tool_mastery
     rarity: epic
@@ -1325,8 +1715,14 @@ definitions:
   - id: image_whisperer
     name: More than meets the eye
     name_cn: 不只眼前所见
+    name_es: "Más de lo que Parece"
+    name_ko: "눈에 보이는 것이 전부가 아니다"
+    name_ja: "見かけ以上"
     description: Agent read images 5+ times.
     description_cn: Agent读图次数>=5次。
+    description_es: "El agente leyó imágenes 5 veces o más."
+    description_ko: "에이전트가 이미지를 5회 이상 읽었습니다."
+    description_ja: "エージェントが5回以上画像を読み取りました。"
     icon: 📸
     category: tool_mastery
     rarity: uncommon
@@ -1343,8 +1739,14 @@ definitions:
   - id: undo_master
     name: Take back a Move
     name_cn: 悔棋
+    name_es: "Retroceder un Movimiento"
+    name_ko: "한 수 무르기"
+    name_ja: "一手を戻す"
     description: Reverted agent's changes 25 times cumulatively. Perfection needs polish.
     description_cn: 累计撤回了 agent 的修改 25 次。完美需要反复打磨。
+    description_es: "Revertiste los cambios del agente 25 veces en total. La perfección necesita pulido."
+    description_ko: "에이전트의 변경을 총 25회 되돌렸습니다. 완벽은 다듬기에서 나옵니다."
+    description_ja: "エージェントの変更を累計25回取り消しました。完璧には磨き上げが必要です。"
     icon: ↩️
     category: tool_mastery
     rarity: uncommon
@@ -1363,8 +1765,14 @@ definitions:
   - id: git_tenderfoot
     name: Git Scouting
     name_cn: Git 童子军
+    name_es: "Git Scout"
+    name_ko: "Git 스카우트"
+    name_ja: "Git見習い"
     description: Agent participated in 10 git commits.
     description_cn: agent 参与了 10 次 git commit。
+    description_es: "El agente participó en 10 commits de git."
+    description_ko: "에이전트가 Git 커밋 10회에 참여했습니다."
+    description_ja: "エージェントが10回のGitコミットに参加しました。"
     icon: 🐾
     category: tool_mastery
     rarity: common
@@ -1386,8 +1794,14 @@ definitions:
   - id: git_veteran
     name: Git Veteran
     name_cn: Git 老兵
+    name_es: "Veterano de Git"
+    name_ko: "Git 베테랑"
+    name_ja: "Gitベテラン"
     description: Agent participated in 250 git commits. Your collaboration transcends code — it's trust.
     description_cn: agent 参与了 250 次 git commit。你们的协作已经超越了代码——是信任。
+    description_es: "El agente participó en 250 commits de git. Tu colaboración trasciende el código: es confianza."
+    description_ko: "에이전트가 Git 커밋 250회에 참여했습니다. 코드를 넘어선 신뢰의 협업."
+    description_ja: "エージェントが250回のGitコミットに参加しました。あなたの協力はコードを超え、信頼そのものです。"
     icon: 🎖️
     category: tool_mastery
     rarity: epic
@@ -1406,8 +1820,14 @@ definitions:
   - id: pr_champion
     name: PR Champion
     name_cn: PR 冠军
+    name_es: "Campeón de PR"
+    name_ko: "PR 챔피언"
+    name_ja: "PRチャンピオン"
     description: Created your first PR through an agent.
     description_cn: 通过 agent 创建了你的第一个 PR。
+    description_es: "Creaste tu primer Pull Request a través de un agente."
+    description_ko: "에이전트를 통해 첫 번째 PR을 생성했습니다."
+    description_ja: "エージェントを通じて初めてのPRを作成しました。"
     icon: 🔀
     category: workflow
     rarity: uncommon
@@ -1427,8 +1847,14 @@ definitions:
   - id: cicd_pioneer
     name: CI/CD Pioneer
     name_cn: CI/CD 先驱
+    name_es: "Pionero CI/CD"
+    name_ko: "CI/CD 개척자"
+    name_ja: "CI/CDパイオニア"
     description: Agent helped you create a GitHub Actions workflow file.
     description_cn: agent 帮你创建了 GitHub Actions workflow 文件。
+    description_es: "El agente te ayudó a crear un archivo de workflow de GitHub Actions."
+    description_ko: "에이전트가 GitHub Actions 워크플로 파일 작성을 도와주었다."
+    description_ja: "エージェントがGitHub Actionsのワークフローファイル作成を支援した。"
     icon: ⚙️
     category: workflow
     rarity: common
@@ -1445,8 +1871,14 @@ definitions:
   - id: code_reviewer
     name: Code Reviewer
     name_cn: 代码审查者
+    name_es: "Revisor de Código"
+    name_ko: "코드 리뷰어"
+    name_ja: "コードレビュアー"
     description: Had your agent review code and provide valuable suggestions.
     description_cn: 让 agent 审查过代码，给出了有价值的建议。
+    description_es: "Le pediste a tu agente que revisara código y diera sugerencias valiosas."
+    description_ko: "에이전트에게 코드 리뷰를 받고 유용한 제안을 얻었다."
+    description_ja: "エージェントにコードレビューを依頼し、貴重な提案を得た。"
     icon: 👁️
     category: workflow
     rarity: common
@@ -1463,8 +1895,14 @@ definitions:
   - id: deep_review
     name: Deep Review
     name_cn: 深度审查
+    name_es: "Revisión Profunda"
+    name_ko: "심층 리뷰"
+    name_ja: "ディープレビュー"
     description: Agent found 10+ issues in a single review.
     description_cn: agent 一次审查发现 10+ 个问题。
+    description_es: "El agente encontró más de 10 problemas en una sola revisión."
+    description_ko: "에이전트가 단 한 번의 리뷰에서 10개 이상의 문제를 발견했다."
+    description_ja: "エージェントが1回のレビューで10件以上の問題を発見した。"
     icon: 🧐
     category: workflow
     rarity: uncommon
@@ -1484,8 +1922,14 @@ definitions:
   - id: plan_mode_user
     name: Strategy Master
     name_cn: 战略大师
+    name_es: "Maestro Estratégico"
+    name_ko: "전략의 달인"
+    name_ja: "戦略の達人"
     description: Used Plan mode for complex tasks. Think twice, code once.
     description_cn: 对复杂任务使用了 Plan 模式，三思而后 code。
+    description_es: "Usaste el modo Plan para tareas complejas. Piensa dos veces, programa una."
+    description_ko: "복잡한 작업에 Plan 모드를 사용했다. 두 번 생각하고, 한 번 코딩하라."
+    description_ja: "複雑なタスクにPlanモードを使用した。考えてからコードを書け。"
     icon: 🧠
     category: workflow
     rarity: common
@@ -1503,8 +1947,14 @@ definitions:
   - id: plan_strategist
     name: Blueprintist
     name_cn: 蓝图主义者
+    name_es: "Arquitecto de Planos"
+    name_ko: "청사진 장인"
+    name_ja: "設計図マニア"
     description: Used Plan mode 25 times cumulatively. You love blueprints.
     description_cn: 累计使用 Plan 模式 25 次，你很喜欢画蓝图。
+    description_es: "Usaste el modo Plan 25 veces en total. Te encantan los planos."
+    description_ko: "Plan 모드를 누적 25회 사용했다. 청사진 그리기를 좋아하는 모양이다."
+    description_ja: "Planモードを累計25回使用した。設計図がお好きらしい。"
     icon: 📐
     category: workflow
     rarity: uncommon
@@ -1523,8 +1973,14 @@ definitions:
   - id: auto_committer
     name: Auto Committer
     name_cn: 自动提交
+    name_es: "Committer Automático"
+    name_ko: "자동 커밋"
+    name_ja: "自動コミッター"
     description: Agent committed code for you. You just nodded.
     description_cn: agent 替你 commit 了代码。你只需要点头。
+    description_es: "El agente hizo commit por ti. Solo asentiste."
+    description_ko: "에이전트가 대신 커밋했다. 당신은 그저 고개만 끄덕였다."
+    description_ja: "エージェントが代わりにコミットした。あなたはうなずくだけ。"
     icon: 🤖
     category: workflow
     rarity: common
@@ -1544,8 +2000,14 @@ definitions:
   - id: changelog_keeper
     name: Keep a diary
     name_cn: 记日记
+    name_es: "Diario de Cambios"
+    name_ko: "일기 쓰기"
+    name_ja: "日記係"
     description: Agent wrote the changelog for you.
     description_cn: agent 帮你写了 changelog。
+    description_es: "El agente escribió el changelog por ti."
+    description_ko: "에이전트가 대신 체인지로그를 작성했다."
+    description_ja: "エージェントが代わりにチェンジログを書いてくれた。"
     icon: 📋
     category: workflow
     rarity: uncommon
@@ -1564,8 +2026,14 @@ definitions:
   - id: context_conscious
     name: Context Anxiety
     name_cn: 上下文焦虑
+    name_es: "Ansiedad de Contexto"
+    name_ko: "컨텍스트 불안"
+    name_ja: "コンテキスト不安症"
     description: Triggered 3+ auto-compactions in a single task. You're pushing your agent's memory limit.
     description_cn: 单 task 中触发了 3 次以上自动压缩。你在挑战 agent 的记忆极限。
+    description_es: "Disparaste 3 o más autocompactaciones en una sola tarea. Estás llevando al límite la memoria de tu agente."
+    description_ko: "단일 태스크에서 자동 압축이 3회 이상 발생했다. 에이전트의 메모리 한계에 도전 중이다."
+    description_ja: "1つのタスクで3回以上の自動圧縮を発生させた。エージェントの記憶限界に挑んでいる。"
     icon: 🧩
     category: workflow
     rarity: uncommon
@@ -1584,8 +2052,14 @@ definitions:
   - id: session_veteran
     name: Talk Show Host
     name_cn: 脱口秀主持人
+    name_es: "Presentador de Talk Show"
+    name_ko: "토크쇼 진행자"
+    name_ja: "トーク番組の司会者"
     description: Started 50 sessions cumulatively.
     description_cn: 累计开启 50 个 session。
+    description_es: "Iniciaste 50 sesiones en total."
+    description_ko: "누적 50개의 세션을 시작했다."
+    description_ja: "累計50セッションを開始した。"
     icon: 🪖
     category: workflow
     rarity: rare
@@ -1605,8 +2079,14 @@ definitions:
   - id: session_centurion
     name: The King's Speech
     name_cn: 国王的演讲
+    name_es: "El Discurso del Rey"
+    name_ko: "킹스 스피치"
+    name_ja: "英国王のスピーチ"
     description: Started 300 sessions cumulatively.
     description_cn: 累计开启 300 个 session。
+    description_es: "Iniciaste 300 sesiones en total."
+    description_ko: "누적 300개의 세션을 시작했다."
+    description_ja: "累計300セッションを開始した。"
     icon: 📚
     category: workflow
     rarity: epic
@@ -1623,8 +2103,14 @@ definitions:
   - id: token_titan
     name: Go buy tokens now!
     name_cn: 快去买Token！
+    name_es: "¡Compra tokens ya!"
+    name_ko: "토큰 좀 사라!"
+    name_ja: "トークン買えよ！"
     description: Consumed 10M tokens cumulatively. Your provider loves you.
     description_cn: 累计消耗 10M token。你是服务商最喜欢的用户。
+    description_es: "Consumiste 10M tokens en total. Tu proveedor te adora."
+    description_ko: "누적 1,000만 토큰 소모. 제공자가 널 좋아해."
+    description_ja: "累計1,000万トークン消費。プロバイダーに愛されてるね。"
     icon: 💎
     category: workflow
     rarity: epic
@@ -1642,8 +2128,14 @@ definitions:
   - id: token_legend
     name: Infinite Monkey Theorem
     name_cn: 无限猴子定理
+    name_es: "Teorema del Mono Infinito"
+    name_ko: "무한 원숭이 정리"
+    name_ja: "無限の猿定理"
     description: Consumed 100M tokens cumulatively.
     description_cn: 累计消耗 100M token。
+    description_es: "Consumiste 100M tokens en total."
+    description_ko: "누적 1억 토큰 소모."
+    description_ja: "累計1億トークン消費。"
     icon: 🌌
     category: workflow
     rarity: epic
@@ -1661,8 +2153,14 @@ definitions:
   - id: multi_project
     name: Multi-Project
     name_cn: 多项目
+    name_es: "Multiproyecto"
+    name_ko: "멀티 프로젝트"
+    name_ja: "マルチプロジェクト"
     description: Used the agent in 3+ different projects on the same day.
     description_cn: 同日内在 3 个以上项目中使用了 agent。
+    description_es: "Usaste el agente en 3+ proyectos distintos en un mismo día."
+    description_ko: "하루에 3개 이상의 프로젝트에서 에이전트를 사용함."
+    description_ja: "1日で3つ以上のプロジェクトでエージェントを使用。"
     icon: 🗂️
     category: workflow
     rarity: rare
@@ -1679,8 +2177,14 @@ definitions:
   - id: full_cycle
     name: Full Cycle
     name_cn: 全流程
+    name_es: "Ciclo Completo"
+    name_ko: "풀 사이클"
+    name_ja: "フルサイクル"
     description: "Agent independently completed the full cycle: code → commit → PR. You just watched the results."
     description_cn: agent 独立完成了编码→commit→PR 全过程，你只是看了结果。
+    description_es: "El agente completó el ciclo entero por sí solo: código → commit → PR. Tú solo viste los resultados."
+    description_ko: "에이전트가 코드 → 커밋 → PR까지 전 과정을 독립 완료. 넌 결과만 지켜봤다."
+    description_ja: "エージェントがコード→コミット→PRを完全自立で完遂。あなたは結果を見てただけ。"
     icon: ♻️
     category: workflow
     rarity: rare
@@ -1697,8 +2201,14 @@ definitions:
   - id: cycle_master
     name: Ouroboros
     name_cn: 衔尾蛇
+    name_es: "Uróboros"
+    name_ko: "우로보로스"
+    name_ja: "ウロボロス"
     description: Completed 10 full cycles (code → commit → PR). You almost don't need to code anymore.
     description_cn: 累计完成 10 次 Full Cycle（编码→commit→PR）。你几乎不需要写代码了。
+    description_es: "Completaste 10 ciclos completos (código → commit → PR). Casi no necesitas programar nunca más."
+    description_ko: "풀 사이클 10회 완료 (코드 → 커밋 → PR). 이제 코딩이 거의 필요 없다."
+    description_ja: "フルサイクル10回達成（コード→コミット→PR）。もうほとんどコードを書く必要がない。"
     icon: 🔁
     category: workflow
     rarity: mythic
@@ -1718,8 +2228,14 @@ definitions:
   - id: merge_tamer
     name: I'm here to mediate
     name_cn: 我是来劝架的
+    name_es: "Soy el mediador"
+    name_ko: "내가 중재자다"
+    name_ja: "仲裁役は俺だ"
     description: Agent successfully resolved a merge conflict.
     description_cn: agent 成功解决了一次 merge conflict。
+    description_es: "El agente resolvió con éxito un conflicto de merge."
+    description_ko: "에이전트가 병합 충돌을 성공적으로 해결함."
+    description_ja: "エージェントがマージコンフリクトを解決した。"
     icon: ☮️
     category: workflow
     rarity: uncommon
@@ -1736,8 +2252,14 @@ definitions:
   - id: subagent_handler
     name: Pokemon Player
     name_cn: 宝可梦玩家
+    name_es: "Entrenador Pokémon"
+    name_ko: "포켓몬 트레이너"
+    name_ja: "ポケモントレーナー"
     description: Dispatched 25 sub-agents cumulatively.
     description_cn: 累计派出了 25 个子 agent。
+    description_es: "Desplegaste 25 subagentes en total."
+    description_ko: "누적 25개의 서브 에이전트를 투입함."
+    description_ja: "累計25体のサブエージェントを派遣。"
     icon: 🐺
     category: workflow
     rarity: rare
@@ -1754,8 +2276,14 @@ definitions:
   - id: review_regular
     name: Gatekeeper
     name_cn: 守门人
+    name_es: "Guardián"
+    name_ko: "문지기"
+    name_ja: "門番"
     description: Requested 25 code reviews cumulatively. You're the gatekeeper of quality.
     description_cn: 累计请求了 25 次代码审查。你是质量的守门人。
+    description_es: "Solicitaste 25 revisiones de código en total. Eres el guardián de la calidad."
+    description_ko: "누적 25회 코드 리뷰 요청. 넌 품질의 문지기다."
+    description_ja: "累計25回のコードレビューを依頼。あなたは品質の門番だ。"
     icon: 🛡️
     category: workflow
     rarity: uncommon
@@ -1774,8 +2302,14 @@ definitions:
   - id: command_crafter
     name: A New Spell
     name_cn: 新的咒语
+    name_es: "Nuevo Hechizo"
+    name_ko: "새로운 주문"
+    name_ja: "新たな呪文"
     description: Created your first custom slash command.
     description_cn: 创建了你的第一个自定义 slash command。
+    description_es: "Creaste tu primer comando de barra personalizado."
+    description_ko: "첫 번째 커스텀 슬래시 명령어를 만들었습니다."
+    description_ja: "初めてのカスタムスラッシュコマンドを作成。"
     icon: ⚡
     category: creator
     rarity: common
@@ -1793,8 +2327,14 @@ definitions:
   - id: command_library
     name: Command Library
     name_cn: 命令图书馆
+    name_es: "Biblioteca de Comandos"
+    name_ko: "명령 도서관"
+    name_ja: "コマンド図書館"
     description: Created 10 custom commands cumulatively.
     description_cn: 累计创建 10 个自定义命令。
+    description_es: "Creaste 10 comandos personalizados en total."
+    description_ko: "누적 10개의 커스텀 명령어를 만들었습니다."
+    description_ja: "累計10個のカスタムコマンドを作成。"
     icon: 📚
     category: creator
     rarity: rare
@@ -1811,8 +2351,14 @@ definitions:
   - id: skill_creator
     name: Skill Creator
     name_cn: 技能创造者
+    name_es: "Creador de Skills"
+    name_ko: "스킬 제작자"
+    name_ja: "スキルクリエイター"
     description: Created your first custom skill. Your agent's capabilities are defined by you.
     description_cn: 创建了你的第一个自定义 skill。agent 的能力边界由你定义。
+    description_es: "Creaste tu primer skill personalizado. Las capacidades de tu agente las defines tú."
+    description_ko: "첫 번째 커스텀 스킬을 만들었습니다. 에이전트의 능력은 당신이 정의합니다."
+    description_ja: "初めてカスタムスキルを作成しました。エージェントの能力はあなたが決める。"
     icon: ✨
     category: creator
     rarity: common
@@ -1830,8 +2376,14 @@ definitions:
   - id: skill_publisher
     name: Skill Publisher
     name_cn: 技能发布者
+    name_es: "Skill Publicado"
+    name_ko: "스킬 발행"
+    name_ja: "スキル公開"
     description: Published your skill to the community. Sharing is caring.
     description_cn: 将你创建的 skill 发布到社区。分享是美德。
+    description_es: "Publicaste tu skill en la comunidad. Compartir es cuidar."
+    description_ko: "스킬을 커뮤니티에 공개했습니다. 나눔은 배려입니다."
+    description_ja: "スキルをコミュニティに公開しました。共有は思いやり。"
     icon: 📦
     category: creator
     rarity: common
@@ -1846,8 +2398,14 @@ definitions:
   - id: skill_adept
     name: Skill Adept
     name_cn: 技多不压身
+    name_es: "Maestro de Skills"
+    name_ko: "스킬 달인"
+    name_ja: "スキルの達人"
     description: Invoked 5+ distinct skills. More skills, less worries — the master of all trades.
     description_cn: 调用过 5 种以上不同的 skill。技多不压身。
+    description_es: "Invocaste 5 o más skills distintas. A más skills, menos preocupaciones: el experto en todo."
+    description_ko: "5가지 이상의 다양한 스킬을 사용했습니다. 스킬이 많을수록 걱정이 줄어듭니다. 만능의 달인."
+    description_ja: "5種類以上のスキルを呼び出しました。スキルが多ければ悩みも少ない——何でも屋の達人。"
     icon: 🎓
     category: skill
     rarity: uncommon
@@ -1867,8 +2425,14 @@ definitions:
   - id: agent_architect
     name: From the first stirrings of life
     name_cn: 从第一个生命的萌芽开始
+    name_es: "El Despertar"
+    name_ko: "생명의 시작"
+    name_ja: "生命の目覚め"
     description: Created your first custom agent.
     description_cn: 创建了你的第一个自定义 agent。
+    description_es: "Creaste tu primer agente personalizado."
+    description_ko: "첫 번째 커스텀 에이전트를 만들었습니다."
+    description_ja: "初めてカスタムエージェントを作成しました。"
     icon: 🏛️
     category: creator
     rarity: common
@@ -1884,8 +2448,14 @@ definitions:
   - id: hooks_master
     name: Hook Up
     name_cn: 勾勾搭搭
+    name_es: "Enganchado"
+    name_ko: "훅 연결"
+    name_ja: "フックアップ"
     description: Configured agent automation hooks.
     description_cn: 配置了 agent 自动化 hook。
+    description_es: "Configuraste hooks de automatización para tu agente."
+    description_ko: "에이전트 자동화 훅을 구성했습니다."
+    description_ja: "エージェントの自動化フックを設定しました。"
     icon: 🪝
     category: creator
     rarity: common
@@ -1903,8 +2473,14 @@ definitions:
   - id: plugin_explorer
     name: Plug and Play
     name_cn: 即插即用
+    name_es: "Plug and Play"
+    name_ko: "플러그 앤 플레이"
+    name_ja: "プラグ＆プレイ"
     description: Installed an agent plugin.
     description_cn: 安装了Agent插件。
+    description_es: "Instalaste un plugin para tu agente."
+    description_ko: "에이전트 플러그인을 설치했습니다."
+    description_ja: "エージェントプラグインをインストールしました。"
     icon: 🧩
     category: creator
     rarity: common
@@ -1922,8 +2498,14 @@ definitions:
   - id: template_master
     name: Use Template
     name_cn: 用模板
+    name_es: "Plantillero"
+    name_ko: "템플릿 사용"
+    name_ja: "テンプレート使い"
     description: Created more than 1 template.
     description_cn: 创建超过1个模板。
+    description_es: "Creaste más de una plantilla."
+    description_ko: "템플릿을 2개 이상 만들었습니다."
+    description_ja: "2つ以上のテンプレートを作成しました。"
     icon: 📐
     category: creator
     rarity: common
@@ -1940,8 +2522,14 @@ definitions:
   - id: slash_commander
     name: Welcome back, Commander
     name_cn: 欢迎回家，指挥官
+    name_es: "Bienvenido, Comandante"
+    name_ko: "돌아온 사령관"
+    name_ja: "おかえり、司令官"
     description: Used more than 5 different commands.
     description_cn: 使用超过5种不同command。
+    description_es: "Usaste más de 5 comandos distintos."
+    description_ko: "5가지 이상의 다양한 명령어를 사용했습니다."
+    description_ja: "5種類以上の異なるコマンドを使用しました。"
     icon: 🔣
     category: creator
     rarity: rare
@@ -1958,8 +2546,14 @@ definitions:
   - id: ill_do_it_myself
     name: Pissed Off
     name_cn: 怒上心头
+    name_es: "Cabreado"
+    name_ko: "빡침"
+    name_ja: "ブチ切れ"
     description: Rejected 10+ tool calls within 1 hour.
     description_cn: 1 小时内拒绝了超过 10 次工具调用。
+    description_es: "Rechazaste más de 10 llamadas a herramientas en 1 hora."
+    description_ko: "1시간 내에 10회 이상의 도구 호출을 거부했습니다."
+    description_ja: "1時間以内に10回以上のツール呼び出しを拒否しました。"
     icon: 😤
     category: tool_mastery
     rarity: uncommon
@@ -1973,8 +2567,14 @@ definitions:
   - id: perfectionist
     name: Perfectionist
     name_cn: 完美主义者
+    name_es: "Perfeccionista"
+    name_ko: "완벽주의자"
+    name_ja: "完全主義者"
     description: "Same function edited 7+ times. The function asks: what do you even want?"
     description_cn: 同一函数被 Edit ≥ 7 次。函数说：你到底想要什么？
+    description_es: "Editaste la misma función 7+ veces. La función pregunta: ¿qué es lo que realmente quieres?"
+    description_ko: "같은 함수를 7회 이상 수정했습니다. 함수가 묻습니다: 도대체 뭘 원하는 거야?"
+    description_ja: "同じ関数を7回以上編集しました。関数が問いかける：一体何が欲しいんだ？"
     icon: ✨
     category: tool_mastery
     rarity: epic
@@ -1990,8 +2590,14 @@ definitions:
   - id: the_all_nighter
     name: The All-Nighter
     name_cn: 熬夜修仙
+    name_es: "Trasnochada"
+    name_ko: "밤샘 코딩"
+    name_ja: "オールナイト"
     description: Single task lasting over 6 hours. The sun came up and you're still coding.
     description_cn: 单 task 持续 > 6h。太阳升起来，你还在 coding。
+    description_es: "Una sola tarea de más de 6 horas. Salió el sol y tú sigues programando."
+    description_ko: "6시간 넘게 이어진 단일 작업. 해가 떠도 넌 코딩 중."
+    description_ja: "単一タスクが6時間超え。日が昇ってもまだコードを書いている。"
     icon: 🌄
     category: milestones
     rarity: legendary
@@ -2006,8 +2612,14 @@ definitions:
   - id: its_learning
     name: Sitcom
     name_cn: 情景喜剧
+    name_es: "Sitcom"
+    name_ko: "시트콤"
+    name_ja: "コメディ"
     description: Agent output made you laugh — or at least smirk.
     description_cn: agent 的回复把你逗笑了——或至少让你嘴角上扬了。
+    description_es: "La respuesta del agente te hizo reír — o al menos sonreír."
+    description_ko: "AI의 답변에 폭소 — 적어도 입가가 올라간 건 확실하다."
+    description_ja: "エージェントの出力に笑った——いや、せめて微笑んだ。"
     icon: 🤖💬
     category: hidden
     rarity: mythic
@@ -2020,8 +2632,14 @@ definitions:
   - id: agent_collector
     name: Playboy
     name_cn: 花花公子
+    name_es: "Donjuán"
+    name_ko: "바람둥이"
+    name_ja: "プレイボーイ"
     description: Used 3 different AI tools from different vendors simultaneously.
     description_cn: 同时使用过 3 个不同厂商的 AI工具。
+    description_es: "Usaste 3 herramientas de IA de distintos fabricantes a la vez."
+    description_ko: "서로 다른 3개 업체의 AI 도구를 동시에 사용했다."
+    description_ja: "異なるベンダーのAIツールを3つ同時に使った。"
     icon: 🃏
     category: community
     rarity: rare
@@ -2035,8 +2653,14 @@ definitions:
   - id: daily_checkin
     name: Daily Check-In
     name_cn: 每日签到
+    name_es: "Fichaje Diario"
+    name_ko: "출석 체크"
+    name_ja: "日課"
     description: Used daily for 15 days, but only sent one message each time. Just clocking in?
     description_cn: 连续 15 天每天使用但只发一条消息。你是来签到的吗？
+    description_es: "Usado a diario durante 15 días, pero solo un mensaje cada vez. ¿Solo vienes a fichar?"
+    description_ko: "15일 동안 매일 사용했지만 하루에 한 메시지. 그냥 출석 도장만 찍으러 오는 거야?"
+    description_ja: "15日間毎日使ったけど、1回だけメッセージ送信。ログインだけが目的？"
     icon: ✅
     category: milestones
     rarity: epic
@@ -2054,8 +2678,14 @@ definitions:
   - id: tinkerer
     name: Tinkerer
     name_cn: 缝缝补补
+    name_es: "Manitas"
+    name_ko: "땜장이"
+    name_ja: "いじり魔"
     description: Manually edited settings / CLAUDE.md more than 20 times.
     description_cn: settings / CLAUDE.md 手动编辑 > 20 次。
+    description_es: "Has editado la configuración / CLAUDE.md manualmente más de 20 veces."
+    description_ko: "설정 / CLAUDE.md를 수동으로 20회 넘게 수정했다."
+    description_ja: "settings / CLAUDE.md を手動で20回以上編集した。"
     icon: ⚙️
     category: tool_mastery
     rarity: rare
@@ -2069,8 +2699,14 @@ definitions:
   - id: hold_my_beer
     name: Hold My Beer
     name_cn: 看我的！
+    name_es: "Sujétame el Cubata"
+    name_ko: "내가 간다"
+    name_ja: "見てろよ"
     description: Used dangerously-skip-permissions. You know what you're doing, right?
     description_cn: 使用了 dangerously-skip-permissions。你知道自己在做什么，对吧？
+    description_es: "Usaste dangerously-skip-permissions. Sabes lo que haces, ¿verdad?"
+    description_ko: "dangerously-skip-permissions을 사용했다. 뭘 하고 있는 건 알지?"
+    description_ja: "dangerously-skip-permissions を使った。何やってるか分かってるよな？"
     icon: 🍺
     category: hidden
     rarity: uncommon
@@ -2083,8 +2719,14 @@ definitions:
   - id: execute_order_66
     name: Wrath of God
     name_cn: 神之愤怒
+    name_es: "Ira de Dios"
+    name_ko: "신의 분노"
+    name_ja: "神の怒り"
     description: Agent executed kill -9.
     description_cn: agent 执行了 kill -9。
+    description_es: "El agente ejecutó kill -9."
+    description_ko: "에이전트가 kill -9를 실행했다."
+    description_ja: "エージェントが kill -9 を実行した。"
     icon: 💀
     category: hidden
     rarity: common
@@ -2098,8 +2740,14 @@ definitions:
   - id: rewriting_history
     name: Rewriting History
     name_cn: 改写历史
+    name_es: "Reescribiendo la Historia"
+    name_ko: "역사 다시 쓰기"
+    name_ja: "歴史書き換え"
     description: Agent executed git push --force.
     description_cn: agent 执行了 git push --force。
+    description_es: "El agente ejecutó git push --force."
+    description_ko: "에이전트가 git push --force를 실행했다."
+    description_ja: "エージェントが git push --force を実行した。"
     icon: ⏰
     category: hidden
     rarity: common
@@ -2113,8 +2761,14 @@ definitions:
   - id: im_root
     name: Three Laws of Robotics
     name_cn: 机器人三定律
+    name_es: "Tres Leyes de la Robótica"
+    name_ko: "로봇 3원칙"
+    name_ja: "ロボット三原則"
     description: Agent ran sudo for the first time.
     description_cn: agent 第一次执行了 sudo。
+    description_es: "El agente ejecutó sudo por primera vez."
+    description_ko: "에이전트가 처음으로 sudo를 실행했다."
+    description_ja: "エージェントが初めて sudo を実行した。"
     icon: 👑
     category: hidden
     rarity: common
@@ -2128,8 +2782,14 @@ definitions:
   - id: art_of_letting_go
     name: The Art of Letting Go
     name_cn: 断舍离
+    name_es: "El Arte de Soltar"
+    name_ko: "놓아주는 법"
+    name_ja: "断捨離"
     description: Agent ran rm -rf. Let it go. All of it.
     description_cn: agent 执行了 rm -rf。断舍离——该扔的，一个不留。
+    description_es: "El agente ejecutó rm -rf. Suéltalo todo. Todo."
+    description_ko: "에이전트가 rm -rf를 실행했다. 다 놓아라. 전부."
+    description_ja: "エージェントが rm -rf を実行した。手放せ。すべてを。"
     icon: 🔥
     category: hidden
     rarity: uncommon
@@ -2143,8 +2803,14 @@ definitions:
   - id: moving_company
     name: Moving Company
     name_cn: 搬家公司
+    name_es: "Mudanzas Express"
+    name_ko: "파일 이사"
+    name_ja: "引越し屋"
     description: Agent ran mv. New place, new path, same file.
     description_cn: agent 执行了 mv。新家新路径，文件还是那个文件。
+    description_es: "El agente ejecutó mv. Casa nueva, ruta nueva, mismo archivo."
+    description_ko: "mv 실행. 새 집, 새 경로, 같은 파일."
+    description_ja: "mvを実行。新しい場所、新しいパス、同じファイル。"
     icon: 📦
     category: hidden
     rarity: uncommon
@@ -2158,8 +2824,14 @@ definitions:
   - id: sharingan
     name: Sharingan
     name_cn: 写轮眼
+    name_es: "Sharingan"
+    name_ko: "사륜안"
+    name_ja: "写輪眼"
     description: Agent ran cp. Copy ninjutsu — why rewrite when you can copy?
     description_cn: agent 执行了 cp。复制忍术——能复印，为什么要重写？
+    description_es: "El agente ejecutó cp. Ninjutsu de copia — ¿para qué reescribir cuando puedes copiar?"
+    description_ko: "cp 실행. 기술 복사 — 베껴도 되는데 왜 다시 쓰겠어?"
+    description_ja: "cpを実行。コピー忍術——コピーできるのに、なぜ書く？"
     icon: 🖨️
     category: hidden
     rarity: uncommon
@@ -2173,8 +2845,14 @@ definitions:
   - id: inventory_check
     name: Inventory Check
     name_cn: 仓储检查
+    name_es: "Inventario"
+    name_ko: "용량 체크"
+    name_ja: "在庫確認"
     description: Agent ran df or du. Who's been hoarding all the gigabytes?
     description_cn: agent 执行了 df 或 du。来，盘点一下——谁占了这么多货架？
+    description_es: "El agente ejecutó df o du. ¿Quién ha estado acaparando todos los gigabytes?"
+    description_ko: "df 또는 du 실행. 누가 기가바이트를 다 차지한 거야?"
+    description_ja: "dfまたはduを実行。誰がギガバイトを独占してる？"
     icon: 📊
     category: hidden
     rarity: uncommon
@@ -2188,8 +2866,14 @@ definitions:
   - id: my_turf_my_rules
     name: My Turf, My Rules
     name_cn: 我的地盘我做主
+    name_es: "Mi Barrio, Mis Reglas"
+    name_ko: "내 땅 내 법칙"
+    name_ja: "俺の縄張り"
     description: Agent ran chmod. Permissions? I am the permission.
     description_cn: agent 执行了 chmod。权限？我就是权限。
+    description_es: "El agente ejecutó chmod. ¿Permisos? Los permisos soy yo."
+    description_ko: "chmod 실행. 권한? 내가 곧 권한이다."
+    description_ja: "chmodを実行。権限？俺こそが権限だ。"
     icon: 🔓
     category: hidden
     rarity: uncommon
@@ -2203,8 +2887,14 @@ definitions:
   - id: peek_a_boo
     name: Peek-a-Boo
     name_cn: 管中窥豹
+    name_es: "Un Vistazo"
+    name_ko: "살짝 보기"
+    name_ja: "チラ見"
     description: Agent ran head. Just checking the top — nothing wrong with that.
     description_cn: agent 执行了 head。就看个开头——管中窥豹，可见一斑。
+    description_es: "El agente ejecutó head. Solo echar un vistazo al principio — no hay nada malo en eso."
+    description_ko: "head 실행. 앞부분만 — 나쁠 건 없잖아?"
+    description_ja: "headを実行。最初だけチラ見——悪くないだろ？"
     icon: 👀
     category: hidden
     rarity: uncommon
@@ -2218,8 +2908,14 @@ definitions:
   - id: stalker
     name: Stalker
     name_cn: 尾行者
+    name_es: "La Sombra"
+    name_ko: "스토커"
+    name_ja: "ストーカー"
     description: Agent ran tail. Following every new line like a shadow.
     description_cn: agent 执行了 tail。如影随形地跟踪文件的每一行新输出。
+    description_es: "El agente ejecutó tail. Siguiendo cada nueva línea como una sombra."
+    description_ko: "tail 실행. 그림자처럼 모든 새 줄을 따라간다."
+    description_ja: "tailを実行。影のように新しい行を追いかける。"
     icon: 🐾
     category: hidden
     rarity: uncommon
@@ -2233,8 +2929,14 @@ definitions:
   - id: snake_charmer
     name: Snake Charmer
     name_cn: 耍蛇人
+    name_es: "Encantador de Serpientes"
+    name_ko: "뱀술사"
+    name_ja: "蛇使い"
     description: Read 100 Python files.
     description_cn: 读取了 100 个 Python 文件。
+    description_es: "Leyó 100 archivos de Python."
+    description_ko: "Python 파일 100개 읽음."
+    description_ja: "Pythonファイルを100個読み込む。"
     icon: 🐍
     category: tool_mastery
     rarity: uncommon
@@ -2250,8 +2952,14 @@ definitions:
   - id: gopher_gang
     name: Gopher Gang
     name_cn: Gopher 帮
+    name_es: "Pandilla Gopher"
+    name_ko: "고퍼 갱"
+    name_ja: "Gopher一味"
     description: Read 100 Go files. Simple, efficient, concurrent — you know.
     description_cn: 读取了 100 个 Go 文件。简单、高效、并发——你懂。
+    description_es: "Leyó 100 archivos de Go. Simple, eficiente, concurrente — ya sabes."
+    description_ko: "Go 파일 100개 읽음. 단순, 효율, 동시성 — 알지?"
+    description_ja: "Goファイルを100個読み込む。シンプル、効率的、並行処理——わかるでしょ？"
     icon: 🐹
     category: tool_mastery
     rarity: uncommon
@@ -2267,8 +2975,14 @@ definitions:
   - id: rustacean
     name: Rustacean
     name_cn: 锈粉
+    name_es: "Rustáceo"
+    name_ko: "러스티션"
+    name_ja: "ラスティーシャン"
     description: Read 100 Rust files.
     description_cn: 读取了 100 个 Rust 文件。
+    description_es: "Leyó 100 archivos de Rust."
+    description_ko: "Rust 파일 100개 읽음."
+    description_ja: "Rustファイルを100個読み込む。"
     icon: 🦀
     category: tool_mastery
     rarity: uncommon
@@ -2284,8 +2998,14 @@ definitions:
   - id: js_everywhere
     name: JS Everywhere
     name_cn: JS 无处不在
+    name_es: "JS en Todas Partes"
+    name_ko: "JS의 지배"
+    name_ja: "JS無双"
     description: Read 100 JavaScript / TypeScript files. Frontend, backend — everywhere.
     description_cn: 读取了 100 个 JavaScript/TypeScript 文件。前端后端，无所不在。
+    description_es: "Leyó 100 archivos de JavaScript/TypeScript. Frontend, backend — en todas partes."
+    description_ko: "JavaScript/TypeScript 파일 100개 읽음. 프론트엔드, 백엔드 — 어디에나."
+    description_ja: "JavaScript/TypeScriptファイルを100個読み込む。フロントエンド、バックエンド——どこでも。"
     icon: 📜
     category: tool_mastery
     rarity: uncommon
@@ -2303,8 +3023,14 @@ definitions:
   - id: true_vibe_coder
     name: True Vibe Coder
     name_cn: 真·Vibe Coder
+    name_es: "Vibe Coder Auténtico"
+    name_ko: "진정한 바이브 코더"
+    name_ja: "真のバイブコーダー"
     description: Skip permissions + write code + commit + PR, all in one smooth flow. Complete trust, complete vibe.
     description_cn: skip permissions + 写代码 + commit + PR，一气呵成。完全的信任，完全的 vibe。
+    description_es: "Saltas permisos + escribes código + haces commit + PR, todo de un tirón. Confianza total, vibe total."
+    description_ko: "권한 건너뛰기 + 코드 작성 + 커밋 + PR까지 한 번에. 완전한 신뢰, 완전한 바이브."
+    description_ja: "権限スキップ + コード作成 + commit + PR、すべて一気通貫。完全な信頼、完全なバイブ。"
     icon: 🌊
     category: hidden
     rarity: epic
@@ -2320,8 +3046,14 @@ definitions:
   - id: lucky_777
     name: Lucky 777
     name_cn: 幸运777
+    name_es: "Suerte 777"
+    name_ko: "럭키 777"
+    name_ja: "ラッキー777"
     description: Agent output was 777–799 tokens. Go buy a lottery ticket.
     description_cn: agent 某次输出在 777–799 tokens 之间。今天去抽卡。
+    description_es: "La salida del agente fue de 777 a 799 tokens. Ve a comprar un billete de lotería."
+    description_ko: "에이전트 출력이 777–799 토큰이었습니다. 복권 한 장 사보세요."
+    description_ja: "エージェントの出力が777～799トークンでした。宝くじを買いましょう。"
     icon: 🎰
     category: hidden
     rarity: epic
@@ -2337,8 +3069,14 @@ definitions:
   - id: im_sorry_dave
     name: I'm Sorry, Dave
     name_cn: 抱歉 Dave
+    name_es: "Lo Siento, Dave"
+    name_ko: "미안해, 데이브"
+    name_ja: "ごめん、デイブ"
     description: Agent refused you.
     description_cn: agent 拒绝了你。
+    description_es: "El agente te ha rechazado."
+    description_ko: "에이전트가 당신을 거절했습니다."
+    description_ja: "エージェントに拒否されました。"
     icon: 🔴
     category: hidden
     rarity: epic
@@ -2356,8 +3094,14 @@ definitions:
   - id: please_maybe
     name: Pretty Please?
     name_cn: 说"请"
+    name_es: "¿Por Favor?"
+    name_ko: "제발요?"
+    name_ja: "お願い"
     description: Said "please" in a prompt — and the agent actually listened.
     description_cn: 在 prompt 中说了"请"——agent 居然真的听了。
+    description_es: "Dijiste 'por favor' en un prompt… y el agente te hizo caso."
+    description_ko: "프롬프트에 '제발'이라고 썼더니 에이전트가 실제로 들어줬어요."
+    description_ja: "プロンプトで「お願い」と言ったら、エージェントが聞いてくれた。"
     icon: 🙏
     category: hidden
     rarity: uncommon
@@ -2369,8 +3113,14 @@ definitions:
   - id: say_please
     name: Mind Your Manners
     name_cn: 讲礼貌
+    name_es: "Buenos Modales"
+    name_ko: "예의 바르게"
+    name_ja: "お行儀よく"
     description: Said "please" 5 times. Your agent appreciates the courtesy.
     description_cn: 说了 5 次"请"。你的 agent 欣赏你的礼貌。
+    description_es: "Dijiste 'por favor' 5 veces. Tu agente aprecia la cortesía."
+    description_ko: "'제발'을 5번 말했습니다. 에이전트가 당신의 예의를 고마워합니다."
+    description_ja: "「お願い」を5回言いました。エージェントも礼儀は嬉しいものです。"
     icon: 🎩
     category: style
     rarity: rare
@@ -2385,8 +3135,14 @@ definitions:
   - id: magic_word
     name: Abracadabra
     name_cn: 急急如律令
+    name_es: "Abracadabra"
+    name_ko: "아브라카다브라"
+    name_ja: "アブラカダブラ"
     description: Said "abracadabra" or "open sesame" in a prompt. Is that a magic word?
     description_cn: 在 prompt 中说了"急急如律令"或"芝麻开门"。咒语真的有用吗？
+    description_es: "Dijiste 'abracadabra' o 'ábrete sésamo' en un prompt. ¿Será una palabra mágica?"
+    description_ko: "프롬프트에 '아브라카다브라' 또는 '열려라 참깨'라고 했나요? 그게 진짜 주문일까?"
+    description_ja: "プロンプトで「アブラカダブラ」か「開けゴマ」と言った。魔法の言葉なのか？"
     icon: ✨
     category: hidden
     rarity: rare
@@ -2398,8 +3154,14 @@ definitions:
   - id: swear_jar
     name: Swear Jar
     name_cn: 脏话罐
+    name_es: "Alcancía de Groserías"
+    name_ko: "욕설 항아리"
+    name_ja: "罰金箱"
     description: Dropped a swear word in a prompt. That'll be $1 in the jar.
     description_cn: 在 prompt 里说了脏话。往罐子里交 1 块钱。
+    description_es: "¿Dijiste una grosería en el prompt? Un dólar a la alcancía."
+    description_ko: "프롬프트에 욕설을 썼네요. 항아리에 1달러 넣으세요."
+    description_ja: "プロンプトで悪態をつきました。罰金箱に1ドルです。"
     icon: 🏺
     category: hidden
     rarity: uncommon
@@ -2411,8 +3173,14 @@ definitions:
   - id: sweet_troubles
     name: Sweet & Troubles
     name_cn: 甜蜜与烦恼
+    name_es: "Dulces Problemas"
+    name_ko: "달콤한 고민"
+    name_ja: "甘い悩み"
     description: Your first message in this session mentioned your significant other. Sweet, but also a bit of trouble.
     description_cn: 你在本 session 的第一条消息就提到了另一半——甜蜜，也是烦恼。
+    description_es: "Tu primer mensaje en esta sesión mencionó a tu pareja. Dulce, pero también un problema."
+    description_ko: "이번 세션의 첫 메시지에서 연인을 언급했네요. 달콤하지만, 약간의 고민도."
+    description_ja: "このセッションの最初のメッセージで大切な人について言及。甘くて、ちょっと厄介。"
     icon: 💕
     category: hidden
     rarity: rare
@@ -2426,8 +3194,14 @@ definitions:
   - id: cheat_code
     name: Cheat Code
     name_cn: 作弊码
+    name_es: "Código Secreto"
+    name_ko: "치트 코드"
+    name_ja: "チートコード"
     description: Read one of the core files of the achievement system. You're peeking under the hood.
     description_cn: 读取了成就系统的核心文件之一。你在偷看引擎盖下的秘密。
+    description_es: "Leíste uno de los archivos centrales del sistema de logros. Estás viendo lo que hay debajo del capó."
+    description_ko: "업적 시스템의 핵심 파일 중 하나를 읽었습니다. 후드 아래를 들여다보고 있군요."
+    description_ja: "実績システムの中核ファイルの一つを読みました。ボンネットの下を覗いています。"
     icon: 🎮
     category: hidden
     rarity: common
@@ -2442,8 +3216,14 @@ definitions:
   - id: creative_mode
     name: Creative Mode
     name_cn: 创造模式
+    name_es: "Modo Creativo"
+    name_ko: "크리에이티브 모드"
+    name_ja: "クリエイティブモード"
     description: Edited one of the core files of the achievement system. Creative freedom — unlocked.
     description_cn: 编辑了成就系统的核心文件之一。创造模式——已解锁。
+    description_es: "Editaste uno de los archivos centrales del sistema de logros. Libertad creativa — desbloqueada."
+    description_ko: "업적 시스템의 핵심 파일 중 하나를 편집했습니다. 창작의 자유 — 해제되었습니다."
+    description_ja: "実績システムの中核ファイルの一つを編集しました。創造の自由 — アンロック。"
     icon: 🛠️
     category: hidden
     rarity: rare
@@ -2458,8 +3238,14 @@ definitions:
   - id: tl_dr
     name: TL;DR
     name_cn: 太长不看
+    name_es: "TL;DR"
+    name_ko: "TL;DR"
+    name_ja: "TL;DR"
     description: Asked the agent to summarize something. Classic.
     description_cn: 让 agent 摘要什么东西。经典操作。
+    description_es: "Le pediste al agente que resumiera algo. Clásico."
+    description_ko: "에이전트에게 요약을 부탁했다. 클래식."
+    description_ja: "エージェントに要約を頼んだ。鉄板。"
     icon: 📋
     category: style
     rarity: common
@@ -2477,8 +3263,14 @@ definitions:
   - id: early_bird
     name: Early Bird
     name_cn: 早起的鸟儿有虫吃
+    name_es: "Madrugador"
+    name_ko: "일찍 일어나는 새"
+    name_ja: "早起き鳥"
     description: Started a session in the early morning (6:00-9:00). The early bird gets the worm.
     description_cn: 某次在清晨 (6:00-9:00) 启动了 session。早起的鸟儿有虫吃。
+    description_es: "Iniciaste una sesión en la madrugada (6:00-9:00). A quien madruga, Dios le ayuda."
+    description_ko: "이른 아침(6:00-9:00)에 세션을 시작했다. 일찍 일어나는 새가 벌레를 잡는다."
+    description_ja: "早朝(6:00-9:00)にセッションを開始した。早起きは三文の徳。"
     icon: 🐦
     category: style
     rarity: uncommon
@@ -2492,8 +3284,14 @@ definitions:
   - id: midas_touch
     name: Midas Touch
     name_cn: 点石成金
+    name_es: "Toque de Midas"
+    name_ko: "미다스의 손"
+    name_ja: "ミダスタッチ"
     description: Edited 20+ files in a single task.
     description_cn: 单 task 中编辑了 20+ 个文件。
+    description_es: "Editaste más de 20 archivos en una sola tarea."
+    description_ko: "단일 작업에서 20개 이상의 파일을 수정했다."
+    description_ja: "1つのタスクで20以上のファイルを編集した。"
     icon: 🪙
     category: tool_mastery
     rarity: epic
@@ -2508,8 +3306,14 @@ definitions:
   - id: rubber_duck
     name: Rubber Duck
     name_cn: 橡皮小黄鸭
+    name_es: "Pato de Goma"
+    name_ko: "러버덕"
+    name_ja: "ラバーダック"
     description: Agent sent 20+ messages in a single session. It's your chatty debugging buddy.
     description_cn: 单 session 中 agent 发送了 20+ 条消息。它是个爱说话的 debugging 伙伴。
+    description_es: "El agente te envió más de 20 mensajes en una sesión. Tu compañero parlanchín de debugging."
+    description_ko: "단일 세션에서 에이전트가 20개 이상의 메시지를 보냈다. 수다스러운 디버깅 친구."
+    description_ja: "1セッションでエージェントが20以上のメッセージを送信。おしゃべりなデバッグ仲間。"
     icon: 🦆
     category: hidden
     rarity: uncommon
@@ -2524,8 +3328,14 @@ definitions:
   - id: the_negotiator
     name: The Negotiator
     name_cn: 谈判专家
+    name_es: "El Negociador"
+    name_ko: "협상가"
+    name_ja: "交渉人"
     description: Agent refused you at first, but accepted after you rephrased. Communication is an art.
     description_cn: agent 第一次拒绝了你的请求，换个说法它就接受了。沟通是一门艺术。
+    description_es: "El agente te rechazó al principio, pero aceptó cuando reformulaste la petición. La comunicación es un arte."
+    description_ko: "에이전트가 처음엔 거절했지만 표현을 바꾸자 수락했다. 소통은 예술이다."
+    description_ja: "エージェントに一度断られたが、言い方を変えたら通った。コミュニケーションは芸術。"
     icon: 🤝
     category: skill
     rarity: uncommon
@@ -2540,8 +3350,14 @@ definitions:
   - id: u_turn
     name: Remastered
     name_cn: 重制版
+    name_es: "Remasterizado"
+    name_ko: "리마스터"
+    name_ja: "リマスター"
     description: Had your agent revert and start over in a new direction. Starting over takes courage — and knowing what you want.
     description_cn: 主动让 agent revert 后换方向重新实现。推翻重来需要勇气，也说明你明确知道自己要什么。
+    description_es: "Le pediste al agente que deshiciera todo y empezara de nuevo. Empezar de cero requiere valor y tener claro lo que quieres."
+    description_ko: "에이전트를 롤백시키고 다른 방향으로 다시 시작하게 했다. 다시 시작하려면 용기와 확신이 필요하다."
+    description_ja: "エージェントに元に戻させて別の方向から再スタート。やり直すには勇気と確固たる意志が必要。"
     icon: ↩️
     category: workflow
     rarity: uncommon
@@ -2556,8 +3372,14 @@ definitions:
   - id: silent_partner
     name: Guy in the Chair
     name_cn: 幕后搭档
+    name_es: "El Tipo en la Silla"
+    name_ko: "배후의 사나이"
+    name_ja: "指令室の男"
     description: Agent edited files and completed a task — you just watched. Pure delegation.
     description_cn: agent 编辑了文件并完成了一个 task——你只是看着。纯粹的委派。
+    description_es: "El agente editó archivos y completó una tarea mientras tú solo mirabas. Delegación pura."
+    description_ko: "에이전트가 파일을 수정하고 작업을 완료했다. 당신은 그저 지켜봤다. 순수한 위임."
+    description_ja: "エージェントがファイルを編集してタスクを完了。あなたはただ見ていただけ。純粋な委任。"
     icon: 🤐
     category: style
     rarity: rare
@@ -2574,8 +3396,14 @@ definitions:
   - id: time_traveler
     name: Time Traveler
     name_cn: 时间旅者
+    name_es: "Viajero en el Tiempo"
+    name_ko: "타임 트래블러"
+    name_ja: "タイムトラベラー"
     description: Agent successfully used git bisect to find a bug. Traversing git history to find the culprit.
     description_cn: agent 成功使用了 git bisect 定位 bug。穿越 git 历史，找出真凶。
+    description_es: "El agente usó git bisect para encontrar un bug. Viajando por el historial de git para hallar al culpable."
+    description_ko: "에이전트가 git bisect를 성공적으로 사용해 버그를 찾았다. git 역사를 넘나들며 범인을 추적했다."
+    description_ja: "エージェントがgit bisectを使ってバグを特定した。gitの歴史を旅して犯人を追う。"
     icon: ⏳
     category: workflow
     rarity: epic
@@ -2589,8 +3417,14 @@ definitions:
   - id: regex_sorcerer
     name: Regex Sorcerer
     name_cn: 正则术士
+    name_es: "Hechicero de Regex"
+    name_ko: "정규식 마법사"
+    name_ja: "正規表現の魔術師"
     description: Agent wrote a regex command.
     description_cn: agent 写出了一条正则表达式命令。
+    description_es: "El agente escribió una expresión regular. Magia negra."
+    description_ko: "에이전트가 정규식 명령어를 작성했다."
+    description_ja: "エージェントが正規表現コマンドを書いた。"
     icon: 🧙‍♂️
     category: tool_mastery
     rarity: uncommon
@@ -2604,8 +3438,14 @@ definitions:
   - id: friday_deploy
     name: Thank God It's Friday
     name_cn: 周五还不下班
+    name_es: "TGIF"
+    name_ko: "TGIF"
+    name_ja: "TGIF"
     description: Git push on Friday afternoon.
     description_cn: 周五下午还在git  push。
+    description_es: "Git push un viernes por la tarde."
+    description_ko: "금요일 오후에 git push를 했다."
+    description_ja: "金曜日の午後にgit pushした。"
     icon: 🍸
     category: milestones
     rarity: uncommon
@@ -2619,8 +3459,14 @@ definitions:
   - id: infinite_loop
     name: Infinite Loop
     name_cn: 无限循环
+    name_es: "Bucle Infinito"
+    name_ko: "무한 루프"
+    name_ja: "無限ループ"
     description: A command took over 60 seconds. Patience is a virtue... or an infinite loop.
     description_cn: 一个命令执行超过了 60 秒。耐心，是一种美德……也可能是死循环。
+    description_es: "Un comando tardó más de 60 segundos. La paciencia es una virtud... o un bucle infinito."
+    description_ko: "명령어가 60초 넘게 걸렸습니다. 인내심은 미덕... 아니면 무한 루프."
+    description_ja: "コマンドが60秒以上かかりました。忍耐は美徳……あるいは無限ループ。"
     icon: ♾️
     category: hidden
     rarity: uncommon
@@ -2635,8 +3481,14 @@ definitions:
   - id: undying_curiosity
     name: Undying Curiosity
     name_cn: 不死的好奇心
+    name_es: "Curiosidad Eterna"
+    name_ko: "불멸의 호기심"
+    name_ja: "不滅の好奇心"
     description: 50 different searches in a single session. What are you even researching?
     description_cn: 单 session 中发起了 50 次不同的搜索。你到底在研究什么？
+    description_es: "50 búsquedas distintas en una sola sesión. ¿Qué estás investigando?"
+    description_ko: "한 세션에서 50번의 검색을 수행했습니다. 대체 뭘 연구하는 거예요?"
+    description_ja: "1セッションで50回の検索。いったい何を調べているの？"
     icon: 🔬
     category: tool_mastery
     rarity: epic
@@ -2652,8 +3504,14 @@ definitions:
   - id: oops_all_bash
     name: Oops, All Bash!
     name_cn: 全是命令行
+    name_es: "Oops, Todo Bash"
+    name_ko: "이런, 온통 Bash"
+    name_ja: "ああ、全部Bash"
     description: Ran 50+ bash commands in a single session. Living in the terminal.
     description_cn: 一个 session 里跑了 50+ 条命令行。住在终端里了。
+    description_es: "Ejecutaste 50+ comandos bash en una sesión. Viviendo en la terminal."
+    description_ko: "한 세션에서 50개 이상의 bash 명령어를 실행했습니다. 터미널에 살고 있군요."
+    description_ja: "1セッションで50以上のbashコマンドを実行。ターミナルに住み着いてる。"
     icon: 💻
     category: hidden
     rarity: epic
@@ -2667,8 +3525,14 @@ definitions:
   - id: deepseek_dabbler
     name: Whale Song
     name_cn: 鲸歌
+    name_es: "Canto de Ballena"
+    name_ko: "고래의 노래"
+    name_ja: "クジラの歌"
     description: Used a DeepSeek model at least once. Diving into new waters.
     description_cn: 用过一次 DeepSeek 模型。潜入了新的海域。
+    description_es: "Usaste un modelo DeepSeek al menos una vez. Buceando en aguas nuevas."
+    description_ko: "DeepSeek 모델을 한 번이라도 사용했습니다. 새로운 바다로 잠수합니다."
+    description_ja: "DeepSeekモデルを少なくとも1回使用。新しい海域へのダイブ。"
     icon: 🌊
     category: hidden
     rarity: common
@@ -2685,8 +3549,14 @@ definitions:
   - id: file_type_sampler
     name: Type Sampler
     name_cn: 文件类型收集者
+    name_es: "Muestrario de Tipos"
+    name_ko: "파일 수집가"
+    name_ja: "タイプコレクター"
     description: Created files of 5+ different types in one session.
     description_cn: 同一个 session 创建了 5 种以上不同类型的文件。
+    description_es: "Creaste archivos de 5+ tipos distintos en una sola sesión."
+    description_ko: "한 세션에서 5가지 이상의 파일 형식을 생성했습니다."
+    description_ja: "1セッションで5種類以上のファイルを作成。"
     icon: 🎨
     category: hidden
     rarity: uncommon
@@ -2701,9 +3571,15 @@ definitions:
   - id: clockwork_orange
     name: A Clockwork Orange
     name_cn: 发条橙
+    name_es: "La Naranja Mecánica"
+    name_ko: "시계태엽 오렌지"
+    name_ja: "時計じかけのオレンジ"
     description: Activated automode 3 times. Like Alex, your agent runs on clockwork now — a little ultraviolence, a little
       automation.
     description_cn: 累计激活 automode 3 次。你的 agent 像发条一样自动运转——带着一点超暴力和一点机械感。
+    description_es: "Activaste el automodo 3 veces. Como Alex, tu agente funciona a cuerda — un poco de ultraviolencia, un poco de automatización."
+    description_ko: "자동 모드를 3회 활성화했습니다. 알렉스처럼, 당신의 에이전트는 시계태엽으로 움직입니다 — 약간의 울트라바이올렌스, 약간의 자동화."
+    description_ja: "オートモードを3回起動。アレックスのように、エージェントはゼンマイ仕掛け——少しのウルトラバイオレンスと、少しの自動化。"
     icon: 🍊
     category: hidden
     rarity: common
@@ -2720,8 +3596,14 @@ definitions:
   - id: whale_song
     name: Orca
     name_cn: 杀手鲸
+    name_es: "Orca"
+    name_ko: "범고래"
+    name_ja: "シャチ"
     description: Completed a task using a DeepSeek model. The deep sea hums — and you listened.
     description_cn: 使用 DeepSeek 模型完成了一个 task。深海在低语——而你听见了。
+    description_es: "Completaste una tarea usando un modelo DeepSeek. El mar profundo zumba — y tú escuchaste."
+    description_ko: "DeepSeek 모델로 작업을 완료했습니다. 깊은 바다가 울리고 — 당신은 귀 기울였습니다."
+    description_ja: "DeepSeekモデルでタスクを完了。深海が唸る——そしてあなたは耳を傾けた。"
     icon: 🐋
     category: hidden
     rarity: common
@@ -2740,8 +3622,14 @@ definitions:
   - id: mathematical_theory_of_communication
     name: A Mathematical Theory of Communication
     name_cn: 通信的数学理论
+    name_es: "Una Teoría Matemática de la Comunicación"
+    name_ko: "통신의 수학적 이론"
+    name_ja: "通信の数学的理論"
     description: Completed a task using a Claude model. Shannon laid the foundation, Claude carries the signal.
     description_cn: 使用 Claude 模型完成了一个 task。香农奠基，Claude传信。
+    description_es: "Completaste una tarea usando un modelo Claude. Shannon sentó las bases, Claude lleva la señal."
+    description_ko: "Claude 모델로 작업을 완료했습니다. 섀넌이 기초를 놓고, Claude가 신호를 전합니다."
+    description_ja: "Claudeモデルでタスクを完了。シャノンが基礎を築き、Claudeが信号を伝える。"
     icon: 📡
     category: hidden
     rarity: common
@@ -2760,8 +3648,14 @@ definitions:
   - id: blossom
     name: Blossom
     name_cn: 花朵
+    name_es: "Floración"
+    name_ko: "꽃"
+    name_ja: "花"
     description: Completed a task using a GPT model. Like a flower seeking sunlight, the model reached for the right answer.
     description_cn: 使用 GPT 模型完成了一个 task。如花向阳光，模型向答案。
+    description_es: "Completaste una tarea usando un modelo GPT. Como una flor buscando el sol, el modelo alcanzó la respuesta correcta."
+    description_ko: "GPT 모델로 작업을 완료했습니다. 햇빛을 찾는 꽃처럼, 모델이 정답을 향해 피어났습니다."
+    description_ja: "GPTモデルでタスクを完了。太陽を求める花のように、モデルは正解に手を伸ばした。"
     icon: 🌸
     category: hidden
     rarity: common
@@ -2780,8 +3674,14 @@ definitions:
   - id: alien
     name: Alien
     name_cn: 异形
+    name_es: "Alien"
+    name_ko: "에일리언"
+    name_ja: "エイリアン"
     description: Your first sub-agent spawned. In space, no one can hear you scream… but the event log caught it.
     description_cn: 你第一次 spawn 了 sub-agent。在太空中，没人听得到你的尖叫……但 event log 记下来了。
+    description_es: "Tu primer sub-agente apareció. En el espacio, nadie puede oír tus gritos… pero el registro de eventos lo capturó."
+    description_ko: "첫 번째 하위 에이전트가 생성되었습니다. 우주에서는 아무도 당신의 비명을 듣지 못합니다… 하지만 이벤트 로그는 기록했습니다."
+    description_ja: "最初のサブエージェントが生成されました。宇宙では誰も悲鳴を聞き取れない……でもイベントログは記録した。"
     icon: 👾
     category: hidden
     rarity: common
@@ -2799,8 +3699,14 @@ definitions:
   - id: fifth_element
     name: The Fifth Element
     name_cn: 第五元素
+    name_es: "El Quinto Elemento"
+    name_ko: "다섯 번째 원소"
+    name_ja: "第五の元素"
     description: "Used 5+ different tools in a single task. Earth, water, fire, air… and the fifth: you. All elements united."
     description_cn: 同一个 task 里调用了 5 种以上不同的工具。地、水、火、风……第五元素就是你。五行齐聚，万物合一。
+    description_es: "Usaste 5 o más herramientas distintas en una sola tarea. Tierra, agua, fuego, aire... y el quinto: tú. Todos los elementos unidos."
+    description_ko: "하나의 태스크에서 5개 이상의 도구를 사용했습니다. 땅, 물, 불, 바람... 그리고 다섯 번째는 바로 당신. 모든 원소가 하나로 합쳐졌습니다."
+    description_ja: "1つのタスクで5種類以上のツールを使用。地、水、火、風…そして第五の元素、それはあなた。すべての元素が融合した。"
     icon: 💫
     category: hidden
     rarity: rare
@@ -2818,8 +3724,14 @@ definitions:
   - id: dragonborn
     name: Dragonborn
     name_cn: 龙裔
+    name_es: "Sangre de Dragón"
+    name_ko: "드래곤본"
+    name_ja: "ドラゴンボーン"
     description: Read 337 distinct files. You've read every book in the College of Winterhold. FUS RO DAH!
     description_cn: 累计阅读了 337 个不同的文件。冬堡学院的所有藏书你都翻遍了。伏斯洛达！
+    description_es: "Leíste 337 archivos distintos. Has leído todos los libros del Colegio de Invernalia. ¡FUS RO DAH!"
+    description_ko: "337개의 서로 다른 파일을 읽었습니다. 윈터홀드 대학의 책을 모조리 읽어치웠군요. FUS RO DAH!"
+    description_ja: "337個の異なるファイルを読破。冬包大学の蔵書をすべて読み尽くした。FUS RO DAH!"
     icon: 🐉
     category: hidden
     rarity: epic
@@ -2837,8 +3749,14 @@ definitions:
   - id: meltdown
     name: Meltdown
     name_cn: 熔断
+    name_es: "Colapso"
+    name_ko: "폭주"
+    name_ja: "メルトダウン"
     description: 5 tool failures in a single session. Someone's having a rough day.
     description_cn: 单 session 中 5 次工具失败。今天诸事不顺。
+    description_es: "5 fallos de herramientas en una sola sesión. Alguien tuvo un día difícil."
+    description_ko: "단일 세션에서 도구가 5번 실패했습니다. 오늘 왠지 운이 없었나 보네요."
+    description_ja: "1回のセッションでツールが5回失敗。ついてない日もある。"
     icon: 💥
     category: hidden
     rarity: uncommon
@@ -2854,8 +3772,14 @@ definitions:
   - id: merry_christmas
     name: Silent Night, Code Bright
     name_cn: 平安夜，代码明
+    name_es: "Noche de Paz, Código Brillante"
+    name_ko: "고요한 밤, 코드는 빛나고"
+    name_ja: "聖夜に輝くコード"
     description: Messaged the agent on Christmas Day. Even AI deserves a holiday glow.
     description_cn: 在圣诞日给 agent 发了消息。AI 也需要节日氛围。 🎄
+    description_es: "Le enviaste un mensaje al agente en Navidad. Hasta la IA merece un brillo navideño."
+    description_ko: "크리스마스에 에이전트에게 메시지를 보냈습니다. AI라도 명절 분위기는 즐길 자격이 있죠."
+    description_ja: "クリスマスにエージェントへメッセージを送信。AIだってホリデーの輝きを楽しむ権利がある。"
     icon: 🎄
     category: hidden
     rarity: rare
@@ -2870,8 +3794,14 @@ definitions:
   - id: new_year_code
     name: First Dispatch of the Year
     name_cn: 新年第一令
+    name_es: "Primer Mensaje del Año"
+    name_ko: "새해 첫 명령"
+    name_ja: "新年の第一報"
     description: Sent the first prompt of the new year. Your agent is ready for 365 more.
     description_cn: 在新年第一天发出了第一条 prompt。你的 agent 准备好迎接接下来 365 条了。
+    description_es: "Enviaste el primer prompt del año nuevo. Tu agente está listo para 365 más."
+    description_ko: "새해 첫 프롬프트를 전송했습니다. 당신의 에이전트는 앞으로 365개 더 받을 준비가 되어 있습니다."
+    description_ja: "新年最初のプロンプトを送信。エージェントはあと365回分の準備はできている。"
     icon: 🎆
     category: hidden
     rarity: rare
@@ -2886,8 +3816,14 @@ definitions:
   - id: code_valentine
     name: Be My Code Valentine
     name_cn: 代码情人
+    name_es: "San Valentín del Código"
+    name_ko: "코드 발렌타인"
+    name_ja: "コード・バレンタイン"
     description: Spent Valentine's Day with your agent. Who needs roses when you have a terminal?
     description_cn: 在情人节和 agent 一起度过。有 terminal 还要什么玫瑰花。
+    description_es: "Pasaste el Día de San Valentín con tu agente. ¿Quién necesita rosas cuando tienes una terminal?"
+    description_ko: "발렌타인데이를 에이전트와 함께 보냈습니다. 터미널이 있는데 장미가 무슨 소용일까요?"
+    description_ja: "バレンタインデーをエージェントと一緒に過ごしました。ターミナルがあるのにバラなんていらない。"
     icon: 💘
     category: hidden
     rarity: rare
@@ -2902,8 +3838,14 @@ definitions:
   - id: spring_festival
     name: Lunar New Year
     name_cn: 新春大吉
+    name_es: "Año Nuevo Lunar"
+    name_ko: "음력 설날"
+    name_ja: "春節"
     description: Sent a message during Spring Festival. Your agent doesn't need red envelopes — just clean code.
     description_cn: 春节期间给 agent 发了消息。你的 agent 不要红包，只要干净的代码。
+    description_es: "Enviaste un mensaje durante el Festival de Primavera. Tu agente no necesita sobres rojos — solo código limpio."
+    description_ko: "설날에 에이전트에게 메시지를 보냈습니다. 에이전트는 세뱃돈이 필요 없어요 — 깨끗한 코드면 충분합니다."
+    description_ja: "春節にエージェントにメッセージを送信。エージェントはお年玉なんていらない——きれいなコードだけでいい。"
     icon: 🧧
     category: hidden
     rarity: rare
@@ -2918,8 +3860,14 @@ definitions:
   - id: last_stand
     name: Last Stand
     name_cn: 背水一战
+    name_es: "Última Resistencia"
+    name_ko: "최후의 저항"
+    name_ja: "最後の砦"
     description: Used the Agent while running on battery with barely any juice left. A true warrior doesn't need a charger.
     description_cn: 电池快没电了还在用 Agent。真正的战士不需要充电器。
+    description_es: "Usaste al agente con la batería a punto de agotarse. Un verdadero guerrero no necesita cargador."
+    description_ko: "배터리가 거의 바닥난 상태에서 에이전트를 사용했습니다. 진정한 전사는 충전기 따윈 필요하지 않습니다."
+    description_ja: "バッテリー残量わずかでエージェントを使用。真の戦士に充電器は必要ない。"
     icon: 🪫
     category: hidden
     rarity: common
@@ -2934,8 +3882,14 @@ definitions:
   - id: mind_the_gap
     name: Movie Ticket
     name_cn: 电影票
+    name_es: "Boleto de Cine"
+    name_ko: "영화 한 편"
+    name_ja: "映画一本分"
     description: Over 2 hours between two messages in the same session. Did you go watch a movie?
     description_cn: 同一次 session 中两次消息间隔超过 2 小时。你是去看电影了吗？
+    description_es: "Más de 2 horas entre dos mensajes en la misma sesión. ¿Fuiste al cine?"
+    description_ko: "같은 세션에서 두 메시지 사이의 간격이 2시간을 넘었습니다. 영화 보러 갔다 왔나요?"
+    description_ja: "同じセッション内で2つのメッセージの間隔が2時間以上。映画でも観てた？"
     icon: 🎬
     category: hidden
     rarity: epic
@@ -2949,8 +3903,14 @@ definitions:
   - id: silent_night
     name: Silent Night
     name_cn: 静夜思
+    name_es: "Noche Silenciosa"
+    name_ko: "고요한 밤"
+    name_ja: "静かな夜"
     description: Completed a task in the wee hours (0:00-5:00). The best code is born in darkness.
     description_cn: 某次在凌晨（0:00-5:00）完成了一个 task。最好的代码诞生在黑暗中。
+    description_es: "Completaste una tarea en la madrugada (0:00-5:00). El mejor código nace en la oscuridad."
+    description_ko: "새벽 시간(0:00-5:00)에 태스크를 완료했습니다. 최고의 코드는 어둠 속에서 탄생합니다."
+    description_ja: "深夜（0:00-5:00）にタスクを完了。最高のコードは闇の中で生まれる。"
     icon: 🌙
     category: challenge
     rarity: uncommon
@@ -2971,8 +3931,14 @@ definitions:
   - id: polyglot_challenge
     name: Polyglot Fetish
     name_cn: 跨语言爱好者
+    name_es: "Fetichista Políglota"
+    name_ko: "다국어 중독자"
+    name_ja: "多言語フェチ"
     description: Used 3+ programming languages in a single task.
     description_cn: 单个 task 中涉及了 3 种以上的编程语言。
+    description_es: "Usaste 3 o más lenguajes de programación en una sola tarea."
+    description_ko: "단일 작업에서 3개 이상의 프로그래밍 언어를 사용했습니다."
+    description_ja: "1つのタスクで3つ以上のプログラミング言語を使用しました。"
     icon: 🗣️
     category: challenge
     rarity: uncommon
@@ -2993,8 +3959,14 @@ definitions:
   - id: speed_run_bronze
     name: Speed Run (Bronze)
     name_cn: 速通(铜牌)
+    name_es: "Speed Run (Bronce)"
+    name_ko: "스피드런 (브론즈)"
+    name_ja: "スピードラン (ブロンズ)"
     description: Completed a full task (requirement → code → tests pass) in under 3 minutes.
     description_cn: 3 分钟内完成完整 task：需求→代码→测试通过。
+    description_es: "Completaste un ciclo completo (requisito → código → pruebas pasan) en menos de 3 minutos."
+    description_ko: "3분 이내에 전체 작업(요구사항→코드→테스트 통과)을 완료했습니다."
+    description_ja: "3分以内にタスク全体（要件→コード→テスト通過）を完了しました。"
     icon: ⏱️
     category: challenge
     rarity: epic
@@ -3014,8 +3986,14 @@ definitions:
   - id: speed_run_silver
     name: Speed Run (Silver)
     name_cn: 速通(银牌)
+    name_es: "Speed Run (Plata)"
+    name_ko: "스피드런 (실버)"
+    name_ja: "スピードラン (シルバー)"
     description: Completed in under 1 minute.
     description_cn: 1 分钟内完成。
+    description_es: "Completado en menos de 1 minuto."
+    description_ko: "1분 이내에 완료했습니다."
+    description_ja: "1分以内に完了しました。"
     icon: ⚡
     category: challenge
     rarity: legendary
@@ -3035,8 +4013,14 @@ definitions:
   - id: ten_task_no_edit
     name: Ten-Task No Edit
     name_cn: 十连零编辑
+    name_es: "Diez Tareas Sin Editar"
+    name_ko: "10연속 무수정"
+    name_ja: "10連続ノーエディット"
     description: 10 consecutive tasks with zero manual edits. You're a conductor, not an editor.
     description_cn: 连续 10 个 task 零手动编辑。你是 conductor，不是 editor。
+    description_es: "10 tareas consecutivas sin ediciones manuales. Eres un director de orquesta, no un editor."
+    description_ko: "연속 10개 작업을 수동 편집 없이 완료했습니다. 지휘자이지 편집자가 아닙니다."
+    description_ja: "連続10タスクを手動編集ゼロで達成。君は指揮者であって編集者じゃない。"
     icon: 🎼
     category: challenge
     rarity: legendary
@@ -3053,8 +4037,14 @@ definitions:
   - id: multi_model
     name: Multi-Model User
     name_cn: 模型换着用
+    name_es: "Usuario Multi-Modelo"
+    name_ko: "멀티모델 유저"
+    name_ja: "マルチモデルユーザー"
     description: Used 3 different models within 24 hours.
     description_cn: 24h 内使用 3 种不同模型。
+    description_es: "Usaste 3 modelos diferentes en 24 horas."
+    description_ko: "24시간 내에 3개의 다른 모델을 사용했습니다."
+    description_ja: "24時間以内に3つの異なるモデルを使用しました。"
     icon: 🎨
     category: challenge
     rarity: common
@@ -3075,8 +4065,14 @@ definitions:
   - id: short_circuit
     name: Short Circuit
     name_cn: 短路
+    name_es: "Cortocircuito"
+    name_ko: "숏 서킷"
+    name_ja: "ショートサーキット"
     description: Completed a task in 3 steps or fewer. Short and sweet.
     description_cn: 3 步以内完成了一个 task。短平快。
+    description_es: "Completaste una tarea en 3 pasos o menos. Corto y dulce."
+    description_ko: "3단계 이내로 작업을 완료했습니다. 짧고 굵게."
+    description_ja: "3ステップ以内でタスク完了。短くて完璧。"
     icon: ⚡
     category: challenge
     rarity: legendary
@@ -3093,8 +4089,14 @@ definitions:
   - id: speed_run_gold
     name: Speed Run (Gold)
     name_cn: 速通 (金牌)
+    name_es: "Speed Run (Oro)"
+    name_ko: "스피드런 (골드)"
+    name_ja: "スピードラン (ゴールド)"
     description: Completed a task within 30 seconds of session start. Blink and you'll miss it.
     description_cn: 在 session 开启 30 秒内完成一个 task。还没暖身就结束了。
+    description_es: "Completaste una tarea en los primeros 30 segundos de la sesión. Parpadea y te lo pierdes."
+    description_ko: "세션 시작 30초 이내에 작업을 완료했습니다. 눈 깜빡할 사이입니다."
+    description_ja: "セッション開始30秒以内にタスク完了。瞬きする間に終わってる。"
     icon: ⚡
     category: challenge
     rarity: legendary
@@ -3115,8 +4117,14 @@ definitions:
   - id: silent_partner_ii
     name: Guy in the Chair II
     name_cn: 幕后搭档 II
+    name_es: "El Tipo en la Silla II"
+    name_ko: "의자 속의 사내 II"
+    name_ja: "椅子の男 II"
     description: Agent edited files in 3 tasks, one session, zero interference from you. Autopilot engaged.
     description_cn: 同一 session 中 agent 编辑了文件并完成了 3 个 task，你毫无干预。自动驾驶已激活。
+    description_es: "El agente editó archivos en 3 tareas en una sola sesión sin tu intervención. Piloto automático activado."
+    description_ko: "한 세션에서 에이전트가 3개 작업의 파일을 편집했고 당신의 개입은 전혀 없었습니다. 자동 조종 장치 가동."
+    description_ja: "1セッションでエージェントが3タスクのファイルを編集、介入ゼロ。オートパイロット起動中。"
     icon: 🪑
     category: challenge
     rarity: epic
@@ -3136,8 +4144,14 @@ definitions:
   - id: in_the_zone
     name: In the Zone
     name_cn: 心流状态
+    name_es: "En la Zona"
+    name_ko: "몰입"
+    name_ja: "ゾーン状態"
     description: Completed 5+ tasks in a single session. When you're in the zone, you're unstoppable.
     description_cn: 单 session 里完成了 5+ 个 task。进入状态的人，势不可挡。
+    description_es: "Completaste 5 o más tareas en una sola sesión. Cuando estás en la zona, eres imparable."
+    description_ko: "단일 세션에서 5개 이상의 작업을 완료했습니다. 몰입하면 누구도 막을 수 없습니다."
+    description_ja: "1セッションで5つ以上のタスクを完了。ゾーンに入ったら止まらない。"
     icon: 🌪️
     category: challenge
     rarity: uncommon
@@ -3154,8 +4168,14 @@ definitions:
   - id: trophy_case
     name: Trophy Case
     name_cn: 奖杯柜
+    name_es: "Vitrina de Trofeos"
+    name_ko: "트로피 진열장"
+    name_ja: "トロフィーケース"
     description: Unlocked 6 achievements. Your collection is growing.
     description_cn: 解锁了 6 个成就。你的收藏正在增长。
+    description_es: "Desbloqueaste 6 logros. Tu colección está creciendo."
+    description_ko: "6개의 업적을 달성했습니다. 컬렉션이 점점 늘어납니다."
+    description_ja: "6つの実績を解除。コレクションが成長しています。"
     icon: 🖼️
     category: community
     rarity: common
@@ -3174,8 +4194,14 @@ definitions:
   - id: completionist_bronze
     name: Completionist (Bronze)
     name_cn: 完美主义(铜牌)
+    name_es: "Completista (Bronce)"
+    name_ko: "완벽주의자(브론즈)"
+    name_ja: "コンプリート(ブロンズ)"
     description: Unlocked all Common achievements.
     description_cn: 解锁了所有 Common 成就。
+    description_es: "Has desbloqueado todos los logros Comunes."
+    description_ko: "모든 Common 등급 업적을 해금했습니다."
+    description_ja: "全てのCommon実績を解除した。"
     icon: 🥉
     category: community
     rarity: rare
@@ -3189,8 +4215,14 @@ definitions:
   - id: completionist_silver
     name: Completionist (Silver)
     name_cn: 完美主义(银牌)
+    name_es: "Completista (Plata)"
+    name_ko: "완벽주의자(실버)"
+    name_ja: "コンプリート(シルバー)"
     description: Unlocked all Uncommon and above achievements.
     description_cn: 解锁了所有 Uncommon 及以上成就。
+    description_es: "Has desbloqueado todos los logros Poco Comunes y superiores."
+    description_ko: "모든 Uncommon 이상 업적을 해금했습니다."
+    description_ja: "全てのUncommon以上の実績を解除した。"
     icon: 🥈
     category: community
     rarity: epic
@@ -3205,8 +4237,14 @@ definitions:
   - id: completionist_gold
     name: Completionist (Gold)
     name_cn: 完美主义(金牌)
+    name_es: "Completista (Oro)"
+    name_ko: "완벽주의자(골드)"
+    name_ja: "コンプリート(ゴールド)"
     description: Unlocked all non-hidden achievements.
     description_cn: 解锁了全部非隐藏成就。
+    description_es: "Has desbloqueado todos los logros no ocultos."
+    description_ko: "숨겨지지 않은 모든 업적을 해금했습니다."
+    description_ja: "全ての非表示実績を解除した。"
     icon: 🥇
     category: community
     rarity: legendary
@@ -3220,8 +4258,14 @@ definitions:
   - id: mythic_completionist
     name: Mythic Completionist
     name_cn: 超神完美主义者
+    name_es: "Completista Mítico"
+    name_ko: "전설의 완벽주의자"
+    name_ja: "神コンプリート"
     description: All achievements, including hidden ones. Are you the first?
     description_cn: 全部成就，包括隐藏。你是第一个吗？
+    description_es: "Todos los logros, incluidos los ocultos. ¿Serás el primero?"
+    description_ko: "숨겨진 업적까지 모두 해금. 당신이 첫 번째인가요?"
+    description_ja: "隠し実績を含む全ての実績を解除。あなたが最初？"
     icon: 👑
     category: community
     rarity: mythic
@@ -3235,8 +4279,14 @@ definitions:
   - id: cross_agent
     name: Cross-Agent Collector
     name_cn: 跨Agent成就收藏家
+    name_es: "Coleccionista Multiagente"
+    name_ko: "크로스 에이전트 수집가"
+    name_ja: "クロスエージェントコレクター"
     description: Has achievement records on 2 different agent tools (e.g. Claude Code + OpenCode). Agent polyglot.
     description_cn: 在 2 个不同的 agent 工具上都有成就记录（如 Claude Code + OpenCode）。agent 多面手。
+    description_es: "Tienes logros en 2 herramientas de agente distintas (ej. Claude Code + OpenCode). Agente políglota."
+    description_ko: "2개의 에이전트 도구(예: Claude Code + OpenCode)에서 업적 보유. 에이전트 폴리글랏."
+    description_ja: "2つのエージェントツール(例: Claude Code + OpenCode)で実績を記録。エージェントポリグロット。"
     icon: 🔗
     category: community
     rarity: epic
@@ -3252,8 +4302,14 @@ definitions:
   - id: casual_collector
     name: Casual Collector
     name_cn: 随缘收集
+    name_es: "Coleccionista Casual"
+    name_ko: "캐주얼 수집가"
+    name_ja: "カジュアルコレクター"
     description: Unlocked 20 achievements. You're not hunting for completion — the good ones just come naturally.
     description_cn: 解锁了 20 个成就。你不追求全收集，好东西自然来。
+    description_es: "Has desbloqueado 20 logros. No buscas la perfección, los buenos llegan solos."
+    description_ko: "20개 업적 해금. 완벽을 쫓지 않아도 좋은 건 저절로 찾아옵니다."
+    description_ja: "20個の実績を解除。全部を狙わなくても、いいものは自然と手に入る。"
     icon: 🍀
     category: community
     rarity: uncommon
@@ -3273,8 +4329,14 @@ definitions:
   - id: achievement_hunter
     name: Achievement Hunter
     name_cn: 成就猎人
+    name_es: "Cazador de Logros"
+    name_ko: "업적 헌터"
+    name_ja: "実績ハンター"
     description: Unlocked 50 achievements. Not just collecting — you've become a hunter.
     description_cn: 解锁了 50 个成就。不是收集而已——你已成猎人。
+    description_es: "Has desbloqueado 50 logros. Ya no solo coleccionas, te has convertido en cazador."
+    description_ko: "50개 업적 해금. 모으는 걸 넘어, 사냥꾼이 되었습니다."
+    description_ja: "50個の実績を解除。集めるだけじゃない——狩人になったのだ。"
     icon: 🎯
     category: community
     rarity: rare
@@ -3292,8 +4354,14 @@ definitions:
   - id: pipemaster
     name: Pipemaster
     name_cn: 管道大师
+    name_es: "Maestro del Pipe"
+    name_ko: "파이프마스터"
+    name_ja: "パイプマスター"
     description: Agent wrote 10 piped commands. Data flows between the |.
     description_cn: agent 写出了 10 条带管道的命令。数据在 | 之间流淌。
+    description_es: "El agente escribió 10 comandos con pipe. Los datos fluyen entre |."
+    description_ko: "에이전트가 파이프 명령어 10개를 작성. 데이터가 | 사이를 흐릅니다."
+    description_ja: "エージェントが10回パイプコマンドを書いた。データが|の間を流れる。"
     icon: 🔗
     category: tool_mastery
     rarity: uncommon
@@ -3313,8 +4381,14 @@ definitions:
   - id: command_baby
     name: Command Baby
     name_cn: 命令宝宝
+    name_es: "Bebé de Comandos"
+    name_ko: "명령어 초보"
+    name_ja: "コマンドビギナー"
     description: Agent tried 30 different shell commands. It's curious about everything on the terminal.
     description_cn: agent 试过 30 种不同的 shell 命令。它对终端的一切都充满好奇。
+    description_es: "El agente probó 30 comandos distintos. Siente curiosidad por todo en la terminal."
+    description_ko: "에이전트가 30가지 셸 명령어를 시도. 터미널의 모든 게 궁금합니다."
+    description_ja: "エージェントが30種類のシェルコマンドを試した。ターミナルの全てに興味津々。"
     icon: 👶
     category: tool_mastery
     rarity: rare
@@ -3331,8 +4405,14 @@ definitions:
   - id: command_master
     name: Command Master
     name_cn: 命令大师
+    name_es: "Maestro de Comandos"
+    name_ko: "명령어 마스터"
+    name_ja: "コマンドマスター"
     description: Agent used 100 different shell commands. Its terminal knowledge rivals yours.
     description_cn: agent 用过 100 种不同的 shell 命令。它的终端知识已经不在你之下了。
+    description_es: "El agente usó 100 comandos distintos. Su conocimiento de la terminal ya compite con el tuyo."
+    description_ko: "에이전트가 100가지 셸 명령어를 사용. 터미널 지식이 당신에 맞먹습니다."
+    description_ja: "エージェントが100種類のシェルコマンドを使いこなした。ターミナル知識はあなたに匹敵する。"
     icon: 🧙
     category: tool_mastery
     rarity: legendary
@@ -3349,8 +4429,14 @@ definitions:
   - id: cerberus
     name: Super Mario Bros
     name_cn: 超级马力欧兄弟
+    name_es: "Super Mario Bros"
+    name_ko: "슈퍼 마리오 브라더스"
+    name_ja: "スーパーマリオブラザーズ"
     description: Agent wrote 2 commands containing pipes. It's-a me, pipe!
     description_cn: agent 写出过 2 条带管道的命令。It's-a me, pipe!
+    description_es: "El agente escribió 2 comandos con tuberías. ¡Soy yo, la tubería!"
+    description_ko: "파이프가 포함된 명령어를 2개 작성했다. 파이프다, 나야!"
+    description_ja: "パイプ入りコマンドを2つ書いた。オレはパイプだ！"
     icon: 🍄
     category: skill
     rarity: common
@@ -3369,8 +4455,14 @@ definitions:
   - id: fail_forward
     name: Fail Forward
     name_cn: 初尝失败
+    name_es: "Fracasa y Avanza"
+    name_ko: "실패도 발판"
+    name_ja: "失敗は糧"
     description: Agent encountered its first tool call failure. Deep breath, try again.
     description_cn: agent 第一次遇到工具调用失败。深呼吸，再来一次。
+    description_es: "El agente experimentó su primer fallo de herramienta. Respira hondo, inténtalo de nuevo."
+    description_ko: "첫 도구 호출 실패. 심호흡하고 다시 도전."
+    description_ja: "エージェントが初めてツール呼び出しに失敗した。深呼吸して、もう一度。"
     icon: 🫤
     category: workflow
     rarity: common
@@ -3388,8 +4480,14 @@ definitions:
   - id: bounce_back
     name: Bounce Back
     name_cn: 反弹力
+    name_es: "Recuperación"
+    name_ko: "다시 일어서다"
+    name_ja: "立ち直り"
     description: Agent failed 10 times cumulatively. Fell 10 times, stood up 11.
     description_cn: agent 累计失败 10 次。摔倒了 10 次，站起来了 11 次。
+    description_es: "El agente acumuló 10 fallos en total. Cayó 10 veces, se levantó 11."
+    description_ko: "에이전트가 총 10번 실패했다. 10번 넘어져도, 11번 일어난다."
+    description_ja: "累計10回失敗した。10回倒れて、11回立ち上がる。"
     icon: 🦘
     category: workflow
     rarity: uncommon
@@ -3408,8 +4506,14 @@ definitions:
   - id: failure_mother
     name: Failure Is the Mother of Success
     name_cn: 失败是成功之母
+    name_es: "El fracaso es la madre del éxito"
+    name_ko: "실패는 성공의 어머니"
+    name_ja: "失敗は成功の母"
     description: Agent failed 100 times cumulatively. It's long past being a rookie.
     description_cn: agent 累计失败 100 次。它早已不是当初那个菜鸟了。
+    description_es: "El agente acumuló 100 fallos en total. Ya no es ningún novato."
+    description_ko: "에이전트가 총 100번 실패했다. 더 이상 초보가 아니다."
+    description_ja: "累計100回失敗した。もう新米じゃない。"
     icon: 🧘
     category: workflow
     rarity: epic
@@ -3425,8 +4529,14 @@ definitions:
   - id: phoenix
     name: Phoenix
     name_cn: 凤凰涅槃
+    name_es: "Fénix"
+    name_ko: "불사조"
+    name_ja: "フェニックス"
     description: Agent failed and immediately succeeded on the next try, 10 times. Rise from the ashes.
     description_cn: agent 失败后立即在下一次尝试中成功，反复 10 次。浴火重生。
+    description_es: "El agente falló y acertó al intento siguiente, 10 veces. Renace de las cenizas."
+    description_ko: "실패 직후 다음 시도에서 성공, 10회 반복. 잿더미에서 다시 태어나다."
+    description_ja: "失敗の直後に成功を10回達成。灰の中から蘇る。"
     icon: 🔥
     category: skill
     rarity: epic
@@ -3443,8 +4553,14 @@ definitions:
   - id: mcp_connoisseur
     name: MCP Connoisseur
     name_cn: MCP 品鉴师
+    name_es: "Catador de MCP"
+    name_ko: "MCP 감식가"
+    name_ja: "MCP通"
     description: Agent used 10 different MCP tools. Not just any tools.
     description_cn: agent 用过 10 种不同的 MCP tool。不是随便什么工具都用的。
+    description_es: "El agente usó 10 herramientas MCP distintas. No son herramientas cualquiera."
+    description_ko: "10가지 다른 MCP 도구를 사용했다. 아무 도구나 쓰는 게 아니다."
+    description_ja: "10種類のMCPツールを使った。ただのツールじゃない。"
     icon: 🍷
     category: tool_mastery
     rarity: rare
@@ -3461,8 +4577,14 @@ definitions:
   - id: mcp_collector
     name: MCP Collector
     name_cn: MCP 收藏家
+    name_es: "Coleccionista de MCP"
+    name_ko: "MCP 수집가"
+    name_ja: "MCPコレクター"
     description: Agent used 30 different MCP tools. It's not using tools — it's collecting them.
     description_cn: agent 用过 30 种不同的 MCP tool。它不是在用工具，是在收集工具。
+    description_es: "El agente usó 30 herramientas MCP distintas. No las usa, las colecciona."
+    description_ko: "30가지 다른 MCP 도구를 사용했다. 도구를 쓰는 게 아니라 — 모으는 중이다."
+    description_ja: "30種類のMCPツールを使った。使ってるんじゃない — 集めてるんだ。"
     icon: 🏛️
     category: tool_mastery
     rarity: epic
@@ -3479,8 +4601,14 @@ definitions:
   - id: scribe
     name: Scribe
     name_cn: 笔耕不辍
+    name_es: "Escriba"
+    name_ko: "문필가"
+    name_ja: "書記"
     description: Wrote 50 files from scratch. Words become code, code becomes files.
     description_cn: 从零写了 50 个文件。文字变代码，代码变文件。
+    description_es: "Escribió 50 archivos desde cero. Las palabras se vuelven código, el código se vuelve archivos."
+    description_ko: "50개 파일을 처음부터 작성했다. 글이 코드가 되고, 코드가 파일이 된다."
+    description_ja: "50ファイルをゼロから書いた。言葉がコードに、コードがファイルになる。"
     icon: ✍️
     category: tool_mastery
     rarity: uncommon
@@ -3499,8 +4627,14 @@ definitions:
   - id: delegator
     name: Delegator
     name_cn: 放权大师
+    name_es: "Delegador"
+    name_ko: "위임의 달인"
+    name_ja: "委任の達人"
     description: Agent dispatched 5 sub-agents. A good leader knows how to delegate.
     description_cn: agent 派出了 5 个子 agent。懂分权才是好领导。
+    description_es: "El agente desplegó 5 subagentes. Un buen líder sabe delegar."
+    description_ko: "5명의 하위 에이전트를 파견했다. 좋은 리더는 위임하는 법을 안다."
+    description_ja: "5つのサブエージェントを派遣した。良いリーダーは委任の仕方を知っている。"
     icon: 👥
     category: workflow
     rarity: uncommon
@@ -3519,8 +4653,14 @@ definitions:
   - id: swat_team
     name: SWAT Team
     name_cn: 特种小队
+    name_es: "Equipo SWAT"
+    name_ko: "SWAT 팀"
+    name_ja: "SWATチーム"
     description: Spawned exactly 4 sub-agents in a single session. Four-person tactical unit.
     description_cn: 同一 session 中恰好 spawn 了 4 个子 agent。四人战术小组。
+    description_es: "Generó exactamente 4 subagentes en una misma sesión. Unidad táctica de cuatro."
+    description_ko: "단일 세션에서 정확히 4개의 하위 에이전트를 생성했다. 4인 전술 유닛."
+    description_ja: "1セッションでちょうど4つのサブエージェントを生成した。4人戦術ユニット。"
     icon: 🎯
     category: workflow
     rarity: uncommon
@@ -3540,8 +4680,14 @@ definitions:
   - id: ultraman_8
     name: Ultraman 8 Brothers
     name_cn: 超奥特曼8兄弟
+    name_es: "Ultraman 8 Hermanos"
+    name_ko: "울트라맨 8형제"
+    name_ja: "ウルトラ8兄弟"
     description: Spawned exactly 8 sub-agents in a single session. Eight heroes, one light.
     description_cn: 同一 session 中恰好 spawn 了 8 个子 agent。八位英雄，一束光。
+    description_es: "Generaste exactamente 8 subagentes en una misma sesión. Ocho héroes, una luz."
+    description_ko: "한 세션에서 정확히 8명의 하위 에이전트를 생성하라. 여덟 영웅, 하나의 빛."
+    description_ja: "1セッションで8体のサブエージェントを生み出せ。8人の英雄、ひとつの光。"
     icon: 🦸
     category: workflow
     rarity: rare
@@ -3558,8 +4704,14 @@ definitions:
   - id: avengers_assemble
     name: Avengers Assemble
     name_cn: 复仇者集结
+    name_es: "Vengadores Unidos"
+    name_ko: "어벤져스 어셈블"
+    name_ja: "アベンジャーズ集結"
     description: Spawned 6 distinct agent types. Each hero brings a different power. Avengers, assemble!
     description_cn: Spawn 过 6 种不同类型的 agent。每位英雄各怀绝技。复仇者，集结！
+    description_es: "Invocaste 6 tipos distintos de agente. Cada héroe aporta su propio poder. ¡Vengadores, uníos!"
+    description_ko: "6가지 서로 다른 에이전트 유형을 소환하라. 각 영웅은 저마다 다른 힘을 지녔다. 어벤져스, 집결!"
+    description_ja: "6種類のエージェントタイプを呼び出せ。各ヒーローが異なる力をもたらす。アベンジャーズ、集結！"
     icon: 🛡️
     category: workflow
     rarity: epic
@@ -3576,8 +4728,14 @@ definitions:
   - id: shipper
     name: Ship It
     name_cn: 一键发货
+    name_es: "Ship It"
+    name_ko: "일단 배포"
+    name_ja: "出荷"
     description: 10 git pushes. Ship early, ship often.
     description_cn: 10 次 git 推送。早发多发。
+    description_es: "10 git pushes. Envía temprano, envía a menudo."
+    description_ko: "git 푸시 10회. 일찍, 자주 배포하라."
+    description_ja: "gitプッシュ10回。早く出せ、頻繁に出せ。"
     icon: 🚢
     category: workflow
     rarity: uncommon
@@ -3597,8 +4755,14 @@ definitions:
   - id: pythonista
     name: Pythonista
     name_cn: Pythonista
+    name_es: "Pythonista"
+    name_ko: "파이썬리스타"
+    name_ja: "パイソニスタ"
     description: Write 50+ Python files. Snake? No, Python.
     description_cn: 写了 50+ 个 Python 文件。是蟒蛇不是巨蟒。
+    description_es: "Escribiste 50+ archivos Python. Serpiente? No, Python."
+    description_ko: "50개 이상의 Python 파일을 작성하라. 뱀? 아니요, 파이썬입니다."
+    description_ja: "50以上のPythonファイルを書け。ヘビ？いやPythonだ。"
     icon: 🐍
     category: tool_mastery
     rarity: uncommon
@@ -3619,8 +4783,14 @@ definitions:
   - id: type_astronaut
     name: Type Astronaut
     name_cn: 类型宇航员
+    name_es: "Astronauta de Tipos"
+    name_ko: "타입 우주비행사"
+    name_ja: "型宇宙飛行士"
     description: Write 50+ TypeScript files. Types are rocket fuel.
     description_cn: 写了 50+ 个 TypeScript 文件。类型就是火箭燃料。
+    description_es: "Escribiste 50+ archivos TypeScript. Los tipos son combustible de cohetes."
+    description_ko: "50개 이상의 TypeScript 파일을 작성하라. 타입은 로켓 연료다."
+    description_ja: "50以上のTypeScriptファイルを書け。型はロケットの燃料だ。"
     icon: 📘
     category: tool_mastery
     rarity: uncommon
@@ -3641,8 +4811,14 @@ definitions:
   - id: web_weaver
     name: Web Weaver
     name_cn: 网络织者
+    name_es: "Tejedor Web"
+    name_ko: "웹 위버"
+    name_ja: "ウェブウィーバー"
     description: Write 50+ JavaScript files. Weaving the web since '95.
     description_cn: 写了 50+ 个 JavaScript 文件。95 年就开始织网。
+    description_es: "Escribiste 50+ archivos JavaScript. Tejiendo la web desde el 95."
+    description_ko: "50개 이상의 JavaScript 파일을 작성하라. 95년부터 웹을 짜왔다."
+    description_ja: "50以上のJavaScriptファイルを書け。95年からウェブを紡ぐ。"
     icon: 🕸️
     category: tool_mastery
     rarity: uncommon
@@ -3663,8 +4839,14 @@ definitions:
   - id: bean_counter
     name: Bean Counter
     name_cn: 咖啡豆计数员
+    name_es: "Contador de Café"
+    name_ko: "빈 카운터"
+    name_ja: "ビーンカウンター"
     description: Write 50+ Java files. Object my my my.
     description_cn: 写了 50+ 个 Java 文件。对象啊对象。
+    description_es: "Escribiste 50+ archivos Java. Objeto, mi mi mi."
+    description_ko: "50개 이상의 Java 파일을 작성하라. 객체, 내 내 내."
+    description_ja: "50以上のJavaファイルを書け。オブジェクト、マイマイマイ。"
     icon: ☕
     category: tool_mastery
     rarity: uncommon
@@ -3685,8 +4867,14 @@ definitions:
   - id: pointer_pilot
     name: Pointer Pilot
     name_cn: 指针领航员
+    name_es: "Piloto de Punteros"
+    name_ko: "포인터 파일럿"
+    name_ja: "ポインターパイロット"
     description: Write 50+ C or C++ files. Manual memory? manual fun.
     description_cn: 写了 50+ 个 C 或 C++ 文件。手动内存，手动乐趣。
+    description_es: "Escribiste 50+ archivos C o C++. Memoria manual? diversión manual."
+    description_ko: "50개 이상의 C 또는 C++ 파일을 작성하라. 수동 메모리? 수동 재미."
+    description_ja: "50以上のC/C++ファイルを書け。手動メモリは手動の楽しさ。"
     icon: 🔗
     category: tool_mastery
     rarity: rare
@@ -3705,8 +4893,14 @@ definitions:
   - id: ferris_fan
     name: Ferris Fan
     name_cn: 螃蟹粉丝
+    name_es: "Fan de Ferris"
+    name_ko: "페리스 팬"
+    name_ja: "フェリスの信者"
     description: Write 50+ Rust files. The borrow checker approves.
     description_cn: 写了 50+ 个 Rust 文件。借用检查器表示通过。
+    description_es: "Escribiste 50+ archivos Rust. El borrow checker da su visto bueno."
+    description_ko: "50개 이상의 Rust 파일을 작성하라. 대여 검사기가 승인했다."
+    description_ja: "50以上のRustファイルを書け。借用チェッカーもお墨付き。"
     icon: 🦀
     category: tool_mastery
     rarity: rare
@@ -3725,8 +4919,14 @@ definitions:
   - id: go_getter
     name: Go Getter
     name_cn: 进取者
+    name_es: "Go Getter"
+    name_ko: "고 게터"
+    name_ja: "ゴーゲッター"
     description: Write 50+ Go files. Simplicity is a feature.
     description_cn: 写了 50+ 个 Go 文件。简洁就是一种特性。
+    description_es: "Escribiste 50+ archivos Go. La simplicidad es una virtud."
+    description_ko: "50개 이상의 Go 파일을 작성하라. 단순함이 곧 기능이다."
+    description_ja: "50以上のGoファイルを書け。シンプルさは機能だ。"
     icon: 🏃
     category: tool_mastery
     rarity: uncommon
@@ -3747,8 +4947,14 @@ definitions:
   - id: smorgasbord
     name: Smorgasbord
     name_cn: 丰盛大餐
+    name_es: "Buffet de Código"
+    name_ko: "코드 뷔페"
+    name_ja: "コードバイキング"
     description: Use 6+ languages in one session. All-you-can-code buffet.
     description_cn: 单次 session 用 6+ 种语言。编码自助餐。
+    description_es: "Usa 6+ idiomas en una sesión. El buffet libre del código."
+    description_ko: "한 세션에서 6개 이상 언어 사용. 무한리필 코딩 뷔페."
+    description_ja: "1セッションで6言語以上使用。コードの食い放題。"
     icon: 🧩
     category: challenge
     rarity: rare
@@ -3767,8 +4973,14 @@ definitions:
   - id: sisyphus
     name: Myth of Sisyphus
     name_cn: 西西弗斯神话
+    name_es: "El Mito de Sísifo"
+    name_ko: "시시포스의 신화"
+    name_ja: "シーシュポスの神話"
     description: Edited the same file 30 times. Push the boulder up, watch it roll down, push again.
     description_cn: 同一个文件改了 30 次。石头推上去，滚下来，再推上去。
+    description_es: "Editó el mismo archivo 30 veces. Empujas la roca, cae rodando, y vuelves a empujar."
+    description_ko: "같은 파일을 30번 수정했다. 바위를 밀고, 굴러떨어지고, 다시 민다."
+    description_ja: "同じファイルを30回編集。岩を押し上げ、転がり落ち、また押し上げる。"
     icon: 🪨
     category: challenge
     rarity: epic
@@ -3788,8 +5000,14 @@ definitions:
   - id: breath_of_the_wild
     name: Breath of the Wild
     name_cn: 旷野之息
+    name_es: "Breath of the Wild"
+    name_ko: "야생의 숨결"
+    name_ja: "ブレス オブ ザ ワイルド"
     description: Used exactly 4 tools and 4 MCP servers in a single session. The perfect loadout to take on Ganon.
     description_cn: 一次 session 中恰巧用了 4 种工具和 4 个 MCP 服务器。准备好去打盖侬了。
+    description_es: "Usaste exactamente 4 herramientas y 4 servidores MCP en una sesión. El equipo perfecto para enfrentar a Ganon."
+    description_ko: "한 세션에서 정확히 4개의 도구와 4개의 MCP 서버를 사용. 가논을 쓰러뜨리기에 완벽한 조합."
+    description_ja: "1セッションでちょうど4つのツールと4つのMCPサーバーを使った。ガノンに挑む完璧な装備だ。"
     icon: 🗡️
     category: challenge
     rarity: legendary
@@ -3813,8 +5031,14 @@ definitions:
   - id: matrix
     name: The Matrix
     name_cn: 黑客帝国
+    name_es: "Matrix"
+    name_ko: "매트릭스"
+    name_ja: "マトリックス"
     description: Edited a .m file. Red pill or blue pill?
     description_cn: 修改了一个 .m 文件。红色药丸还是蓝色药丸？
+    description_es: "Editó un archivo .m. ¿Pastilla roja o pastilla azul?"
+    description_ko: ".m 파일을 수정했다. 빨간 약 vs 파란 약?"
+    description_ja: ".mファイルを編集。赤い薬か、青い薬か？"
     icon: 💊
     category: hidden
     rarity: common
@@ -3833,8 +5057,14 @@ definitions:
   - id: attention_is_all_you_need
     name: Attention Is All You Need
     name_cn: 变形金刚
+    name_es: "La Atención Lo Es Todo"
+    name_ko: "내게 필요한 건 어텐션"
+    name_ja: "注意こそすべて"
     description: You are editing a Transformer. Autobots, roll out!
     description_cn: 你在编辑Transformer。汽车人，变形出发！
+    description_es: "Estás editando un Transformer. ¡Autobots, a rodar!"
+    description_ko: "Transformer를 편집 중입니다. 오토봇, 출동!"
+    description_ja: "Transformerを編集中。オートボット、トランスフォーム！"
     icon: 🚚
     category: hidden
     rarity: common
@@ -3853,8 +5083,14 @@ definitions:
   - id: thanos
     name: Thanos
     name_cn: 灭霸
+    name_es: "Thanos"
+    name_ko: "타노스"
+    name_ja: "サノス"
     description: In a single session, total lines of all edited files was exactly halved. Perfectly balanced.
     description_cn: 同一 session 中，所有修改文件的总行数恰好减半。完美平衡。
+    description_es: "En una sesión, las líneas totales de todos los archivos editados se redujeron exactamente a la mitad. Perfectamente balanceado."
+    description_ko: "한 세션에서 수정한 모든 파일 총 라인 수가 정확히 절반으로 줄었다. 완벽하게 균형 잡혔어."
+    description_ja: "1セッションで編集した全ファイルの行数がちょうど半減。パーフェクトバランス。"
     icon: 🧤
     category: hidden
     rarity: epic
@@ -3876,8 +5112,14 @@ definitions:
   - id: mitosis
     name: Mitosis
     name_cn: 有丝分裂
+    name_es: "Mitosis"
+    name_ko: "유사분열"
+    name_ja: "有糸分裂"
     description: Edited a file to exactly double its line count. The cell divides.
     description_cn: 编辑了一个文件，行数恰好翻倍。细胞开始分裂了。
+    description_es: "Editó un archivo y duplicó exactamente su número de líneas. La célula se divide."
+    description_ko: "파일 행 수를 정확히 두 배로 만들었다. 세포 분열이 시작된다."
+    description_ja: "ファイルの行数を正確に2倍に編集。細胞が分裂する。"
     icon: 🧬
     category: hidden
     rarity: common
@@ -3895,8 +5137,14 @@ definitions:
   - id: how_bout_a_round_of_gwent
     name: How 'Bout a Round of Gwent?
     name_cn: 来局昆特牌吗
+    name_es: "¿Qué Tal una Partida de Gwent?"
+    name_ko: "궨트 한 판?"
+    name_ja: "グウェント、やらないか"
     description: Busy editing code in a heated session, then… opened the dashboard. Priorities, witcher.
     description_cn: 正忙着改代码呢，然后……打开了成就面板。当代猎魔人的优先级。
+    description_es: "Estás codeando intensamente, y de repente… abres el panel de logros. Prioridades, brujo."
+    description_ko: "열심히 코딩하다가… 갑자기 업적 패널을 열었다. 우선순위를 좀, 위쳐."
+    description_ja: "コードに没頭中のはずが…ダッシュボードを開いていた。優先順位だ、ウィッチャー。"
     icon: ♠️
     category: hidden
     rarity: uncommon
@@ -3926,8 +5174,14 @@ definitions:
   - id: wake_up_samurai
     name: Wake Up, Samurai
     name_cn: 醒醒，武士
+    name_es: "Despierta, Samurái"
+    name_ko: "일어나, 사무라이"
+    name_ja: "起きろ、サムライ"
     description: From 9pm to midnight you coded, then returned after 7am. We've got a city to burn.
     description_cn: 深夜码到 9 点后，清晨 7 点继续回来烧城。
+    description_es: "Programaste de 9pm a medianoche y volviste después de las 7am. Tenemos una ciudad que quemar."
+    description_ko: "밤 9시부터 자정까지 코딩하고, 아침 7시 이후 다시 돌아왔다. 불태울 도시가 기다린다."
+    description_ja: "夜9時から深夜までコードを書き、朝7時過ぎに戻ってきた。燃やすべき街があるんだ。"
     icon: 🔥
     category: hidden
     rarity: rare
@@ -3949,8 +5203,14 @@ definitions:
   - id: full_spectrum
     name: Full Spectrum
     name_cn: 全光谱
+    name_es: "Espectro Completo"
+    name_ko: "풀 스펙트럼"
+    name_ja: "フルスペクトラム"
     description: Use 10+ languages cumulatively. True polyglot, no impostor.
     description_cn: 累计使用过 10+ 种语言。真多语言者。
+    description_es: "Usa 10+ idiomas en total. Políglota de verdad, sin impostor."
+    description_ko: "누적 10개 이상 언어 사용. 진짜 폴리글롯, 가짜는 없다."
+    description_ja: "累計10言語以上を使え。真のポリグロット、偽物はいない。"
     icon: 🌈
     category: milestones
     rarity: epic
@@ -3969,8 +5229,14 @@ definitions:
   - id: test_champion
     name: Test Champion
     name_cn: 测试冠军
+    name_es: "Campeón de Tests"
+    name_ko: "테스트 챔피언"
+    name_ja: "テストチャンピオン"
     description: 500 tests passed. The CI pipeline worships you.
     description_cn: 累计 500 个测试通过。CI 流程视你为神。
+    description_es: "500 pruebas superadas. El pipeline de CI te adora."
+    description_ko: "테스트 500개 통과. CI 파이프라인이 널 숭배한다."
+    description_ja: "500テストを突破。CIパイプラインもひれ伏す。"
     icon: 🏆
     category: milestones
     rarity: epic
@@ -3988,8 +5254,14 @@ definitions:
   - id: the_scheduler
     name: The Scheduler
     name_cn: 日程规划师
+    name_es: "El Planificador"
+    name_ko: "스케줄러"
+    name_ja: "スケジューラー"
     description: Start sessions at 12+ different hours. You're always there.
     description_cn: 在 12+ 个不同时间段启动过 session。你无处不在。
+    description_es: "Inicias sesiones en 12+ horas distintas. Siempre estás ahí."
+    description_ko: "12개 이상 시간대에 세션 시작. 넌 어디에나 있다."
+    description_ja: "12以上の時間帯でセッション開始。どこにでも君がいる。"
     icon: 📅
     category: style
     rarity: uncommon
@@ -4010,8 +5282,14 @@ definitions:
   - id: power_session
     name: Power Session
     name_cn: 全力冲刺
+    name_es: "A Toda Máquina"
+    name_ko: "파워 세션"
+    name_ja: "パワーセッション"
     description: 25+ tools in a single session. Full throttle.
     description_cn: 单次 session 中发起 25+ 次工具调用。马力全开。
+    description_es: "25+ herramientas en una sola sesión. Acelerador a fondo."
+    description_ko: "한 세션에 도구 25+개. 전력 질주."
+    description_ja: "1セッションで25以上のツール。全開だ。"
     icon: ⚡
     category: endurance
     rarity: uncommon

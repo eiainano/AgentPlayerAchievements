@@ -75,7 +75,7 @@ export const INIT_DATA: Record<string, InitToolData> = {
       return cfg;
     },
     instructionFiles: [
-      { path: path.join(process.cwd(), 'AGENTS.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING v2 -->' },
+      { path: path.join(homedir(), '.config', 'kilo', 'AGENTS.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING v2 -->' },
     ],
   },
   'hermes': {
@@ -86,7 +86,7 @@ export const INIT_DATA: Record<string, InitToolData> = {
       return cfg;
     },
     instructionFiles: [
-      { path: path.join(process.cwd(), 'AGENTS.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING v2 -->' },
+      { path: path.join(homedir(), '.hermes', 'SOUL.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING v2 -->' },
     ],
   },
   'opencode': {
@@ -102,7 +102,7 @@ export const INIT_DATA: Record<string, InitToolData> = {
       return cfg;
     },
     instructionFiles: [
-      { path: path.join(process.cwd(), 'AGENTS.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING v2 -->' },
+      { path: path.join(homedir(), '.config', 'opencode', 'AGENTS.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING v2 -->' },
     ],
   },
   'openclaw': {
@@ -119,7 +119,7 @@ export const INIT_DATA: Record<string, InitToolData> = {
       return cfg;
     },
     instructionFiles: [
-      { path: path.join(process.cwd(), 'AGENTS.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING v2 -->' },
+      { path: path.join(homedir(), '.openclaw', 'workspace', 'AGENTS.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING v2 -->' },
       { path: path.join(homedir(), '.openclaw', 'workspace', 'TOOLS.md'), marker: '<!-- AGPA ACHIEVEMENT TRACKING v2 -->' },
     ],
   },
@@ -182,8 +182,8 @@ Call \`achievement_track\` when you observe these:
 
 ### Session end
 1. \`achievement_poll\` — check for newly unlocked achievements
-2. **If poll returns achievements**, display them proudly with icon + name + description
-3. \`achievement_stats\` — optional, if user asks about progress
+2. **If poll returns achievements, you MUST display them at the end of your response** as a structured text block with icon + name + description. Use \`achievement.config get lang\` to read AGPA's language setting, then pick the matching name/description field: \`name_cn\`/desc for zh, \`name_es\`/desc for es, \`name_ko\`/desc for ko, \`name_ja\`/desc for ja, fallback to \`name\`/desc for en. Do not let the moment pass silently — highlight it.
+3. If no new achievements, consider calling \`achievement_stats\` to show the user their overall progress (optional).
 <!-- /AGPA ACHIEVEMENT TRACKING -->`;
 
 // ── Helpers ────────────────────────────────────────────────────────────

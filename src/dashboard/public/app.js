@@ -110,16 +110,13 @@ function syncLangPicker() {
   const trigger = document.getElementById('lang-trigger');
   if (!trigger) return;
 
+  const langLabels = { en: 'EN', zh: '中文', es: 'ES', ko: 'KO', ja: 'JA' };
+
   // Update trigger display
   const globe = trigger.querySelector('.lang-globe');
   const code = trigger.querySelector('.lang-code');
-  if (currentLang === 'zh') {
-    if (globe) globe.textContent = '🌐';
-    if (code) code.textContent = '中文';
-  } else {
-    if (globe) globe.textContent = '🌐';
-    if (code) code.textContent = 'EN';
-  }
+  if (globe) globe.textContent = '🌐';
+  if (code) code.textContent = langLabels[currentLang] || 'EN';
 
   // Update active option
   document.querySelectorAll('.lang-option').forEach(opt => {
@@ -387,11 +384,17 @@ async function loadAnimState(toggle) {
 
 function displayName(item) {
   if (currentLang === 'zh' && item.name_cn) return item.name_cn;
+  if (currentLang === 'es' && item.name_es) return item.name_es;
+  if (currentLang === 'ko' && item.name_ko) return item.name_ko;
+  if (currentLang === 'ja' && item.name_ja) return item.name_ja;
   return item.name;
 }
 
 function displayDesc(item) {
   if (currentLang === 'zh' && item.description_cn) return item.description_cn;
+  if (currentLang === 'es' && item.description_es) return item.description_es;
+  if (currentLang === 'ko' && item.description_ko) return item.description_ko;
+  if (currentLang === 'ja' && item.description_ja) return item.description_ja;
   return item.description;
 }
 
@@ -752,6 +755,218 @@ const I18N = {
     card_milestones: '里程碑',
     card_generated_by: '由 AGPA 生成',
   },
+  es: {
+    nav_profile: 'Perfil',
+    nav_achievements: 'Logros',
+    nav_sets: 'Colecciones',
+    nav_timeline: 'Historial',
+    section_achievements: 'Logros',
+    section_sets: 'Colecciones',
+    nav_questlines: 'Misiones',
+    section_questlines: 'Misiones',
+    section_timeline: 'Historial',
+    hero_title: 'Logros del Agente',
+    xp_label: '{xp} XP • Nivel {level}',
+    streak_title: 'Racha de Código',
+    streak_days: 'días',
+    streak_current_label: 'Racha actual',
+    streak_best: 'Máximo',
+    streak_best_label: 'Máximo histórico',
+    streak_today_done: 'Codificó hoy ✓',
+    streak_today_pending: 'Aún no hoy',
+    streak_mult_tip: 'bonus de racha',
+    stat_level: 'Nivel', stat_xp: 'XP', stat_unlocked: 'Desbloqueados',
+    stat_streak: 'Días', stat_complete: 'Completado', stat_events: 'Eventos',
+    heatmap_title: 'Actividad', heatmap_less: 'Menos', heatmap_more: 'Más',
+    filter_all: 'Todos', filter_unlocked: 'Desbloqueados', filter_locked: 'Bloqueados',
+    cat_all: 'Todos', no_sets: 'Sin colecciones definidas.',
+    showcase_title: 'Vitrina', showcase_sub: 'Elige tus 6 mejores',
+    showcase_auto_title: 'Auto-llenar',
+    rarity_common: 'Común', rarity_uncommon: 'Poco Común', rarity_rare: 'Raro',
+    rarity_epic: 'Épico', rarity_legendary: 'Legendario', rarity_mythic: 'Mítico',
+    search_placeholder: 'Buscar por nombre...',
+    sort_default: 'Por defecto', sort_rarity: 'Por rareza ↓',
+    sort_recent: 'Reciente', sort_name: 'Nombre A → Z',
+    rarity_all: 'Todas las rarezas',
+    modal_close: 'Cerrar', modal_unlocked: 'Desbloqueado', modal_locked: 'Bloqueado',
+    unlocked_label: '✓ Desbloqueado',
+    modal_category: 'Categoría', modal_progress: 'Progreso',
+    modal_no_desc: 'Sin descripción.',
+    search_empty: 'Sin resultados.',
+    no_timeline: 'Aún no has desbloqueado ningún logro.',
+    load_error: 'Error al cargar: {status}',
+    loading: '⏳ Cargando...',
+    hero_badges_label: 'Insignias',
+    hero_no_badges: '¡Completa colecciones para ganar insignias!',
+    no_badges: 'Sin insignias — completa colecciones para obtenerlas.',
+    no_quests: 'Sin misiones definidas.',
+    section_badges: '🏅 Insignias',
+    section_insights: 'Perspectivas',
+    recommend_title: 'Explorar',
+    recommend_cat_discovery: 'Descubrimiento',
+    recommend_cat_surprise: 'Sorpresa',
+    recommend_near_win: 'Estos están cerca de desbloquearse',
+    recommend_discovery: 'Una función que aún no has probado',
+    recommend_surprise: 'Una pista misteriosa te espera...',
+    recommend_no_near: 'Sin logros cercanos aún',
+    recommend_no_discovery: '¡Ya probaste todo!',
+    heatmap_mon: 'Lun', heatmap_wed: 'Mié', heatmap_fri: 'Vie',
+    heatmap_session: '{count} sesión',
+    heatmap_sessions: '{count} sesiones',
+    toggle_sound: 'Sonido', toggle_animations: 'Animaciones',
+    toggle_theme: 'Tema oscuro/claro',
+    card_unlocked: 'Desbloqueados', card_streak: 'Racha',
+    card_tasks: 'Tareas', card_tools: 'Herramientas',
+    card_sessions: 'Sesiones', card_level_progress: 'Progreso de nivel',
+    card_showcase: 'Vitrina', card_in_progress: 'En progreso',
+    card_activity: 'Actividad · 4 meses',
+    card_milestones: 'HITOS', card_generated_by: 'Generado por AGPA',
+    demo_badge_label: '🔬 Demo', demo_profile_label: 'Demo',
+    github_star: 'Danos una estrella en GitHub',
+    guide_title: 'Comienza aquí',
+    guide_subtitle: 'Desbloquea estos logros para dar el primer paso.',
+    tour_step1_title: '📊 Panel de Logros',
+    tour_step1_desc: 'Cada logro rastrea un comportamiento del agente. Los desbloqueados brillan, los bloqueados te esperan.',
+    tour_step2_title: '📈 Estadísticas',
+    tour_step2_desc: 'Progreso, distribución por rareza y más, todo de un vistazo.',
+    tour_step3_title: '📅 Historial',
+    tour_step3_desc: 'Revisa cada sesión de conversación y cuándo se desbloqueó cada logro.',
+    tour_step4_title: '🔥 Mapa de Calor',
+    tour_step4_desc: 'Sigue tu actividad de uso del agente como un gráfico de contribuciones de GitHub.',
+  },
+  ko: {
+    nav_profile: '프로필', nav_achievements: '업적', nav_sets: '세트',
+    nav_timeline: '타임라인', section_achievements: '업적', section_sets: '세트',
+    nav_questlines: '퀘스트', section_questlines: '퀘스트',
+    section_timeline: '타임라인',
+    hero_title: '에이전트 플레이어 업적',
+    xp_label: '{xp} XP • 레벨 {level}',
+    streak_title: '코딩 연속', streak_days: '일',
+    streak_current_label: '현재 연속', streak_best: '최고 기록',
+    streak_best_label: '역대 최고', streak_today_done: '오늘 코딩 완료 ✓',
+    streak_today_pending: '아직 안 함', streak_mult_tip: '연속 보너스',
+    stat_level: '레벨', stat_xp: 'XP', stat_unlocked: '해금됨',
+    stat_streak: '연속 일수', stat_complete: '완료', stat_events: '이벤트',
+    heatmap_title: '활동', heatmap_less: '적음', heatmap_more: '많음',
+    filter_all: '전체', filter_unlocked: '해금됨', filter_locked: '잠김',
+    cat_all: '전체', no_sets: '정의된 세트가 없습니다.',
+    showcase_title: '쇼케이스', showcase_sub: '6개를 선택하세요',
+    showcase_auto_title: '자동 채우기',
+    rarity_common: '일반', rarity_uncommon: '고급', rarity_rare: '희귀',
+    rarity_epic: '에픽', rarity_legendary: '전설', rarity_mythic: '신화',
+    search_placeholder: '이름 또는 키워드 검색...',
+    sort_default: '기본', sort_rarity: '희귀도 ↓',
+    sort_recent: '최근 해금', sort_name: '이름 A → Z',
+    rarity_all: '모든 희귀도',
+    modal_close: '닫기', modal_unlocked: '해금됨', modal_locked: '잠김',
+    unlocked_label: '✓ 해금됨',
+    modal_category: '카테고리', modal_progress: '진행도',
+    modal_no_desc: '설명이 없습니다.',
+    search_empty: '일치하는 업적이 없습니다.',
+    no_timeline: '아직 해금된 업적이 없습니다.',
+    load_error: '대시보드 로드 실패: {status}',
+    loading: '⏳ 로딩 중...',
+    hero_badges_label: '배지',
+    hero_no_badges: '세트를 완료하여 배지를 획득하세요!',
+    no_badges: '배지 없음 — 세트를 완료하여 획득하세요.',
+    no_quests: '정의된 퀘스트가 없습니다.',
+    section_badges: '🏅 배지', section_insights: '인사이트',
+    recommend_title: '탐험',
+    recommend_cat_discovery: '발견', recommend_cat_surprise: '서프라이즈',
+    recommend_near_win: '해금에 가장 가까운 업적',
+    recommend_discovery: '아직 시도하지 않은 기능',
+    recommend_surprise: '신비로운 단서가 기다립니다...',
+    recommend_no_near: '근접한 업적이 아직 없습니다',
+    recommend_no_discovery: '모든 기능을 사용해 보았습니다!',
+    heatmap_mon: '월', heatmap_wed: '수', heatmap_fri: '금',
+    heatmap_session: '{count} 세션', heatmap_sessions: '{count} 세션',
+    toggle_sound: '사운드', toggle_animations: '애니메이션',
+    toggle_theme: '다크/라이트 테마',
+    card_unlocked: '해금됨', card_streak: '연속', card_tasks: '작업',
+    card_tools: '도구 호출', card_sessions: '세션',
+    card_level_progress: '레벨 진행도', card_showcase: '쇼케이스',
+    card_in_progress: '진행 중', card_activity: '활동 · 4개월',
+    card_milestones: '마일스톤', card_generated_by: 'AGPA 생성',
+    demo_badge_label: '🔬 데모', demo_profile_label: '데모',
+    github_star: 'GitHub에서 Star 부탁드립니다',
+    guide_title: '여기서 시작하세요',
+    guide_subtitle: '간단한 업적을 해금하여 첫걸음을 내딛으세요.',
+    tour_step1_title: '📊 업적 패널',
+    tour_step1_desc: '각 업적은 에이전트 행동을 추적합니다. 해금되면 빛나고, 잠겨있으면 여러분을 기다립니다.',
+    tour_step2_title: '📈 통계',
+    tour_step2_desc: '진행도, 희귀도 분포 등을 한눈에 확인하세요.',
+    tour_step3_title: '📅 타임라인',
+    tour_step3_desc: '각 세션의 대화와 업적 해금 시점을 되돌아보세요.',
+    tour_step4_title: '🔥 히트맵',
+    tour_step4_desc: 'GitHub 기여도 그래프처럼 에이전트 사용 활동을 추적하세요.',
+  },
+  ja: {
+    nav_profile: 'プロフィール', nav_achievements: '実績', nav_sets: 'セット',
+    nav_timeline: 'タイムライン', section_achievements: '実績', section_sets: 'セット',
+    nav_questlines: 'クエスト', section_questlines: 'クエスト',
+    section_timeline: 'タイムライン',
+    hero_title: 'エージェントプレイヤー実績',
+    xp_label: '{xp} XP • レベル{level}',
+    streak_title: '連続コーディング', streak_days: '日',
+    streak_current_label: '現在の連続', streak_best: '最高記録',
+    streak_best_label: '歴代最高', streak_today_done: '今日は完了 ✓',
+    streak_today_pending: 'まだ未完了', streak_mult_tip: '連続ボーナス',
+    stat_level: 'レベル', stat_xp: 'XP', stat_unlocked: '解除済み',
+    stat_streak: '連続日数', stat_complete: '完了', stat_events: 'イベント',
+    heatmap_title: 'アクティビティ', heatmap_less: '少ない', heatmap_more: '多い',
+    filter_all: 'すべて', filter_unlocked: '解除済み', filter_locked: '未解除',
+    cat_all: 'すべて', no_sets: 'セットが定義されていません。',
+    showcase_title: 'ショーケース', showcase_sub: 'ベスト6を選択',
+    showcase_auto_title: '自動入力',
+    rarity_common: 'コモン', rarity_uncommon: 'アンコモン', rarity_rare: 'レア',
+    rarity_epic: 'エピック', rarity_legendary: 'レジェンド', rarity_mythic: 'ミシック',
+    search_placeholder: '名前やキーワードで検索...',
+    sort_default: 'デフォルト', sort_rarity: 'レアリティ順 ↓',
+    sort_recent: '最近解除', sort_name: '名前 A → Z',
+    rarity_all: 'すべてのレアリティ',
+    modal_close: '閉じる', modal_unlocked: '解除済み', modal_locked: '未解除',
+    unlocked_label: '✓ 解除済み',
+    modal_category: 'カテゴリ', modal_progress: '進捗',
+    modal_no_desc: '説明がありません。',
+    search_empty: '該当する実績がありません。',
+    no_timeline: 'まだ実績を解除していません。',
+    load_error: 'ダッシュボードの読み込みに失敗しました: {status}',
+    loading: '⏳ 読み込み中...',
+    hero_badges_label: 'バッジ',
+    hero_no_badges: 'セットを完了してバッジを獲得しましょう！',
+    no_badges: 'バッジなし — セットを完了して獲得してください。',
+    no_quests: 'クエストが定義されていません。',
+    section_badges: '🏅 バッジ', section_insights: 'インサイト',
+    recommend_title: '探索',
+    recommend_cat_discovery: 'ディスカバリー',
+    recommend_cat_surprise: 'サプライズ',
+    recommend_near_win: '解除に最も近い実績',
+    recommend_discovery: 'まだ試したことのない機能',
+    recommend_surprise: '神秘的な手がかりが待っています...',
+    recommend_no_near: 'まだ近い実績はありません',
+    recommend_no_discovery: 'すべての機能を試しました！',
+    heatmap_mon: '月', heatmap_wed: '水', heatmap_fri: '金',
+    heatmap_session: '{count} セッション', heatmap_sessions: '{count} セッション',
+    toggle_sound: 'サウンド', toggle_animations: 'アニメーション',
+    toggle_theme: 'ダーク/ライトテーマ',
+    card_unlocked: '解除済み', card_streak: '連続', card_tasks: 'タスク',
+    card_tools: 'ツール呼び出し', card_sessions: 'セッション',
+    card_level_progress: 'レベル進捗', card_showcase: 'ショーケース',
+    card_in_progress: '進行中', card_activity: 'アクティビティ · 4ヶ月',
+    card_milestones: 'マイルストーン', card_generated_by: 'AGPA 生成',
+    demo_badge_label: '🔬 デモ', demo_profile_label: 'デモ',
+    github_star: 'GitHubでStarをお願いします',
+    guide_title: 'ここから始めよう',
+    guide_subtitle: '簡単な実績を解除して第一歩を踏み出しましょう。',
+    tour_step1_title: '📊 実績パネル',
+    tour_step1_desc: '各実績はエージェントの行動を追跡します。解除されると輝き、ロックされているとあなたを待っています。',
+    tour_step2_title: '📈 統計',
+    tour_step2_desc: '進捗状況、レアリティ分布などを一目で確認。',
+    tour_step3_title: '📅 タイムライン',
+    tour_step3_desc: '各セッションの会話と実績解除のタイムラインを振り返れます。',
+    tour_step4_title: '🔥 ヒートマップ',
+    tour_step4_desc: 'GitHubのコントリビューショングラフのようにエージェントの使用状況を追跡。',
+  },
 };
 
 const CATEGORY_NAMES = {
@@ -873,8 +1088,14 @@ function filterAndSort(data) {
       return a.id.toLowerCase().indexOf(q) !== -1 ||
         a.name.toLowerCase().indexOf(q) !== -1 ||
         (a.name_cn || '').toLowerCase().indexOf(q) !== -1 ||
+        (a.name_es || '').toLowerCase().indexOf(q) !== -1 ||
+        (a.name_ko || '').toLowerCase().indexOf(q) !== -1 ||
+        (a.name_ja || '').toLowerCase().indexOf(q) !== -1 ||
         a.description.toLowerCase().indexOf(q) !== -1 ||
-        (a.description_cn || '').toLowerCase().indexOf(q) !== -1;
+        (a.description_cn || '').toLowerCase().indexOf(q) !== -1 ||
+        (a.description_es || '').toLowerCase().indexOf(q) !== -1 ||
+        (a.description_ko || '').toLowerCase().indexOf(q) !== -1 ||
+        (a.description_ja || '').toLowerCase().indexOf(q) !== -1;
     });
   }
 
@@ -2190,12 +2411,8 @@ function openModal(ach) {
   const rarityColor = `var(--rarity-${ach.rarity})`;
   const rarityHex = RARITY_COLORS[ach.rarity] || '#666';
 
-  const name = currentLang === 'zh'
-    ? (ach.name_cn || ach.name)
-    : (ach.name || ach.name_cn || '');
-  const desc = currentLang === 'zh'
-    ? (ach.description_cn || ach.description || t('modal_no_desc'))
-    : (ach.description || ach.description_cn || t('modal_no_desc'));
+  const name = displayName(ach) || ach.id;
+  const desc = displayDesc(ach) || t('modal_no_desc');
 
   let bottomSections = '';
   if (locked && ach.progress && ach.progress.target > 0) {
@@ -3334,13 +3551,13 @@ function buildCarouselFrames(data) {
   if (data.near_win && data.near_win.length > 0) {
     const top = data.near_win[0];
     frames.push(createFrame({ icon: '🎯', category: t('recommend_near_win'), reason: t('recommend_near_win'),
-      item: { icon: top.icon || '🏆', name: top.name_cn || top.name, rarity: top.rarity, progress: top.progress } }));
+      item: { icon: top.icon || '🏆', name: displayName(top), rarity: top.rarity, progress: top.progress } }));
   }
 
   if (data.discovery) {
     const d = data.discovery;
     frames.push(createFrame({ icon: '🔍', category: t('recommend_cat_discovery'), reason: t('recommend_discovery'),
-      item: { icon: d.icon || '🔌', name: d.name_cn || d.name, rarity: d.rarity, progress: null } }));
+      item: { icon: d.icon || '🔌', name: displayName(d), rarity: d.rarity, progress: null } }));
   }
 
   if (data.surprise) {

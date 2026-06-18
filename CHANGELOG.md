@@ -1,5 +1,11 @@
 # Changelog
 
+### 批量生成 66 张像素画 + 1:1 比例规范 — 2026-06-18
+
+- **217 条生图 prompt 统一添加"1:1 正方形比例"**: `docs/pixel-art-ideas.md` 全部描述追加比例说明，文件头新增规范描述
+- **生成 66 张像素画**: 通过 Gemini API 完成 Onboarding（14 张）、Tool Mastery（38 张）、Milestones（14 张）三个分类
+- **存量图片覆盖重生成**: first_contact、shell_shocker、perfectionist、pipemaster 等多轮重试优化
+
 ### 像素画描述统一风格前缀 — 2026-06-18
 
 - **217 条生图 prompt 统一添加"高清像素风。"前缀**: `docs/pixel-art-ideas.md` 中所有成就的像素画描述，将开头变体（`像素`、`像素风格的`、`一个像素`、`一棵像素`、`三只像素` 等）统一为 `高清像素风。`

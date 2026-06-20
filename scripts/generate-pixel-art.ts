@@ -60,13 +60,14 @@ function systemPrompt(ratio: string): string {
     : ratio === '2:3' ? 'portrait (2:3)'
     : ratio === '3:4' ? 'portrait (3:4)'
     : ratio === '21:9' ? 'ultrawide cinematic (21:9)'
+    : ratio === '3:1' ? 'widescreen landscape (3:1)'
     : ratio === '1:1' ? 'square (1:1)'
     : `${ratio}`;
 
   return `Create a pixel art image in ${aspect} aspect ratio.
 
 CRITICAL STYLE RULES:
-- TRUE PIXEL ART style: visible square pixels, limited color palette (8-16 colors max)
+- TRUE PIXEL ART style: visible square pixels, limited color palette (10-32 colors max)
 - NO anti-aliasing, NO smooth curves, NO gradients, NO photorealism
 - Sharp blocky edges — like SNES / GBA era game sprites
 - Dark outlines around main subjects (retro game art style)
@@ -183,7 +184,7 @@ function parsePixelArtDoc(filePath: string): { category: string; entries: Achiev
   for (const line of lines) {
     const catMatch = line.match(/^## (.+)/);
     if (catMatch) {
-      if (currentCategory && currentEntries.length > 0) {
+      if (currentEntries.length > 0) {
         sections.push({ category: currentCategory, entries: currentEntries });
       }
       currentCategory = catMatch[1]!.trim();
@@ -205,7 +206,7 @@ function parsePixelArtDoc(filePath: string): { category: string; entries: Achiev
           nameCn: cells[1]!,
           descCn: cells[2]!,
           pixelArtDesc: cells[3]!,
-          category: currentCategory,
+          category: currentCategory || 'All',
         });
       }
     }
@@ -215,8 +216,8 @@ function parsePixelArtDoc(filePath: string): { category: string; entries: Achiev
     }
   }
 
-  if (currentCategory && currentEntries.length > 0) {
-    sections.push({ category: currentCategory, entries: currentEntries });
+  if (currentEntries.length > 0) {
+    sections.push({ category: currentCategory || 'All', entries: currentEntries });
   }
 
   return sections;
@@ -224,14 +225,18 @@ function parsePixelArtDoc(filePath: string): { category: string; entries: Achiev
 
 // ── Prompt builder ────────────────────────────────────────────────────────
 
-function buildPrompt(entry: AchievementEntry, ratio: string): string {
-  return `${systemPrompt(ratio)}
+function getRatioForCategory(category: string, defaultRatio: string): string {
+  if (category.toLowerCase().includes('questline')) return '3:1';
+  return defaultRatio;
+}
 
-ACHIEVEMENT: ${entry.nameCn} (${entry.id})
-MEANING: ${entry.descCn}
+function buildPrompt(entry: AchievementEntry, ratio: string): string {
+  const actualRatio = getRatioForCategory(entry.category, ratio);
+  return `${systemPrompt(actualRatio)}
+
 SCENE: ${entry.pixelArtDesc}
 
-The image should clearly communicate the achievement concept at a glance.`;
+The image should clearly communicate the concept at a glance.`;
 }
 
 // ── API call ───────────────────────────────────────────────────────────────
@@ -295,7 +300,7 @@ async function generateImage(prompt: string, apiKey: string): Promise<{ data: st
 async function main(): Promise<void> {
   const args = parseArgs();
 
-  const docPath = path.join(PROJECT_ROOT, 'docs', 'pixel-art-ideas.md');
+  const docPath = path.join(PROJECT_ROOT, 'docs', 'pixel-art-ideas-a-z.md');
   if (!fs.existsSync(docPath)) {
     console.error(`Pixel art document not found: ${docPath}`);
     process.exit(1);

@@ -42,6 +42,8 @@ const MIME_TYPES: Record<string, string> = {
   '.png': 'image/png',
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
 };
 
 // ── Read version from package.json (once, at module load) ──────────────

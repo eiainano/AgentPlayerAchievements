@@ -1592,7 +1592,7 @@ body[data-showcase-border="gold"] .showcase-card {
 /* ── Achievement Grid ──────────────────────────────── */
 .achievement-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 10px;
 }
 
@@ -1624,7 +1624,7 @@ body[data-showcase-border="gold"] .showcase-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 14px 14px 12px;
+  padding: 6px 6px 4px;
   cursor: crosshair;
   transition: all .3s cubic-bezier(.4,0,.2,1);
   position: relative;
@@ -1634,7 +1634,7 @@ body[data-showcase-border="gold"] .showcase-card {
   animation-delay: var(--delay, 0ms);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
   /* 3D perspective for tilt effect (applied via JS inline style) */
   perspective: 600px;
   will-change: transform;
@@ -1747,36 +1747,56 @@ body[data-showcase-border="gold"] .showcase-card {
   50%      { opacity: 1;  transform: scale(1.2); text-shadow: 0 0 12px currentColor; }
 }
 
-/* Icon */
+/* Icon — hero image fills card top, 1:1 square with inner border-radius */
 .ach-icon-wrap {
-  width: 38px; height: 38px;
-  border-radius: 10px;
-  background: var(--bg-surface);
+  width: 100%;
+  aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 2px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  position: relative;
+  margin: 0;
 }
 .ach-icon { font-size: 20px; line-height: 1; }
 [data-theme="dark"] .ach-icon { filter: brightness(1.15); }
 
-/* Pixel art image icon */
+/* Pixel art image icon — fill the container */
 .ach-icon-img {
   display: inline-block;
   vertical-align: middle;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
-[data-theme="dark"] .ach-icon-img { filter: brightness(1.1); }
+/* Inside achievement cards, image fills the icon wrap */
+.ach-icon-wrap .ach-icon-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+  border-radius: inherit;
+}
+[data-theme="dark"] .ach-icon-wrap .ach-icon-img { filter: brightness(1.1); }
 
-/* Name */
+/* Locked pixel art — extreme blur */
+.ach-icon-img.locked-blur {
+  filter: blur(16px) grayscale(0.6) brightness(0.45);
+  opacity: 0.35;
+}
+[data-theme="dark"] .ach-icon-img.locked-blur {
+  filter: blur(16px) grayscale(0.6) brightness(0.3);
+}
+
+/* Name — ultra-compact below image */
 .ach-name {
-  font-size: 13px;
+  font-size: 10.5px;
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.2;
   text-align: center;
   font-family: var(--font-display);
   letter-spacing: -.1px;
+  padding: 4px 6px 0;
 }
 
 /* ── Unlocked card name rarity glow ── */
@@ -1867,43 +1887,51 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
   animation: name-glow 3s ease-in-out infinite;
 }
 
-/* Rarity badge */
+/* Rarity badge — overlay on image top-right */
 .ach-rarity-badge {
-  display: inline-block;
-  align-self: center;
-  font-size: 9.5px;
-  font-weight: 600;
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 3;
+  font-size: 8.5px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: .6px;
-  padding: 2px 8px;
-  border-radius: 10px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
+  letter-spacing: .7px;
+  padding: 3px 7px;
+  border-radius: 8px;
+  background: rgba(0,0,0,.75);
+  border: 1px solid rgba(255,255,255,.15);
   color: var(--rarity-common);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
 }
-.ach-card[data-rarity="uncommon"] .ach-rarity-badge { color: var(--rarity-uncommon); border-color: rgba(78, 196, 110, .25); background: rgba(78, 196, 110, .06); }
-.ach-card[data-rarity="rare"] .ach-rarity-badge { color: var(--rarity-rare); border-color: rgba(80, 144, 240, .25); background: rgba(80, 144, 240, .06); }
-.ach-card[data-rarity="epic"] .ach-rarity-badge { color: var(--rarity-epic); border-color: rgba(180, 92, 240, .25); background: rgba(180, 92, 240, .06); }
-.ach-card[data-rarity="legendary"] .ach-rarity-badge { color: var(--rarity-legendary); border-color: rgba(240, 152, 32, .25); background: rgba(240, 152, 32, .06); }
-.ach-card[data-rarity="mythic"] .ach-rarity-badge { color: var(--rarity-mythic); border-color: rgba(240, 64, 80, .25); background: rgba(240, 64, 80, .06); }
+.ach-card[data-rarity="uncommon"] .ach-rarity-badge { color: #4ec46e; border-color: rgba(78,196,110,.35); }
+.ach-card[data-rarity="rare"] .ach-rarity-badge { color: #5090f0; border-color: rgba(80,144,240,.35); }
+.ach-card[data-rarity="epic"] .ach-rarity-badge { color: #b45cf0; border-color: rgba(180,92,240,.35); }
+.ach-card[data-rarity="legendary"] .ach-rarity-badge { color: #f09820; border-color: rgba(240,152,32,.35); }
+.ach-card[data-rarity="mythic"] .ach-rarity-badge { color: #f04050; border-color: rgba(240,64,80,.35); }
 
-/* Unlocked label */
+/* Unlocked label — ultra-compact */
 .ach-unlocked-label {
   display: inline-block;
   align-self: center;
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 8px;
+  font-weight: 700;
   color: var(--accent);
-  letter-spacing: .3px;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+  padding: 0 8px 0;
+  line-height: 1.1;
 }
 
 /* Progress */
 .ach-progress {
-  height: 5px;
-  border-radius: 3px;
+  height: 3px;
+  border-radius: 2px;
   background: var(--bg-surface);
   overflow: hidden;
   position: relative;
+  margin: 2px 8px 0;
 }
 .ach-progress-fill {
   height: 100%;
@@ -1928,18 +1956,20 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
 
 /* Hidden hint */
 .ach-hidden-hint {
-  font-size: 10px;
+  font-size: 9px;
   color: var(--text-muted);
   font-style: italic;
   text-align: center;
+  padding: 0 6px;
+  line-height: 1.2;
 }
 
 .ach-hint {
-  font-size: 10px;
+  font-size: 9px;
   color: var(--text-dim);
   text-align: center;
-  padding: 4px 6px 0;
-  line-height: 1.3;
+  padding: 2px 6px 0;
+  line-height: 1.2;
   opacity: .7;
 }
 
@@ -1959,21 +1989,18 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
 
 /* Enhanced locked state — mystery card feel */
 .ach-card.locked {
-  filter: grayscale(100%);
-  opacity: .4;
+  opacity: .85;
   box-shadow: none;
   background: var(--bg-surface);
   background-image:
     repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(128,128,144,0.03) 8px, rgba(128,128,144,0.03) 16px);
 }
 .ach-card.locked:hover {
-  opacity: .6;
-  filter: grayscale(70%);
+  opacity: .95;
 }
-.ach-card.locked .ach-stripe { background: var(--text-muted); }
+.ach-card.locked .ach-stripe { background: var(--text-muted); opacity: .3; }
 .ach-card.locked .ach-icon-wrap {
-  background: transparent;
-  opacity: 1;
+  background: rgba(0,0,0,.15);
 }
 .ach-card.locked .ach-name {
   color: var(--text-muted);
@@ -1981,7 +2008,7 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
   animation: none;
 }
 .ach-card.locked .ach-rarity-badge {
-  opacity: .5;
+  opacity: .4;
 }
 
 /* ── Showcase pick mode ──────────────────── */
@@ -2059,6 +2086,9 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
 }
 
 /* ── Responsive grid ─────────────────────────────── */
+@media (max-width: 1200px) {
+  .achievement-grid { grid-template-columns: repeat(4, 1fr); }
+}
 @media (max-width: 1000px) {
   .achievement-grid { grid-template-columns: repeat(3, 1fr); }
 }
@@ -2903,7 +2933,7 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
   transform-origin: center center;
 }
 
-/* Rarity top accent bar */
+/* Rarity top accent bar — over hero image */
 .modal-container::before {
   content: '';
   position: absolute;
@@ -2911,7 +2941,7 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
   height: 3px;
   background: var(--modal-rarity-color, var(--border));
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  z-index: 1;
+  z-index: 6;
   transition: background .3s ease;
 }
 
@@ -2935,14 +2965,18 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
   to   { transform: scale(.85) translateY(20px); opacity: 0; filter: blur(6px); }
 }
 
-.modal-header {
+/* Hero image section — inset with gap from modal edges */
+.modal-hero {
+  position: relative;
+  width: calc(100% - 16px);
+  margin: 12px 8px 0;
+  aspect-ratio: 3 / 2;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  padding: 28px 28px 0;
-}
-
-.modal-icon-wrap {
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  overflow: hidden;
   animation: icon-bounce-in .35s .08s cubic-bezier(.34,1.56,.64,1) both;
 }
 @keyframes icon-bounce-in {
@@ -2951,18 +2985,30 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
   100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 
-.modal-icon {
-  font-size: 48px;
+.modal-hero .ach-icon-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.modal-hero-icon {
+  font-size: 80px;
   line-height: 1;
 }
 
+/* Close button — overlay on hero image */
 .modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
-  color: var(--text-dim);
+  border: 1px solid rgba(255,255,255,.2);
+  background: rgba(0,0,0,.65);
+  backdrop-filter: blur(6px);
+  color: #fff;
   font-size: 16px;
   cursor: pointer;
   display: flex;
@@ -2985,10 +3031,10 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
 }
 
 .modal-body {
-  padding: 16px 28px 28px;
+  padding: 12px 24px 20px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 /* ── Staggered content reveal ── */
@@ -3663,6 +3709,14 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
   width: 3px; height: 44px; border-radius: 2px; flex-shrink: 0; align-self: stretch;
 }
 .card-ach-icon { font-size: 32px; flex-shrink: 0; line-height: 1; }
+.card-ach-pixel {
+  width: 48px; height: 48px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  border-radius: 6px;
+  display: block;
+}
 .card-ach-body { flex: 1; min-width: 0; }
 .card-ach-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
 .card-ach-name { font-size: 14px; font-weight: 700; }
@@ -4805,7 +4859,7 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
 
   /* Modal — fullscreen */
   .modal-container { width: 100vw; height: 100vh; border-radius: 0; padding: 16px; overflow-y: auto; }
-  .modal-icon-wrap { font-size: 40px; }
+  .modal-hero { aspect-ratio: 1/1; width: calc(100% - 12px); margin: 10px 6px 0; }
 
   /* Onboarding guide */
   .onboarding-guide-section { padding: 16px 12px; }
@@ -4934,6 +4988,35 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
 
 .questline-card.complete .questline-card-bar-fill {
   background: var(--gold);
+}
+
+/* Hero banner image — shown only when expanded */
+.questline-hero {
+  display: none;
+  width: 100%;
+  aspect-ratio: 3 / 1;
+  margin-top: 12px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-card);
+}
+.questline-hero .ach-icon-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+.questline-hero .ach-icon {
+  /* emoji fallback: large centered */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 36px;
+}
+.questline-card.expanded .questline-hero {
+  display: block;
 }
 
 /* Expanded stages */

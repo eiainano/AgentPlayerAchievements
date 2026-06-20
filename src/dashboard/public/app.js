@@ -1180,7 +1180,14 @@ var PixelArtRenderer = (function() {
 
 /** Render achievement icon as emoji span, pixel-art img, or file-path img */
 function iconHtml(icon, opts = {}) {
-  const { size = 20, className = '', pixelArt } = opts;
+  const { size = 20, className = '', pixelArt, pixelArtUrl, locked = false } = opts;
+
+  // Pixel art URL (file-based images from pixel-art-output/) — top priority
+  if (pixelArtUrl) {
+    const lockedClass = locked ? ' locked-blur' : '';
+    const sizeStyle = `width:${size}px;height:${size}px;object-fit:contain`;
+    return `<img src="${escAttr(pixelArtUrl)}" class="ach-icon-img${lockedClass} ${className}" style="${sizeStyle}" alt="">`;
+  }
 
   // Pixel art data → inline SVG image (takes priority)
   if (pixelArt && pixelArt.palette && pixelArt.data) {
@@ -2090,7 +2097,7 @@ function renderProfile(data) {
         return `<div class="showcase-slot filled" data-rarity="${s.achievement.rarity}"
           title="${escHtml(nameDisplay)} — ${t('click_to_remove')}"
           onclick="clearSlot(${s.slot})">
-          ${iconHtml(s.achievement.icon, { size: 32, className: 'showcase-slot-icon', pixelArt: s.achievement.pixel_art_48 })}
+          ${iconHtml(s.achievement.icon, { size: 32, className: 'showcase-slot-icon', pixelArt: s.achievement.pixel_art_48, pixelArtUrl: s.achievement.pixel_art_url })}
         </div>`;
       }
       return `<div class="showcase-slot empty"
@@ -2355,6 +2362,7 @@ function renderGrid(data) {
     const locked = !a.unlocked;
     const showIcon = locked && a.hidden ? '\u{1F512}' : a.icon;
     const showPixelArt = locked && a.hidden ? undefined : a.pixel_art_48;
+    const showPixelArtUrl = locked && a.hidden ? undefined : a.pixel_art_url;
     const progressPct = a.progress && a.progress.target > 0
       ? Math.min((a.progress.current / a.progress.target) * 100, 100)
       : 0;
@@ -2385,7 +2393,7 @@ function renderGrid(data) {
       <div class="ach-stripe"></div>
       ${cornerOrnament}
       ${pinBtn}
-      <div class="ach-icon-wrap">${iconHtml(showIcon, { pixelArt: showPixelArt })}</div>
+      <div class="ach-icon-wrap">${iconHtml(showIcon, { pixelArt: showPixelArt, pixelArtUrl: showPixelArtUrl, locked })}</div>
       <div class="ach-name">${escHtml(nameDisplay)}</div>
       ${unlockedLabel}
       <span class="ach-rarity-badge">${displayRarity(a.rarity)}</span>
@@ -2445,8 +2453,8 @@ function openModal(ach) {
   // Build innerHTML and set card-color in one synchronous block,
   // THEN restart the animation from a clean frame for both locked & unlocked.
   container.innerHTML = `
-    <div class="modal-header">
-      <span class="modal-icon-wrap">${iconHtml(locked && ach.hidden ? '\u{1F512}' : ach.icon, { size: 48, className: 'modal-icon', pixelArt: locked && ach.hidden ? undefined : ach.pixel_art_48 })}</span>
+    <div class="modal-hero">
+      ${iconHtml(locked && ach.hidden ? '\u{1F512}' : ach.icon, { size: 120, className: 'modal-hero-icon', pixelArt: locked && ach.hidden ? undefined : ach.pixel_art_48, pixelArtUrl: locked && ach.hidden ? undefined : ach.pixel_art_url, locked })}
       <button class="modal-close" onclick="closeModal()" title="${t('modal_close')}">✕</button>
     </div>
     <div class="modal-body">
@@ -2573,7 +2581,7 @@ function renderSets(data) {
     }, 'common');
 
     const membersHtml = set.achievements.map(a =>
-      `<div class="set-member ${a.unlocked ? 'unlocked' : 'locked'}" title="${escHtml(displayName(a))}">${iconHtml(a.unlocked ? a.icon : '?', { size: 16, pixelArt: a.unlocked ? a.pixel_art_48 : undefined })}</div>`
+      `<div class="set-member ${a.unlocked ? 'unlocked' : 'locked'}" title="${escHtml(displayName(a))}">${iconHtml(a.unlocked ? a.icon : '?', { size: 16, pixelArt: a.unlocked ? a.pixel_art_48 : undefined, pixelArtUrl: a.pixel_art_url, locked: !a.unlocked })}</div>`
     ).join('');
 
     const complete = set.completed === set.total && set.total > 0;
@@ -2583,7 +2591,7 @@ function renderSets(data) {
 
     return `<div class="set-card ${complete ? 'complete' : ''}">
       <div class="set-header">
-        ${iconHtml(set.achievements.find(a => a.unlocked)?.icon || '\u{1F4E6}', { size: 24, pixelArt: set.achievements.find(a => a.unlocked)?.pixel_art_48 })}
+        ${iconHtml(set.achievements.find(a => a.unlocked)?.icon || '\u{1F4E6}', { size: 24, pixelArt: set.achievements.find(a => a.unlocked)?.pixel_art_48, pixelArtUrl: set.achievements.find(a => a.unlocked)?.pixel_art_url })}
         <span class="set-name">${escHtml(currentLang === 'zh' && set.name_cn ? set.name_cn : set.name)}</span>
       </div>
       <div class="set-count">${set.completed}/${set.total}</div>
@@ -2618,7 +2626,7 @@ function renderQuestlines(data) {
       var stageNameStr = currentLang === 'zh' ? (s.name_cn || s.name) : s.name;
       var achsHtml = s.achievements.map(function(a) {
         return '<div class="questline-ach-badge ' + (a.unlocked ? 'unlocked' : 'locked') + '">' +
-          '<span class="ach-icon">' + (a.unlocked ? escHtml(a.icon) : '○') + '</span>' +
+          iconHtml(a.unlocked ? a.icon : '○', { size: 16, pixelArtUrl: a.pixel_art_url, locked: !a.unlocked }) +
           '<span>' + escHtml(currentLang === 'zh' && a.name_cn ? a.name_cn : a.name) + '</span>' +
         '</div>';
       }).join('');
@@ -2634,7 +2642,7 @@ function renderQuestlines(data) {
 
     return '<div class="questline-card' + (complete ? ' complete' : '') + '" onclick="toggleQuestlineCard(this)">' +
       '<div class="questline-card-header">' +
-        '<span class="questline-card-icon">' + escHtml(ql.icon) + '</span>' +
+        '<span class="questline-card-icon">' + iconHtml(ql.icon, { size: 28, pixelArtUrl: ql.pixel_art_url }) + '</span>' +
         '<div class="questline-card-info">' +
           '<div class="questline-card-name">' + escHtml(displayNameQl) + '</div>' +
           '<div class="questline-card-desc">' + escHtml(displayDesc) + '</div>' +
@@ -2647,6 +2655,7 @@ function renderQuestlines(data) {
       '<div class="questline-card-bar">' +
         '<div class="questline-card-bar-fill" style="width:' + escHtml(String(pct)) + '%"></div>' +
       '</div>' +
+      '<div class="questline-hero">' + iconHtml(ql.icon, { pixelArtUrl: ql.pixel_art_url }) + '</div>' +
       '<div class="questline-stages">' + stagesHtml + rewardHtml + '</div>' +
     '</div>';
   }).join('');
@@ -2761,7 +2770,7 @@ function renderTimeline(data) {
       const achRarity = e.ach.rarity || 'common';
       const achColor = rarityColor(achRarity);
       const nameHtml = escHtml(displayName(e.ach));
-      const iconHtmlStr = iconHtml(e.ach.icon, { size: 16, pixelArt: e.ach.pixel_art_48 });
+      const iconHtmlStr = iconHtml(e.ach.icon, { size: 16, pixelArt: e.ach.pixel_art_48, pixelArtUrl: e.ach.pixel_art_url });
       return `<div class="tl-ach-card" data-rarity="${achRarity}" style="--tl-delay:${idx * 60}ms">
         <div class="tl-ach-card-strip" style="background:${achColor}"></div>
         <div class="tl-ach-card-icon">${iconHtmlStr}</div>
@@ -3252,7 +3261,16 @@ function generateCardCore(btn) {
         preview.innerHTML = buildCardHTML(data);
         preview.style.visibility = 'visible';
 
-        requestAnimationFrame(function() {
+        // Wait for all images to load before capturing (pixel art must be ready)
+        var imgs = preview.querySelectorAll('img');
+        var imgPromises = Array.from(imgs).map(function(img) {
+          if (img.complete) return Promise.resolve();
+          return new Promise(function(resolve) {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        });
+        Promise.all(imgPromises).then(function() {
           html2canvas(preview, {
             scale: 2,
             backgroundColor: '#14151f',
@@ -3389,7 +3407,11 @@ function buildCardHTML(data) {
     var a = data.achievements[i];
     h += '<div class="card-ach-item">';
     h += '<div class="card-ach-rarity-strip" style="background:' + esc(a.rarity_color) + '"></div>';
-    h += '<div class="card-ach-icon">' + esc(a.icon) + '</div>';
+    if (a.pixel_art_url) {
+      h += '<div class="card-ach-icon"><img src="' + esc(a.pixel_art_url) + '" class="card-ach-pixel" alt=""></div>';
+    } else {
+      h += '<div class="card-ach-icon">' + esc(a.icon) + '</div>';
+    }
     h += '<div class="card-ach-body">';
     h += '<div class="card-ach-name-row"><span class="card-ach-name" style="color:' + esc(a.rarity_color) + '">' + esc(a.name) + '</span><span class="card-ach-badge" style="color:' + esc(a.rarity_color) + ';background:' + esc(a.rarity_color) + '22">' + esc(a.rarity_label) + '</span></div>';
     h += '<div class="card-ach-desc">' + esc(a.description) + '</div>';

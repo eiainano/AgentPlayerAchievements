@@ -45,6 +45,7 @@ export interface FormattedAchievement {
   set_progress?: { current: number; total: number; members: string[] };
   hidden?: boolean;
   pixel_art_48?: PixelArtSize;
+  pixel_art_url?: string;
 }
 
 export function formatAchievement(
@@ -71,6 +72,7 @@ export function formatAchievement(
     set_progress: ach.set_id ? computeSetProgress(engine, ach.set_id) : undefined,
     hidden: ach.hidden,
     pixel_art_48: ach.pixel_art?.['48'],
+    pixel_art_url: `/pixel-art/${ach.id}.jpg`,
   };
 }
 

@@ -55,6 +55,7 @@ export interface AchievementItem {
   unlocked_at?: string;
   progress?: { current: number; target: number };
   pixel_art_48?: PixelArtSize;
+  pixel_art_url?: string;
 }
 
 export interface SetAchievementMember {
@@ -64,6 +65,7 @@ export interface SetAchievementMember {
   rarity: RarityLevel;
   unlocked: boolean;
   pixel_art_48?: PixelArtSize;
+  pixel_art_url?: string;
 }
 
 export interface SetItem {
@@ -141,6 +143,7 @@ export interface QuestlineStageItem {
     icon: string;
     rarity: RarityLevel;
     unlocked: boolean;
+    pixel_art_url?: string;
   }>;
   completed: number;
   total: number;
@@ -162,6 +165,7 @@ export interface QuestlineItem {
   completed: boolean;
   reward: SetReward;
   reward_earned: boolean;
+  pixel_art_url?: string;
 }
 
 export interface StatCounterItem {
@@ -247,6 +251,7 @@ export interface CardAchievement {
   progress_pct?: number;
   progress_text?: string;
   pixel_art_48?: PixelArtSize;
+  pixel_art_url?: string;
 }
 
 export interface CardMilestone {
@@ -333,6 +338,7 @@ export function buildAchievementsResponse(
       unlocked_at: unlockedAt,
       progress: unlocked ? undefined : computeProgress(def, opts.events || []),
       pixel_art_48: def.pixel_art?.['48'],
+      pixel_art_url: `/pixel-art/${def.id}.jpg`,
     };
   });
 }
@@ -419,6 +425,7 @@ export function buildCardResponse(
       set_name: setDef ? _name(setDef) : undefined,
       set_progress: setDef ? `${setCompleted}/${setMembers.length}` : undefined,
       pixel_art_48: def.pixel_art?.['48'],
+      pixel_art_url: `/pixel-art/${def.id}.jpg`,
     });
   }
 
@@ -449,6 +456,7 @@ export function buildCardResponse(
         progress_pct: Math.round(x.ratio * 100),
         progress_text: `${x.result.progress} / ${x.result.target}`,
         pixel_art_48: def.pixel_art?.['48'],
+        pixel_art_url: `/pixel-art/${def.id}.jpg`,
       });
     }
   }
@@ -536,6 +544,7 @@ export function buildQuestlinesResponse(
           icon: def?.icon || '🏆',
           rarity: def?.rarity || 'common',
           unlocked,
+          pixel_art_url: `/pixel-art/${achId}.jpg`,
         };
       });
 
@@ -586,6 +595,7 @@ export function buildQuestlinesResponse(
       completed,
       reward: q.reward,
       reward_earned: completed,
+      pixel_art_url: `/pixel-art/${q.id}.jpg`,
     };
   });
 
@@ -626,6 +636,7 @@ export function buildSetsResponse(
         rarity: m.rarity,
         unlocked: !!state.unlocked[m.id],
         pixel_art_48: m.pixel_art?.['48'],
+        pixel_art_url: `/pixel-art/${m.id}.jpg`,
       })),
       completed: members.filter(m => state.unlocked[m.id]).length,
       total: members.length,

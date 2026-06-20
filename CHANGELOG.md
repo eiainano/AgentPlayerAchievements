@@ -1,5 +1,10 @@
 # Changelog
 
+### 删除 the_negotiator 成就 — 2026-06-20
+
+- **删除成就定义**: achievement-definitions.yaml 中移除 the_negotiator 全部字段
+- **清理所有引用**: customize-api.ts、pixel-art-ideas.md、issues-todo.md、两篇设计文档同步移除
+
 ### 生成 Workflow + Creator 分类像素画（38 张）— 2026-06-20
 
 - **生成 38 张像素画**: Workflow（工作流）29 张 + Creator（创造者）9 张

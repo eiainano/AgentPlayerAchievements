@@ -3325,16 +3325,6 @@ definitions:
         window: single_session
         operator: ">="
         value: 20
-    category: skill
-    rarity: uncommon
-    hidden: true
-    conditions:
-      - type: sequence
-        events:
-          - tool.deny
-          - conversation.message
-          - tool.complete
-        window: single_task
   - id: u_turn
     name: Remastered
     name_cn: 重制版

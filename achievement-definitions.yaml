@@ -3325,18 +3325,6 @@ definitions:
         window: single_session
         operator: ">="
         value: 20
-  - id: the_negotiator
-    name: The Negotiator
-    name_cn: 谈判专家
-    name_es: "El Negociador"
-    name_ko: "협상가"
-    name_ja: "交渉人"
-    description: Agent refused you at first, but accepted after you rephrased. Communication is an art.
-    description_cn: agent 第一次拒绝了你的请求，换个说法它就接受了。沟通是一门艺术。
-    description_es: "El agente te rechazó al principio, pero aceptó cuando reformulaste la petición. La comunicación es un arte."
-    description_ko: "에이전트가 처음엔 거절했지만 표현을 바꾸자 수락했다. 소통은 예술이다."
-    description_ja: "エージェントに一度断られたが、言い方を変えたら通った。コミュニケーションは芸術。"
-    icon: 🤝
     category: skill
     rarity: uncommon
     hidden: true

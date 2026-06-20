@@ -226,7 +226,7 @@
 
 ### tool.deny 已知限制（仍依赖手动 track）
 
-`tool.deny` 无 hook auto-track（PreToolUse → tool.requested 仅记录请求，拒绝由用户操作决定）。受影响：`ill_do_it_myself` / `the_negotiator` / `im_sorry_dave` — 需 agent 手动 track。`full_auto` — `tool.deny == 0` 条件因无事件而永真，解锁比设计意图更容易。
+`tool.deny` 无 hook auto-track（PreToolUse → tool.requested 仅记录请求，拒绝由用户操作决定）。受影响：`ill_do_it_myself` / `im_sorry_dave` — 需 agent 手动 track。`full_auto` — `tool.deny == 0` 条件因无事件而永真，解锁比设计意图更容易。
 
 ## 🆕 本次新增 — 5 新成就 (v0.1.6, 6/7)
 

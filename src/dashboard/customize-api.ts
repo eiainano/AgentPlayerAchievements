@@ -245,7 +245,6 @@ function suggestChineseName(ach: RawAchievement): string {
       early_bird: '早起的鸟',
       midas_touch: '点石成金',
       rubber_duck: '橡皮鸭',
-      the_negotiator: '谈判专家',
       u_turn: '推倒重来',
       silent_partner: '幕后搭档',
       time_traveler: '时间旅者',

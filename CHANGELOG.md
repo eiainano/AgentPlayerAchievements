@@ -1,5 +1,11 @@
 # Changelog
 
+### 生成 Workflow + Creator 分类像素画（38 张）— 2026-06-20
+
+- **生成 38 张像素画**: Workflow（工作流）29 张 + Creator（创造者）9 张
+- **修复 avengers_assemble 内容过滤**: 修改像素画描述避免商标相关词汇后 Gemini API 正常返回
+- **同步提交历史存量未提交像素画**: 此前 Onboarding/Tool Mastery/Milestones 等分类的部分图也一并提交
+
 ### 批量生成 66 张像素画 + 1:1 比例规范 — 2026-06-18
 
 - **217 条生图 prompt 统一添加"1:1 正方形比例"**: `docs/pixel-art-ideas.md` 全部描述追加比例说明，文件头新增规范描述

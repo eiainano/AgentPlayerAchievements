@@ -112,12 +112,10 @@ That's it. Keep using your agent — achievements unlock automatically as you wo
 > [!TIP]
 > Want to see what the dashboard looks like without waiting for real unlocks? Run `agpa demo` to generate sample data instantly.
 
-> [!TIP]
-> Pixel-art badges are downloaded on demand when you open the dashboard. To pre-download all 219 badges at once, run `agpa assets download`.
-
 ```bash
-agpa dashboard   # open the achievement dashboard
-agpa stats       # check your progress
+agpa dashboard         # open the achievement dashboard
+agpa stats             # check your progress
+agpa assets download   # (optional) pre-download all 219 pixel-art badges
 ```
 
 ## How It Works

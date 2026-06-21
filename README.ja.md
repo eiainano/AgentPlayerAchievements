@@ -113,8 +113,9 @@ agpa init
 > 実際の解除を待たずにダッシュボードを見てみたい？`agpa demo`を実行すればサンプルデータが即座に生成されます。
 
 ```bash
-agpa dashboard   # 実績ダッシュボードを開く
-agpa stats       # 進捗を確認
+agpa dashboard         # 実績ダッシュボードを開く
+agpa stats             # 進捗を確認
+agpa assets download   # (オプション) 219枚のピクセルアートバッジを一括ダウンロード
 ```
 
 ## 仕組み

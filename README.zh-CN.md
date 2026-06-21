@@ -114,8 +114,9 @@ agpa init
 > 想立刻看看仪表盘长什么样？运行 `agpa demo` 即可生成演示数据。
 
 ```bash
-agpa dashboard   # 打开成就仪表盘
-agpa stats       # 查看进度
+agpa dashboard         # 打开成就仪表盘
+agpa stats             # 查看进度
+agpa assets download   # （可选）预下载全部 219 张 pixel-art 徽章
 ```
 
 ## 工作原理

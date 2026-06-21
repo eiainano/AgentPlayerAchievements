@@ -113,8 +113,9 @@ Eso es todo. Sigue usando tu agente — los logros se desbloquean automáticamen
 > ¿Quieres ver cómo es el panel sin esperar desbloqueos reales? Ejecuta `agpa demo` para generar datos de muestra al instante.
 
 ```bash
-agpa dashboard   # abre el panel de logros
-agpa stats       # consulta tu progreso
+agpa dashboard         # abre el panel de logros
+agpa stats             # consulta tu progreso
+agpa assets download   # (opcional) descarga las 219 insignias pixel-art
 ```
 
 ## Cómo Funciona

@@ -20,7 +20,7 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <a href="#"><img src="https://img.shields.io/badge/achievements-217-blueviolet" alt="217 achievements"></a>
-  <a href="#"><img src="https://img.shields.io/badge/tests-1204-green" alt="1204 tests"></a>
+  <a href="#"><img src="https://img.shields.io/badge/tests-1207-green" alt="1207 tests"></a>
   <a href="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml"><img src="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="#"><img src="https://img.shields.io/badge/node-%E2%89%A518-brightgreen" alt="Node >= 18"></a>
   <a href="#"><img src="https://img.shields.io/badge/CLI-27_commands-orange" alt="27 CLI commands"></a>
@@ -43,6 +43,7 @@
   <a href="#dashboard">Dashboard</a> ·
   <a href="#documentation">Documentation</a> ·
   <a href="#security--privacy">Security & Privacy</a> ·
+  <a href="#contributing">Contributing</a> ·
   <a href="#faq">FAQ</a>
 </p>
 
@@ -66,7 +67,14 @@
 
 ## Quick Start
 
+**Prerequisites:** Node.js ≥ 18
+
 ```bash
+# Option A: install globally (recommended for users)
+npm install -g agpa
+agpa init
+
+# Option B: clone and link (recommended for contributors)
 git clone https://github.com/eiainano/AgentPlayerAchievements.git
 cd AgentPlayerAchievements && npm install && npm link
 agpa init
@@ -407,7 +415,7 @@ scripts/                     # dev tools (logo gen, pixel art gen, sounds)
 ```bash
 npm install          # install dependencies (5 runtime deps)
 npm run build        # tsc --noEmit
-npm test             # 1204 tests, 46 files
+npm test             # 1207 tests, 46 files
 npm run dashboard    # start dev dashboard
 npm run demo         # generate MVP data
 ```
@@ -441,6 +449,16 @@ npm run demo         # generate MVP data
 - **STDIO isolation** — The MCP server communicates via standard I/O only. No HTTP endpoints exposed.
 - **Hook sandbox** — The Hook CLI runs as a sub-millisecond subprocess — it cannot persist state or access the network.
 - **Supply chain** — No native modules, no postinstall scripts, no binary downloads at install time.
+
+To report a vulnerability, see [SECURITY.md](SECURITY.md).
+
+## 👥 Contributing
+
+We welcome contributions! Whether it's an achievement pack, a Dashboard improvement, a new tool integration, or an engine fix — there's a path for every skill level.
+
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** — setup, coding conventions, PR process, and 4 contribution paths
+- **[Creating Achievement Packs](docs/creating-achievements.md)** — the complete guide to writing achievement definitions
+- **[`.github/ISSUE_TEMPLATE/`](.github/ISSUE_TEMPLATE/)** — issue and PR templates
 
 ## 🌐 Environment Variables
 

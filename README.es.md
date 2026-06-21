@@ -20,7 +20,7 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <a href="#"><img src="https://img.shields.io/badge/logros-217-blueviolet" alt="217 logros"></a>
-  <a href="#"><img src="https://img.shields.io/badge/tests-1204-green" alt="1204 tests"></a>
+  <a href="#"><img src="https://img.shields.io/badge/tests-1207-green" alt="1207 tests"></a>
   <a href="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml"><img src="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="#"><img src="https://img.shields.io/badge/node-%E2%89%A518-brightgreen" alt="Node >= 18"></a>
   <a href="#"><img src="https://img.shields.io/badge/CLI-27_comandos-orange" alt="27 comandos CLI"></a>
@@ -43,6 +43,7 @@
   <a href="#panel">Panel</a> ·
   <a href="#documentación">Documentación</a> ·
   <a href="#seguridad-y-privacidad">Seguridad</a> ·
+  <a href="#contribuir">Contribuir</a> ·
   <a href="#preguntas-frecuentes">FAQ</a>
 </p>
 
@@ -66,7 +67,14 @@
 
 ## Inicio Rápido
 
+**Requisitos previos:** Node.js ≥ 18
+
 ```bash
+# Opción A: instalar globalmente (recomendado para usuarios)
+npm install -g agpa
+agpa init
+
+# Opción B: clonar y enlazar (recomendado para contribuidores)
 git clone https://github.com/eiainano/AgentPlayerAchievements.git
 cd AgentPlayerAchievements && npm install && npm link
 agpa init
@@ -407,7 +415,7 @@ scripts/                     # herramientas de desarrollo (gen de logo, pixel ar
 ```bash
 npm install          # instalar dependencias (5 dependencias runtime)
 npm run build        # tsc --noEmit
-npm test             # 1204 tests, 46 archivos
+npm test             # 1207 tests, 46 archivos
 npm run dashboard    # iniciar panel de desarrollo
 npm run demo         # generar datos MVP
 ```
@@ -441,6 +449,16 @@ npm run demo         # generar datos MVP
 - **Aislamiento STDIO** — El servidor MCP se comunica solo por E/S estándar. Sin endpoints HTTP expuestos.
 - **Sandbox de Hooks** — El Hook CLI se ejecuta como un subproceso de menos de un milisegundo — no puede persistir estado ni acceder a la red.
 - **Cadena de suministro** — Sin módulos nativos, sin scripts postinstall, sin descargas de binarios en tiempo de instalación.
+
+Para reportar una vulnerabilidad, consulta [SECURITY.md](SECURITY.md).
+
+## 👥 Contribuir
+
+¡Damos la bienvenida a contribuciones! Ya sea un pack de logros, una mejora del Dashboard, una nueva integración de herramientas o una corrección del motor — hay un camino para cada nivel.
+
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** — configuración, convenciones de código, proceso de PR y 4 caminos de contribución
+- **[Creación de Paquetes de Logros](docs/creating-achievements.md)** — la guía completa para escribir definiciones de logros
+- **[`.github/ISSUE_TEMPLATE/`](.github/ISSUE_TEMPLATE/)** — plantillas de issues y PRs
 
 ## 🌐 Variables de Entorno
 

@@ -47,6 +47,35 @@
 
 ---
 
+## 仪表盘预览
+
+<p align="center">
+  <table>
+    <tr>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/agpa-shot-1.png" alt="AGPA 首页" width="100%"><br>
+        <sub><b>首页</b> — 经验条、连胜、Agent 统计</sub>
+      </td>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/agpa-shot-2.png" alt="成就网格" width="100%"><br>
+        <sub><b>成就</b> — 217 个成就 × 11 个类别</sub>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/agpa-shot-3.png" alt="成就套装" width="100%"><br>
+        <sub><b>套装</b> — 主题收藏 × 进度追踪</sub>
+      </td>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/agpa-shot-4.png" alt="成就详情" width="100%"><br>
+        <sub><b>详情卡片</b> — 稀有度、解锁日期、重播动画</sub>
+      </td>
+    </tr>
+  </table>
+</p>
+
+---
+
 ### 没有 AGPA ❌
 
 - **看不见**你的编码习惯，跨会话无法追溯
@@ -62,6 +91,7 @@
 - **即时反馈**——终端弹窗、macOS 通知、8-bit 音效
 
 ---
+
 
 ## 快速开始
 

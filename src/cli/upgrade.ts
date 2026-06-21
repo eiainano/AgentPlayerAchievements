@@ -22,7 +22,7 @@ function getCurrentVersion(): string {
 
 function getLatestVersion(): { version: string; error?: string } {
   try {
-    const result = spawnSync('npm', ['view', 'agpa', 'version'], {
+    const result = spawnSync('npm', ['view', '@eiainano/agpa', 'version'], {
       encoding: 'utf-8',
       timeout: 10_000,
       stdio: ['ignore', 'pipe', 'ignore'],
@@ -65,7 +65,7 @@ function getGitRemote(): string | null {
 
 function isNpmPackage(): boolean {
   try {
-    const result = spawnSync('npm', ['list', '-g', 'agpa', '--depth=0'], {
+    const result = spawnSync('npm', ['list', '-g', '@eiainano/agpa', '--depth=0'], {
       encoding: 'utf-8',
       timeout: 5_000,
       stdio: ['ignore', 'pipe', 'ignore'],
@@ -101,7 +101,7 @@ Usage:
   agpa upgrade --help       Show this help
 
 Install methods:
-  npm:  npm update -g agpa           (global install)
+  npm:  npm update -g @eiainano/agpa           (global install)
   git:  git pull && npm install      (source checkout)
 
 Current version: ${getCurrentVersion()}
@@ -164,8 +164,8 @@ Current version: ${getCurrentVersion()}
       console.log(`  ${D}Run "agpa init --upgrade" to refresh hooks/configs.${R}`);
       console.log(`\n  \x1b[38;5;178m⭐ Enjoying AGPA? Star us on GitHub → \x1b[4mhttps://github.com/eiainano/AgentPlayerAchievements\x1b[0m\n`);
     } else {
-      console.log(`  ${D}npm update -g agpa...${R}`);
-      const npmResult = spawnSync('npm', ['update', '-g', 'agpa'], { stdio: 'inherit' });
+      console.log(`  ${D}npm update -g @eiainano/agpa...${R}`);
+      const npmResult = spawnSync('npm', ['update', '-g', '@eiainano/agpa'], { stdio: 'inherit' });
       if (npmResult.status !== 0) {
         console.log(`\n  ${Y}⚠ npm update failed${R}\n`);
         process.exit(1);
@@ -189,7 +189,7 @@ Current version: ${getCurrentVersion()}
     }
   } else {
     console.log(`  ${B}Upgrade via npm:${R}`);
-    console.log(`  ${D}  npm update -g agpa${R}`);
+    console.log(`  ${D}  npm update -g @eiainano/agpa${R}`);
     console.log(`\n  ${D}After upgrading, run: agpa init --auto${R}`);
     console.log(`  ${D}(This ensures hook + instruction files are up-to-date.)${R}`);
   }

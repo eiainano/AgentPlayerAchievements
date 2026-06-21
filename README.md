@@ -63,6 +63,35 @@
 
 ---
 
+## Dashboard Preview
+
+<p align="center">
+  <table>
+    <tr>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/agpa-shot-1.png" alt="AGPA Home" width="100%"><br>
+        <sub><b>Home</b> — XP bar, streaks, agent stats</sub>
+      </td>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/agpa-shot-2.png" alt="Achievement Grid" width="100%"><br>
+        <sub><b>Achievements</b> — 217 achievements × 11 categories</sub>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/agpa-shot-3.png" alt="Achievement Sets" width="100%"><br>
+        <sub><b>Sets</b> — themed collections with progress tracking</sub>
+      </td>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/agpa-shot-4.png" alt="Achievement Detail" width="100%"><br>
+        <sub><b>Detail Card</b> — rarity, unlock date, replay animation</sub>
+      </td>
+    </tr>
+  </table>
+</p>
+
+---
+
 ## Quick Start
 
 **Prerequisites:** Node.js ≥ 18
@@ -82,6 +111,9 @@ That's it. Keep using your agent — achievements unlock automatically as you wo
 
 > [!TIP]
 > Want to see what the dashboard looks like without waiting for real unlocks? Run `agpa demo` to generate sample data instantly.
+
+> [!TIP]
+> Pixel-art badges are downloaded on demand when you open the dashboard. To pre-download all 219 badges at once, run `agpa assets download`.
 
 ```bash
 agpa dashboard   # open the achievement dashboard

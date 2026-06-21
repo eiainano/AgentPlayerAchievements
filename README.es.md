@@ -47,6 +47,35 @@
 
 ---
 
+## Vista Previa
+
+<p align="center">
+  <table>
+    <tr>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/agpa-shot-1.png" alt="AGPA Inicio" width="100%"><br>
+        <sub><b>Inicio</b> — XP, rachas, estadísticas</sub>
+      </td>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/agpa-shot-2.png" alt="Logros" width="100%"><br>
+        <sub><b>成就</b> — 217 logros × 11 categorías</sub>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/agpa-shot-3.png" alt="Conjuntos" width="100%"><br>
+        <sub><b>套装</b> — colecciones con progreso</sub>
+      </td>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/agpa-shot-4.png" alt="Detalle" width="100%"><br>
+        <sub><b>Detalle</b> — rareza, fecha, repetición</sub>
+      </td>
+    </tr>
+  </table>
+</p>
+
+---
+
 ### Sin AGPA ❌
 
 - **Sin visibilidad** de tus hábitos de programación entre sesiones
@@ -69,7 +98,7 @@
 
 ```bash
 # Opción A: instalar globalmente (recomendado para usuarios)
-npm install -g agpa
+npm install -g @eiainano/agpa
 agpa init
 
 # Opción B: clonar y enlazar (recomendado para contribuidores)

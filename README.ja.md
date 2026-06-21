@@ -47,6 +47,35 @@
 
 ---
 
+## ダッシュボードプレビュー
+
+<p align="center">
+  <table>
+    <tr>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/agpa-shot-1.png" alt="AGPA ホーム" width="100%"><br>
+        <sub><b>ホーム</b> — XPバー、連続記録、エージェント統計</sub>
+      </td>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/agpa-shot-2.png" alt="実績" width="100%"><br>
+        <sub><b>成就</b> — 217個の実績 × 11カテゴリ</sub>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/agpa-shot-3.png" alt="セット" width="100%"><br>
+        <sub><b>套装</b> — テーマコレクション × 進捗</sub>
+      </td>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/agpa-shot-4.png" alt="詳細" width="100%"><br>
+        <sub><b>詳細カード</b> — レア度、解除日、リプレイ</sub>
+      </td>
+    </tr>
+  </table>
+</p>
+
+---
+
 ### AGPAなし ❌
 
 - セッションをまたいだコーディング習慣の**可視性なし**
@@ -69,7 +98,7 @@
 
 ```bash
 # 方法A: グローバルインストール（一般ユーザー向け）
-npm install -g agpa
+npm install -g @eiainano/agpa
 agpa init
 
 # 方法B: クローンしてリンク（コントリビューター向け）

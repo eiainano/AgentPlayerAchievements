@@ -18,7 +18,7 @@ describe('upgrade', () => {
       const { stdout, status } = runUpgrade('--help');
       expect(status).toBe(0);
       expect(stdout).toContain('AGPA Upgrade');
-      expect(stdout).toContain('npm update -g agpa');
+      expect(stdout).toContain('npm update -g @eiainano/agpa');
       expect(stdout).toContain('git pull');
       expect(stdout).toContain('Current version:');
     });

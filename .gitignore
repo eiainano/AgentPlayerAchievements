@@ -29,6 +29,7 @@ research/
 !pixel-art-output/agpa-logo-*.png
 !src/dashboard/public/agpa-logo-*.png
 !src/dashboard/public/favicon.png
+!assets/screenshots/*.png
 .vscode/
 .claude/
 .remember/

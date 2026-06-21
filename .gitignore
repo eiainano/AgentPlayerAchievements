@@ -39,3 +39,15 @@ DEVLOG.md
 docs/design/
 docs/superpowers/
 docs/issues-todo.md
+
+# Internal dev artifacts (local only)
+CLAUDE.md
+AGENTS.md
+docs/PROGRESS.md
+docs/code-review-*.md
+docs/description-lang-audit-*.md
+docs/pixel-art-review-*.md
+docs/readme-competitive-analysis-*.md
+docs/claude-code-best-practices.md
+docs/top10-next-todos-*.md
+docs/whatsmore.md

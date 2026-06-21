@@ -50,7 +50,7 @@ const COMMANDS: Subcommand[] = [
   { name: 'config',     description: 'View or change AGPA settings',                                      usage: 'agpa config [key] [value]',                 module: './config.ts' },
   { name: 'dashboard',  description: 'Start achievement dashboard (default :3867)',                        usage: 'agpa dashboard [port] [--profile <name>]',   module: './dashboard.ts' },
   { name: 'web',        description: 'Alias for dashboard',                                                usage: 'agpa web [port] [--profile <name>]',         module: './dashboard.ts' },
-  { name: 'profile',    description: 'Manage achievement profiles (create | list | switch | softwares | delete)',               usage: 'agpa profile <create|list|switch|softwares|delete> [name]',   module: './profile.ts' },
+  { name: 'profile',    description: 'Manage achievement profiles (create | list | switch | tools | delete)',               usage: 'agpa profile <create|list|switch|tools|delete> [name]',   module: './profile.ts' },
   { name: 'showcase',   description: 'Manage achievement showcase',                                        usage: 'agpa showcase <list|pin|unpin|auto-fill>',   module: './showcase.ts' },
   { name: 'demo',       description: 'Simulate 1-day usage with 5 achievements + open Dashboard',           usage: 'agpa demo',                                 module: './demo.ts' },
   { name: 'stats',      description: 'View achievement stats in terminal',                                 usage: 'agpa stats [--json] [--profile <name>]',    module: './mvp.ts' },
@@ -77,7 +77,7 @@ const COMMANDS: Subcommand[] = [
 const COMMAND_GROUPS: Array<{ title: string; names: string[] }> = [
   { title: 'Setup',     names: ['init', 'uninstall', 'verify', 'doctor', 'config'] },
   { title: 'Dashboard', names: ['dashboard', 'web'] },
-  { title: 'View',      names: ['stats', 'progress', 'activity', 'search', 'suggest'] },
+  { title: 'View',      names: ['stats', 'progress', 'activity', 'search', 'suggest', 'demo'] },
   { title: 'Explain',   names: ['explain'] },
   { title: 'Profiles',  names: ['profile', 'showcase'] },
   { title: 'Data',      names: ['export', 'import', 'reset'] },

@@ -220,8 +220,8 @@ function printHelp(): void {
 🏆 AGPA Init — Connect AI coding tools to the achievement system
 
 Usage:
-  npx tsx src/cli/init.ts               Scan & pick tools interactively
-  npx tsx src/cli/init.ts --tool <name>  Configure a specific tool
+  agpa init [options]             Auto-detect & configure (recommended)
+  npx tsx src/cli/init.ts [...]   Development alias (same as agpa init)
 
 Tools:
   claude-code, cc        Claude Code
@@ -285,10 +285,17 @@ function readJSON(filePath: string): Record<string, unknown> | null {
   try {
     if (!fs.existsSync(filePath)) return null;
     const raw = fs.readFileSync(filePath, 'utf-8');
-    const cleaned = raw.replace(/,(\s*[}\]])/g, '$1');
-    return JSON.parse(cleaned);
+    // Native parse first — fast path for well-formed JSON
+    return JSON.parse(raw);
   } catch {
-    return null;
+    // Retry with trailing-comma cleanup (some tools produce JSON5-like output)
+    try {
+      const raw = fs.readFileSync(filePath, 'utf-8');
+      const cleaned = raw.replace(/,(\s*[}\]])/g, '$1');
+      return JSON.parse(cleaned);
+    } catch {
+      return null;
+    }
   }
 }
 
@@ -1085,8 +1092,9 @@ function installAchievementCommands(): boolean {
 /**
  * Compile YAML achievement definitions → JSON snapshot in the state dir.
  * Claude command files read this JSON to know metadata (Claude can't parse YAML).
+ * Returns compiled file path and the count of achievements found.
  */
-function compileAchievementsJSON(dataDir: string): string | null {
+function compileAchievementsJSON(dataDir: string): { path: string; count: number } | null {
   const yamlPath = path.join(AGPA_ROOT, 'achievement-definitions.yaml');
   if (!fs.existsSync(yamlPath)) return null;
 
@@ -1155,7 +1163,7 @@ function compileAchievementsJSON(dataDir: string): string | null {
   const outPath = path.join(dataDir, 'achievements.json');
   fs.mkdirSync(dataDir, { recursive: true });
   fs.writeFileSync(outPath, JSON.stringify(output, null, 2), 'utf-8');
-  return outPath;
+  return { path: outPath, count: definitions.length };
 }
 
 // ── Welcome banner ─────────────────────────────────────────────────────
@@ -1273,14 +1281,19 @@ function promptLanguage(): Promise<string> {
 
 /**
  * Auto-verify after init — runs a quick health check and returns a summary line.
- * Uses shared check functions from doctor.ts to avoid duplication.
+ * toolIds limits MCP config checks to only the tools the user configured,
+ * so users don't see misleading warnings for tools they didn't set up.
  */
-function autoVerify(dataDir: string): string | null {
+function autoVerify(dataDir: string, toolIds: string[]): string | null {
   const results = [
     checkDataDir(dataDir),
     checkStateJson(dataDir),
     checkDefsYaml(),
-    ...checkMcpConfigs(),
+    // Only check MCP configs for tools the user just configured
+    ...checkMcpConfigs().filter(r => {
+      const toolId = r.id.startsWith('mcp-') ? r.id.slice(4) : '';
+      return toolIds.includes(toolId) || !r.id.startsWith('mcp-');
+    }),
     ...checkInstructionFiles(),
   ];
 
@@ -1417,7 +1430,8 @@ async function promptCompletion(lang: string, auto: boolean): Promise<void> {
           fs.mkdirSync(fishDir, { recursive: true });
           const dest = path.join(fishDir, 'agpa.fish');
           if (!fs.existsSync(dest)) {
-            const result = spawnSync('agpa', ['completion', 'fish'], { stdio: ['ignore', 'pipe', 'pipe'] });
+            const completionScript = path.resolve(import.meta.dirname, 'completion.ts');
+            const result = spawnSync(TSX_BIN, [completionScript, 'fish'], { stdio: ['ignore', 'pipe', 'pipe'] });
             if (result.status === 0 && result.stdout) {
               fs.writeFileSync(dest, result.stdout.toString());
               console.log(isZh
@@ -1700,7 +1714,12 @@ async function main(): Promise<void> {
   console.log(`  \u{2502}  ${toolLine.padEnd(47)}\u{2502}`);
   const langLabel = `Language: ${lang === 'zh' ? '中文' : 'English'}`;
   console.log(`  \u{2502}  ${langLabel.padEnd(47)}\u{2502}`);
-  console.log(`  \u{2502}  Data:    ${dataDir.padEnd(37)}\u{2502}`);
+  // Truncate long dataDir paths so the box doesn't break
+  const maxPath = 38;
+  const shortPath = dataDir.length > maxPath
+    ? '…' + dataDir.slice(-(maxPath - 1))
+    : dataDir.padEnd(maxPath);
+  console.log(`  \u{2502}  Data:    ${shortPath}\u{2502}`);
   console.log(`  \u{2502}                                                 \u{2502}`);
   console.log(`  \u{2502}  \u{26A0}\u{FE0F}  Restart your AI tool to activate            \u{2502}`);
   console.log(`  \u{2502}     Achievements won\u{2019}t track until you do       \u{2502}`);
@@ -1726,7 +1745,7 @@ async function main(): Promise<void> {
   printPhase(3, 3, 'Verification');
 
   // ── Auto-verify after init ────────────────────────────────────────────
-  const verifyResults = autoVerify(dataDir);
+  const verifyResults = autoVerify(dataDir, toolIds);
   if (verifyResults) console.log(verifyResults);
 
   // ── Daemon opt-in ─────────────────────────────────────────────────────

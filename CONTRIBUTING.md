@@ -138,7 +138,7 @@ A maintainer will review within a few days. Don't be discouraged if we ask for c
 
 - **Bug reports & feature requests**: [GitHub Issues](https://github.com/eiainano/AgentPlayerAchievements/issues)
 - **Questions about writing achievements**: read [`docs/creating-achievements.md`](docs/creating-achievements.md) first
-- **Architecture questions**: the [CLAUDE.md](CLAUDE.md) file at the repo root is the definitive technical reference
+- **Architecture questions**: read the source — `src/engine/evaluator.ts` and `src/engine/types.ts` are the best starting points
 
 ---
 

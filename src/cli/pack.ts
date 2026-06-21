@@ -7,6 +7,8 @@
  */
 
 import { AchievementEngine } from '../engine/engine.js';
+import { loadConfig } from '../config.js';
+import { resolveProfileDir, DEFAULT_PROFILE } from '../utils/profile.js';
 
 const DIM = '\x1b[2m';
 const BOLD = '\x1b[1m';
@@ -94,8 +96,19 @@ async function main(): Promise<void> {
     process.exit(0);
   }
 
+  // Resolve profile (--profile flag > config env > default)
+  let profileFlag: string | null = null;
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--profile' && args[i + 1]) {
+      profileFlag = args[i + 1]!;
+      break;
+    }
+  }
+  const resolvedProfile = profileFlag || loadConfig().active_profile || DEFAULT_PROFILE;
+  const stateDir = resolvedProfile !== 'default' ? resolveProfileDir(resolvedProfile) : undefined;
+
   // Create engine and load core + packs
-  const engine = new AchievementEngine();
+  const engine = new AchievementEngine(stateDir ? { stateDir } : {});
   engine.init();
 
   switch (subcmd) {

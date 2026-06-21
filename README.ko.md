@@ -21,7 +21,6 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <a href="#"><img src="https://img.shields.io/badge/업적-217-blueviolet" alt="217 업적"></a>
   <a href="#"><img src="https://img.shields.io/badge/테스트-1207-green" alt="1207 테스트"></a>
-  <a href="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml"><img src="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="#"><img src="https://img.shields.io/badge/node-%E2%89%A518-brightgreen" alt="Node >= 18"></a>
   <a href="#"><img src="https://img.shields.io/badge/CLI-27_명령어-orange" alt="27 CLI 명령어"></a>
   <a href="https://github.com/eiainano/AgentPlayerAchievements"><img src="https://img.shields.io/github/stars/eiainano/AgentPlayerAchievements?style=flat&logo=github" alt="GitHub stars"></a>

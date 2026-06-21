@@ -93,7 +93,7 @@ The engine is a set of pure functions operating on in-memory data. It's where ac
 | `src/engine/types.ts` | TypeScript interfaces — the source of truth for data shapes |
 | `src/engine/store.ts` | File I/O (event.log, state.json, stats.json, config.json) |
 
-**Before touching the evaluator**, read [`docs/issues-todo.md`](docs/issues-todo.md) — it tracks known bugs, edge cases, and design decisions for every condition type.
+**Before touching the evaluator**, review existing tests in `tests/engine/evaluator.test.ts` — they document edge cases and expected behavior for every condition type.
 
 ## Coding Conventions
 
@@ -123,20 +123,13 @@ Test infrastructure: [Vitest](https://vitest.dev/), with `testTimeout: 20000` fo
 
 ## Project Documentation
 
-| Document | Purpose |
-|----------|---------|
-| [`docs/issues-todo.md`](docs/issues-todo.md) | Live issue tracker — read before starting engine/YAML work |
-| [`docs/PROGRESS.md`](docs/PROGRESS.md) | High-level development status + version comparison |
-| [`docs/creating-achievements.md`](docs/creating-achievements.md) | Complete guide to writing achievement definitions |
-| [`docs/multi-tool-setup.md`](docs/multi-tool-setup.md) | MCP configuration guide for all 5 agent tools |
-
 ## Pull Request Process
 
 1. **Check existing work** — search [issues](https://github.com/eiainano/AgentPlayerAchievements/issues) to avoid duplication
 2. **Branch from `dev`** — `main` is the stable release branch
 3. **Keep it focused** — one PR = one logical change. A new achievement pack, a bug fix, a feature — not all three at once
 4. **Write tests** — CI will not pass without them
-5. **If you changed docs, sync the numbers** — achievement count, test count, CLI command count, etc. across `README*.md`, `PROGRESS.md`, `issues-todo.md`
+5. **If you changed docs, sync the numbers** — achievement count, test count, CLI command count, etc. across `README*.md`
 6. **PR description** should say what you did and why
 
 A maintainer will review within a few days. Don't be discouraged if we ask for changes — it's how we keep quality high.

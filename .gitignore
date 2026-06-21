@@ -31,3 +31,4 @@ research/
 !src/dashboard/public/favicon.png
 .vscode/
 .claude/
+.remember/

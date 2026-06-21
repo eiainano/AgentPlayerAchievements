@@ -36,6 +36,20 @@ export function ensureIcon(stateDir: string): string | null {
   return null;
 }
 
+/**
+ * Resolve the filesystem path to a pixel-art JPG for a given achievement ID.
+ * Returns null if the image doesn't exist (graceful fallback to emoji).
+ */
+export function getPixelArtPath(achievementId: string): string | null {
+  try {
+    const dir = path.resolve(import.meta.dirname, '../dashboard/public/pixel-art');
+    const filePath = path.join(dir, `${achievementId}.jpg`);
+    return fs.existsSync(filePath) ? filePath : null;
+  } catch {
+    return null;
+  }
+}
+
 // ── Platform-specific notifiers ─────────────────────────────────
 
 function sendJxaNotification(
@@ -117,13 +131,20 @@ app.run();
   });
 }
 
-function sendMacNotification(title: string, body: string, stateDir: string, profile?: string): void {
+function sendMacNotification(title: string, body: string, stateDir: string, profile?: string, imagePath?: string): void {
   const icon = ensureIcon(stateDir);
   const dashboardUrl = profile && profile !== 'default'
     ? `${DASHBOARD_URL}?profile=${encodeURIComponent(profile)}`
     : DASHBOARD_URL;
 
-  // Tier 1: terminal-notifier — best experience (custom app icon, clickable, sound)
+  if (imagePath && fs.existsSync(imagePath)) {
+    // Have pixel art — use JXA which supports per-notification contentImage
+    // terminal-notifier doesn't support per-notification images, so skip it
+    sendJxaNotification(title, body, dashboardUrl, imagePath);
+    return;
+  }
+
+  // No pixel art — try terminal-notifier first (better UX), fall back to JXA
   const args = [
     '-title', title,
     '-message', body,
@@ -140,7 +161,7 @@ function sendMacNotification(title: string, body: string, stateDir: string, prof
   });
 }
 
-function sendLinuxNotification(title: string, body: string, stateDir: string): void {
+function sendLinuxNotification(title: string, body: string, stateDir: string, imagePath?: string): void {
   const icon = ensureIcon(stateDir);
   const args = [
     ...(icon ? ['-i', icon] : ['-i', 'dialog-information']),
@@ -153,6 +174,10 @@ function sendLinuxNotification(title: string, body: string, stateDir: string): v
     // Label=command pairs; the command is executed when the action is clicked.
     '--action', `Open Dashboard=xdg-open ${DASHBOARD_URL}`,
   ];
+  if (imagePath && fs.existsSync(imagePath)) {
+    // notify-send supports image-path hint for rich notifications
+    args.splice(1, 0, '--hint', `string:image-path:${imagePath}`);
+  }
   execFile('notify-send', args, (err) => {
     if (err) {
       process.stderr.write(`[AGPA] Linux notify failed (is libnotify installed?): ${err.message}\n`);
@@ -258,11 +283,14 @@ export function playSound(rarity: string, stateDir: string): void {
 /**
  * Send an achievement-unlock notification on the user's desktop.
  *
- * @param title   e.g. "👋 Hello World"
- * @param body    e.g. "开启你的第一次Agent对话。"
- * @param stateDir Achievements state directory (for icon asset)
- * @param profile  Named profile (used for clickable dashboard URL on macOS)
- * @param rarity   Achievement rarity — if provided, plays the corresponding sound
+ * @param title     e.g. "Hello World" (clean title — shown on desktop notification)
+ * @param body      e.g. "开启你的第一次Agent对话。"
+ * @param stateDir  Achievements state directory (for icon asset)
+ * @param profile   Named profile (used for clickable dashboard URL on macOS)
+ * @param rarity    Achievement rarity — if provided, plays the corresponding sound
+ * @param imagePath Optional filesystem path to a pixel-art JPG shown as the notification image
+ * @param termTitle Title for terminal fallback (e.g. includes emoji prefix);
+ *                  falls back to `title` when omitted
  */
 export function sendNotification(
   title: string,
@@ -270,6 +298,8 @@ export function sendNotification(
   stateDir: string,
   profile?: string,
   rarity?: string,
+  imagePath?: string,
+  termTitle?: string,
 ): void {
   if (rarity) {
     playSound(rarity, stateDir);
@@ -279,10 +309,10 @@ export function sendNotification(
 
   switch (os) {
     case 'macos':
-      sendMacNotification(title, body, stateDir, profile);
+      sendMacNotification(title, body, stateDir, profile, imagePath);
       break;
     case 'linux':
-      sendLinuxNotification(title, body, stateDir);
+      sendLinuxNotification(title, body, stateDir, imagePath);
       break;
     case 'windows':
       sendWindowsNotification(title, body);
@@ -290,5 +320,6 @@ export function sendNotification(
   }
 
   // Terminal fallback always fires — TTY users / headless systems rely on it
-  sendTerminalNotification(title, body);
+  // Uses termTitle (emoji-prefixed) when available so emoji is shown in TTY
+  sendTerminalNotification(termTitle ?? title, body);
 }

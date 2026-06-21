@@ -47,7 +47,7 @@ import { createHash } from 'crypto';
 import { homedir } from 'os';
 import { AchievementEngine } from '../engine/engine.js';
 import { loadConfig } from '../config.js';
-import { sendNotification, playSound } from '../utils/notify.js';
+import { sendNotification, playSound, getPixelArtPath } from '../utils/notify.js';
 import { resolveProfileDir, DEFAULT_PROFILE } from '../utils/profile.js';
 import { renderPopup, type PopupAchievement } from '../utils/ansi-popup.js';
 import { findNearUnlocks } from '../utils/progress-nudge.js';
@@ -615,9 +615,15 @@ function cmdPoll(): void {
   const useZh = cfg.lang === 'zh';
   for (const ach of newlyUnlocked) {
     const icon = ach.icon || '🏆';
-    const title = useZh ? (ach.name_cn || ach.name) : ach.name;
+    const rawTitle = useZh ? (ach.name_cn || ach.name) : ach.name;
     const desc = useZh ? (ach.description_cn || ach.description) : ach.description;
-    sendNotification(`${icon} ${title}`, desc, ENGINE.stateDir, activeProfile);
+    const pixelArtPath = getPixelArtPath(ach.id);
+    if (pixelArtPath) {
+      // Desktop: pixel art replaces the emoji; terminal: still show emoji prefix
+      sendNotification(rawTitle, desc, ENGINE.stateDir, activeProfile, undefined, pixelArtPath, `${icon} ${rawTitle}`);
+    } else {
+      sendNotification(`${icon} ${rawTitle}`, desc, ENGINE.stateDir, activeProfile);
+    }
   }
 
   // ── Star nudge: 10th unlock → desktop notification ────────────

@@ -1,5 +1,14 @@
 # Changelog
 
+### 通知改用像素图替代 emoji — 2026-06-21
+
+- **新增 `getPixelArtPath()`**: 根据成就 ID 查找对应 `pixel-art/{id}.jpg` 文件路径
+- **扩展 `sendNotification()`**: 新增 `imagePath` 参数（桌面通知显示像素图）和 `termTitle` 参数（终端回退保留 emoji 前缀）
+- **macOS**: 有像素图时绕过 terminal-notifier，直接用 JXA NSUserNotification.contentImage 显示
+- **Linux**: 有像素图时通过 `--hint string:image-path:` 传给 notify-send
+- **Windows / 终端**: Windows 系统 toast 不支持图像；终端回退仍用 emoji（`★`）
+- 修改文件: `src/utils/notify.ts`、`src/cli/hook.ts`（+51/-14 行）
+
 ### 文档核查：同步所有过时数字至代码实际值 — 2026-06-21
 
 - **成就总数**: 213/218 → 217（YAML 实际值）

@@ -620,24 +620,6 @@ body::before {
   color: var(--gold);
 }
 
-/* Dev reset button */
-.dev-reset-btn {
-  background: rgba(255, 50, 50, 0.04);
-  border: 1px solid transparent;
-  border-radius: 6px;
-  font-size: 14px;
-  padding: 3px 8px;
-  cursor: pointer;
-  opacity: .35;
-  transition: opacity .2s, border-color .2s, background .2s;
-  line-height: 1;
-}
-.dev-reset-btn:hover {
-  opacity: 1;
-  border-color: rgba(240, 64, 80, .3);
-  background: rgba(240, 64, 80, .1);
-}
-
 /* ── Toggle Switches ───────────────────────────────── */
 
 .switch {
@@ -3179,11 +3161,6 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
   animation: modal-reveal .35s ease both;
 }
 
-.modal-desc-cn {
-  font-size: 13px;
-  color: var(--text-muted);
-  line-height: 1.7;
-}
 
 .modal-divider {
   height: 1px;
@@ -3511,12 +3488,6 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
    Next achievement card (1-10 achievements)
    ═══════════════════════════════════════════════════════════════════ */
 
-/* pulse highlight animation — available for future use */
-@keyframes pulse-highlight {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 200, 0, 0); }
-  50% { box-shadow: 0 0 0 4px rgba(255, 200, 0, 0.3); }
-}
-
 /* ── Shareable Card Preview ───────────────────────────────────── */
 
 #card-preview .share-btn {
@@ -3682,9 +3653,6 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
 .card-body {
   padding: 0 24px 20px;
 }
-.card-body-compact {
-  padding: 0 24px 16px;
-}
 
 .card-section-head {
   font-size: 11px;
@@ -3835,8 +3803,7 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
 [data-theme="light"] #card-preview .card-xp-track { background: rgba(0,0,0,.06); }
 [data-theme="light"] #card-preview .card-ach-progress-bar { background: rgba(0,0,0,.06); }
 
-[data-theme="light"] #card-preview .card-body,
-[data-theme="light"] #card-preview .card-body-compact { }
+[data-theme="light"] #card-preview .card-body { }
 [data-theme="light"] #card-preview .card-section-head { color: #3b6ba0; }
 
 [data-theme="light"] #card-preview .card-ach-item {
@@ -4811,7 +4778,6 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
   .lang-chevron { display: none; }
   .profile-btn { font-size: 11px; padding: 4px 8px; }
   #profile-name-display { max-width: 60px; overflow: hidden; text-overflow: ellipsis; }
-  #dev-reset-btn { font-size: 12px; padding: 2px 4px; }
   .switch { gap: 1px; }
   .switch-track { width: 32px; height: 18px; }
   .switch-knob { width: 14px; height: 14px; }

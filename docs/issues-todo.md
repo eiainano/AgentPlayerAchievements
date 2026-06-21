@@ -1,10 +1,45 @@
 # Achievement System Issues & TODOs
 
-> 最后更新: 2026-06-15 | 总成就数: 217 | 隐藏成就: 63 | 条件类型: 12 | Tests: 1204 (46 文件) | CC: 0 不可达 ✅ | 非 CC: 0 不可达，~12 依赖 agent 遵守度 | last_stand: 已修复 ✅ | Event Log 增长 → 监控 🚫
+> 最后更新: 2026-06-21 | 总成就数: 217 | 隐藏成就: 63 | 条件类型: 12 | Tests: 1204 (46 文件, 9 fail) | CC: 0 不可达 ✅ | 非 CC: 0 不可达，~12 依赖 agent 遵守度 | last_stand: 已修复 ✅ | Event Log 增长 → 监控 🚫 | 像素画: 217/217 ✅ | CLI: 27/27 ✅ | Questline: 5/5 ✅
 
 ---
 
 > **可达性定义**: "不可达" = 事件完全无发射器，agent 无论如何都解不了。"依赖 agent 遵守度" = 发射器存在（CLAUDE.md 手动 track 指令），agent 执行了就能解。当前非 CC 的 ~12 个属于后者，不是功能缺口。
+
+## 🔥 代码审计新发现 (v0.1.8, 6/21)
+
+5 个 agent 并行审计全代码库。推翻多项假设，发现 7 个实际待办问题。详见 `docs/superpowers/specs/2026-06-21-codebase-audit-top7.md`。
+
+### P0
+
+| # | 问题 | 位置 | 修复成本 |
+|---|------|------|:---:|
+| 1 | **测试套件 9 失败**：8 个 CLI 测试超时（默认 5s 不够子进程启动）+ 1 个 auditor 断言数据漂移（expect 213, got 212）+ `jsdom` devDep 缺失 | vitest.config.ts + tests/verify/auditor.test.ts + package.json | 极低 |
+
+### P1
+
+| # | 问题 | 位置 | 修复成本 |
+|---|------|------|:---:|
+| 2 | **热力图标签 DOM 断裂**：JS 寻找 `#heatmap-col-labels` / `#heatmap-row-labels` 但 index.html 中不存在这两个元素，月份/星期标签从未渲染 | app.js:1924 + index.html | 低 |
+| 3 | **像素画 `<img>` 无 onerror 兜底**：`iconHtml()` 中 `/pixel-art/xxx.jpg` 加载失败时无回退到 emoji/SVG，影响全部 10+ 渲染位置 | app.js iconHtml() | 极低 |
+| 4 | **Dashboard 错误处理**：5 处 `alert()`（移动端体验差）+ 5 处空 catch 块（静默吞错误） | app.js profile/card/recommend/poll | 中 |
+| 5 | **开源就绪度**：缺少 CONTRIBUTING.md、Issue/PR 模板、`npm pack` 验证 | 项目根 + .github/ | 低 |
+
+### P2
+
+| # | 问题 | 位置 | 修复成本 |
+|---|------|------|:---:|
+| 6 | **Event Log 无界增长**：只增不减，长期性能线性退化 | engine/store.ts | 中 |
+| 7 | **死代码清理**：孤儿 `verify.ts`（347 行不再被 COMMANDS 引用）+ 4 个未使用 CSS 类 + 1 个 dead `<select>` | src/cli/verify.ts + styles.css + index.html | 低 |
+
+### 审计推翻的假设
+
+| 之前认为缺失 | 实际已完成 |
+|-------------|-----------|
+| "像素画需要 Dashboard 试点" | 217/217 JPG 就绪，全链路 SVG>JPG>emoji 渲染 |
+| "Questline 内容为空" | 5 条 QL，YAML 完整，Dashboard + 测试覆盖 |
+| "CLI 可能有空心壳" | 27/27 全实现，零 stub（含 explain/pack 新命令） |
+| "代码库有 TODO/FIXME 标记" | 整个 src/ grep 结果为零 |
 
 ## 🆕 非 CC 工具事件缺口修复 (v0.1.8+, 6/15)
 

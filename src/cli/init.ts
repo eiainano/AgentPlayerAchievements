@@ -1695,9 +1695,8 @@ async function main(): Promise<void> {
 
   // ── Achievement commands & JSON ──
   let commandsInstalled = false;
-  let jsonCompiled: string | null = null;
+  let compiled = compileAchievementsJSON(dataDir);
   commandsInstalled = installAchievementCommands();
-  jsonCompiled = compileAchievementsJSON(dataDir);
 
   // ── Summary ──────────────────────────────────────────────────────────
   const toolList = configuredTools.join(', ');
@@ -1729,12 +1728,14 @@ async function main(): Promise<void> {
   if (commandsInstalled) {
     console.log(`  \u{2502}    /achievements      view progress in chat       \u{2502}`);
   }
-  console.log(`  \u{2502}    agpa dashboard     browse all 160 achievements \u{2502}`);
+  const achCount = compiled?.count ?? 217;
+  const countPad = String(achCount).padEnd(3);
+  console.log(`  \u{2502}    agpa dashboard     browse all ${achCount} achievements\u{2502}`);
   console.log(`  \u{2502}                                                 \u{2502}`);
   console.log(`  \u{2502}    \u{1F6AE} To remove:    agpa uninstall --all           \u{2502}`);
   console.log(`  \u{2502}                                                 \u{2502}`);
-  if (jsonCompiled) {
-    console.log(`  \u{2502}  \u{1F4E6} 160 achievements compiled — /achievements ready  \u{2502}`);
+  if (compiled) {
+    console.log(`  \u{2502}  \u{1F4E6} ${achCount} achievements compiled — /achievements ready\u{2502}`);
     console.log(`  \u{2502}                                                 \u{2502}`);
   }
   console.log(`  \u{2502}  \u{1F4A1} Your first achievement unlocks the moment    \u{2502}`);

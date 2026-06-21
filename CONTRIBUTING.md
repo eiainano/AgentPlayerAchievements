@@ -80,7 +80,7 @@ To add a new tool, you need:
 2. Init logic in `src/cli/init.ts` (MCP config injection + instruction injection)
 3. Installation docs in `docs/multi-tool-setup.md`
 
-Read [`docs/multi-tool-research.md`](docs/multi-tool-research.md) for the hook API research behind each tool.
+See `src/cli/hook.ts` for the full event translation layer supporting all 5 tools.
 
 ### 4. Engine Core
 

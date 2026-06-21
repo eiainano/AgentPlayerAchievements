@@ -25,6 +25,7 @@
  *   agpa completion  Generate shell completion script
  *   agpa upgrade     Check for updates and upgrade
  *   agpa watch       Real-time achievement monitor
+ *   agpa assets      Download or check pixel-art badge images
  */
 
 import * as fs from 'node:fs';
@@ -70,6 +71,7 @@ const COMMANDS: Subcommand[] = [
   { name: 'history',    description: 'Browse raw event log entries',                                       usage: 'agpa history [--N <n>] [--event <type>] [--today] [--json] [--profile <name>]', module: './history.ts' },
   { name: 'explain',    description: 'Show why an achievement is locked/unlocked — condition breakdown',    usage: 'agpa explain <id> [--json] [--profile <name>]', module: './explain.ts' },
   { name: 'pack',       description: 'List or inspect installed community achievement packs',               usage: 'agpa pack <list|info> [id]',                  module: './pack.ts' },
+  { name: 'assets',     description: 'Download or check pixel-art badge images',                           usage: 'agpa assets <download|status>',               module: './assets.ts' },
 ];
 
 // ── Help ─────────────────────────────────────────────────────────────────
@@ -82,7 +84,7 @@ const COMMAND_GROUPS: Array<{ title: string; names: string[] }> = [
   { title: 'Profiles',  names: ['profile', 'showcase'] },
   { title: 'Data',      names: ['export', 'import', 'reset'] },
   { title: 'Packs',     names: ['pack'] },
-  { title: 'Tools',     names: ['sound', 'banner', 'mcp', 'completion', 'upgrade', 'watch', 'history'] },
+  { title: 'Tools',     names: ['sound', 'banner', 'mcp', 'completion', 'upgrade', 'watch', 'history', 'assets'] },
 ];
 
 function printHelp(): void {

@@ -29,6 +29,7 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.resolve(__dirname, 'public');
+const PIXEL_ART_DIR = path.join(PUBLIC_DIR, 'pixel-art');
 
 // CSRF protection: random token generated once per server start,
 // injected into HTML pages and required as x-dev-token header on /api/reset.
@@ -626,6 +627,46 @@ export function createServer(port: number, defaultProfile: string): http.Server 
         res.end(JSON.stringify({ error: msg }));
       }
       return;
+    }
+
+    // ── Lazy pixel-art download (not bundled in npm; fetched from GitHub on demand) ──
+    if (url.pathname.startsWith('/pixel-art/') && (url.pathname.endsWith('.jpg') || url.pathname.endsWith('.png'))) {
+      const filename = path.basename(url.pathname);
+      const filePath = path.join(PIXEL_ART_DIR, filename);
+
+      // Try local first
+      try {
+        const local = fs.readFileSync(filePath);
+        const ext = path.extname(filename);
+        res.writeHead(200, { 'Content-Type': MIME_TYPES[ext] || 'image/jpeg' });
+        res.end(local);
+        return;
+      } catch { /* not on disk — download below */ }
+
+      // Fetch from GitHub raw content
+      const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/eiainano/AgentPlayerAchievements/main/src/dashboard/public/pixel-art/';
+      try {
+        fs.mkdirSync(PIXEL_ART_DIR, { recursive: true });
+        const buf = await new Promise<Buffer>((resolve, reject) => {
+          https.get(GITHUB_RAW_BASE + encodeURIComponent(filename), (res) => {
+            if (res.statusCode !== 200) { reject(new Error(`HTTP ${res.statusCode}`)); return; }
+            const chunks: Buffer[] = [];
+            res.on('data', (c: Buffer) => chunks.push(c));
+            res.on('end', () => resolve(Buffer.concat(chunks)));
+          }).on('error', reject);
+        });
+        // Cache to disk for offline use (best-effort)
+        try { fs.writeFileSync(filePath, buf); } catch { /* ok */ }
+        const ext = path.extname(filename);
+        res.writeHead(200, { 'Content-Type': MIME_TYPES[ext] || 'image/jpeg' });
+        res.end(buf);
+        return;
+      } catch {
+        // Fallback: SVG placeholder badge
+        res.writeHead(200, { 'Content-Type': 'image/svg+xml' });
+        res.end(`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="#333" rx="8"/><text x="32" y="40" text-anchor="middle" fill="#999" font-size="24">🎮</text></svg>`);
+        return;
+      }
     }
 
     // ── Serve html2canvas (local if possible, lazy CDN fallback) ──

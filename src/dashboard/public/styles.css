@@ -1760,6 +1760,18 @@ body[data-showcase-border="gold"] .showcase-card {
   border-radius: inherit;
 }
 [data-theme="dark"] .ach-icon-wrap .ach-icon-img { filter: brightness(1.1); }
+/* Wrapper span from iconHtml() defaults to 20×20px inline-block,
+   which bottlenecks the img inside. Force it to fill the parent so
+   img width:100% resolves against the full card / modal-hero area. */
+.ach-icon-wrap > span,
+.modal-hero > span,
+.questline-hero > span {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
 
 /* Locked pixel art — extreme blur */
 .ach-icon-img.locked-blur {
@@ -4027,10 +4039,21 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
   animation: gacha-pulse-q 1.2s ease-in-out infinite;
 }
 
+
 .gacha-icon-wrap {
   font-size: 56px;
   line-height: 1;
   margin-bottom: 4px;
+}
+
+.gacha-pixel-art {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  display: block;
+  margin: -8px auto 0;
 }
 
 .gacha-name {

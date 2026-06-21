@@ -467,9 +467,3 @@ A: 可以。仪表盘中的 `/customize` 页面允许你重命名任何成就。
 ## 许可
 
 MIT — 详见 [LICENSE](LICENSE)
-
----
-
-<p align="center">
-  <sub>为热爱游戏化的开发者而建。217 个成就，持续更新中。</sub>
-</p>

@@ -13,8 +13,8 @@
 // ── Rarity configuration matrix ──────────────────────────
 
 const RARITY_CONFIG = {
-  common:    { flip: false, particles: 0,  entry: 'fade',   duration: 600,  soundAt: 'end',     hasRing: false, hasGlow: false, hasShake: false },
-  uncommon:  { flip: false, particles: 0,  entry: 'scale',  duration: 1000, soundAt: 'end',     hasRing: false, hasGlow: false, hasShake: false },
+  common:    { flip: false, particles: 0,  entry: 'fade',   duration: 1500, soundAt: 'end',     hasRing: false, hasGlow: false, hasShake: false },
+  uncommon:  { flip: false, particles: 0,  entry: 'scale',  duration: 1500, soundAt: 'end',     hasRing: false, hasGlow: false, hasShake: false },
   rare:      { flip: true,  particles: 12, entry: 'scale',  duration: 1500, soundAt: 'flip',    hasRing: false, hasGlow: false, hasShake: false },
   epic:      { flip: true,  particles: 30, entry: 'scale',  duration: 2000, soundAt: 'flip',    hasRing: true,  hasGlow: true,  hasShake: false },
   legendary: { flip: true,  particles: 60, entry: 'scale',  duration: 3000, soundAt: 'flip',    hasRing: true,  hasGlow: true,  hasShake: true },
@@ -227,9 +227,16 @@ class GachaReveal {
     front.className = 'gacha-card-face front';
     const name = (typeof displayName === 'function' ? displayName(this.ach) : this.ach.name) || this.ach.id;
     const desc = (typeof displayDesc === 'function' ? displayDesc(this.ach) : this.ach.description) || '';
-    const icon = this.ach.icon || '\u{1F3C6}';
+    // Use pixel art image when available, fall back to emoji
+    var iconHtml;
+    if (this.ach.pixel_art_url) {
+      iconHtml = '<img src="' + this._esc(this.ach.pixel_art_url) + '" class="gacha-pixel-art" alt="">';
+    } else {
+      var icon = this.ach.icon || '\u{1F3C6}';
+      iconHtml = icon;
+    }
     const rarityLabel = this.rarity.charAt(0).toUpperCase() + this.rarity.slice(1);
-    front.innerHTML = '<div class="gacha-icon-wrap">' + icon +
+    front.innerHTML = '<div class="gacha-icon-wrap">' + iconHtml +
       '</div><div class="gacha-name">' + this._esc(name) +
       '</div><div class="gacha-desc">' + this._esc(desc) +
       '</div><div class="gacha-rarity-badge">' + rarityLabel + '</div>';

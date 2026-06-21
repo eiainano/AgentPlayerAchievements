@@ -29,6 +29,7 @@
   "files": [
     "bin/",
     "src/",
+    "!src/dashboard/public/pixel-art/",
     "achievement-definitions.yaml",
     "README.md",
     "README.zh-CN.md",

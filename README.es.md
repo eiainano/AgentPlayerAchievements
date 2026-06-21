@@ -467,9 +467,3 @@ Para problemas persistentes, revisa `~/.agent-achievements/error.log` o [abre un
 ## Licencia
 
 MIT — consulta [LICENSE](LICENSE)
-
----
-
-<p align="center">
-  <sub>Construido para desarrolladores que aman la gamificación. 217 logros y contando.</sub>
-</p>

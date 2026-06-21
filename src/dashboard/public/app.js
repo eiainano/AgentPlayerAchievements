@@ -1301,7 +1301,7 @@ function setupGlobalHandlers() {
       const achId = card?.dataset.id;
       if (!achId) return;
       const ach = dashboardData?.achievements.find(a => a.id === achId);
-      if (ach) openModal(ach);
+      if (ach && ach.unlocked) openModal(ach);
     });
 
     // 3D tilt on card hover — inline style to override animation
@@ -1341,7 +1341,7 @@ function setupGlobalHandlers() {
         e.preventDefault();
         const achId = card.dataset.id;
         const ach = dashboardData?.achievements.find(a => a.id === achId);
-        if (ach) openModal(ach);
+        if (ach && ach.unlocked) openModal(ach);
       }
     }
   });

@@ -467,9 +467,3 @@ For persistent issues, check `~/.agent-achievements/error.log` or [open an issue
 ## License
 
 MIT — see [LICENSE](LICENSE)
-
----
-
-<p align="center">
-  <sub>Built for developers who love gamification. 217 achievements and counting.</sub>
-</p>

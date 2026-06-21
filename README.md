@@ -266,14 +266,14 @@ OpenClaw supports a plugin system for hook-level tracking. `agpa init` registers
 | `agpa dashboard` | Start achievement dashboard (localhost:3867) |
 | `agpa stats` | Show achievement progress summary |
 | `agpa progress` | List all achievements with unlock status |
-| `agpa profile` | Manage achievement profiles (create, list, switch) |
+| `agpa profile` | Manage achievement profiles (create, list, switch, softwares, delete) |
 | `agpa demo` | Generate MVP demo data for testing |
 | `agpa reset` | Reset all tracking data |
 | `agpa config` | View/modify config (lang, sound, debug...) |
 | `agpa showcase` | Manage showcase (list, pin, unpin, auto-fill) |
 | `agpa search` | Search achievements by keyword/rarity/category |
 | `agpa suggest` | Suggest next achievement to hunt |
-| `agpa sound` | Test 8-bit rarity-graded sound effects |
+| `agpa sound` | Toggle 8-bit rarity-graded sound effects (on, off) |
 | `agpa activity` | View streak + 4-month activity heatmap |
 | `agpa export` | Export achievement data as JSON |
 | `agpa import` | Import from backup |

@@ -266,14 +266,14 @@ OpenClaw soporta un sistema de plugins para seguimiento a nivel de hooks. `agpa 
 | `agpa dashboard` | Iniciar el panel de logros (localhost:3867) |
 | `agpa stats` | Mostrar resumen de progreso de logros |
 | `agpa progress` | Listar todos los logros con estado de desbloqueo |
-| `agpa profile` | Gestionar perfiles de logros (crear, listar, cambiar) |
+| `agpa profile` | Gestionar perfiles de logros (crear, listar, cambiar, softwares, eliminar) |
 | `agpa demo` | Generar datos de demostración MVP para pruebas |
 | `agpa reset` | Restablecer todos los datos de seguimiento |
 | `agpa config` | Ver/modificar configuración (idioma, sonido, depuración...) |
 | `agpa showcase` | Gestionar vitrina (listar, fijar, soltar, auto-llenar) |
 | `agpa search` | Buscar logros por palabra clave/rareza/categoría |
 | `agpa suggest` | Sugerir el próximo logro a conseguir |
-| `agpa sound` | Probar efectos de sonido 8-bit clasificados por rareza |
+| `agpa sound` | Alternar efectos de sonido 8-bit clasificados por rareza (on, off) |
 | `agpa activity` | Ver racha + heatmap de actividad de 4 meses |
 | `agpa export` | Exportar datos de logros como JSON |
 | `agpa import` | Importar desde copia de seguridad |

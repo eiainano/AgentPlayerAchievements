@@ -279,7 +279,7 @@ iterative_refiner:       step_count >= 20
 
 ## 数据来源
 
-- `achievement-definitions.yaml` — 全部成就定义（约 218 个成就）
+- `achievement-definitions.yaml` — 全部成就定义（217 个成就）
 - `src/engine/evaluator.ts` — 条件评估引擎（12 种条件类型）
 - `src/cli/hook.ts` — Hook 事件映射（~30 种事件自动发射）
 - `src/engine/engine.ts` — 引擎核心（track / poll / init）

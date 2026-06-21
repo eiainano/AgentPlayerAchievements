@@ -19,8 +19,8 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
-  <a href="#"><img src="https://img.shields.io/badge/logros-213-blueviolet" alt="213 logros"></a>
-  <a href="#"><img src="https://img.shields.io/badge/tests-1205-green" alt="1205 tests"></a>
+  <a href="#"><img src="https://img.shields.io/badge/logros-217-blueviolet" alt="217 logros"></a>
+  <a href="#"><img src="https://img.shields.io/badge/tests-1204-green" alt="1204 tests"></a>
   <a href="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml"><img src="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="#"><img src="https://img.shields.io/badge/node-%E2%89%A518-brightgreen" alt="Node >= 18"></a>
   <a href="#"><img src="https://img.shields.io/badge/CLI-27_comandos-orange" alt="27 comandos CLI"></a>
@@ -59,7 +59,7 @@
 
 - **Seguimiento automático** — cada llamada de herramienta, edición de archivo y commit de git registrado automáticamente
 - **Panel estilo Steam** — barra de XP, niveles, rachas, heatmaps, vitrina de logros
-- **213 logros** en 11 categorías — desde "Hello World" hasta "Completionist"
+- **217 logros** en 11 categorías — desde "Hello World" hasta "Completionist"
 - **Retroalimentación instantánea** — ventanas emergentes en terminal, notificaciones macOS, sonidos 8-bit al desbloquear
 
 ---
@@ -90,7 +90,7 @@ Tu Sesión de Programación
   ├─ Tú programas, el agente responde — cada acción se registra
   │   └─ doble canal: herramientas MCP + eventos Hook
   │
-  ├─ Fin de sesión → el motor evalúa 213 logros
+  ├─ Fin de sesión → el motor evalúa 217 logros
   │   └─ ¿desbloqueado? → notificación macOS 🎉
   │
   └─ agpa dashboard → ver, ordenar, filtrar, compartir
@@ -103,7 +103,7 @@ Tu Sesión de Programación
 | **Hook CLI** | Hooks de herramienta (subproceso vía stdin) | file.read/write/edit, tool.complete, git.commit, session.start/end, task.complete, agent.spawn |
 | **Servidor MCP** | Protocolo STDIO (7 herramientas) | image.read, file.language_used, plan.mode_entered, user.message, automode.start |
 
-Ambos canales escriben en el mismo registro de eventos `~/.agent-achievements/`. El motor evalúa 12 tipos de condiciones contra 213 logros.
+Ambos canales escriben en el mismo registro de eventos `~/.agent-achievements/`. El motor evalúa 12 tipos de condiciones contra 217 logros.
 
 > [!NOTE]
 > **Cero sobrecarga.** El Hook CLI es un subproceso de menos de un milisegundo. El servidor MCP se ejecuta sobre STDIO sin llamadas de red. Todos los datos permanecen en tu máquina.
@@ -111,7 +111,7 @@ Ambos canales escriben en el mismo registro de eventos `~/.agent-achievements/`.
 ## Características
 
 - 🎮 **Panel de Logros** — barra de XP, nivel, racha, heatmap de actividad, distribución por rareza, vitrina
-- 🏆 **213 Logros** en 11 categorías (Introducción, Maestría de Herramientas, Hitos, Habilidad, Estilo, Flujo de Trabajo, Creador, Ocultos, Desafío, Comunidad, Resistencia)
+- 🏆 **217 Logros** en 11 categorías (Introducción, Maestría de Herramientas, Hitos, Habilidad, Estilo, Flujo de Trabajo, Creador, Ocultos, Desafío, Comunidad, Resistencia)
 - 🔥 **Heatmap estilo GitHub** — 4 meses de actividad de programación de un vistazo
 - 📸 **Tarjeta para Compartir** — tema oscuro/claro, bilingüe (EN/ZH), descargable como PNG
 - 🔊 **Efectos de sonido 8-bit** — sonidos retro clasificados por rareza al desbloquear
@@ -304,7 +304,7 @@ Consulta [Creación de Paquetes de Logros](docs/creating-achievements.md) para c
 | 1 | Introducción | 14 | Hello World, primera llamada de herramienta, primer PR |
 | 2 | Maestría de Herramientas | 38 | Umbrales de habilidad Read/Edit/Bash |
 | 3 | Hitos | 19 | número de tareas, racha, uso de tokens |
-| 4 | Habilidad | 17 | reacciones en cadena, depurador, one-shots |
+| 4 | Habilidad | 16 | reacciones en cadena, depurador, one-shots |
 | 5 | Estilo | 17 | minimalista, búho nocturno, rey del copy-paste |
 | 6 | Flujo de Trabajo | 29 | PRs, CI/CD, revisión de código, conflictos de merge |
 | 7 | Creador | 9 | comandos slash, skills, agentes, hooks |
@@ -398,7 +398,7 @@ src/
 └── helpers.ts               # Utilidades compartidas
 
 pixel-art-output/            # Logo + pixel art de logros
-achievement-definitions.yaml   # 213 definiciones de logros (fuente autoritativa)
+achievement-definitions.yaml   # 217 definiciones de logros (fuente autoritativa)
 scripts/                     # herramientas de desarrollo (gen de logo, pixel art, sonidos)
 ```
 
@@ -407,7 +407,7 @@ scripts/                     # herramientas de desarrollo (gen de logo, pixel ar
 ```bash
 npm install          # instalar dependencias (5 dependencias runtime)
 npm run build        # tsc --noEmit
-npm test             # 1205 tests, 46 archivos
+npm test             # 1204 tests, 46 archivos
 npm run dashboard    # iniciar panel de desarrollo
 npm run demo         # generar datos MVP
 ```
@@ -506,5 +506,5 @@ MIT — consulta [LICENSE](LICENSE)
 ---
 
 <p align="center">
-  <sub>Construido para desarrolladores que aman la gamificación. 213 logros y contando.</sub>
+  <sub>Construido para desarrolladores que aman la gamificación. 217 logros y contando.</sub>
 </p>

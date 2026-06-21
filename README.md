@@ -19,8 +19,8 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
-  <a href="#"><img src="https://img.shields.io/badge/achievements-213-blueviolet" alt="213 achievements"></a>
-  <a href="#"><img src="https://img.shields.io/badge/tests-1205-green" alt="1205 tests"></a>
+  <a href="#"><img src="https://img.shields.io/badge/achievements-217-blueviolet" alt="217 achievements"></a>
+  <a href="#"><img src="https://img.shields.io/badge/tests-1204-green" alt="1204 tests"></a>
   <a href="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml"><img src="https://github.com/eiainano/AgentPlayerAchievements/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="#"><img src="https://img.shields.io/badge/node-%E2%89%A518-brightgreen" alt="Node >= 18"></a>
   <a href="#"><img src="https://img.shields.io/badge/CLI-27_commands-orange" alt="27 CLI commands"></a>
@@ -59,7 +59,7 @@
 
 - **Auto-tracking** — every tool call, file edit, and git commit logged automatically
 - **Steam-style dashboard** — XP bar, levels, streaks, heatmaps, achievement showcase
-- **213 achievements** across 11 categories — from "Hello World" to "Completionist"
+- **217 achievements** across 11 categories — from "Hello World" to "Completionist"
 - **Instant feedback** — terminal popups, macOS notifications, 8-bit sounds on unlock
 
 ---
@@ -90,7 +90,7 @@ Your Coding Session
   ├─ You code, agent responds — every action is tracked
   │   └─ dual-channel: MCP tools + Hook events
   │
-  ├─ Session ends → engine evaluates 213 achievements
+  ├─ Session ends → engine evaluates 217 achievements
   │   └─ unlocked? → macOS notification 🎉
   │
   └─ agpa dashboard → view, sort, filter, share
@@ -103,7 +103,7 @@ Your Coding Session
 | **Hook CLI** | Tool hooks (subprocess via stdin) | file.read/write/edit, tool.complete, git.commit, session.start/end, task.complete, agent.spawn |
 | **MCP Server** | STDIO protocol (7 tools) | image.read, file.language_used, plan.mode_entered, user.message, automode.start, achievement config, explain |
 
-Both channels write to the same `~/.agent-achievements/` event log. The engine evaluates 12 condition types against 213 achievements.
+Both channels write to the same `~/.agent-achievements/` event log. The engine evaluates 12 condition types against 217 achievements.
 
 > [!NOTE]
 > **Zero overhead.** The Hook CLI is a sub-millisecond subprocess. The MCP server runs on STDIO with no network calls. All data stays on your machine.
@@ -111,7 +111,7 @@ Both channels write to the same `~/.agent-achievements/` event log. The engine e
 ## Features
 
 - 🎮 **Achievement Dashboard** — XP bar, level, streak, activity heatmap, rarity breakdown, showcase
-- 🏆 **213 Achievements** across 11 categories (Onboarding, Tool Mastery, Milestones, Skill, Style, Workflow, Creator, Hidden, Challenge, Community, Endurance)
+- 🏆 **217 Achievements** across 11 categories (Onboarding, Tool Mastery, Milestones, Skill, Style, Workflow, Creator, Hidden, Challenge, Community, Endurance)
 - 🔥 **GitHub-style heatmap** — 4 months of coding activity at a glance
 - 📸 **Share Card** — dark/light themed, bilingual (EN/ZH), downloadable PNG
 - 🔊 **8-bit sound effects** — rarity-graded retro sounds for unlocks
@@ -304,7 +304,7 @@ See [Creating Achievement Packs](docs/creating-achievements.md) for the pack for
 | 1 | Onboarding | 14 | Hello World, first tool call, first PR |
 | 2 | Tool Mastery | 38 | Read/Edit/Bash skill thresholds |
 | 3 | Milestones | 19 | task count, streak, token usage |
-| 4 | Skill | 17 | chain reactions, debugger, one-shots |
+| 4 | Skill | 16 | chain reactions, debugger, one-shots |
 | 5 | Style | 17 | minimalist, night owl, copy-paste king |
 | 6 | Workflow | 29 | PRs, CI/CD, code review, merge conflict |
 | 7 | Creator | 9 | slash commands, skills, agents, hooks |
@@ -390,7 +390,7 @@ src/
 │   ├── api.ts               # Card data, stats aggregation
 │   ├── public/              # Zero-framework HTML/CSS/JS frontend
 │   └── customize-api.ts     # Self-customize endpoint
-├── tools/                   # MCP tool definitions (8 tools)
+├── tools/                   # MCP tool definitions (7 tools)
 ├── utils/                   # notify, validate, profile, pixel-art, battery, etc.
 ├── verify/
 │   └── auditor.ts           # Achievement verification logic
@@ -398,7 +398,7 @@ src/
 └── helpers.ts               # Shared utilities
 
 pixel-art-output/            # Logo + achievement pixel art
-achievement-definitions.yaml   # 213 achievement definitions (authoritative)
+achievement-definitions.yaml   # 217 achievement definitions (authoritative)
 scripts/                     # dev tools (logo gen, pixel art gen, sounds)
 ```
 
@@ -407,7 +407,7 @@ scripts/                     # dev tools (logo gen, pixel art gen, sounds)
 ```bash
 npm install          # install dependencies (5 runtime deps)
 npm run build        # tsc --noEmit
-npm test             # 1205 tests, 46 files
+npm test             # 1204 tests, 46 files
 npm run dashboard    # start dev dashboard
 npm run demo         # generate MVP data
 ```
@@ -506,5 +506,5 @@ MIT — see [LICENSE](LICENSE)
 ---
 
 <p align="center">
-  <sub>Built for developers who love gamification. 213 achievements and counting.</sub>
+  <sub>Built for developers who love gamification. 217 achievements and counting.</sub>
 </p>

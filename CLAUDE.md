@@ -3,7 +3,7 @@
 ## Commands
 
 ```
-npm run test       # vitest (1176 tests, 45 files)
+npm run test       # vitest (1204 tests, 46 files)
 npm run build      # tsc --noEmit
 npm run dashboard  # start on :3867, then open browser (supports --profile <name>)
 npm run demo       # generate MVP data + stats
@@ -11,7 +11,7 @@ npm run doctor     # diagnose system state
 npm run profile    # manage achievement profiles (create <name> | list)
 ```
 
-Unified CLI via `bin` field (npm link): 25 commands — `agpa init | uninstall | verify | doctor | config | dashboard | web | profile <create|list|switch|softwares> | showcase | demo | stats | progress | reset | search | suggest | sound | activity | export | import | mcp | completion | upgrade | watch | history`
+Unified CLI via `bin` field (npm link): 27 commands — `agpa init | uninstall | verify | doctor | config | dashboard | web | profile <create|list|switch|softwares> | showcase | demo | stats | progress | reset | search | suggest | sound | banner | activity | export | import | mcp | completion | upgrade | watch | history | explain | pack`
 
 ## Architecture
 
@@ -40,7 +40,7 @@ Three layers, **two channels**:
           └───────────┘          └─────────────┘
 ```
 
-- **MCP Server** (channel 1) — STDIO protocol, 6 tools (track/poll/stats/showcase/config/suggest). Agent **actively calls** these for semantic events that hooks can't capture (image.read, file.language_used, plan.mode_entered, etc.)
+- **MCP Server** (channel 1) — STDIO protocol, 7 tools (track/poll/stats/showcase/config/suggest/explain). Agent **actively calls** these for semantic events that hooks can't capture (image.read, file.language_used, plan.mode_entered, etc.)
 - **Hook CLI** (channel 2) — Short-lived subprocess called by tool hooks. **Agent is unaware** — hooks fire automatically. Events: tool.complete, file.read/edit/write, session.start/end, task.complete, agent.spawn, git.commit, etc.
 - **Engine** — pure functions on in-memory data. `track()` appends to event.log via both channels. `poll()` evaluates and writes state.json. File I/O only in store.ts.
 - **Dashboard** — zero-framework HTML/CSS/JS, HTTP server in dashboard/server.ts, API layer in dashboard/api.ts.
@@ -68,7 +68,7 @@ Useful for quick testing: `echo '{"hook_event_name":"PostToolUse","tool_name":"R
 - All JSON parsing uses `safeParse()` from `src/utils/validate.ts` — never raw `JSON.parse()`.
 - Notifications go through `src/utils/notify.ts` — not duplicated in hook.ts and poll.ts.
 - Hook stdin parsing happens exactly once (cached), then `mapEvents()` transforms.
-- **每次改 README.md 后，同步翻译** — 用户说"同步翻译"或"把我刚改的 README 同步到其他语言"时，将英文版变更同步到 `README.{zh-CN,es,ko,ja}.md`。五份文件行数必须一致（当前 491 行）。
+- **每次改 README.md 后，同步翻译** — 用户说"同步翻译"或"把我刚改的 README 同步到其他语言"时，将英文版变更同步到 `README.{zh-CN,es,ko,ja}.md`。五份文件行数必须一致（当前 510 行）。
 
 ## The YAML Condition Types (all 12 implemented)
 
@@ -112,7 +112,7 @@ If evaluator behavior seems wrong, check src/engine/evaluator.ts — each type h
 | 检查项 | 命令/位置 | 通过标准 |
 |--------|----------|:--------:|
 | `tsc` 零错误 | `npx tsc --noEmit` | 输出为空 |
-| 测试全绿 | `npm test` | 1176/1176 |
+| 测试全绿 | `npm test` | 1204/1204 |
 | `files` 包含 YAML | `npm pack --dry-run` | 列表中有 `achievement-definitions.yaml` |
 | `tsx` 在 dependencies | `package.json` | `dependencies.tsx` 存在 |
 | bin shebang 正确 | `head -1 src/cli/index.ts` | `#!/usr/bin/env -S npx tsx` |

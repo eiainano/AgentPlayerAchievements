@@ -492,7 +492,7 @@ For persistent issues, check `~/.agent-achievements/error.log` or [open an issue
 
 ## Star History
 
-<img alt="Star History Chart" src="https://api.star-history.com/svg?repos=eiainao/AgentPlayerAchievements&type=Date" width="100%">
+<img alt="Star History Chart" src="https://api.star-history.com/svg?repos=eiainano%2Fagentplayerachievements&type=Date" width="100%">
 
 ## License
 

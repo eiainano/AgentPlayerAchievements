@@ -492,7 +492,7 @@ A: はい。ダッシュボードの `/customize` ページで任意の実績名
 
 ## スター履歴
 
-<img alt="Star History Chart" src="https://api.star-history.com/svg?repos=eiainao/AgentPlayerAchievements&type=Date" width="100%">
+<img alt="Star History Chart" src="https://api.star-history.com/svg?repos=eiainano%2Fagentplayerachievements&type=Date" width="100%">
 
 ## ライセンス
 

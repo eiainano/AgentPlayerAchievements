@@ -56,63 +56,81 @@ function sendJxaNotification(
   title: string,
   body: string,
   dashboardUrl: string,
-  iconPath: string | null,
+  imagePath: string | null,
 ): void {
   // JXA (JavaScript for Automation) — built into macOS since 10.10.
-  // Uses NSUserNotification for rich notifications with click-to-open,
-  // sound, and optional contentImage. Auto-terminates after a 30 s
-  // timeout so the process doesnʼt linger.
+  // Uses modern UserNotifications.framework (UNNotificationAttachment) for
+  // pixel-art image display and UNUserNotificationCenterDelegate for
+  // click-to-open. Auto-terminates after a 30 s timeout.
   const esc = (s: string) => s.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 
-  let iconBlock = '';
-  if (iconPath) {
-    iconBlock = `
-  var img = $.NSImage.alloc.initWithContentsOfFile($('${esc(iconPath)}'));
-  if (img) notification.contentImage = img;`;
+  let attachmentBlock = '';
+  if (imagePath) {
+    // UNNotificationAttachment copies the image into the notification
+    // service's data store so it renders inline in the notification banner.
+    attachmentBlock = `
+  var imgURL = $.NSURL.fileURLWithPath($('${esc(imagePath)}'));
+  var attachment = $.UNNotificationAttachment.attachmentWithIdentifierURLOptionsError(
+    $('pixel-art'), imgURL, null, null
+  );
+  if (attachment) content.attachments = [attachment];`;
   }
 
   const jxa = `
+ObjC.import('UserNotifications');
 ObjC.import('AppKit');
+
 var app = $.NSApplication.sharedApplication;
+var center = $.UNUserNotificationCenter.currentNotificationCenter;
 
-// Delegate — fires when the user clicks the notification action button
-var Delegate = $.NSObject.extend('AGPANotifyDelegate');
-Delegate.addMethod(
-  'userNotificationCenter:didActivateNotification:',
-  'v@:@@',
-  function(_self, _cmd, _center, notif) {
-    var info = notif.userInfo;
-    if (info) {
-      var urlStr = info.objectForKey('url');
-      if (urlStr && urlStr.js) {
-        $.NSWorkspace.sharedWorkspace.openURL(
-          $.NSURL.URLWithString(urlStr.js)
-        );
+// Request notification permission (no-op if already granted).
+// badge (1<<0) | sound (1<<1) | alert (1<<2) = alert | sound.
+center.requestAuthorizationWithOptionsCompletionHandler(
+  6,  // alert (4) | sound (2)
+  function(granted, error) {
+    if (!granted) { app.terminate(null); return; }
+
+    var content = $.UNMutableNotificationContent.alloc.init;
+    content.title = $('${esc(title)}');
+    content.body = $('${esc(body)}');
+    content.sound = $.UNNotificationSound.defaultSound;
+    content.userInfo = $.NSDictionary.dictionaryWithObjectForKey(
+      $('${esc(dashboardUrl)}'), $('url')
+    );${attachmentBlock}
+
+    // Delegate — fires when the user clicks the notification
+    var Delegate = $.NSObject.extend('AGPANotifyDelegate2');
+    Delegate.addMethod(
+      'userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:',
+      'v@:@@@?',
+      function(_self, _cmd, _ctr, response, handler) {
+        var info = response.notification.content.userInfo;
+        if (info) {
+          var urlStr = info.objectForKey('url');
+          if (urlStr && urlStr.js) {
+            $.NSWorkspace.sharedWorkspace.openURL(
+              $.NSURL.URLWithString(urlStr.js)
+            );
+          }
+        }
+        if (handler) handler();
+        app.terminate(null);
       }
-    }
-    app.terminate(null);
+    );
+    center.delegate = $.Delegate.alloc.init;
+
+    var request = $.UNNotificationRequest.requestWithIdentifierContentTrigger(
+      $('agpa-unlock'), content, null
+    );
+    center.addNotificationRequestWithCompletionHandler(request, function(err) {
+      // notification delivered
+    });
+
+    // Auto-exit after 30 s if the user never clicks
+    $.NSTimer.scheduledTimerWithTimeIntervalTargetSelectorUserInfoRepeats(
+      30, app, 'terminate:', null, false
+    );
   }
-);
-$.NSUserNotificationCenter.defaultUserNotificationCenter.delegate =
-  $.Delegate.alloc.init;
-
-var notification = $.NSUserNotification.alloc.init;
-notification.title = $('${esc(title)}');
-notification.informativeText = $('${esc(body)}');
-notification.soundName = $.NSUserNotificationDefaultSoundName;
-notification.hasActionButton = true;
-notification.actionButtonTitle = 'View Dashboard';
-notification.otherButtonTitle = 'Close';
-notification.userInfo = $.NSDictionary.dictionaryWithObjectForKey(
-  $('${esc(dashboardUrl)}'), $('url')
-);${iconBlock}
-
-$.NSUserNotificationCenter.defaultUserNotificationCenter
-  .deliverNotification(notification);
-
-// Auto-exit after 30 s if the user never clicks
-$.NSTimer.scheduledTimerWithTimeIntervalTargetSelectorUserInfoRepeats(
-  30, app, 'terminate:', null, false
 );
 
 app.run();
@@ -137,14 +155,9 @@ function sendMacNotification(title: string, body: string, stateDir: string, prof
     ? `${DASHBOARD_URL}?profile=${encodeURIComponent(profile)}`
     : DASHBOARD_URL;
 
-  if (imagePath && fs.existsSync(imagePath)) {
-    // Have pixel art — use JXA which supports per-notification contentImage
-    // terminal-notifier doesn't support per-notification images, so skip it
-    sendJxaNotification(title, body, dashboardUrl, imagePath);
-    return;
-  }
-
-  // No pixel art — try terminal-notifier first (better UX), fall back to JXA
+  // Primary: terminal-notifier (signed macOS app bundle — most reliable
+  // for both basic text and -contentImage rich notifications).
+  // Fallback: JXA with modern UserNotifications.framework.
   const args = [
     '-title', title,
     '-message', body,
@@ -153,11 +166,14 @@ function sendMacNotification(title: string, body: string, stateDir: string, prof
     '-open', dashboardUrl,
   ];
   if (icon) args.push('-appIcon', icon);
+  if (imagePath && fs.existsSync(imagePath)) {
+    args.push('-contentImage', imagePath);
+  }
 
   execFile('terminal-notifier', args, (err) => {
     if (!err) return;
-    // Tier 2: JXA (NSUserNotification) — clickable, sound, optional contentImage
-    sendJxaNotification(title, body, dashboardUrl, icon);
+    // terminal-notifier unavailable — fall back to JXA
+    sendJxaNotification(title, body, dashboardUrl, imagePath ?? icon);
   });
 }
 

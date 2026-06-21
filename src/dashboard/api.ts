@@ -728,11 +728,11 @@ function buildBadges(
 
   // ── Level milestone badges ──
   const LEVEL_BADGES: Array<{ level: number; badge: string; badge_cn: string; icon: string }> = [
-    { level: 3,  badge: 'Bronze Agent',     icon: '🥉' },
-    { level: 7,  badge: 'Silver Agent',     icon: '🥈' },
-    { level: 11, badge: 'Gold Agent',       icon: '🥇' },
-    { level: 15, badge: 'Diamond Agent',    icon: '💎' },
-    { level: 20, badge: 'Grandmaster',      icon: '👑' },
+    { level: 3,  badge: 'Bronze Agent',     badge_cn: 'Bronze Agent',     icon: '🥉' },
+    { level: 7,  badge: 'Silver Agent',     badge_cn: 'Silver Agent',     icon: '🥈' },
+    { level: 11, badge: 'Gold Agent',       badge_cn: 'Gold Agent',       icon: '🥇' },
+    { level: 15, badge: 'Diamond Agent',    badge_cn: 'Diamond Agent',    icon: '💎' },
+    { level: 20, badge: 'Grandmaster',      badge_cn: 'Grandmaster',      icon: '👑' },
   ];
   for (const lb of LEVEL_BADGES) {
     if (currentLevel >= lb.level) {

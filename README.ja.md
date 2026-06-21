@@ -397,7 +397,7 @@ src/
 ├── config.ts                # グローバル設定
 └── helpers.ts               # 共有ユーティリティ
 
-pixel-art-output/            # ロゴ + 実績ピクセルアート
+pixel-art-output/            # ロゴ (README)
 achievement-definitions.yaml   # 217個の実績定義（信頼できるデータソース）
 scripts/                     # 開発ツール（ロゴ生成、ピクセルアート生成、サウンド）
 ```

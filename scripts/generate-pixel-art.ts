@@ -14,7 +14,7 @@
  *                                    4:5, 5:4, 1:4, 4:1, 1:8, 8:1
  *   --ids <id1,id2,...>   Only generate for specific achievement IDs
  *   --category <name>     Only generate for a specific category
- *   --output, -o <dir>    Output directory (default: "pixel-art-output")
+ *   --output, -o <dir>    Output directory (default: "src/dashboard/public/pixel-art")
  *   --dry-run             Print prompts without calling API
  *   --limit, -n <n>       Max number of images to generate
  *   --help, -h            Show this help
@@ -84,7 +84,7 @@ function parseArgs(): CliArgs {
   let ratio = '1:1';
   let ids: string[] | null = null;
   let category: string | null = null;
-  let outputDir = path.join(PROJECT_ROOT, 'pixel-art-output');
+  let outputDir = path.join(PROJECT_ROOT, 'src/dashboard/public/pixel-art');
   let dryRun = false;
   let limit = Infinity;
   let apiKey = process.env.GEMINI_API_KEY || '';
@@ -152,7 +152,7 @@ Options:
   --ratio, -r <w:h>     Aspect ratio (default: "1:1")
   --ids <id1,id2,...>   Only generate for specific achievement IDs
   --category <name>     Only generate for a specific category
-  --output, -o <dir>    Output directory (default: "pixel-art-output")
+  --output, -o <dir>    Output directory (default: "src/dashboard/public/pixel-art")
   --dry-run             Print prompts without calling API
   --limit, -n <n>       Max number of images to generate
   --key <key>           Gemini API key (or set GEMINI_API_KEY env var)

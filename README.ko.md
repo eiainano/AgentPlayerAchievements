@@ -397,7 +397,7 @@ src/
 ├── config.ts                # 전역 설정
 └── helpers.ts               # 공유 유틸리티
 
-pixel-art-output/            # 로고 + 업적 픽셀 아트
+pixel-art-output/            # 로고 (README)
 achievement-definitions.yaml   # 217개 업적 정의 (권위적 소스)
 scripts/                     # 개발 도구 (로고 생성, 픽셀 아트 생성, 사운드)
 ```

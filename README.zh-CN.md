@@ -397,7 +397,7 @@ src/
 ├── config.ts                # 全局配置
 └── helpers.ts               # 共享工具函数
 
-pixel-art-output/            # Logo + 成就像素画
+pixel-art-output/            # Logo 图片 (README 用)
 achievement-definitions.yaml   # 217 个成就定义（权威数据源）
 scripts/                     # 开发工具（Logo 生成、像素画生成、音效）
 ```

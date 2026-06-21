@@ -397,7 +397,7 @@ src/
 ├── config.ts                # Configuración global
 └── helpers.ts               # Utilidades compartidas
 
-pixel-art-output/            # Logo + pixel art de logros
+pixel-art-output/            # Logo (README)
 achievement-definitions.yaml   # 217 definiciones de logros (fuente autoritativa)
 scripts/                     # herramientas de desarrollo (gen de logo, pixel art, sonidos)
 ```

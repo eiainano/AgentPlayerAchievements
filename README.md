@@ -41,7 +41,6 @@
   <a href="#cli-commands">CLI Commands</a> ·
   <a href="#community-packs">Community Packs</a> ·
   <a href="#dashboard">Dashboard</a> ·
-  <a href="#documentation">Documentation</a> ·
   <a href="#security--privacy">Security & Privacy</a> ·
   <a href="#contributing">Contributing</a> ·
   <a href="#faq">FAQ</a>
@@ -119,15 +118,11 @@ Both channels write to the same `~/.agent-achievements/` event log. The engine e
 ## Features
 
 - 🎮 **Achievement Dashboard** — XP bar, level, streak, activity heatmap, rarity breakdown, showcase
-- 🏆 **217 Achievements** across 11 categories (Onboarding, Tool Mastery, Milestones, Skill, Style, Workflow, Creator, Hidden, Challenge, Community, Endurance)
-- 🔥 **GitHub-style heatmap** — 4 months of coding activity at a glance
-- 📸 **Share Card** — dark/light themed, bilingual (EN/ZH), downloadable PNG
-- 🔊 **8-bit sound effects** — rarity-graded retro sounds for unlocks
-- 🔔 **macOS notifications** — click to jump to dashboard
-- 📊 **XP & Level system** — usage-scaled XP with level ladder
-- 📂 **Multi-profile** — up to 4 profiles, switch any time
-- 🌓 **Dark & Light themes** — auto-detects system preference
-- 🖥️ **Terminal ANSI popups** — achievement unlocked banners in terminal
+- 🏆 **217 Achievements** across 11 categories — from "Hello World" to "Completionist"
+- 🔥 **GitHub-style activity heatmap** — 4 months of coding activity at a glance
+- 📸 **Share Card** — dark/light themed, bilingual, downloadable PNG
+- 🔊 **8-bit sound effects & notifications** — rarity-graded retro sounds + desktop push notifications on unlock
+- 📂 **Multi-profile** — up to 4 profiles, switch anytime (work, personal, experimentation)
 
 ## Supported Tools
 
@@ -305,22 +300,6 @@ agpa pack info <id>         # show pack details
 
 See [Creating Achievement Packs](docs/creating-achievements.md) for the pack format spec, event type catalog, and 12 condition types.
 
-## Achievement Categories
-
-| # | Category | Count | Highlight |
-|---|----------|:-----:|-----------|
-| 1 | Onboarding | 14 | Hello World, first tool call, first PR |
-| 2 | Tool Mastery | 38 | Read/Edit/Bash skill thresholds |
-| 3 | Milestones | 19 | task count, streak, token usage |
-| 4 | Skill | 16 | chain reactions, debugger, one-shots |
-| 5 | Style | 17 | minimalist, night owl, copy-paste king |
-| 6 | Workflow | 29 | PRs, CI/CD, code review, merge conflict |
-| 7 | Creator | 9 | slash commands, skills, agents, hooks |
-| 8 | Hidden | 47 | easter eggs and surprise unlocks |
-| 9 | Challenge | 13 | speed runs, multi-model, no-edit streaks |
-| 10 | Community | 9 | completionist tiers, cross-tool collector |
-| 11 | Endurance | 1 | marathon sessions, long streaks |
-
 ## Dashboard
 
 <p align="center">
@@ -409,37 +388,6 @@ pixel-art-output/            # Logo images (README)
 achievement-definitions.yaml   # 217 achievement definitions (authoritative)
 scripts/                     # dev tools (logo gen, pixel art gen, sounds)
 ```
-
-## Development
-
-```bash
-npm install          # install dependencies (5 runtime deps)
-npm run build        # tsc --noEmit
-npm test             # 1207 tests, 46 files
-npm run dashboard    # start dev dashboard
-npm run demo         # generate MVP data
-```
-
-## Dependencies
-
-- **Runtime** (5): `@modelcontextprotocol/sdk` · `yaml` · `zod` · `figlet` · `tsx`
-- **Dev**: `typescript` · `vitest` · `tsx`
-- **Optional** (macOS): `terminal-notifier` — system notifications for unlocks
-
-> [!NOTE]
-> **Deliberately minimal.** Five runtime dependencies, zero network calls at runtime. The engine is pure functions with JSONL storage — easy to audit, impossible to break.
-
-## 📚 Documentation
-
-| Document | Description |
-|----------|-------------|
-| [Multi-Tool Setup](docs/multi-tool-setup.md) | Configuring AGPA across 5 supported agent tools |
-| [Achievement Design](docs/design/01-成就分类体系.md) | Achievement taxonomy, naming conventions & YAML field reference |
-| [Engine Architecture](docs/design/05-核心引擎设计.md) | Event flow → condition evaluation → state persistence |
-| [Event Capture Design](docs/design/08-EventCapture落地设计.md) | Dual-channel capture: Hook CLI + MCP server |
-| [Steam Research](docs/design/12-Steam游戏成就设计调研.md) | Survey of achievement systems from 21 popular Steam games |
-| [Issues & TODOs](docs/issues-todo.md) | Known bugs, gaps, and P0–P3 priorities |
-| [Changelog](CHANGELOG.md) | Version history and release notes |
 
 ## 🔒 Security & Privacy
 

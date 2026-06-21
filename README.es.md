@@ -41,7 +41,6 @@
   <a href="#comandos-cli">Comandos CLI</a> ·
   <a href="#paquetes-comunitarios">Paquetes Comunitarios</a> ·
   <a href="#panel">Panel</a> ·
-  <a href="#documentación">Documentación</a> ·
   <a href="#seguridad-y-privacidad">Seguridad</a> ·
   <a href="#contribuir">Contribuir</a> ·
   <a href="#preguntas-frecuentes">FAQ</a>
@@ -119,15 +118,11 @@ Ambos canales escriben en el mismo registro de eventos `~/.agent-achievements/`.
 ## Características
 
 - 🎮 **Panel de Logros** — barra de XP, nivel, racha, heatmap de actividad, distribución por rareza, vitrina
-- 🏆 **217 Logros** en 11 categorías (Introducción, Maestría de Herramientas, Hitos, Habilidad, Estilo, Flujo de Trabajo, Creador, Ocultos, Desafío, Comunidad, Resistencia)
-- 🔥 **Heatmap estilo GitHub** — 4 meses de actividad de programación de un vistazo
-- 📸 **Tarjeta para Compartir** — tema oscuro/claro, bilingüe (EN/ZH), descargable como PNG
-- 🔊 **Efectos de sonido 8-bit** — sonidos retro clasificados por rareza al desbloquear
-- 🔔 **Notificaciones macOS** — clic para ir al panel
-- 📊 **Sistema de XP y Niveles** — XP escalado por uso con escalera de niveles
-- 📂 **Múltiples perfiles** — hasta 4 perfiles, cambia en cualquier momento
-- 🌓 **Temas Claro y Oscuro** — detecta automáticamente la preferencia del sistema
-- 🖥️ **Ventanas ANSI en terminal** — banners de logro desbloqueado directamente en la terminal
+- 🏆 **217 Logros** en 11 categorías — desde "Hello World" hasta "Completionist"
+- 🔥 **Heatmap de actividad estilo GitHub** — 4 meses de actividad de programación de un vistazo
+- 📸 **Tarjeta para Compartir** — tema oscuro/claro, bilingüe, descargable como PNG
+- 🔊 **Efectos de sonido 8-bit y notificaciones** — sonidos retro clasificados por rareza + notificaciones push de escritorio al desbloquear
+- 📂 **Múltiples perfiles** — hasta 4 perfiles, cambia en cualquier momento (trabajo, personal, experimentación)
 
 ## Herramientas Compatibles
 
@@ -305,22 +300,6 @@ agpa pack info <id>         # mostrar detalles del paquete
 
 Consulta [Creación de Paquetes de Logros](docs/creating-achievements.md) para conocer el formato, el catálogo de eventos y los 12 tipos de condición.
 
-## Categorías de Logros
-
-| # | Categoría | Cantidad | Destacado |
-|---|----------|:-----:|-----------|
-| 1 | Introducción | 14 | Hello World, primera llamada de herramienta, primer PR |
-| 2 | Maestría de Herramientas | 38 | Umbrales de habilidad Read/Edit/Bash |
-| 3 | Hitos | 19 | número de tareas, racha, uso de tokens |
-| 4 | Habilidad | 16 | reacciones en cadena, depurador, one-shots |
-| 5 | Estilo | 17 | minimalista, búho nocturno, rey del copy-paste |
-| 6 | Flujo de Trabajo | 29 | PRs, CI/CD, revisión de código, conflictos de merge |
-| 7 | Creador | 9 | comandos slash, skills, agentes, hooks |
-| 8 | Ocultos | 47 | easter eggs y desbloqueos sorpresa |
-| 9 | Desafío | 13 | speed runs, multi-modelo, rachas sin editar |
-| 10 | Comunidad | 9 | niveles completionist, coleccionista multi-herramienta |
-| 11 | Resistencia | 1 | sesiones maratón, rachas largas |
-
 ## Panel
 
 <p align="center">
@@ -409,37 +388,6 @@ pixel-art-output/            # Logo (README)
 achievement-definitions.yaml   # 217 definiciones de logros (fuente autoritativa)
 scripts/                     # herramientas de desarrollo (gen de logo, pixel art, sonidos)
 ```
-
-## Desarrollo
-
-```bash
-npm install          # instalar dependencias (5 dependencias runtime)
-npm run build        # tsc --noEmit
-npm test             # 1207 tests, 46 archivos
-npm run dashboard    # iniciar panel de desarrollo
-npm run demo         # generar datos MVP
-```
-
-## Dependencias
-
-- **Runtime** (5): `@modelcontextprotocol/sdk` · `yaml` · `zod` · `figlet` · 
-- **Desarrollo**: `typescript` · `vitest` · `tsx`
-- **Opcional** (macOS): `terminal-notifier` — notificaciones del sistema para desbloqueos
-
-> [!NOTE]
-> **Deliberadamente mínimo.** Cinco dependencias runtime, cero llamadas de red en tiempo de ejecución. El motor son funciones puras con almacenamiento JSONL — fácil de auditar, imposible de romper.
-
-## 📚 Documentación
-
-| Documento | Descripción |
-|----------|-------------|
-| [Configuración Multi-Herramienta](docs/multi-tool-setup.md) | Configurar AGPA en 7 herramientas de agente compatibles |
-| [Diseño de Logros](docs/design/01-成就分类体系.md) | Taxonomía de logros, convenciones de nomenclatura y referencia de campos YAML |
-| [Arquitectura del Motor](docs/design/05-核心引擎设计.md) | Flujo de eventos → evaluación de condiciones → persistencia de estado |
-| [Diseño de Captura de Eventos](docs/design/08-EventCapture落地设计.md) | Captura de doble canal: Hook CLI + Servidor MCP |
-| [Investigación de Steam](docs/design/12-Steam游戏成就设计调研.md) | Estudio de sistemas de logros de 21 juegos populares de Steam |
-| [Problemas y Tareas](docs/issues-todo.md) | Errores conocidos, brechas y prioridades P0–P3 |
-| [Registro de Cambios](CHANGELOG.md) | Historial de versiones y notas de publicación |
 
 ## 🔒 Seguridad y Privacidad
 

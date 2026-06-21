@@ -1,5 +1,5 @@
 {
-  "name": "agpa",
+  "name": "@eiainano/agpa",
   "version": "0.1.8",
   "type": "module",
   "description": "Agent Player Achievements — gamified achievement system for AI coding agents",

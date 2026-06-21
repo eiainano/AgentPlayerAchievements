@@ -69,7 +69,7 @@
 
 ```bash
 # 方案 A：全局安装（推荐普通用户）
-npm install -g agpa
+npm install -g @eiainano/agpa
 agpa init
 
 # 方案 B：克隆并链接（推荐贡献者）

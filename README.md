@@ -69,7 +69,7 @@
 
 ```bash
 # Option A: install globally (recommended for users)
-npm install -g agpa
+npm install -g @eiainano/agpa
 agpa init
 
 # Option B: clone and link (recommended for contributors)

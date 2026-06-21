@@ -24,9 +24,10 @@
     "build": "tsc --noEmit"
   },
   "bin": {
-    "agpa": "./src/cli/index.ts"
+    "agpa": "./bin/agpa"
   },
   "files": [
+    "bin/",
     "src/",
     "achievement-definitions.yaml",
     "README.md",

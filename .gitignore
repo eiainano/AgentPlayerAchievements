@@ -32,3 +32,9 @@ research/
 .vscode/
 .claude/
 .remember/
+
+# Development artifacts (local only)
+CHANGELOG.md
+DEVLOG.md
+docs/design/
+docs/superpowers/

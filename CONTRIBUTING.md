@@ -129,9 +129,6 @@ Test infrastructure: [Vitest](https://vitest.dev/), with `testTimeout: 20000` fo
 | [`docs/PROGRESS.md`](docs/PROGRESS.md) | High-level development status + version comparison |
 | [`docs/creating-achievements.md`](docs/creating-achievements.md) | Complete guide to writing achievement definitions |
 | [`docs/multi-tool-setup.md`](docs/multi-tool-setup.md) | MCP configuration guide for all 5 agent tools |
-| [`docs/superpowers/`](docs/superpowers/) | Design specs, plans, and audit reports |
-| [`docs/design/`](docs/design/) | System architecture + Steam game research |
-| [`CHANGELOG.md`](CHANGELOG.md) | Every change, organized by date |
 
 ## Pull Request Process
 
@@ -139,9 +136,8 @@ Test infrastructure: [Vitest](https://vitest.dev/), with `testTimeout: 20000` fo
 2. **Branch from `dev`** — `main` is the stable release branch
 3. **Keep it focused** — one PR = one logical change. A new achievement pack, a bug fix, a feature — not all three at once
 4. **Write tests** — CI will not pass without them
-5. **Update CHANGELOG.md** — add your change under today's date at the top
-6. **If you changed docs, sync the numbers** — achievement count, test count, CLI command count, etc. across `CLAUDE.md`, `README*.md`, `PROGRESS.md`, `issues-todo.md`
-7. **PR description** should say what you did and why
+5. **If you changed docs, sync the numbers** — achievement count, test count, CLI command count, etc. across `README*.md`, `PROGRESS.md`, `issues-todo.md`
+6. **PR description** should say what you did and why
 
 A maintainer will review within a few days. Don't be discouraged if we ask for changes — it's how we keep quality high.
 

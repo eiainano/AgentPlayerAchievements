@@ -1,5 +1,16 @@
 # Changelog
 
+### 文档核查：同步所有过时数字至代码实际值 — 2026-06-21
+
+- **成就总数**: 213/218 → 217（YAML 实际值）
+- **测试数**: 1176/1205 → 1204（46 文件）运行实测
+- **CLI 命令**: 25 → 27（新增 explain, pack, banner）
+- **MCP 工具**: 6 → 7（新增 explain）
+- **Skill 类别**: 17 → 16
+- **隐藏成就**: 64 → 63
+- **5 份 README 行数**: 491 → 510，翻译一致
+- 修改文件: CLAUDE.md + 5 README + PROGRESS.md + issues-todo.md + code-review + top10-next-todos + whatsmore.md（共 11 个）
+
 ### 删除 the_negotiator 成就 — 2026-06-20
 
 - **删除成就定义**: achievement-definitions.yaml 中移除 the_negotiator 全部字段

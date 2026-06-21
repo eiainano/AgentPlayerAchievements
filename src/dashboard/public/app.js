@@ -328,6 +328,7 @@ async function toggleSound() {
       body: JSON.stringify({ sound_enabled: enabled }),
     });
   } catch {
+    console.warn('[AGPA] Failed to save sound config');
     // Revert on failure
     toggle.checked = !enabled;
   }
@@ -340,7 +341,7 @@ async function loadSoundState(toggle) {
       const data = await res.json();
       toggle.checked = data.sound_enabled;
     }
-  } catch { /* use default (checked) */ }
+  } catch { console.warn('[AGPA] Failed to load sound config, using default'); }
 }
 
 // ── Animation Toggle ────────────────────────────────────
@@ -365,6 +366,7 @@ async function toggleAnimations() {
     });
     syncSimpleAnim(!enabled);
   } catch {
+    console.warn('[AGPA] Failed to save animation config');
     toggle.checked = !enabled;
   }
 }
@@ -379,7 +381,7 @@ async function loadAnimState(toggle) {
       toggle.checked = !simple;
       syncSimpleAnim(simple);
     }
-  } catch { /* use default (checked) */ }
+  } catch { console.warn('[AGPA] Failed to load animation config, using default'); }
 }
 
 function displayName(item) {
@@ -1186,7 +1188,10 @@ function iconHtml(icon, opts = {}) {
   if (pixelArtUrl) {
     const lockedClass = locked ? ' locked-blur' : '';
     const sizeStyle = `width:${size}px;height:${size}px;object-fit:contain`;
-    return `<img src="${escAttr(pixelArtUrl)}" class="ach-icon-img${lockedClass} ${className}" style="${sizeStyle}" alt="">`;
+    const escapedIcon = icon.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return `<span style="display:inline-block;width:${size}px;height:${size}px;vertical-align:middle">` +
+      `<img src="${escAttr(pixelArtUrl)}" class="ach-icon-img${lockedClass} ${className}" style="${sizeStyle}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display=''">` +
+      `<span class="ach-icon ${className}" style="display:none">${escapedIcon}</span></span>`;
   }
 
   // Pixel art data → inline SVG image (takes priority)
@@ -1475,7 +1480,7 @@ function startAutoPoll() {
           if (!isModalOpen) updateStatsInPlace(newData);
         }
       }
-    } catch {}
+    } catch { console.warn('[AGPA] Auto-poll failed'); }
   }
 
   // Start the first poll immediately
@@ -1719,7 +1724,7 @@ async function switchProfile(profileName) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile: profileName }),
       });
-    } catch { /* ignore, still navigate even if API fails */ }
+    } catch { console.warn('[AGPA] Profile switch API failed, navigating anyway'); }
   }
 
   const url = new URL(window.location);
@@ -1792,11 +1797,11 @@ async function confirmCreateProfile() {
       switchProfile(data.name);
     } else {
       const err = await res.json();
-      alert(err.error || 'Failed to create profile');
+      showHintToast(err.error || 'Failed to create profile');
       closeProfileModal();
     }
   } catch (e) {
-    alert('Failed to create profile');
+    showHintToast('Failed to create profile');
     closeProfileModal();
   }
 }
@@ -3235,7 +3240,7 @@ function generateCard() {
         generateCardCore(btn);
       };
       script.onerror = function() {
-        alert('Failed to load html2canvas. Please check your internet connection.');
+        showHintToast('Failed to load html2canvas. Check your connection.');
         btn.disabled = false;
         btn.textContent = '📸 Share';
       };
@@ -3306,7 +3311,7 @@ function generateCardCore(btn) {
             btn.textContent = '📸 Share';
           }).catch(function(err) {
             console.error('Card capture failed:', err);
-            alert('Failed to generate card. Please try again.');
+            showHintToast('Failed to generate card. Please try again.');
             preview.innerHTML = '';
             preview.style.visibility = 'hidden';
             btn.disabled = false;
@@ -3316,7 +3321,7 @@ function generateCardCore(btn) {
       })
       .catch(function(err) {
         console.error('Card API failed:', err);
-        alert('Failed to load card data. Please try again.');
+        showHintToast('Failed to load card data. Please try again.');
         btn.disabled = false;
         btn.textContent = '📸 Share';
       });
@@ -3351,7 +3356,7 @@ function exportData() {
     })
     .catch(function(err) {
       console.error('Export failed:', err);
-      alert('Export failed. Please try again.');
+      showHintToast('Export failed. Please try again.');
       btn.disabled = false;
       btn.textContent = '📦 Export';
     });
@@ -3511,7 +3516,7 @@ function initRecommendWidget() {
     fetch('/api/data?include_recommend=true&profile=' + (currentProfile || 'default'))
       .then(r => r.json())
       .then(data => { if (data.recommend) startCarousel(data.recommend); })
-      .catch(() => {});
+      .catch(() => { console.warn('[AGPA] Recommend data load failed'); });
   });
 
   if (autoExpand) { toggle.click(); }

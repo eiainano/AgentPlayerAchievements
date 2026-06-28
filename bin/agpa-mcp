@@ -1,0 +1,14 @@
+#!/usr/bin/env -S npx tsx
+/**
+ * AGPA MCP Server entry point.
+ *
+ * Run standalone:  npx @eiainano/agpa agpa-mcp
+ * Or after install: agpa-mcp
+ *
+ * This starts the Model Context Protocol server over stdio,
+ * exposing 7 achievement tools for any MCP-compatible client.
+ */
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+await import(resolve(__dirname, '../src/main.ts'));

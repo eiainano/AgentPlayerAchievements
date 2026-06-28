@@ -190,7 +190,7 @@ agpa assets download   # （可选）预下载全部 219 张 pixel-art 徽章
   "mcpServers": {
     "agpa": {
       "command": "npx",
-      "args": ["tsx", "path/to/AgentPlayerAchievements/src/main.ts"]
+      "args": ["-y", "@eiainano/agpa", "agpa-mcp"]
     }
   }
 }
@@ -210,7 +210,7 @@ agpa assets download   # （可选）预下载全部 219 张 pixel-art 徽章
   "mcpServers": {
     "agpa": {
       "command": "npx",
-      "args": ["tsx", "path/to/AgentPlayerAchievements/src/main.ts"]
+      "args": ["-y", "@eiainano/agpa", "agpa-mcp"]
     }
   }
 }
@@ -222,7 +222,7 @@ agpa assets download   # （可选）预下载全部 219 张 pixel-art 徽章
   "mcpServers": {
     "agpa": {
       "command": "npx",
-      "args": ["tsx", "path/to/AgentPlayerAchievements/src/main.ts"]
+      "args": ["-y", "@eiainano/agpa", "agpa-mcp"]
     }
   }
 }
@@ -240,7 +240,7 @@ agpa assets download   # （可选）预下载全部 219 张 pixel-art 徽章
   "mcpServers": {
     "agpa": {
       "command": "npx",
-      "args": ["tsx", "path/to/AgentPlayerAchievements/src/main.ts"]
+      "args": ["-y", "@eiainano/agpa", "agpa-mcp"]
     }
   }
 }
@@ -260,7 +260,7 @@ Hermes 没有暴露 Hook API。基于 MCP 的追踪覆盖工具调用和会话�
   "mcpServers": {
     "agpa": {
       "command": "npx",
-      "args": ["tsx", "path/to/AgentPlayerAchievements/src/main.ts"]
+      "args": ["-y", "@eiainano/agpa", "agpa-mcp"]
     }
   }
 }
@@ -278,7 +278,7 @@ OpenClaw 支持插件系统进行 Hook 级别的追踪。`agpa init` 会注册�
   "mcpServers": {
     "agpa": {
       "command": "npx",
-      "args": ["tsx", "path/to/AgentPlayerAchievements/src/main.ts"]
+      "args": ["-y", "@eiainano/agpa", "agpa-mcp"]
     }
   }
 }

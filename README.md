@@ -189,7 +189,7 @@ All five tools have full dual-channel coverage except Hermes (no hook API). For 
   "mcpServers": {
     "agpa": {
       "command": "npx",
-      "args": ["tsx", "path/to/AgentPlayerAchievements/src/main.ts"]
+      "args": ["-y", "@eiainano/agpa", "agpa-mcp"]
     }
   }
 }
@@ -209,7 +209,7 @@ These editors support MCP but don't expose hook APIs for auto-tracking. You get 
   "mcpServers": {
     "agpa": {
       "command": "npx",
-      "args": ["tsx", "path/to/AgentPlayerAchievements/src/main.ts"]
+      "args": ["-y", "@eiainano/agpa", "agpa-mcp"]
     }
   }
 }
@@ -221,7 +221,7 @@ These editors support MCP but don't expose hook APIs for auto-tracking. You get 
   "mcpServers": {
     "agpa": {
       "command": "npx",
-      "args": ["tsx", "path/to/AgentPlayerAchievements/src/main.ts"]
+      "args": ["-y", "@eiainano/agpa", "agpa-mcp"]
     }
   }
 }
@@ -239,7 +239,7 @@ These tools support TS plugins for hook-level auto-tracking. `agpa init` registe
   "mcpServers": {
     "agpa": {
       "command": "npx",
-      "args": ["tsx", "path/to/AgentPlayerAchievements/src/main.ts"]
+      "args": ["-y", "@eiainano/agpa", "agpa-mcp"]
     }
   }
 }
@@ -259,7 +259,7 @@ Hermes does not expose a hook API. MCP-based tracking covers tool calls and sess
   "mcpServers": {
     "agpa": {
       "command": "npx",
-      "args": ["tsx", "path/to/AgentPlayerAchievements/src/main.ts"]
+      "args": ["-y", "@eiainano/agpa", "agpa-mcp"]
     }
   }
 }
@@ -277,12 +277,41 @@ OpenClaw supports a plugin system for hook-level tracking. `agpa init` registers
   "mcpServers": {
     "agpa": {
       "command": "npx",
-      "args": ["tsx", "path/to/AgentPlayerAchievements/src/main.ts"]
+      "args": ["-y", "@eiainano/agpa", "agpa-mcp"]
     }
   }
 }
 ```
 </details>
+
+## MCP Server
+
+AGPA runs a [Model Context Protocol](https://modelcontextprotocol.io) server (stdio transport) that exposes 7 tools for any MCP-compatible client — Claude Desktop, Cursor, VS Code, Windsurf, and more.
+
+| Tool | Description |
+|------|-------------|
+| `achievement.track` | Record an agent event (lightweight, <1ms append-only write) |
+| `achievement.poll` | Evaluate pending events → check for unlocks → return new achievements |
+| `achievement.stats` | Get player stats: XP, level, total achievements, streaks, recent activity |
+| `achievement.showcase` | Display all achievement definitions — name, category, rarity, progress |
+| `achievement.config` | Read/write AGPA config: language, notification preferences, profile |
+| `achievement.suggest` | Get personalized achievement recommendations based on current progress |
+| `achievement.explain` | Explain why an achievement is (un)locked — condition breakdown with event history |
+
+**Quick start with any MCP client:**
+
+```json
+{
+  "mcpServers": {
+    "agpa": {
+      "command": "npx",
+      "args": ["-y", "@eiainano/agpa", "agpa-mcp"]
+    }
+  }
+}
+```
+
+> Already installed AGPA globally? Run `agpa-mcp` directly. The server auto-detects your active profile and tool source.
 
 ## CLI Commands
 

@@ -24,7 +24,20 @@
     "build": "tsc --noEmit"
   },
   "bin": {
-    "agpa": "./bin/agpa"
+    "agpa": "bin/agpa",
+    "agpa-mcp": "bin/agpa-mcp"
+  },
+  "mcp": {
+    "servers": {
+      "agpa": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@eiainano/agpa",
+          "agpa-mcp"
+        ]
+      }
+    }
   },
   "files": [
     "bin/",

@@ -2,8 +2,7 @@
   "mcpServers": {
     "agpa": {
       "command": "npx",
-      "args": ["tsx", "src/main.ts"],
-      "cwd": "${workspaceFolder}"
+      "args": ["-y", "@eiainano/agpa", "agpa-mcp"]
     }
   }
 }

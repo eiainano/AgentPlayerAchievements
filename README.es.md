@@ -189,7 +189,7 @@ Las cinco herramientas tienen cobertura completa de doble canal excepto Hermes (
   "mcpServers": {
     "agpa": {
       "command": "npx",
-      "args": ["tsx", "path/to/AgentPlayerAchievements/src/main.ts"]
+      "args": ["-y", "@eiainano/agpa", "agpa-mcp"]
     }
   }
 }
@@ -209,7 +209,7 @@ Estos editores soportan MCP pero no exponen APIs de hooks para auto-seguimiento.
   "mcpServers": {
     "agpa": {
       "command": "npx",
-      "args": ["tsx", "path/to/AgentPlayerAchievements/src/main.ts"]
+      "args": ["-y", "@eiainano/agpa", "agpa-mcp"]
     }
   }
 }
@@ -221,7 +221,7 @@ Estos editores soportan MCP pero no exponen APIs de hooks para auto-seguimiento.
   "mcpServers": {
     "agpa": {
       "command": "npx",
-      "args": ["tsx", "path/to/AgentPlayerAchievements/src/main.ts"]
+      "args": ["-y", "@eiainano/agpa", "agpa-mcp"]
     }
   }
 }
@@ -239,7 +239,7 @@ Estas herramientas soportan plugins TS para auto-seguimiento a nivel de hooks. `
   "mcpServers": {
     "agpa": {
       "command": "npx",
-      "args": ["tsx", "path/to/AgentPlayerAchievements/src/main.ts"]
+      "args": ["-y", "@eiainano/agpa", "agpa-mcp"]
     }
   }
 }
@@ -259,7 +259,7 @@ Hermes no expone una API de hooks. El seguimiento basado en MCP cubre llamadas d
   "mcpServers": {
     "agpa": {
       "command": "npx",
-      "args": ["tsx", "path/to/AgentPlayerAchievements/src/main.ts"]
+      "args": ["-y", "@eiainano/agpa", "agpa-mcp"]
     }
   }
 }
@@ -277,7 +277,7 @@ OpenClaw soporta un sistema de plugins para seguimiento a nivel de hooks. `agpa 
   "mcpServers": {
     "agpa": {
       "command": "npx",
-      "args": ["tsx", "path/to/AgentPlayerAchievements/src/main.ts"]
+      "args": ["-y", "@eiainano/agpa", "agpa-mcp"]
     }
   }
 }

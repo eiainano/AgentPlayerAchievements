@@ -1,6 +1,6 @@
 {
   "name": "@eiainano/agpa",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "type": "module",
   "description": "Agent Player Achievements — gamified achievement system for AI coding agents",
   "license": "MIT",
@@ -25,7 +25,8 @@
   },
   "bin": {
     "agpa": "bin/agpa",
-    "agpa-mcp": "bin/agpa-mcp"
+    "agpa-mcp": "bin/agpa-mcp",
+    "agpa-hook": "bin/agpa-hook"
   },
   "mcp": {
     "servers": {

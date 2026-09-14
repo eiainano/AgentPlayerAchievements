@@ -56,3 +56,6 @@ docs/multi-tool-research.md
 docs/pixel-art-ideas.md
 docs/pixel-art-ideas-a-z.md
 docs/cs-pop-culture-terminology.md
+
+# Agent tooling runtime (local, not for commit)
+.apodex/

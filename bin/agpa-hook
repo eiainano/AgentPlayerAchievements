@@ -1,0 +1,17 @@
+#!/usr/bin/env -S npx tsx
+/**
+ * AGPA Hook CLI entry point.
+ *
+ * Run standalone:  npx @eiainano/agpa agpa-hook <mode>
+ * Or after install: agpa-hook auto
+ *
+ * Forwards to src/cli/hook.ts, the event-ingestion CLI that reads one
+ * normalized hook JSON on stdin, maps it onto AGPA events, and tracks them.
+ * Modes: auto | hermes-auto | openclaw-auto | kilocode-auto | track | poll.
+ *
+ * Requires a `mode` as argv[2] — hook.ts dispatches on process.argv[2].
+ */
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+await import(resolve(__dirname, '../src/cli/hook.ts'));

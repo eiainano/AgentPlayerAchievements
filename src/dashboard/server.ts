@@ -687,7 +687,10 @@ export function createServer(port: number, defaultProfile: string): http.Server 
 }
 
 export function startDashboard(port = 3867, profile?: string): http.Server {
-  const defaultProfile = profile || process.env.AGPA_PROFILE || DEFAULT_PROFILE;
+  // loadConfig() folds AGPA_PROFILE into active_profile, so the chain here is
+  // --profile flag > AGPA_PROFILE > config.active_profile > 'default'. Skipping
+  // the active_profile link made every profile but "default" serve wrong data.
+  const defaultProfile = profile || loadConfig().active_profile || DEFAULT_PROFILE;
 
   const server = createServer(port, defaultProfile);
   server.listen(port, '127.0.0.1', () => {

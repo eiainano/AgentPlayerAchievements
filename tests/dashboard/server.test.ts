@@ -1,6 +1,10 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import * as http from 'http';
-import { createServer } from '../../src/dashboard/server.js';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
+import { createServer, startDashboard } from '../../src/dashboard/server.js';
+import { setConfigDir } from '../../src/config.js';
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -223,5 +227,64 @@ describe('error handling', () => {
     req.write('{ invalid json }');
     req.end();
     await new Promise(r => setTimeout(r, 500));
+  });
+});
+
+// ── startDashboard profile resolution ───────────────────────────────────────
+//
+// Regression: `agpa dashboard` invoked with no --profile flag must fall back to
+// config.active_profile. It previously skipped that link in the chain and always
+// served the "default" profile, so a user on any other profile silently got the
+// wrong data.
+
+describe('startDashboard profile resolution', () => {
+  let tmpDir: string;
+  let prevProfile: string | undefined;
+
+  beforeAll(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agpa-dash-'));
+    fs.writeFileSync(path.join(tmpDir, 'config.json'), JSON.stringify({ active_profile: 'work' }));
+    prevProfile = process.env.AGPA_PROFILE;
+    delete process.env.AGPA_PROFILE;
+    setConfigDir(tmpDir);
+  });
+
+  afterAll(() => {
+    setConfigDir(undefined);
+    if (prevProfile === undefined) delete process.env.AGPA_PROFILE;
+    else process.env.AGPA_PROFILE = prevProfile;
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  /**
+   * Boot startDashboard on an ephemeral port and read back the profile it
+   * announces. No request is issued, so no engine is instantiated and the
+   * profile name is never resolved against the real ~/.agent-achievements.
+   */
+  async function bootAndReadProfile(flag?: string): Promise<string> {
+    let srv: http.Server;
+    let logged = '';
+    const spy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    try {
+      srv = startDashboard(0, flag);
+      await new Promise<void>((resolve) => srv.once('listening', resolve));
+    } finally {
+      // Read before restoring — mockRestore() clears recorded calls.
+      logged = spy.mock.calls.map((c) => String(c[0])).join('');
+      spy.mockRestore();
+    }
+    await new Promise<void>((resolve) => srv.close(() => resolve()));
+
+    const match = logged.match(/\(profile: ([^)]+)\)/);
+    if (!match) throw new Error(`startDashboard announced no profile. stderr was: ${logged}`);
+    return match[1]!;
+  }
+
+  it('falls back to config.active_profile when no --profile flag is passed', async () => {
+    expect(await bootAndReadProfile()).toBe('work');
+  });
+
+  it('lets an explicit --profile flag win over config.active_profile', async () => {
+    expect(await bootAndReadProfile('other')).toBe('other');
   });
 });

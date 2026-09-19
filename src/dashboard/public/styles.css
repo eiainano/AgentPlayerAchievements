@@ -3954,6 +3954,12 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
   border-color: rgba(248, 113, 113, .35);
   color: #fca5a5;
 }
+/* DeepSeek Harness (external source, via agpa-dsh-plugin) */
+.tracked-tool-badge.tool-dsh {
+  background: rgba(77, 107, 254, .18);
+  border-color: rgba(77, 107, 254, .35);
+  color: #8ea6ff;
+}
 
 /* Light theme overrides */
 [data-theme="light"] .tracked-tool-badge.tool-claude-code {
@@ -3980,6 +3986,11 @@ body:not([data-simple-anim="true"]) .ach-card[data-rarity="mythic"]:not(.locked)
   background: rgba(185, 28, 28, .12);
   border-color: rgba(185, 28, 28, .3);
   color: #991b1b;
+}
+[data-theme="light"] .tracked-tool-badge.tool-dsh {
+  background: rgba(43, 63, 191, .12);
+  border-color: rgba(43, 63, 191, .3);
+  color: #2b3fbf;
 }
 
 /* ═══════════════════════════════════════════════════════════════════

@@ -1649,6 +1649,8 @@ const TOOL_META = {
   'hermes':      { logo: '/tool-logos/hermes.png',      class: 'tool-hermes' },
   'opencode':    { logo: '/tool-logos/opencode.png',    class: 'tool-opencode' },
   'openclaw':    { logo: '/tool-logos/openclaw.svg',    class: 'tool-openclaw' },
+  // External source: integrated by agpa-dsh-plugin, not by `agpa init`.
+  'dsh':         { logo: '/tool-logos/dsh.svg',         class: 'tool-dsh' },
 };
 
 function renderTrackedTools(data) {
@@ -1674,6 +1676,7 @@ function renderTrackedTools(data) {
     'hermes': 'Hermes Agent',
     'opencode': 'OpenCode',
     'openclaw': 'OpenClaw',
+    'dsh': 'DeepSeek Harness',
   };
 
   bar.style.display = '';

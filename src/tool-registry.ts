@@ -85,3 +85,60 @@ export function findTool(toolId: string): ToolDef | null {
   }
   return null;
 }
+
+/**
+ * External tool *sources* — harnesses that report events to AGPA through their
+ * own integration rather than an `agpa init` hook. DeepSeek Harness is wired up
+ * by the `agpa-dsh-plugin` Cordis plugin, which stamps events with
+ * `AGPA_TOOL_SOURCE=dsh`.
+ *
+ * These ids deliberately do NOT belong in `TOOLS`: that array drives hook
+ * installation, and `init` rejects any id without `INIT_DATA` ("No init data for
+ * tool"), so adding `dsh` there would surface a bogus error. They still need a
+ * human-readable name and a place in the tracked-tools picker, otherwise a
+ * profile that tracks one would print a bare `dsh` and silently lose it the next
+ * time the picker is saved.
+ */
+export interface ExternalToolSource {
+  id: string;
+  name: string;
+  /** Representative install path; its existence marks the harness as present. */
+  detectPath: string;
+}
+
+export const EXTERNAL_TOOL_SOURCES: ExternalToolSource[] = [
+  {
+    id: 'dsh',
+    name: 'DeepSeek Harness',
+    detectPath: path.join(HOME, '.dsh'),
+  },
+];
+
+export function findExternalToolSource(toolId: string): ExternalToolSource | null {
+  return EXTERNAL_TOOL_SOURCES.find((t) => t.id === toolId) ?? null;
+}
+
+/** Resolve a tool id to its display name across init targets and external sources. */
+export function toolDisplayName(toolId: string): string {
+  return TOOLS.find((t) => t.id === toolId)?.name
+    ?? findExternalToolSource(toolId)?.name
+    ?? toolId;
+}
+
+/**
+ * Rows for the tracked-tools picker: `agpa init` targets plus external sources.
+ * External rows are marked detected when their install path exists, and carry a
+ * synthetic config path so the picker has something to render.
+ */
+export function trackedToolRows(): ScanResult[] {
+  const rows: ScanResult[] = scanTools();
+  for (const src of EXTERNAL_TOOL_SOURCES) {
+    rows.push({
+      id: src.id,
+      name: src.name,
+      detected: fs.existsSync(src.detectPath),
+      configPath: src.detectPath,
+    });
+  }
+  return rows;
+}

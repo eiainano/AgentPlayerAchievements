@@ -12,7 +12,7 @@ import * as readline from 'node:readline';
 import { homedir } from 'node:os';
 import { createProfile, listProfiles, listProfilesWithMeta, getProfileMeta, setTrackedTools, validateProfileName, profileExists, deleteProfile, DEFAULT_PROFILE, MAX_PROFILES } from '../utils/profile.js';
 import { saveConfig } from '../config.js';
-import { TOOLS, scanTools } from '../tool-registry.js';
+import { trackedToolRows, toolDisplayName } from '../tool-registry.js';
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -39,7 +39,9 @@ function printHelp() {
  * Fallback (non-TTY): display current state and detected tools; no changes.
  */
 function promptTrackedTools(profileName: string): Promise<void> {
-  const scanResults = scanTools();
+  // Includes external sources (e.g. dsh via agpa-dsh-plugin), so saving here
+  // cannot silently drop a tracked tool that `agpa init` cannot install hooks for.
+  const scanResults = trackedToolRows();
   const meta = getProfileMeta(profileName);
   const current = new Set(meta.tracked_tools || []);
   const home = homedir();
@@ -58,13 +60,6 @@ function promptTrackedTools(profileName: string): Promise<void> {
 
   return new Promise(resolve => {
     const selected = scanResults.map(r => current.has(r.id));
-    const toolNames: Record<string, string> = {
-      'claude-code': 'Claude Code',
-      'kilo-code': 'Kilo Code',
-      'hermes': 'Hermes Agent',
-      'opencode': 'OpenCode',
-      'openclaw': 'OpenClaw',
-    };
     let cursor = 0;
     let lineCount = 0;
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -122,7 +117,7 @@ function promptTrackedTools(profileName: string): Promise<void> {
         setTrackedTools(profileName, chosen);
         console.log(`\n  ✅ Updated "${profileName}" → ${chosen.length} tool(s) tracked:`);
         for (const id of chosen) {
-          console.log(`     ${toolNames[id] || id}`);
+          console.log(`     ${toolDisplayName(id)}`);
         }
         console.log('');
         console.log('  💡 Run \x1b[36magpa init --profile ' + profileName + '\x1b[0m to configure any new tools.\n');
@@ -168,7 +163,7 @@ switch (command) {
     console.log(`Profiles (${metaList.length}/${MAX_PROFILES + 1} max):\n`);
     for (const m of metaList) {
       const marker = m.name === 'default' ? ' (default)' : '';
-      const tools = (m.tracked_tools || []).map(id => TOOLS.find(t => t.id === id)?.name || id).join(', ') || 'none';
+      const tools = (m.tracked_tools || []).map(id => toolDisplayName(id)).join(', ') || 'none';
       console.log(`  ${m.emoji}  ${m.name}${marker}`);
       console.log(`     Tools: ${tools}`);
       console.log('');
